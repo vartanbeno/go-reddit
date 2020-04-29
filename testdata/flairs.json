@@ -1,0 +1,20 @@
+[
+  {
+    "text": "Beginner",
+    "richtext": [],
+    "text_editable": false,
+    "override_css": false,
+    "css_class": "Beginner1",
+    "type": "text",
+    "id": "b8a1c822-3feb-11e8-88e1-0e5f55d58ce0"
+  },
+  {
+    "text": "Beginner",
+    "richtext": [],
+    "text_editable": false,
+    "override_css": false,
+    "css_class": "Beginner2",
+    "type": "text",
+    "id": "b8ea0fce-3feb-11e8-af7a-0e263a127cf8"
+  }
+]

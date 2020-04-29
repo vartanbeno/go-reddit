@@ -9,19 +9,66 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"reflect"
+	"strings"
+
+	"github.com/google/go-querystring/query"
+	"golang.org/x/oauth2"
 )
 
 const (
-	libraryVersion      = "0.0.1"
-	defaultBaseURL      = "https://reddit.com"
-	defaultBaseURLOauth = "https://oauth.reddit.com"
-	userAgent           = "geddit/" + libraryVersion
-	mediaType           = "application/json"
+	libraryName    = "github.com/vartanbeno/geddit"
+	libraryVersion = "0.0.1"
+
+	defaultBaseURL  = "https://oauth.reddit.com"
+	defaultTokenURL = "https://www.reddit.com/api/v1/access_token"
+
+	mediaTypeJSON = "application/json"
+	mediaTypeForm = "application/x-www-form-urlencoded"
 
 	headerContentType = "Content-Type"
 	headerAccept      = "Accept"
 	headerUserAgent   = "User-Agent"
 )
+
+// cloneRequest returns a clone of the provided *http.Request.
+// The clone is a shallow copy of the struct and its Header map,
+// since we'll only be modify the headers.
+// Per the specification of http.RoundTripper, we should not directly modify a request.
+func cloneRequest(r *http.Request) *http.Request {
+	r2 := new(http.Request)
+	*r2 = *r
+	// deep copy of the Header
+	r2.Header = make(http.Header, len(r.Header))
+	for k, s := range r.Header {
+		r2.Header[k] = append([]string(nil), s...)
+	}
+	return r2
+}
+
+// sets the User-Agent header for requests
+type userAgentTransport struct {
+	ua   string
+	Base http.RoundTripper
+}
+
+func (t *userAgentTransport) setUserAgent(req *http.Request) *http.Request {
+	req2 := cloneRequest(req)
+	req2.Header.Set(headerUserAgent, t.ua)
+	return req2
+}
+
+func (t *userAgentTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req2 := t.setUserAgent(req)
+	return t.base().RoundTrip(req2)
+}
+
+func (t *userAgentTransport) base() http.RoundTripper {
+	if t.Base != nil {
+		return t.Base
+	}
+	return http.DefaultTransport
+}
 
 // RequestCompletionCallback defines the type of the request callback function
 type RequestCompletionCallback func(*http.Request, *http.Response)
@@ -31,12 +78,25 @@ type Client struct {
 	// HTTP client used to communicate with the Reddit API
 	client *http.Client
 
-	// Base URL for HTTP requests
-	BaseURL *url.URL
+	BaseURL  *url.URL
+	TokenURL *url.URL
 
-	UserAgent string
+	userAgent string
 
+	ID       string
+	Secret   string
+	Username string
+	Password string
+
+	Comment   CommentService
+	Flair     FlairService
+	Link      LinkService
+	Listings  ListingsService
 	Subreddit SubredditService
+	User      UserService
+	Vote      VoteService
+
+	oauth2Transport *oauth2.Transport
 
 	onRequestCompleted RequestCompletionCallback
 }
@@ -52,21 +112,47 @@ func newClient(httpClient *http.Client) *Client {
 	}
 
 	baseURL, _ := url.Parse(defaultBaseURL)
+	tokenURL, _ := url.Parse(defaultTokenURL)
 
-	c := &Client{client: httpClient, BaseURL: baseURL, UserAgent: userAgent}
+	c := &Client{client: httpClient, BaseURL: baseURL, TokenURL: tokenURL}
+
+	c.Comment = &CommentServiceOp{client: c}
+	c.Flair = &FlairServiceOp{client: c}
+	c.Link = &LinkServiceOp{client: c}
+	c.Listings = &ListingsServiceOp{client: c}
 	c.Subreddit = &SubredditServiceOp{client: c}
+	c.User = &UserServiceOp{client: c}
+	c.Vote = &VoteServiceOp{client: c}
 
 	return c
 }
 
-// New returns a client that can make requests to the Reddit API
-func New(httpClient *http.Client, opts ...Opt) (c *Client, err error) {
+// NewClient returns a client that can make requests to the Reddit API
+func NewClient(httpClient *http.Client, opts ...Opt) (c *Client, err error) {
 	c = newClient(httpClient)
+
 	for _, opt := range opts {
 		if err = opt(c); err != nil {
 			return
 		}
 	}
+
+	c.userAgent = fmt.Sprintf("golang:%s:v%s (by /u/%s)", libraryName, libraryVersion, c.Username)
+	userAgentTransport := &userAgentTransport{
+		ua:   c.userAgent,
+		Base: c.client.Transport,
+	}
+
+	oauth2Config := oauth2Config{
+		id:                 c.ID,
+		secret:             c.Secret,
+		username:           c.Username,
+		password:           c.Password,
+		tokenURL:           c.TokenURL.String(),
+		userAgentTransport: userAgentTransport,
+	}
+	c.client.Transport = oauth2Transport(oauth2Config)
+
 	return
 }
 
@@ -93,9 +179,28 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 		return nil, err
 	}
 
-	req.Header.Add(headerContentType, mediaType)
-	req.Header.Add(headerAccept, mediaType)
-	req.Header.Add(headerUserAgent, c.UserAgent)
+	req.Header.Add(headerContentType, mediaTypeJSON)
+	req.Header.Add(headerAccept, mediaTypeJSON)
+
+	return req, nil
+}
+
+// NewPostForm creates an API request with a POST form
+// The path is the relative URL which will be resolves to the BaseURL of the Client
+// It should always be specified without a preceding slash
+func (c *Client) NewPostForm(path string, form url.Values) (*http.Request, error) {
+	u, err := c.BaseURL.Parse(path)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, u.String(), strings.NewReader(form.Encode()))
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add(headerContentType, mediaTypeForm)
+	req.Header.Add(headerAccept, mediaTypeJSON)
 
 	return req, nil
 }
@@ -164,6 +269,29 @@ func DoRequestWithClient(ctx context.Context, client *http.Client, req *http.Req
 	return client.Do(req)
 }
 
+// JSONErrorResponse is an error response that sometimes gets returned with a 200 code
+type JSONErrorResponse struct {
+	// HTTP response that caused this error
+	Response *http.Response
+
+	JSON *struct {
+		Errors [][]string `json:"errors,omitempty"`
+	} `json:"json,omitempty"`
+}
+
+func (r *JSONErrorResponse) Error() string {
+	var message string
+	if r.JSON != nil && len(r.JSON.Errors) > 0 {
+		for _, errList := range r.JSON.Errors {
+			message += strings.Join(errList, ", ")
+		}
+	}
+	return fmt.Sprintf(
+		"%v %v: %d %v",
+		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, message,
+	)
+}
+
 // An ErrorResponse reports the error caused by an API request
 type ErrorResponse struct {
 	// HTTP response that caused this error
@@ -182,13 +310,27 @@ func (r *ErrorResponse) Error() string {
 
 // CheckResponse checks the API response for errors, and returns them if present.
 // A response is considered an error if it has a status code outside the 200 range.
+// Reddit also sometimes sends errors with 200 codes; we check for those too.
 func CheckResponse(r *http.Response) error {
+	jsonErrorResponse := &JSONErrorResponse{Response: r}
+
+	data, err := ioutil.ReadAll(r.Body)
+	if err == nil && len(data) > 0 {
+		json.Unmarshal(data, jsonErrorResponse)
+		if jsonErrorResponse.JSON != nil {
+			return jsonErrorResponse
+		}
+	}
+
+	// reset response body
+	r.Body = ioutil.NopCloser(bytes.NewBuffer(data))
+
 	if c := r.StatusCode; c >= 200 && c <= 299 {
 		return nil
 	}
 
 	errorResponse := &ErrorResponse{Response: r}
-	data, err := ioutil.ReadAll(r.Body)
+	data, err = ioutil.ReadAll(r.Body)
 	if err == nil && len(data) > 0 {
 		err := json.Unmarshal(data, errorResponse)
 		if err != nil {
@@ -198,3 +340,60 @@ func CheckResponse(r *http.Response) error {
 
 	return errorResponse
 }
+
+// ListOptions are the optional parameters to the various endpoints that return lists
+type ListOptions struct {
+	Sort string `url:"sort,omitempty"`
+	Type string `url:"type,omitempty"` // links or comments
+
+	// For getting submissions
+	// all, year, month, week, day, hour
+	Timespan string `url:"t,omitempty"`
+
+	// Common for all listing endpoints
+	After  string `url:"after,omitempty"`
+	Before string `url:"before,omitempty"`
+	Limit  int    `url:"limit,omitempty"` // default: 25
+	Count  int    `url:"count,omitempty"` // default: 0
+}
+
+func addOptions(s string, opt interface{}) (string, error) {
+	v := reflect.ValueOf(opt)
+	if v.Kind() == reflect.Ptr && v.IsNil() {
+		return s, nil
+	}
+
+	origURL, err := url.Parse(s)
+	if err != nil {
+		return s, err
+	}
+
+	origValues := origURL.Query()
+
+	newValues, err := query.Values(opt)
+	if err != nil {
+		return s, err
+	}
+
+	for k, v := range newValues {
+		origValues[k] = v
+	}
+
+	origURL.RawQuery = origValues.Encode()
+	return origURL.String(), nil
+}
+
+type root struct {
+	Kind string      `json:"kind,omitempty"`
+	Data interface{} `json:"data,omitempty"`
+}
+
+const (
+	kindListing   string = "Listing"
+	kindComment   string = "t1"
+	kindAccount   string = "t2"
+	kindLink      string = "t3"
+	kindMessage   string = "t4"
+	kindSubreddit string = "t5"
+	kindAward     string = "t6"
+)
