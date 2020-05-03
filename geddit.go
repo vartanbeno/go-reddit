@@ -564,6 +564,31 @@ type Subreddit struct {
 	UserIsMod       bool `json:"user_is_moderator"`
 }
 
+func (rl *rootListing) getAfter() string {
+	if rl == nil || rl.Data == nil {
+		return ""
+	}
+	return rl.Data.After
+}
+
+func (rl *rootListing) getBefore() string {
+	if rl == nil || rl.Data == nil {
+		return ""
+	}
+	return rl.Data.Before
+}
+
+func (rl *rootListing) getComments() *CommentList {
+	if rl == nil || rl.Data == nil {
+		return nil
+	}
+	return &CommentList{
+		Comments: rl.Data.Things.Comments,
+		After:    rl.Data.After,
+		Before:   rl.Data.Before,
+	}
+}
+
 func (rl *rootListing) getLinks() *LinkList {
 	if rl == nil || rl.Data == nil {
 		return nil
@@ -575,13 +600,13 @@ func (rl *rootListing) getLinks() *LinkList {
 	}
 }
 
-func (rl *rootListing) getComments() *CommentList {
+func (rl *rootListing) getSubreddits() *SubredditList {
 	if rl == nil || rl.Data == nil {
 		return nil
 	}
-	return &CommentList{
-		Comments: rl.Data.Things.Comments,
-		After:    rl.Data.After,
-		Before:   rl.Data.Before,
+	return &SubredditList{
+		Subreddits: rl.Data.Things.Subreddits,
+		After:      rl.Data.After,
+		Before:     rl.Data.Before,
 	}
 }

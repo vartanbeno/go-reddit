@@ -8,7 +8,7 @@ import (
 // ListingsService handles communication with the link (post)
 // related methods of the Reddit API
 type ListingsService interface {
-	Get(ctx context.Context, ids ...string) (*Listing, *Response, error)
+	Get(ctx context.Context, ids ...string) (*CommentsLinksSubreddits, *Response, error)
 }
 
 // ListingsServiceOp implements the Vote interface
@@ -35,10 +35,16 @@ type listingRoot struct {
 // 	Subreddits []*Subreddit  `json:"subreddits,omitempty"`
 // }
 
+// CommentsLinksSubreddits holds comments, links, and subreddits
+type CommentsLinksSubreddits struct {
+	Comments   []Comment   `json:"comments,omitempty"`
+	Links      []Link      `json:"links,omitempty"`
+	Subreddits []Subreddit `json:"subreddits,omitempty"`
+}
+
 // Get gets a list of things based on their IDs
 // Only links, comments, and subreddits are allowed
-// todo: only links, comments, subreddits
-func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) (*Listing, *Response, error) {
+func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) (*CommentsLinksSubreddits, *Response, error) {
 	type query struct {
 		IDs []string `url:"id,comma"`
 	}
@@ -60,7 +66,12 @@ func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) (*Listing, *
 		return nil, resp, err
 	}
 
-	return root.Data, resp, nil
+	v := new(CommentsLinksSubreddits)
+	v.Comments = root.getComments().Comments
+	v.Links = root.getLinks().Links
+	v.Subreddits = root.getSubreddits().Subreddits
+
+	return v, resp, nil
 }
 
 // todo: do by_id next
