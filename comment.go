@@ -25,15 +25,6 @@ type CommentServiceOp struct {
 
 var _ CommentService = &CommentServiceOp{}
 
-// CommentList holds information about a list of comments
-// The after and before fields help decide the anchor point for a subsequent
-// call that returns a list
-type CommentList struct {
-	Comments []Comment `json:"comments,omitempty"`
-	After    string    `json:"after,omitempty"`
-	Before   string    `json:"before,omitempty"`
-}
-
 func (s *CommentServiceOp) isCommentID(id string) bool {
 	return strings.HasPrefix(id, kindComment+"_")
 }

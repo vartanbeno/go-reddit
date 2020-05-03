@@ -15,22 +15,22 @@ import (
 type SubredditService interface {
 	GetByName(ctx context.Context, name string) (*Subreddit, *Response, error)
 
-	GetPopular(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error)
-	GetNew(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error)
-	GetGold(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error)
-	GetDefault(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error)
+	GetPopular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
+	GetNew(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
+	GetGold(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
+	GetDefault(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
 
-	GetMineWhereSubscriber(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error)
-	GetMineWhereContributor(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error)
-	GetMineWhereModerator(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error)
-	GetMineWhereStreams(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error)
+	GetMineWhereSubscriber(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
+	GetMineWhereContributor(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
+	GetMineWhereModerator(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
+	GetMineWhereStreams(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
 
-	GetHotLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error)
-	GetBestLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error)
-	GetNewLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error)
-	GetRisingLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error)
-	GetControversialLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error)
-	GetTopLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error)
+	GetHotLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error)
+	GetBestLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error)
+	GetNewLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error)
+	GetRisingLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error)
+	GetControversialLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error)
+	GetTopLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error)
 
 	// GetSticky1(ctx context.Context, name string) (interface{}, *Response, error)
 	// GetSticky2(ctx context.Context, name string) (interface{}, *Response, error)
@@ -49,25 +49,6 @@ type SubredditServiceOp struct {
 }
 
 var _ SubredditService = &SubredditServiceOp{}
-
-// SubredditList holds information about a list of subreddits
-// The after and before fields help decide the anchor point for a subsequent
-// call that returns a list
-type SubredditList struct {
-	Subreddits []Subreddit `json:"subreddits,omitempty"`
-	After      string      `json:"after,omitempty"`
-	Before     string      `json:"before,omitempty"`
-}
-
-// LinkList holds information about a list of links
-// The after and before fields help decide the anchor point for a subsequent
-// call that returns a list
-// Note: not to be confused with linked lists
-type LinkList struct {
-	Links  []Link `json:"submissions,omitempty"`
-	After  string `json:"after,omitempty"`
-	Before string `json:"before,omitempty"`
-}
 
 // GetByName gets a subreddit by name
 func (s *SubredditServiceOp) GetByName(ctx context.Context, name string) (*Subreddit, *Response, error) {
@@ -91,42 +72,42 @@ func (s *SubredditServiceOp) GetByName(ctx context.Context, name string) (*Subre
 }
 
 // GetPopular returns popular subreddits
-func (s *SubredditServiceOp) GetPopular(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error) {
+func (s *SubredditServiceOp) GetPopular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/popular", opts)
 }
 
 // GetNew returns new subreddits
-func (s *SubredditServiceOp) GetNew(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error) {
+func (s *SubredditServiceOp) GetNew(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/new", opts)
 }
 
 // GetGold returns gold subreddits
-func (s *SubredditServiceOp) GetGold(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error) {
+func (s *SubredditServiceOp) GetGold(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/gold", opts)
 }
 
 // GetDefault returns default subreddits
-func (s *SubredditServiceOp) GetDefault(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error) {
+func (s *SubredditServiceOp) GetDefault(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/default", opts)
 }
 
 // GetMineWhereSubscriber returns the list of subreddits the client is subscribed to
-func (s *SubredditServiceOp) GetMineWhereSubscriber(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error) {
+func (s *SubredditServiceOp) GetMineWhereSubscriber(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/subscriber", opts)
 }
 
 // GetMineWhereContributor returns the list of subreddits the client is a contributor to
-func (s *SubredditServiceOp) GetMineWhereContributor(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error) {
+func (s *SubredditServiceOp) GetMineWhereContributor(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
 }
 
 // GetMineWhereModerator returns the list of subreddits the client is a moderator in
-func (s *SubredditServiceOp) GetMineWhereModerator(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error) {
+func (s *SubredditServiceOp) GetMineWhereModerator(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
 }
 
 // GetMineWhereStreams returns the list of subreddits the client is subscribed to and has hosted videos in
-func (s *SubredditServiceOp) GetMineWhereStreams(ctx context.Context, opts *ListOptions) (*SubredditList, *Response, error) {
+func (s *SubredditServiceOp) GetMineWhereStreams(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
 }
 
@@ -154,7 +135,7 @@ var sorts = [...]string{
 // If no subreddit names are provided, then it runs the search against all those the client is subscribed to
 // IMPORTANT: for subreddits, this will include the stickied posts (if any)
 // PLUS the number of posts from the limit parameter (which is 25 by default)
-func (s *SubredditServiceOp) GetHotLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error) {
+func (s *SubredditServiceOp) GetHotLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error) {
 	return s.getLinks(ctx, sortHot, opts, names...)
 }
 
@@ -162,31 +143,31 @@ func (s *SubredditServiceOp) GetHotLinks(ctx context.Context, opts *ListOptions,
 // If no subreddit names are provided, then it runs the search against all those the client is subscribed to
 // IMPORTANT: for subreddits, this will include the stickied posts (if any)
 // PLUS the number of posts from the limit parameter (which is 25 by default)
-func (s *SubredditServiceOp) GetBestLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error) {
+func (s *SubredditServiceOp) GetBestLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error) {
 	return s.getLinks(ctx, sortBest, opts, names...)
 }
 
 // GetNewLinks returns the new links
 // If no subreddit names are provided, then it runs the search against all those the client is subscribed to
-func (s *SubredditServiceOp) GetNewLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error) {
+func (s *SubredditServiceOp) GetNewLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error) {
 	return s.getLinks(ctx, sortNew, opts, names...)
 }
 
 // GetRisingLinks returns the rising links
 // If no subreddit names are provided, then it runs the search against all those the client is subscribed to
-func (s *SubredditServiceOp) GetRisingLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error) {
+func (s *SubredditServiceOp) GetRisingLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error) {
 	return s.getLinks(ctx, sortRising, opts, names...)
 }
 
 // GetControversialLinks returns the controversial links
 // If no subreddit names are provided, then it runs the search against all those the client is subscribed to
-func (s *SubredditServiceOp) GetControversialLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error) {
+func (s *SubredditServiceOp) GetControversialLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error) {
 	return s.getLinks(ctx, sortControversial, opts, names...)
 }
 
 // GetTopLinks returns the top links
 // If no subreddit names are provided, then it runs the search against all those the client is subscribed to
-func (s *SubredditServiceOp) GetTopLinks(ctx context.Context, opts *ListOptions, names ...string) (*LinkList, *Response, error) {
+func (s *SubredditServiceOp) GetTopLinks(ctx context.Context, opts *ListOptions, names ...string) (*Links, *Response, error) {
 	return s.getLinks(ctx, sortTop, opts, names...)
 }
 
@@ -258,7 +239,7 @@ func (s *SubredditServiceOp) handleSubscription(ctx context.Context, form url.Va
 	return resp, nil
 }
 
-func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opts *ListOptions) (*SubredditList, *Response, error) {
+func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opts *ListOptions) (*Subreddits, *Response, error) {
 	path, err := addOptions(path, opts)
 	if err != nil {
 		return nil, nil, err
@@ -275,7 +256,7 @@ func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opt
 		return nil, resp, err
 	}
 
-	l := new(SubredditList)
+	l := new(Subreddits)
 
 	if root.Data != nil {
 		l.Subreddits = root.Data.Things.Subreddits
@@ -286,7 +267,7 @@ func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opt
 	return l, resp, nil
 }
 
-func (s *SubredditServiceOp) getLinks(ctx context.Context, sort sort, opts *ListOptions, names ...string) (*LinkList, *Response, error) {
+func (s *SubredditServiceOp) getLinks(ctx context.Context, sort sort, opts *ListOptions, names ...string) (*Links, *Response, error) {
 	path := sorts[sort]
 	if len(names) > 0 {
 		path = fmt.Sprintf("r/%s/%s", strings.Join(names, "+"), sorts[sort])
@@ -308,7 +289,7 @@ func (s *SubredditServiceOp) getLinks(ctx context.Context, sort sort, opts *List
 		return nil, resp, err
 	}
 
-	l := new(LinkList)
+	l := new(Links)
 
 	if root.Data != nil {
 		l.Links = root.Data.Things.Links

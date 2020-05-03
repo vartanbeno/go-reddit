@@ -17,34 +17,34 @@ type UserService interface {
 	Overview(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
 
 	// returns the client's links
-	GetHotLinks(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error)
-	GetNewLinks(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error)
-	GetTopLinks(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error)
-	GetControversialLinks(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error)
+	GetHotLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
+	GetNewLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
+	GetTopLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
+	GetControversialLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
 
 	// returns the links of the user with the username
-	GetHotLinksOf(ctx context.Context, username string, opts *ListOptions) (*LinkList, *Response, error)
-	GetNewLinksOf(ctx context.Context, username string, opts *ListOptions) (*LinkList, *Response, error)
-	GetTopLinksOf(ctx context.Context, username string, opts *ListOptions) (*LinkList, *Response, error)
-	GetControversialLinksOf(ctx context.Context, username string, opts *ListOptions) (*LinkList, *Response, error)
+	GetHotLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error)
+	GetNewLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error)
+	GetTopLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error)
+	GetControversialLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error)
 
-	GetUpvoted(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error)
-	GetDownvoted(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error)
-	GetHidden(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error)
+	GetUpvoted(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
+	GetDownvoted(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
+	GetHidden(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
 	GetSaved(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
 	GetGilded(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
 
 	// returns the client's comments
-	GetHotComments(ctx context.Context, opts *ListOptions) (*CommentList, *Response, error)
-	GetNewComments(ctx context.Context, opts *ListOptions) (*CommentList, *Response, error)
-	GetTopComments(ctx context.Context, opts *ListOptions) (*CommentList, *Response, error)
-	GetControversialComments(ctx context.Context, opts *ListOptions) (*CommentList, *Response, error)
+	GetHotComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error)
+	GetNewComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error)
+	GetTopComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error)
+	GetControversialComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error)
 
 	// returns the comments of the user with the username
-	GetHotCommentsOf(ctx context.Context, username string, opts *ListOptions) (*CommentList, *Response, error)
-	GetNewCommentsOf(ctx context.Context, username string, opts *ListOptions) (*CommentList, *Response, error)
-	GetTopCommentsOf(ctx context.Context, username string, opts *ListOptions) (*CommentList, *Response, error)
-	GetControversialCommentsOf(ctx context.Context, username string, opts *ListOptions) (*CommentList, *Response, error)
+	GetHotCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error)
+	GetNewCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error)
+	GetTopCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error)
+	GetControversialCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error)
 
 	Friend(ctx context.Context, username string, note string) (interface{}, *Response, error)
 	Unblock(ctx context.Context, username string) (*Response, error)
@@ -89,14 +89,6 @@ type UserShort struct {
 	CommentKarma int `json:"comment_karma"`
 
 	NSFW bool `json:"profile_over_18"`
-}
-
-// CommentsLinks holds comments and links
-type CommentsLinks struct {
-	Comments []Comment `json:"comments,omitempty"`
-	Links    []Link    `json:"links,omitempty"`
-	After    string    `json:"after"`
-	Before   string    `json:"before"`
 }
 
 // Get returns information about the user
@@ -177,67 +169,67 @@ func (s *UserServiceOp) Overview(ctx context.Context, opts *ListOptions) (*Comme
 }
 
 // GetHotLinks returns a list of the client's hottest submissions
-func (s *UserServiceOp) GetHotLinks(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetHotLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted?sort=%s", s.client.Username, sorts[sortHot])
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetNewLinks returns a list of the client's newest submissions
-func (s *UserServiceOp) GetNewLinks(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetNewLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted?sort=%s", s.client.Username, sorts[sortNew])
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetTopLinks returns a list of the client's top submissions
-func (s *UserServiceOp) GetTopLinks(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetTopLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted?sort=%s", s.client.Username, sorts[sortTop])
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetControversialLinks returns a list of the client's most controversial submissions
-func (s *UserServiceOp) GetControversialLinks(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetControversialLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted?sort=%s", s.client.Username, sorts[sortControversial])
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetHotLinksOf returns a list of the user's hottest submissions
-func (s *UserServiceOp) GetHotLinksOf(ctx context.Context, username string, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetHotLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, sorts[sortHot])
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetNewLinksOf returns a list of the user's newest submissions
-func (s *UserServiceOp) GetNewLinksOf(ctx context.Context, username string, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetNewLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, sorts[sortNew])
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetTopLinksOf returns a list of the user's top submissions
-func (s *UserServiceOp) GetTopLinksOf(ctx context.Context, username string, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetTopLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, sorts[sortTop])
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetControversialLinksOf returns a list of the user's most controversial submissions
-func (s *UserServiceOp) GetControversialLinksOf(ctx context.Context, username string, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetControversialLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, sorts[sortControversial])
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetUpvoted returns a list of the client's upvoted submissions
-func (s *UserServiceOp) GetUpvoted(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetUpvoted(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/upvoted", s.client.Username)
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetDownvoted returns a list of the client's downvoted submissions
-func (s *UserServiceOp) GetDownvoted(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetDownvoted(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/downvoted", s.client.Username)
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetHidden returns a list of the client's hidden submissions
-func (s *UserServiceOp) GetHidden(ctx context.Context, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) GetHidden(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
 	path := fmt.Sprintf("user/%s/hidden", s.client.Username)
 	return s.getLinks(ctx, path, opts)
 }
@@ -255,42 +247,42 @@ func (s *UserServiceOp) GetGilded(ctx context.Context, opts *ListOptions) (*Comm
 }
 
 // GetHotComments returns a list of the client's hottest comments
-func (s *UserServiceOp) GetHotComments(ctx context.Context, opts *ListOptions) (*CommentList, *Response, error) {
+func (s *UserServiceOp) GetHotComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error) {
 	return s.getComments(ctx, s.client.Username, sortHot, opts)
 }
 
 // GetNewComments returns a list of the client's newest comments
-func (s *UserServiceOp) GetNewComments(ctx context.Context, opts *ListOptions) (*CommentList, *Response, error) {
+func (s *UserServiceOp) GetNewComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error) {
 	return s.getComments(ctx, s.client.Username, sortNew, opts)
 }
 
 // GetTopComments returns a list of the client's top comments
-func (s *UserServiceOp) GetTopComments(ctx context.Context, opts *ListOptions) (*CommentList, *Response, error) {
+func (s *UserServiceOp) GetTopComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error) {
 	return s.getComments(ctx, s.client.Username, sortTop, opts)
 }
 
 // GetControversialComments returns a list of the client's most controversial comments
-func (s *UserServiceOp) GetControversialComments(ctx context.Context, opts *ListOptions) (*CommentList, *Response, error) {
+func (s *UserServiceOp) GetControversialComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error) {
 	return s.getComments(ctx, s.client.Username, sortControversial, opts)
 }
 
 // GetHotCommentsOf returns a list of the user's hottest comments
-func (s *UserServiceOp) GetHotCommentsOf(ctx context.Context, username string, opts *ListOptions) (*CommentList, *Response, error) {
+func (s *UserServiceOp) GetHotCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
 	return s.getComments(ctx, username, sortHot, opts)
 }
 
 // GetNewCommentsOf returns a list of the user's newest comments
-func (s *UserServiceOp) GetNewCommentsOf(ctx context.Context, username string, opts *ListOptions) (*CommentList, *Response, error) {
+func (s *UserServiceOp) GetNewCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
 	return s.getComments(ctx, username, sortNew, opts)
 }
 
 // GetTopCommentsOf returns a list of the user's top comments
-func (s *UserServiceOp) GetTopCommentsOf(ctx context.Context, username string, opts *ListOptions) (*CommentList, *Response, error) {
+func (s *UserServiceOp) GetTopCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
 	return s.getComments(ctx, username, sortTop, opts)
 }
 
 // GetControversialCommentsOf returns a list of the user's most controversial comments
-func (s *UserServiceOp) GetControversialCommentsOf(ctx context.Context, username string, opts *ListOptions) (*CommentList, *Response, error) {
+func (s *UserServiceOp) GetControversialCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
 	return s.getComments(ctx, username, sortControversial, opts)
 }
 
@@ -344,7 +336,7 @@ func (s *UserServiceOp) Unfriend(ctx context.Context, username string) (*Respons
 	return s.client.Do(ctx, req, nil)
 }
 
-func (s *UserServiceOp) getLinks(ctx context.Context, path string, opts *ListOptions) (*LinkList, *Response, error) {
+func (s *UserServiceOp) getLinks(ctx context.Context, path string, opts *ListOptions) (*Links, *Response, error) {
 	path, err := addOptions(path, opts)
 	if err != nil {
 		return nil, nil, err
@@ -364,7 +356,7 @@ func (s *UserServiceOp) getLinks(ctx context.Context, path string, opts *ListOpt
 	return root.getLinks(), resp, nil
 }
 
-func (s *UserServiceOp) getComments(ctx context.Context, username string, sort sort, opts *ListOptions) (*CommentList, *Response, error) {
+func (s *UserServiceOp) getComments(ctx context.Context, username string, sort sort, opts *ListOptions) (*Comments, *Response, error) {
 	path := fmt.Sprintf("user/%s/comments?sort=%s", username, sorts[sort])
 	path, err := addOptions(path, opts)
 	if err != nil {

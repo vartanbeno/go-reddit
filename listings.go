@@ -18,30 +18,6 @@ type ListingsServiceOp struct {
 
 var _ ListingsService = &ListingsServiceOp{}
 
-type listingRoot struct {
-	Kind string `json:"kind,omitempty"`
-	Data *struct {
-		Dist     int                      `json:"dist"`
-		Children []map[string]interface{} `json:"children,omitempty"`
-		After    string                   `json:"after,omitempty"`
-		Before   string                   `json:"before,omitempty"`
-	} `json:"data,omitempty"`
-}
-
-// Listing holds various types of things that all come from the Reddit API
-// type Listing struct {
-// 	Links      []*Submission `json:"links,omitempty"`
-// 	Comments   []*Comment    `json:"comments,omitempty"`
-// 	Subreddits []*Subreddit  `json:"subreddits,omitempty"`
-// }
-
-// CommentsLinksSubreddits holds comments, links, and subreddits
-type CommentsLinksSubreddits struct {
-	Comments   []Comment   `json:"comments,omitempty"`
-	Links      []Link      `json:"links,omitempty"`
-	Subreddits []Subreddit `json:"subreddits,omitempty"`
-}
-
 // Get gets a list of things based on their IDs
 // Only links, comments, and subreddits are allowed
 func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) (*CommentsLinksSubreddits, *Response, error) {

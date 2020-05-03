@@ -1,0 +1,271 @@
+package geddit
+
+import "encoding/json"
+
+const (
+	kindComment   = "t1"
+	kindAccount   = "t2"
+	kindLink      = "t3"
+	kindMessage   = "t4"
+	kindSubreddit = "t5"
+	kindAward     = "t6"
+	kindListing   = "Listing"
+	kindUserList  = "UserList"
+	kindMode      = "more"
+)
+
+type root struct {
+	Kind string      `json:"kind,omitempty"`
+	Data interface{} `json:"data,omitempty"`
+}
+
+type rootListing struct {
+	Kind string   `json:"kind,omitempty"`
+	Data *Listing `json:"data"`
+}
+
+// Listing holds things coming from the Reddit API
+// It also contains the after/before anchors useful for subsequent requests
+type Listing struct {
+	Things Things `json:"children"`
+	After  string `json:"after"`
+	Before string `json:"before"`
+}
+
+// Things are stuff!
+type Things struct {
+	Comments   []Comment   `json:"comments,omitempty"`
+	Links      []Link      `json:"links,omitempty"`
+	Subreddits []Subreddit `json:"subreddits,omitempty"`
+	// todo: add the other kinds of things
+}
+
+type commentRoot struct {
+	Kind string   `json:"kind,omitempty"`
+	Data *Comment `json:"data,omitempty"`
+}
+
+type linkRoot struct {
+	Kind string `json:"kind,omitempty"`
+	Data *Link  `json:"data,omitempty"`
+}
+
+type subredditRoot struct {
+	Kind string     `json:"kind,omitempty"`
+	Data *Subreddit `json:"data,omitempty"`
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (l *Things) UnmarshalJSON(b []byte) error {
+	var children []map[string]interface{}
+	if err := json.Unmarshal(b, &children); err != nil {
+		return err
+	}
+
+	for _, child := range children {
+		byteValue, _ := json.Marshal(child)
+		switch child["kind"] {
+		case kindComment:
+			root := new(commentRoot)
+			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
+				l.Comments = append(l.Comments, *root.Data)
+			}
+		case kindAccount:
+		case kindLink:
+			root := new(linkRoot)
+			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
+				l.Links = append(l.Links, *root.Data)
+			}
+		case kindMessage:
+		case kindSubreddit:
+			root := new(subredditRoot)
+			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
+				l.Subreddits = append(l.Subreddits, *root.Data)
+			}
+		case kindAward:
+		}
+	}
+
+	return nil
+}
+
+// Comment is a comment posted by a user
+type Comment struct {
+	ID        string `json:"id,omitempty"`
+	FullID    string `json:"name,omitempty"`
+	ParentID  string `json:"parent_id,omitempty"`
+	Permalink string `json:"permalink,omitempty"`
+
+	Body            string `json:"body,omitempty"`
+	Author          string `json:"author,omitempty"`
+	AuthorID        string `json:"author_fullname,omitempty"`
+	AuthorFlairText string `json:"author_flair_text,omitempty"`
+	AuthorFlairID   string `json:"author_flair_template_id,omitempty"`
+
+	Subreddit             string `json:"subreddit,omitempty"`
+	SubredditNamePrefixed string `json:"subreddit_name_prefixed,omitempty"`
+	SubredditID           string `json:"subreddit_id,omitempty"`
+
+	Score            int `json:"score"`
+	Controversiality int `json:"controversiality"`
+
+	Created *Timestamp `json:"created_utc,omitempty"`
+	Edited  *Timestamp `json:"edited,omitempty"`
+
+	LinkID string `json:"link_id,omitempty"`
+
+	// These don't appear when submitting a comment
+	LinkTitle       string `json:"link_title,omitempty"`
+	LinkPermalink   string `json:"link_permalink,omitempty"`
+	LinkAuthor      string `json:"link_author,omitempty"`
+	LinkNumComments int    `json:"num_comments"`
+
+	IsSubmitter bool `json:"is_submitter"`
+	ScoreHidden bool `json:"score_hidden"`
+	Saved       bool `json:"saved"`
+	Stickied    bool `json:"stickied"`
+	Locked      bool `json:"locked"`
+	CanGild     bool `json:"can_gild"`
+	NSFW        bool `json:"over_18"`
+
+	// If a comment has no replies, its "replies" value is "",
+	// which the unmarshaler doesn't like
+	// So we capture this varying field in RepliesRaw, and then
+	// fill it in Replies
+	RepliesRaw json.RawMessage `json:"replies,omitempty"`
+	Replies    []commentRoot   `json:"-"`
+}
+
+// Link is a submitted post on Reddit
+type Link struct {
+	ID      string     `json:"id,omitempty"`
+	FullID  string     `json:"name,omitempty"`
+	Created *Timestamp `json:"created_utc,omitempty"`
+	Edited  *Timestamp `json:"edited,omitempty"`
+
+	Permalink string `json:"permalink,omitempty"`
+	URL       string `json:"url,omitempty"`
+
+	Title string `json:"title,omitempty"`
+	Body  string `json:"selftext,omitempty"`
+
+	Score            int `json:"score"`
+	NumberOfComments int `json:"num_comments"`
+
+	SubredditID           string `json:"subreddit_id,omitempty"`
+	SubredditName         string `json:"subreddit,omitempty"`
+	SubredditNamePrefixed string `json:"subreddit_name_prefixed,omitempty"`
+
+	AuthorID   string `json:"author_fullname,omitempty"`
+	AuthorName string `json:"author,omitempty"`
+
+	Spoiler    bool `json:"spoiler"`
+	Locked     bool `json:"locked"`
+	NSFW       bool `json:"over_18"`
+	IsSelfPost bool `json:"is_self"`
+	Saved      bool `json:"saved"`
+	Stickied   bool `json:"stickied"`
+}
+
+// Subreddit holds information about a subreddit
+type Subreddit struct {
+	ID      string     `json:"id,omitempty"`
+	FullID  string     `json:"name,omitempty"`
+	Created *Timestamp `json:"created_utc,omitempty"`
+
+	URL                  string `json:"url,omitempty"`
+	Name                 string `json:"display_name,omitempty"`
+	NamePrefixed         string `json:"display_name_prefixed,omitempty"`
+	Title                string `json:"title,omitempty"`
+	PublicDescription    string `json:"public_description,omitempty"`
+	Type                 string `json:"subreddit_type,omitempty"`
+	SuggestedCommentSort string `json:"suggested_comment_sort,omitempty"`
+
+	Subscribers     int  `json:"subscribers"`
+	ActiveUserCount *int `json:"active_user_count,omitempty"`
+	NSFW            bool `json:"over18"`
+	UserIsMod       bool `json:"user_is_moderator"`
+}
+
+func (rl *rootListing) getAfter() string {
+	if rl == nil || rl.Data == nil {
+		return ""
+	}
+	return rl.Data.After
+}
+
+func (rl *rootListing) getBefore() string {
+	if rl == nil || rl.Data == nil {
+		return ""
+	}
+	return rl.Data.Before
+}
+
+func (rl *rootListing) getComments() *Comments {
+	if rl == nil || rl.Data == nil {
+		return nil
+	}
+	return &Comments{
+		Comments: rl.Data.Things.Comments,
+		After:    rl.Data.After,
+		Before:   rl.Data.Before,
+	}
+}
+
+func (rl *rootListing) getLinks() *Links {
+	if rl == nil || rl.Data == nil {
+		return nil
+	}
+	return &Links{
+		Links:  rl.Data.Things.Links,
+		After:  rl.Data.After,
+		Before: rl.Data.Before,
+	}
+}
+
+func (rl *rootListing) getSubreddits() *Subreddits {
+	if rl == nil || rl.Data == nil {
+		return nil
+	}
+	return &Subreddits{
+		Subreddits: rl.Data.Things.Subreddits,
+		After:      rl.Data.After,
+		Before:     rl.Data.Before,
+	}
+}
+
+// Comments is a list of comments
+type Comments struct {
+	Comments []Comment `json:"comments,omitempty"`
+	After    string    `json:"after"`
+	Before   string    `json:"before"`
+}
+
+// Subreddits is a list of subreddits
+type Subreddits struct {
+	Subreddits []Subreddit `json:"subreddits,omitempty"`
+	After      string      `json:"after"`
+	Before     string      `json:"before"`
+}
+
+// Links is a list of links
+type Links struct {
+	Links  []Link `json:"submissions,omitempty"`
+	After  string `json:"after"`
+	Before string `json:"before"`
+}
+
+// CommentsLinks is a list of comments and links
+type CommentsLinks struct {
+	Comments []Comment `json:"comments,omitempty"`
+	Links    []Link    `json:"links,omitempty"`
+	After    string    `json:"after"`
+	Before   string    `json:"before"`
+}
+
+// CommentsLinksSubreddits is a list of comments, links, and subreddits
+type CommentsLinksSubreddits struct {
+	Comments   []Comment   `json:"comments,omitempty"`
+	Links      []Link      `json:"links,omitempty"`
+	Subreddits []Subreddit `json:"subreddits,omitempty"`
+}
