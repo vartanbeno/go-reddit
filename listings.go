@@ -2,7 +2,6 @@ package geddit
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 )
 
@@ -30,14 +29,15 @@ type listingRoot struct {
 }
 
 // Listing holds various types of things that all come from the Reddit API
-type Listing struct {
-	Links      []*Submission `json:"links,omitempty"`
-	Comments   []*Comment    `json:"comments,omitempty"`
-	Subreddits []*Subreddit  `json:"subreddits,omitempty"`
-}
+// type Listing struct {
+// 	Links      []*Submission `json:"links,omitempty"`
+// 	Comments   []*Comment    `json:"comments,omitempty"`
+// 	Subreddits []*Subreddit  `json:"subreddits,omitempty"`
+// }
 
 // Get gets a list of things based on their IDs
 // Only links, comments, and subreddits are allowed
+// todo: only links, comments, subreddits
 func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) (*Listing, *Response, error) {
 	type query struct {
 		IDs []string `url:"id,comma"`
@@ -54,51 +54,13 @@ func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) (*Listing, *
 		return nil, nil, err
 	}
 
-	root := new(listingRoot)
+	root := new(rootListing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	if root.Data == nil {
-		return nil, resp, nil
-	}
-
-	l := new(Listing)
-
-	for _, result := range root.Data.Children {
-		kind, ok1 := result["kind"].(string)
-		data, ok2 := result["data"]
-
-		if ok1 && ok2 {
-			byteValue, err := json.Marshal(data)
-			if err != nil {
-				return nil, resp, err
-			}
-
-			var v interface{}
-			switch kind {
-			case kindComment:
-				v = new(Comment)
-				l.Comments = append(l.Comments, v.(*Comment))
-			case kindLink:
-				v = new(Submission)
-				l.Links = append(l.Links, v.(*Submission))
-			case kindSubreddit:
-				v = new(Subreddit)
-				l.Subreddits = append(l.Subreddits, v.(*Subreddit))
-			default:
-				continue
-			}
-
-			err = json.Unmarshal(byteValue, v)
-			if err != nil {
-				return nil, resp, err
-			}
-		}
-	}
-
-	return l, resp, nil
+	return root.Data, resp, nil
 }
 
 // todo: do by_id next

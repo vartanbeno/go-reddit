@@ -25,61 +25,6 @@ type CommentServiceOp struct {
 
 var _ CommentService = &CommentServiceOp{}
 
-type commentRoot struct {
-	Kind *string  `json:"kind,omitempty"`
-	Data *Comment `json:"data,omitempty"`
-}
-
-type commentRootListing struct {
-	Kind *string `json:"kind,omitempty"`
-	Data *struct {
-		Dist   int           `json:"dist"`
-		Roots  []commentRoot `json:"children,omitempty"`
-		After  string        `json:"after,omitempty"`
-		Before string        `json:"before,omitempty"`
-	} `json:"data,omitempty"`
-}
-
-// Comment is a comment posted by a user
-type Comment struct {
-	ID        string `json:"id,omitempty"`
-	FullID    string `json:"name,omitempty"`
-	ParentID  string `json:"parent_id,omitempty"`
-	Permalink string `json:"permalink,omitempty"`
-
-	Body            string `json:"body,omitempty"`
-	BodyHTML        string `json:"body_html,omitempty"`
-	Author          string `json:"author,omitempty"`
-	AuthorID        string `json:"author_fullname,omitempty"`
-	AuthorFlairText string `json:"author_flair_text,omitempty"`
-
-	Subreddit             string `json:"subreddit,omitempty"`
-	SubredditNamePrefixed string `json:"subreddit_name_prefixed,omitempty"`
-	SubredditID           string `json:"subreddit_id,omitempty"`
-
-	Score            int `json:"score"`
-	Controversiality int `json:"controversiality"`
-
-	Created    float64 `json:"created"`
-	CreatedUTC float64 `json:"created_utc"`
-
-	LinkID string `json:"link_id,omitempty"`
-
-	// These don't appear when submitting a comment
-	LinkTitle       string `json:"link_title,omitempty"`
-	LinkPermalink   string `json:"link_permalink,omitempty"`
-	LinkAuthor      string `json:"link_author,omitempty"`
-	LinkNumComments int    `json:"num_comments"`
-
-	IsSubmitter bool `json:"is_submitter"`
-	ScoreHidden bool `json:"score_hidden"`
-	Saved       bool `json:"saved"`
-	Stickied    bool `json:"stickied"`
-	Locked      bool `json:"locked"`
-	CanGild     bool `json:"can_gild"`
-	NSFW        bool `json:"over_18"`
-}
-
 // CommentList holds information about a list of comments
 // The after and before fields help decide the anchor point for a subsequent
 // call that returns a list

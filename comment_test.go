@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"reflect"
 	"testing"
+	"time"
 )
 
 var expectedCommentSubmitOrEdit = &Comment{
@@ -15,7 +16,6 @@ var expectedCommentSubmitOrEdit = &Comment{
 	Permalink: "/r/subreddit/comments/test1/some_thread/test2/",
 
 	Body:            "test comment",
-	BodyHTML:        "<div class=\"md\"><p>test comment</p>\n</div>",
 	Author:          "reddit_username",
 	AuthorID:        "t2_user1",
 	AuthorFlairText: "Flair",
@@ -27,8 +27,7 @@ var expectedCommentSubmitOrEdit = &Comment{
 	Score:            1,
 	Controversiality: 0,
 
-	Created:    1588147787,
-	CreatedUTC: 1588118987,
+	Created: &Timestamp{time.Date(2020, 4, 28, 20, 9, 47, 0, time.UTC)},
 
 	LinkID: "t3_link1",
 }
