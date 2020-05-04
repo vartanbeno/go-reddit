@@ -106,6 +106,10 @@ type Comment struct {
 	SubredditNamePrefixed string `json:"subreddit_name_prefixed,omitempty"`
 	SubredditID           string `json:"subreddit_id,omitempty"`
 
+	// Indicates if the client has upvote/downvoted (true/false)
+	// If neither, it will be nil
+	Likes *bool `json:"likes"`
+
 	Score            int `json:"score"`
 	Controversiality int `json:"controversiality"`
 
@@ -148,6 +152,10 @@ type Link struct {
 
 	Title string `json:"title,omitempty"`
 	Body  string `json:"selftext,omitempty"`
+
+	// Indicates if the client has upvote/downvoted (true/false)
+	// If neither, it will be nil
+	Likes *bool `json:"likes"`
 
 	Score            int `json:"score"`
 	NumberOfComments int `json:"num_comments"`
