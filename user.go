@@ -15,6 +15,7 @@ type UserService interface {
 	UsernameAvailable(ctx context.Context, username string) (bool, *Response, error)
 
 	Overview(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
+	OverviewOf(ctx context.Context, username string, opts *ListOptions) (*CommentsLinks, *Response, error)
 
 	// returns the client's links
 	GetHotLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
