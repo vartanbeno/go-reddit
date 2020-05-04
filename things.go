@@ -202,36 +202,33 @@ func (rl *rootListing) getBefore() string {
 }
 
 func (rl *rootListing) getComments() *Comments {
-	if rl == nil || rl.Data == nil {
-		return nil
+	v := new(Comments)
+	if rl != nil && rl.Data != nil {
+		v.Comments = rl.Data.Things.Comments
+		v.After = rl.Data.After
+		v.Before = rl.Data.Before
 	}
-	return &Comments{
-		Comments: rl.Data.Things.Comments,
-		After:    rl.Data.After,
-		Before:   rl.Data.Before,
-	}
+	return v
 }
 
 func (rl *rootListing) getLinks() *Links {
-	if rl == nil || rl.Data == nil {
-		return nil
+	v := new(Links)
+	if rl != nil && rl.Data != nil {
+		v.Links = rl.Data.Things.Links
+		v.After = rl.Data.After
+		v.Before = rl.Data.Before
 	}
-	return &Links{
-		Links:  rl.Data.Things.Links,
-		After:  rl.Data.After,
-		Before: rl.Data.Before,
-	}
+	return v
 }
 
 func (rl *rootListing) getSubreddits() *Subreddits {
-	if rl == nil || rl.Data == nil {
-		return nil
+	v := new(Subreddits)
+	if rl != nil && rl.Data != nil {
+		v.Subreddits = rl.Data.Things.Subreddits
+		v.After = rl.Data.After
+		v.Before = rl.Data.Before
 	}
-	return &Subreddits{
-		Subreddits: rl.Data.Things.Subreddits,
-		After:      rl.Data.After,
-		Before:     rl.Data.Before,
-	}
+	return v
 }
 
 // Comments is a list of comments
