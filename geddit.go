@@ -92,6 +92,7 @@ type Client struct {
 	Flair     FlairService
 	Link      LinkService
 	Listings  ListingsService
+	Search    SearchService
 	Subreddit SubredditService
 	User      UserService
 	Vote      VoteService
@@ -120,6 +121,7 @@ func newClient(httpClient *http.Client) *Client {
 	c.Flair = &FlairServiceOp{client: c}
 	c.Link = &LinkServiceOp{client: c}
 	c.Listings = &ListingsServiceOp{client: c}
+	c.Search = &SearchServiceOp{client: c}
 	c.Subreddit = &SubredditServiceOp{client: c}
 	c.User = &UserServiceOp{client: c}
 	c.Vote = &VoteServiceOp{client: c}

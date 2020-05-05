@@ -14,6 +14,32 @@ const (
 	kindMode      = "more"
 )
 
+type sort int
+
+const (
+	sortHot sort = iota
+	sortBest
+	sortNew
+	sortRising
+	sortControversial
+	sortTop
+	sortRelevance
+	sortComments
+)
+
+var sorts = [...]string{
+	"hot",
+	"best",
+	"new",
+	"rising",
+	"controversial",
+	"top",
+
+	// for search queries
+	"relevance",
+	"comments",
+}
+
 type root struct {
 	Kind string      `json:"kind,omitempty"`
 	Data interface{} `json:"data,omitempty"`
@@ -35,6 +61,7 @@ type Listing struct {
 // Things are stuff!
 type Things struct {
 	Comments   []Comment   `json:"comments,omitempty"`
+	Users      []User      `json:"users,omitempty"`
 	Links      []Link      `json:"links,omitempty"`
 	Subreddits []Subreddit `json:"subreddits,omitempty"`
 	// todo: add the other kinds of things
@@ -43,6 +70,11 @@ type Things struct {
 type commentRoot struct {
 	Kind string   `json:"kind,omitempty"`
 	Data *Comment `json:"data,omitempty"`
+}
+
+type userRoot struct {
+	Kind string `json:"kind,omitempty"`
+	Data *User  `json:"data,omitempty"`
 }
 
 type linkRoot struct {
@@ -71,6 +103,10 @@ func (l *Things) UnmarshalJSON(b []byte) error {
 				l.Comments = append(l.Comments, *root.Data)
 			}
 		case kindAccount:
+			root := new(userRoot)
+			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
+				l.Users = append(l.Users, *root.Data)
+			}
 		case kindLink:
 			root := new(linkRoot)
 			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
@@ -157,8 +193,9 @@ type Link struct {
 	// If neither, it will be nil
 	Likes *bool `json:"likes"`
 
-	Score            int `json:"score"`
-	NumberOfComments int `json:"num_comments"`
+	Score            int     `json:"score"`
+	UpvoteRatio      float32 `json:"upvote_ratio"`
+	NumberOfComments int     `json:"num_comments"`
 
 	SubredditID           string `json:"subreddit_id,omitempty"`
 	SubredditName         string `json:"subreddit,omitempty"`
@@ -219,6 +256,16 @@ func (rl *rootListing) getComments() *Comments {
 	return v
 }
 
+func (rl *rootListing) getUsers() *Users {
+	v := new(Users)
+	if rl != nil && rl.Data != nil {
+		v.Users = rl.Data.Things.Users
+		v.After = rl.Data.After
+		v.Before = rl.Data.Before
+	}
+	return v
+}
+
 func (rl *rootListing) getLinks() *Links {
 	v := new(Links)
 	if rl != nil && rl.Data != nil {
@@ -244,6 +291,13 @@ type Comments struct {
 	Comments []Comment `json:"comments,omitempty"`
 	After    string    `json:"after"`
 	Before   string    `json:"before"`
+}
+
+// Users is a list of users
+type Users struct {
+	Users  []User `json:"users,omitempty"`
+	After  string `json:"after"`
+	Before string `json:"before"`
 }
 
 // Subreddits is a list of subreddits

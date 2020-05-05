@@ -59,11 +59,6 @@ type UserServiceOp struct {
 
 var _ UserService = &UserServiceOp{}
 
-type userRoot struct {
-	Kind *string `json:"kind,omitempty"`
-	Data *User   `json:"data,omitempty"`
-}
-
 // User represents a Reddit user
 type User struct {
 	// is not the full ID, watch out

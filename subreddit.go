@@ -111,26 +111,6 @@ func (s *SubredditServiceOp) GetMineWhereStreams(ctx context.Context, opts *List
 	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
 }
 
-type sort int
-
-const (
-	sortHot sort = iota
-	sortBest
-	sortNew
-	sortRising
-	sortControversial
-	sortTop
-)
-
-var sorts = [...]string{
-	"hot",
-	"best",
-	"new",
-	"rising",
-	"controversial",
-	"top",
-}
-
 // GetHotLinks returns the hot links
 // If no subreddit names are provided, then it runs the search against all those the client is subscribed to
 // IMPORTANT: for subreddits, this will include the stickied posts (if any)
