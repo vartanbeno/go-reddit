@@ -24,6 +24,8 @@ type SearchService interface {
 	SearchLinksByCommentsInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
 
 	SearchSubreddits(ctx context.Context, q string, opts *ListOptions) (*Subreddits, *Response, error)
+	SearchSubredditNames(ctx context.Context, q string) ([]string, *Response, error)
+	SearchSubredditInfo(ctx context.Context, q string) ([]SubredditShort, *Response, error)
 }
 
 // SearchServiceOp implements the VoteService interface
@@ -38,6 +40,21 @@ type searchQuery struct {
 	Query string `url:"q,omitempty"`
 	Type  string `url:"type,omitempty"`
 	Sort  string `url:"sort,omitempty"`
+}
+
+type subredditNamesRoot struct {
+	Names []string `json:"names,omitempty"`
+}
+
+type subredditShortsRoot struct {
+	Subreddits []SubredditShort `json:"subreddits,omitempty"`
+}
+
+// SubredditShort represents minimal information about a subreddit
+type SubredditShort struct {
+	Name        string `json:"name,omitempty"`
+	Subscribers int    `json:"subscriber_count"`
+	ActiveUsers int    `json:"active_user_count"`
 }
 
 func newSearchQuery(query, _type, sort string, opts *ListOptions) *searchQuery {
@@ -64,7 +81,7 @@ func (s *SearchServiceOp) SearchUsers(ctx context.Context, q string, opts *ListO
 	return root.getUsers(), resp, nil
 }
 
-// SearchLinksByRelevance searches for link sorted by relevance to the search query
+// SearchLinksByRelevance searches for links sorted by relevance to the search query in all of Reddit
 func (s *SearchServiceOp) SearchLinksByRelevance(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortRelevance], opts)
 
@@ -76,7 +93,7 @@ func (s *SearchServiceOp) SearchLinksByRelevance(ctx context.Context, q string, 
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByHottest searches for the hottest links
+// SearchLinksByHottest searches for the hottest links in all of Reddit
 func (s *SearchServiceOp) SearchLinksByHottest(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortHot], opts)
 
@@ -88,7 +105,7 @@ func (s *SearchServiceOp) SearchLinksByHottest(ctx context.Context, q string, op
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByTop searches for the top links
+// SearchLinksByTop searches for the top links in all of Reddit
 func (s *SearchServiceOp) SearchLinksByTop(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortTop], opts)
 
@@ -100,7 +117,7 @@ func (s *SearchServiceOp) SearchLinksByTop(ctx context.Context, q string, opts *
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByComments searches for links with the highest number of comments
+// SearchLinksByComments searches for links with the highest number of comments in all of Reddit
 func (s *SearchServiceOp) SearchLinksByComments(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortComments], opts)
 
@@ -170,6 +187,43 @@ func (s *SearchServiceOp) SearchSubreddits(ctx context.Context, q string, opts *
 	}
 
 	return root.getSubreddits(), resp, nil
+}
+
+// SearchSubredditNames searches for subreddits with names beginning with the query provided
+func (s *SearchServiceOp) SearchSubredditNames(ctx context.Context, q string) ([]string, *Response, error) {
+	path := fmt.Sprintf("api/search_reddit_names?query=%s", q)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(subredditNamesRoot)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Names, resp, nil
+}
+
+// SearchSubredditInfo searches for subreddits with names beginning with the query provided
+// They hold a bit more info that just the name
+func (s *SearchServiceOp) SearchSubredditInfo(ctx context.Context, q string) ([]SubredditShort, *Response, error) {
+	path := fmt.Sprintf("api/search_subreddits?query=%s", q)
+
+	req, err := s.client.NewRequest(http.MethodPost, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(subredditShortsRoot)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Subreddits, resp, nil
 }
 
 func (s *SearchServiceOp) search(ctx context.Context, subreddit string, opts *searchQuery) (*rootListing, *Response, error) {
