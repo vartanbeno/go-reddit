@@ -12,20 +12,20 @@ import (
 // user must check the following in their preferences:
 // "include not safe for work (NSFW) search results in searches"
 type SearchService interface {
-	SearchUsers(ctx context.Context, q string, opts *ListOptions) (*Users, *Response, error)
+	Users(ctx context.Context, q string, opts *ListOptions) (*Users, *Response, error)
 
-	SearchLinksByRelevance(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
-	SearchLinksByHottest(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
-	SearchLinksByTop(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
-	SearchLinksByComments(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
-	SearchLinksByRelevanceInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
-	SearchLinksByHottestInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
-	SearchLinksByTopInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
-	SearchLinksByCommentsInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
+	LinksByRelevance(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
+	LinksByHottest(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
+	LinksByTop(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
+	LinksByComments(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
+	LinksByRelevanceInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
+	LinksByHottestInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
+	LinksByTopInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
+	LinksByCommentsInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
 
-	SearchSubreddits(ctx context.Context, q string, opts *ListOptions) (*Subreddits, *Response, error)
-	SearchSubredditNames(ctx context.Context, q string) ([]string, *Response, error)
-	SearchSubredditInfo(ctx context.Context, q string) ([]SubredditShort, *Response, error)
+	Subreddits(ctx context.Context, q string, opts *ListOptions) (*Subreddits, *Response, error)
+	SubredditNames(ctx context.Context, q string) ([]string, *Response, error)
+	SubredditInfo(ctx context.Context, q string) ([]SubredditShort, *Response, error)
 }
 
 // SearchServiceOp implements the VoteService interface
@@ -69,8 +69,8 @@ func newSearchQuery(query, _type, sort string, opts *ListOptions) *searchQuery {
 	}
 }
 
-// SearchUsers searches for users
-func (s *SearchServiceOp) SearchUsers(ctx context.Context, q string, opts *ListOptions) (*Users, *Response, error) {
+// Users searches for users
+func (s *SearchServiceOp) Users(ctx context.Context, q string, opts *ListOptions) (*Users, *Response, error) {
 	query := newSearchQuery(q, "user", "", opts)
 
 	root, resp, err := s.search(ctx, "", query)
@@ -81,8 +81,8 @@ func (s *SearchServiceOp) SearchUsers(ctx context.Context, q string, opts *ListO
 	return root.getUsers(), resp, nil
 }
 
-// SearchLinksByRelevance searches for links sorted by relevance to the search query in all of Reddit
-func (s *SearchServiceOp) SearchLinksByRelevance(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
+// LinksByRelevance searches for links sorted by relevance to the search query in all of Reddit
+func (s *SearchServiceOp) LinksByRelevance(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortRelevance], opts)
 
 	root, resp, err := s.search(ctx, "", query)
@@ -93,8 +93,8 @@ func (s *SearchServiceOp) SearchLinksByRelevance(ctx context.Context, q string, 
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByHottest searches for the hottest links in all of Reddit
-func (s *SearchServiceOp) SearchLinksByHottest(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
+// LinksByHottest searches for the hottest links in all of Reddit
+func (s *SearchServiceOp) LinksByHottest(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortHot], opts)
 
 	root, resp, err := s.search(ctx, "", query)
@@ -105,8 +105,8 @@ func (s *SearchServiceOp) SearchLinksByHottest(ctx context.Context, q string, op
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByTop searches for the top links in all of Reddit
-func (s *SearchServiceOp) SearchLinksByTop(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
+// LinksByTop searches for the top links in all of Reddit
+func (s *SearchServiceOp) LinksByTop(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortTop], opts)
 
 	root, resp, err := s.search(ctx, "", query)
@@ -117,8 +117,8 @@ func (s *SearchServiceOp) SearchLinksByTop(ctx context.Context, q string, opts *
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByComments searches for links with the highest number of comments in all of Reddit
-func (s *SearchServiceOp) SearchLinksByComments(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
+// LinksByComments searches for links with the highest number of comments in all of Reddit
+func (s *SearchServiceOp) LinksByComments(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortComments], opts)
 
 	root, resp, err := s.search(ctx, "", query)
@@ -129,8 +129,8 @@ func (s *SearchServiceOp) SearchLinksByComments(ctx context.Context, q string, o
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByRelevanceInSubreddit searches for link sorted by relevance to the search query in the specified subreddit
-func (s *SearchServiceOp) SearchLinksByRelevanceInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
+// LinksByRelevanceInSubreddit searches for link sorted by relevance to the search query in the specified subreddit
+func (s *SearchServiceOp) LinksByRelevanceInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortRelevance], opts)
 
 	root, resp, err := s.search(ctx, subreddit, query)
@@ -141,8 +141,8 @@ func (s *SearchServiceOp) SearchLinksByRelevanceInSubreddit(ctx context.Context,
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByHottestInSubreddit searches for the hottest links in the specified subreddit
-func (s *SearchServiceOp) SearchLinksByHottestInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
+// LinksByHottestInSubreddit searches for the hottest links in the specified subreddit
+func (s *SearchServiceOp) LinksByHottestInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortHot], opts)
 
 	root, resp, err := s.search(ctx, subreddit, query)
@@ -153,8 +153,8 @@ func (s *SearchServiceOp) SearchLinksByHottestInSubreddit(ctx context.Context, s
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByTopInSubreddit searches for the top links in the specified subreddit
-func (s *SearchServiceOp) SearchLinksByTopInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
+// LinksByTopInSubreddit searches for the top links in the specified subreddit
+func (s *SearchServiceOp) LinksByTopInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortTop], opts)
 
 	root, resp, err := s.search(ctx, subreddit, query)
@@ -165,8 +165,8 @@ func (s *SearchServiceOp) SearchLinksByTopInSubreddit(ctx context.Context, subre
 	return root.getLinks(), resp, nil
 }
 
-// SearchLinksByCommentsInSubreddit searches for links with the highest number of comments in the specified subreddit
-func (s *SearchServiceOp) SearchLinksByCommentsInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
+// LinksByCommentsInSubreddit searches for links with the highest number of comments in the specified subreddit
+func (s *SearchServiceOp) LinksByCommentsInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
 	query := newSearchQuery(q, "link", sorts[sortComments], opts)
 
 	root, resp, err := s.search(ctx, subreddit, query)
@@ -177,8 +177,8 @@ func (s *SearchServiceOp) SearchLinksByCommentsInSubreddit(ctx context.Context, 
 	return root.getLinks(), resp, nil
 }
 
-// SearchSubreddits searches for subreddits
-func (s *SearchServiceOp) SearchSubreddits(ctx context.Context, q string, opts *ListOptions) (*Subreddits, *Response, error) {
+// Subreddits searches for subreddits
+func (s *SearchServiceOp) Subreddits(ctx context.Context, q string, opts *ListOptions) (*Subreddits, *Response, error) {
 	query := newSearchQuery(q, "sr", "", opts)
 
 	root, resp, err := s.search(ctx, "", query)
@@ -189,8 +189,8 @@ func (s *SearchServiceOp) SearchSubreddits(ctx context.Context, q string, opts *
 	return root.getSubreddits(), resp, nil
 }
 
-// SearchSubredditNames searches for subreddits with names beginning with the query provided
-func (s *SearchServiceOp) SearchSubredditNames(ctx context.Context, q string) ([]string, *Response, error) {
+// SubredditNames searches for subreddits with names beginning with the query provided
+func (s *SearchServiceOp) SubredditNames(ctx context.Context, q string) ([]string, *Response, error) {
 	path := fmt.Sprintf("api/search_reddit_names?query=%s", q)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -207,9 +207,9 @@ func (s *SearchServiceOp) SearchSubredditNames(ctx context.Context, q string) ([
 	return root.Names, resp, nil
 }
 
-// SearchSubredditInfo searches for subreddits with names beginning with the query provided
+// SubredditInfo searches for subreddits with names beginning with the query provided
 // They hold a bit more info that just the name
-func (s *SearchServiceOp) SearchSubredditInfo(ctx context.Context, q string) ([]SubredditShort, *Response, error) {
+func (s *SearchServiceOp) SubredditInfo(ctx context.Context, q string) ([]SubredditShort, *Response, error) {
 	path := fmt.Sprintf("api/search_subreddits?query=%s", q)
 
 	req, err := s.client.NewRequest(http.MethodPost, path, nil)
