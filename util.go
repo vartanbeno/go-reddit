@@ -7,6 +7,8 @@ import (
 	"reflect"
 )
 
+var timestampType = reflect.TypeOf(Timestamp{})
+
 // String is a helper routine that allocates a new string value
 // to store v and returns a pointer to it.
 func String(v string) *string {
@@ -89,6 +91,12 @@ func stringifySlice(w io.Writer, v reflect.Value) {
 func stringifyStruct(w io.Writer, v reflect.Value) {
 	if v.Type().Name() != "" {
 		_, _ = w.Write([]byte(v.Type().String()))
+	}
+
+	// special handling of Timestamp values
+	if v.Type() == timestampType {
+		fmt.Fprintf(w, "{%s}", v.Interface())
+		return
 	}
 
 	_, _ = w.Write([]byte{'{'})
