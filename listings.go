@@ -13,6 +13,7 @@ import (
 type ListingsService interface {
 	Get(ctx context.Context, ids ...string) ([]Comment, []Link, []Subreddit, *Response, error)
 	GetLinks(ctx context.Context, ids ...string) ([]Link, *Response, error)
+	GetLink(ctx context.Context, id string) (*LinkAndComments, *Response, error)
 }
 
 // ListingsServiceOp implements the Vote interface
@@ -22,7 +23,7 @@ type ListingsServiceOp struct {
 
 var _ ListingsService = &ListingsServiceOp{}
 
-// Get returns comments, link, and subreddits from their IDs
+// Get returns comments, links, and subreddits from their IDs
 func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) ([]Comment, []Link, []Subreddit, *Response, error) {
 	type query struct {
 		IDs []string `url:"id,comma"`
@@ -52,7 +53,7 @@ func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) ([]Comment, 
 	return comments, links, subreddits, resp, nil
 }
 
-// GetLinks returns links from their IDs
+// GetLinks returns links from their full IDs
 func (s *ListingsServiceOp) GetLinks(ctx context.Context, ids ...string) ([]Link, *Response, error) {
 	if len(ids) == 0 {
 		return nil, nil, errors.New("must provide at least 1 id")
@@ -71,4 +72,21 @@ func (s *ListingsServiceOp) GetLinks(ctx context.Context, ids ...string) ([]Link
 	}
 
 	return root.getLinks().Links, resp, nil
+}
+
+// GetLink returns a link with its comments
+func (s *ListingsServiceOp) GetLink(ctx context.Context, id string) (*LinkAndComments, *Response, error) {
+	path := fmt.Sprintf("comments/%s", id)
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(LinkAndComments)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, nil
 }

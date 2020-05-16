@@ -274,18 +274,52 @@ func DoRequestWithClient(ctx context.Context, client *http.Client, req *http.Req
 // JSONErrorResponse is an error response that sometimes gets returned with a 200 code
 type JSONErrorResponse struct {
 	// HTTP response that caused this error
-	Response *http.Response
+	Response *http.Response `json:"-"`
 
 	JSON *struct {
-		Errors [][]string `json:"errors,omitempty"`
+		Errors []RedditError `json:"errors,omitempty"`
 	} `json:"json,omitempty"`
+}
+
+// RedditError is an error coming from Reddit
+type RedditError struct {
+	Label  string
+	Reason string
+	Field  string
+}
+
+func (e *RedditError) Error() string {
+	return fmt.Sprintf("%s: %s because of field %q", e.Label, e.Reason, e.Field)
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (e *RedditError) UnmarshalJSON(data []byte) error {
+	var info []string
+
+	err := json.Unmarshal(data, &info)
+	if err != nil {
+		return err
+	}
+
+	if len(info) != 3 {
+		return fmt.Errorf("got unexpected Reddit error: %v", info)
+	}
+
+	e.Label = info[0]
+	e.Reason = info[1]
+	e.Field = info[2]
+
+	return nil
 }
 
 func (r *JSONErrorResponse) Error() string {
 	var message string
 	if r.JSON != nil && len(r.JSON.Errors) > 0 {
-		for _, errList := range r.JSON.Errors {
-			message += strings.Join(errList, ", ")
+		for i, err := range r.JSON.Errors {
+			message += err.Error()
+			if i < len(r.JSON.Errors)-1 {
+				message += ";"
+			}
 		}
 	}
 	return fmt.Sprintf(

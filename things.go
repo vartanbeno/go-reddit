@@ -1,6 +1,9 @@
 package geddit
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"errors"
+)
 
 const (
 	kindComment   = "t1"
@@ -39,6 +42,13 @@ var sorts = [...]string{
 	"relevance",
 	"comments",
 }
+
+type sticky int
+
+const (
+	sticky1 sticky = iota + 1
+	sticky2
+)
 
 type root struct {
 	Kind string      `json:"kind,omitempty"`
@@ -97,6 +107,7 @@ func (l *Things) UnmarshalJSON(b []byte) error {
 	for _, child := range children {
 		byteValue, _ := json.Marshal(child)
 		switch child["kind"] {
+		// todo: kindMore
 		case kindComment:
 			root := new(commentRoot)
 			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
@@ -168,12 +179,27 @@ type Comment struct {
 	CanGild     bool `json:"can_gild"`
 	NSFW        bool `json:"over_18"`
 
-	// If a comment has no replies, its "replies" value is "",
-	// which the unmarshaler doesn't like
-	// So we capture this varying field in RepliesRaw, and then
-	// fill it in Replies
-	RepliesRaw json.RawMessage `json:"replies,omitempty"`
-	Replies    []commentRoot   `json:"-"`
+	Replies Replies `json:"replies"`
+}
+
+// Replies are replies to a comment
+type Replies []Comment
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (r *Replies) UnmarshalJSON(data []byte) error {
+	// if a comment has no replies, its "replies" field is set to ""
+	if string(data) == `""` {
+		return nil
+	}
+
+	root := new(rootListing)
+	err := json.Unmarshal(data, root)
+	if err != nil {
+		return err
+	}
+
+	*r = root.getComments().Comments
+	return nil
 }
 
 // Link is a submitted post on Reddit
@@ -327,4 +353,35 @@ type CommentsLinksSubreddits struct {
 	Comments   []Comment   `json:"comments,omitempty"`
 	Links      []Link      `json:"links,omitempty"`
 	Subreddits []Subreddit `json:"subreddits,omitempty"`
+}
+
+// LinkAndComments is a link and its comments
+type LinkAndComments struct {
+	Link     Link      `json:"link,omitempty"`
+	Comments []Comment `json:"comments,omitempty"`
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+// When getting a sticky post, you get an array of 2 Listings
+// The 1st one contains the single post in its children array
+// The 2nd one contains the comments to the post
+func (rl *LinkAndComments) UnmarshalJSON(data []byte) error {
+	var l []rootListing
+
+	err := json.Unmarshal(data, &l)
+	if err != nil {
+		return err
+	}
+
+	if len(l) < 2 {
+		return errors.New("unexpected json response when getting link")
+	}
+
+	stickyLink := l[0].getLinks().Links[0]
+	stickyComments := l[1].getComments().Comments
+
+	rl.Link = stickyLink
+	rl.Comments = stickyComments
+
+	return nil
 }
