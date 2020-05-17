@@ -36,9 +36,7 @@ func (s *SearchServiceOp) Posts(query string) *PostSearchBuilder {
 	b.client = s.client
 	b.opts.Query = query
 	b.opts.Type = "link"
-	b.opts.Sort = SortRelevance.String()
-	b.opts.Timespan = TimespanAll.String()
-	return b
+	return b.Sort(SortRelevance).Timespan(TimespanAll)
 }
 
 // Subreddits searches for subreddits.
@@ -95,12 +93,16 @@ func (b *PostSearchBuilder) Limit(limit int) *PostSearchBuilder {
 	return b
 }
 
-// InSubreddits restricts the search to happen in the specified subreddits only.
-// If none are set, the search is run against r/all.
-func (b *PostSearchBuilder) InSubreddits(subreddits ...string) *PostSearchBuilder {
+// FromSubreddits restricts the search to happen in the specified subreddits only.
+func (b *PostSearchBuilder) FromSubreddits(subreddits ...string) *PostSearchBuilder {
 	b.subreddits = subreddits
 	b.opts.RestrictSubreddits = len(subreddits) > 0
 	return b
+}
+
+// FromAll runs the search against r/all.
+func (b *PostSearchBuilder) FromAll() *PostSearchBuilder {
+	return b.FromSubreddits()
 }
 
 // Sort sets the sort option.
