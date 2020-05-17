@@ -17,18 +17,8 @@ const (
 	kindMode      = "more"
 )
 
-type sort int
-
-const (
-	sortHot sort = iota
-	sortBest
-	sortNew
-	sortRising
-	sortControversial
-	sortTop
-	sortRelevance
-	sortComments
-)
+// Sort is a sorting option.
+type Sort int
 
 var sorts = [...]string{
 	"hot",
@@ -37,10 +27,58 @@ var sorts = [...]string{
 	"rising",
 	"controversial",
 	"top",
-
-	// for search queries
 	"relevance",
 	"comments",
+}
+
+// Different sorting options.
+const (
+	SortHot Sort = iota
+	SortBest
+	SortNew
+	SortRising
+	SortControversial
+	SortTop
+	SortRelevance
+	SortComments
+)
+
+func (s Sort) String() string {
+	if s < SortHot || s > SortComments {
+		return ""
+	}
+	return sorts[s]
+}
+
+// Timespan is a timespan option.
+// E.g. "hour" means in the last hour, "all" means all-time.
+// It is used when conducting searches.
+type Timespan int
+
+var timespans = [...]string{
+	"hour",
+	"day",
+	"week",
+	"month",
+	"year",
+	"all",
+}
+
+// Different timespan options.
+const (
+	TimespanHour Timespan = iota
+	TimespanDay
+	TimespanWeek
+	TimespanMonth
+	TimespanYear
+	TimespanAll
+)
+
+func (t Timespan) String() string {
+	if t < TimespanHour || t > TimespanAll {
+		return ""
+	}
+	return timespans[t]
 }
 
 type sticky int

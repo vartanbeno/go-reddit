@@ -38,6 +38,9 @@ type SubredditService interface {
 	SubscribeByID(ctx context.Context, ids ...string) (*Response, error)
 	Unsubscribe(ctx context.Context, subreddits ...string) (*Response, error)
 	UnsubscribeByID(ctx context.Context, ids ...string) (*Response, error)
+
+	SearchSubredditNames(ctx context.Context, query string) ([]string, *Response, error)
+	SearchSubredditInfo(ctx context.Context, query string) ([]SubredditShort, *Response, error)
 }
 
 // SubredditServiceOp implements the SubredditService interface
@@ -46,6 +49,21 @@ type SubredditServiceOp struct {
 }
 
 var _ SubredditService = &SubredditServiceOp{}
+
+type subredditNamesRoot struct {
+	Names []string `json:"names,omitempty"`
+}
+
+type subredditShortsRoot struct {
+	Subreddits []SubredditShort `json:"subreddits,omitempty"`
+}
+
+// SubredditShort represents minimal information about a subreddit
+type SubredditShort struct {
+	Name        string `json:"name,omitempty"`
+	Subscribers int    `json:"subscriber_count"`
+	ActiveUsers int    `json:"active_user_count"`
+}
 
 // GetByName gets a subreddit by name
 func (s *SubredditServiceOp) GetByName(ctx context.Context, subreddit string) (*Subreddit, *Response, error) {
@@ -113,7 +131,7 @@ func (s *SubredditServiceOp) GetMineWhereStreams(ctx context.Context, opts *List
 // IMPORTANT: for subreddits, this will include the stickied posts (if any)
 // PLUS the number of posts from the limit parameter (which is 25 by default)
 func (s *SubredditServiceOp) GetHotLinks(ctx context.Context, opts *ListOptions, subreddits ...string) (*Links, *Response, error) {
-	return s.getLinks(ctx, sortHot, opts, subreddits...)
+	return s.getLinks(ctx, SortHot, opts, subreddits...)
 }
 
 // GetBestLinks returns the best links
@@ -121,31 +139,31 @@ func (s *SubredditServiceOp) GetHotLinks(ctx context.Context, opts *ListOptions,
 // IMPORTANT: for subreddits, this will include the stickied posts (if any)
 // PLUS the number of posts from the limit parameter (which is 25 by default)
 func (s *SubredditServiceOp) GetBestLinks(ctx context.Context, opts *ListOptions, subreddits ...string) (*Links, *Response, error) {
-	return s.getLinks(ctx, sortBest, opts, subreddits...)
+	return s.getLinks(ctx, SortBest, opts, subreddits...)
 }
 
 // GetNewLinks returns the new links
 // If no subreddit are provided, then it runs the search against all those the client is subscribed to
 func (s *SubredditServiceOp) GetNewLinks(ctx context.Context, opts *ListOptions, subreddits ...string) (*Links, *Response, error) {
-	return s.getLinks(ctx, sortNew, opts, subreddits...)
+	return s.getLinks(ctx, SortNew, opts, subreddits...)
 }
 
 // GetRisingLinks returns the rising links
 // If no subreddit are provided, then it runs the search against all those the client is subscribed to
 func (s *SubredditServiceOp) GetRisingLinks(ctx context.Context, opts *ListOptions, subreddits ...string) (*Links, *Response, error) {
-	return s.getLinks(ctx, sortRising, opts, subreddits...)
+	return s.getLinks(ctx, SortRising, opts, subreddits...)
 }
 
 // GetControversialLinks returns the controversial links
 // If no subreddit are provided, then it runs the search against all those the client is subscribed to
 func (s *SubredditServiceOp) GetControversialLinks(ctx context.Context, opts *ListOptions, subreddits ...string) (*Links, *Response, error) {
-	return s.getLinks(ctx, sortControversial, opts, subreddits...)
+	return s.getLinks(ctx, SortControversial, opts, subreddits...)
 }
 
 // GetTopLinks returns the top links
 // If no subreddit are provided, then it runs the search against all those the client is subscribed to
 func (s *SubredditServiceOp) GetTopLinks(ctx context.Context, opts *ListOptions, subreddits ...string) (*Links, *Response, error) {
-	return s.getLinks(ctx, sortTop, opts, subreddits...)
+	return s.getLinks(ctx, SortTop, opts, subreddits...)
 }
 
 // GetSticky1 returns the first stickied post on a subreddit (if it exists)
@@ -194,6 +212,43 @@ func (s *SubredditServiceOp) UnsubscribeByID(ctx context.Context, ids ...string)
 	return s.handleSubscription(ctx, form)
 }
 
+// SearchSubredditNames searches for subreddits with names beginning with the query provided
+func (s *SubredditServiceOp) SearchSubredditNames(ctx context.Context, query string) ([]string, *Response, error) {
+	path := fmt.Sprintf("api/search_reddit_names?query=%s", query)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(subredditNamesRoot)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Names, resp, nil
+}
+
+// SearchSubredditInfo searches for subreddits with names beginning with the query provided.
+// They hold a bit more info that just the name, but still not much.
+func (s *SubredditServiceOp) SearchSubredditInfo(ctx context.Context, query string) ([]SubredditShort, *Response, error) {
+	path := fmt.Sprintf("api/search_subreddits?query=%s", query)
+
+	req, err := s.client.NewRequest(http.MethodPost, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(subredditShortsRoot)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Subreddits, resp, nil
+}
+
 func (s *SubredditServiceOp) handleSubscription(ctx context.Context, form url.Values) (*Response, error) {
 	path := "api/subscribe"
 	req, err := s.client.NewPostForm(path, form)
@@ -237,10 +292,10 @@ func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opt
 	return l, resp, nil
 }
 
-func (s *SubredditServiceOp) getLinks(ctx context.Context, sort sort, opts *ListOptions, subreddits ...string) (*Links, *Response, error) {
+func (s *SubredditServiceOp) getLinks(ctx context.Context, sort Sort, opts *ListOptions, subreddits ...string) (*Links, *Response, error) {
 	path := sorts[sort]
 	if len(subreddits) > 0 {
-		path = fmt.Sprintf("r/%s/%s", strings.Join(subreddits, "+"), sorts[sort])
+		path = fmt.Sprintf("r/%s/%s", strings.Join(subreddits, "+"), sort)
 	}
 
 	path, err := addOptions(path, opts)

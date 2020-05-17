@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // SearchService handles communication with the search
@@ -12,20 +13,9 @@ import (
 // user must check the following in their preferences:
 // "include not safe for work (NSFW) search results in searches"
 type SearchService interface {
-	Users(ctx context.Context, q string, opts *ListOptions) (*Users, *Response, error)
-
-	LinksByRelevance(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
-	LinksByHottest(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
-	LinksByTop(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
-	LinksByComments(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error)
-	LinksByRelevanceInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
-	LinksByHottestInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
-	LinksByTopInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
-	LinksByCommentsInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error)
-
-	Subreddits(ctx context.Context, q string, opts *ListOptions) (*Subreddits, *Response, error)
-	SubredditNames(ctx context.Context, q string) ([]string, *Response, error)
-	SubredditInfo(ctx context.Context, q string) ([]SubredditShort, *Response, error)
+	Posts(query string) *PostSearchBuilder
+	Subreddits(query string) *SubredditSearchBuilder
+	Users(query string) *UserSearchBuilder
 }
 
 // SearchServiceOp implements the VoteService interface
@@ -35,153 +25,161 @@ type SearchServiceOp struct {
 
 var _ SearchService = &SearchServiceOp{}
 
-type searchQuery struct {
-	ListOptions
-	Query string `url:"q,omitempty"`
-	Type  string `url:"type,omitempty"`
-	Sort  string `url:"sort,omitempty"`
+// Posts searches for posts.
+// By default, it searches for the most relevant posts of all time.
+// To change the sorting, use PostSearchBuilder.Sort().
+// Possible sort options: relevance, hot, top, new, comments.
+// To change the timespan, use PostSearchBuilder.Timespan().
+// Possible timespan options: hour, day, week, month, year, all.
+func (s *SearchServiceOp) Posts(query string) *PostSearchBuilder {
+	b := new(PostSearchBuilder)
+	b.client = s.client
+	b.opts.Query = query
+	b.opts.Type = "link"
+	b.opts.Sort = SortRelevance.String()
+	b.opts.Timespan = TimespanAll.String()
+	return b
 }
 
-type subredditNamesRoot struct {
-	Names []string `json:"names,omitempty"`
+// Subreddits searches for subreddits.
+func (s *SearchServiceOp) Subreddits(query string) *SubredditSearchBuilder {
+	b := new(SubredditSearchBuilder)
+	b.client = s.client
+	b.opts.Query = query
+	b.opts.Type = "sr"
+	return b
 }
 
-type subredditShortsRoot struct {
-	Subreddits []SubredditShort `json:"subreddits,omitempty"`
+// Users searches for users.
+func (s *SearchServiceOp) Users(query string) *UserSearchBuilder {
+	b := new(UserSearchBuilder)
+	b.client = s.client
+	b.opts.Query = query
+	b.opts.Type = "user"
+	return b
 }
 
-// SubredditShort represents minimal information about a subreddit
-type SubredditShort struct {
-	Name        string `json:"name,omitempty"`
-	Subscribers int    `json:"subscriber_count"`
-	ActiveUsers int    `json:"active_user_count"`
+type searchOpts struct {
+	Query              string `url:"q"`
+	Type               string `url:"type,omitempty"`
+	After              string `url:"after,omitempty"`
+	Before             string `url:"before,omitempty"`
+	Limit              int    `url:"limit,omitempty"`
+	RestrictSubreddits bool   `url:"restrict_sr,omitempty"`
+	Sort               string `url:"sort,omitempty"`
+	Timespan           string `url:"t,omitempty"`
 }
 
-func newSearchQuery(query, _type, sort string, opts *ListOptions) *searchQuery {
-	if opts == nil {
-		opts = &ListOptions{}
+// PostSearchBuilder helps conducts searches that return posts.
+type PostSearchBuilder struct {
+	client     *Client
+	subreddits []string
+	opts       searchOpts
+}
+
+// After sets the after option.
+func (b *PostSearchBuilder) After(after string) *PostSearchBuilder {
+	b.opts.After = after
+	return b
+}
+
+// Before sets the before option.
+func (b *PostSearchBuilder) Before(before string) *PostSearchBuilder {
+	b.opts.Before = before
+	return b
+}
+
+// Limit sets the limit option.
+func (b *PostSearchBuilder) Limit(limit int) *PostSearchBuilder {
+	b.opts.Limit = limit
+	return b
+}
+
+// InSubreddits restricts the search to happen in the specified subreddits only.
+// If none are set, the search is run against r/all.
+func (b *PostSearchBuilder) InSubreddits(subreddits ...string) *PostSearchBuilder {
+	b.subreddits = subreddits
+	b.opts.RestrictSubreddits = len(subreddits) > 0
+	return b
+}
+
+// Sort sets the sort option.
+func (b *PostSearchBuilder) Sort(sort Sort) *PostSearchBuilder {
+	b.opts.Sort = sort.String()
+	return b
+}
+
+// Timespan sets the timespan option.
+func (b *PostSearchBuilder) Timespan(timespan Timespan) *PostSearchBuilder {
+	b.opts.Timespan = timespan.String()
+	return b
+}
+
+// Do conducts the search.
+func (b *PostSearchBuilder) Do(ctx context.Context) (*Links, *Response, error) {
+	path := "search"
+	if len(b.subreddits) > 0 {
+		path = fmt.Sprintf("r/%s/search", strings.Join(b.subreddits, "+"))
 	}
-	return &searchQuery{
-		ListOptions: *opts,
-		Query:       query,
-		Type:        _type,
-		Sort:        sort,
-	}
-}
 
-// Users searches for users
-func (s *SearchServiceOp) Users(ctx context.Context, q string, opts *ListOptions) (*Users, *Response, error) {
-	query := newSearchQuery(q, "user", "", opts)
-
-	root, resp, err := s.search(ctx, "", query)
+	path, err := addOptions(path, b.opts)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return root.getUsers(), resp, nil
-}
-
-// LinksByRelevance searches for links sorted by relevance to the search query in all of Reddit
-func (s *SearchServiceOp) LinksByRelevance(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
-	query := newSearchQuery(q, "link", sorts[sortRelevance], opts)
-
-	root, resp, err := s.search(ctx, "", query)
+	req, err := b.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := b.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
 	}
 
 	return root.getLinks(), resp, nil
 }
 
-// LinksByHottest searches for the hottest links in all of Reddit
-func (s *SearchServiceOp) LinksByHottest(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
-	query := newSearchQuery(q, "link", sorts[sortHot], opts)
+// SubredditSearchBuilder helps conducts searches that return subreddits.
+type SubredditSearchBuilder struct {
+	client *Client
+	opts   searchOpts
+}
 
-	root, resp, err := s.search(ctx, "", query)
+// After sets the after option.
+func (b *SubredditSearchBuilder) After(after string) *SubredditSearchBuilder {
+	b.opts.After = after
+	return b
+}
+
+// Before sets the before option.
+func (b *SubredditSearchBuilder) Before(before string) *SubredditSearchBuilder {
+	b.opts.Before = before
+	return b
+}
+
+// Limit sets the limit option.
+func (b *SubredditSearchBuilder) Limit(limit int) *SubredditSearchBuilder {
+	b.opts.Limit = limit
+	return b
+}
+
+// Do conducts the search.
+func (b *SubredditSearchBuilder) Do(ctx context.Context) (*Subreddits, *Response, error) {
+	path := "search"
+	path, err := addOptions(path, b.opts)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return root.getLinks(), resp, nil
-}
-
-// LinksByTop searches for the top links in all of Reddit
-func (s *SearchServiceOp) LinksByTop(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
-	query := newSearchQuery(q, "link", sorts[sortTop], opts)
-
-	root, resp, err := s.search(ctx, "", query)
+	req, err := b.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	return root.getLinks(), resp, nil
-}
-
-// LinksByComments searches for links with the highest number of comments in all of Reddit
-func (s *SearchServiceOp) LinksByComments(ctx context.Context, q string, opts *ListOptions) (*Links, *Response, error) {
-	query := newSearchQuery(q, "link", sorts[sortComments], opts)
-
-	root, resp, err := s.search(ctx, "", query)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return root.getLinks(), resp, nil
-}
-
-// LinksByRelevanceInSubreddit searches for link sorted by relevance to the search query in the specified subreddit
-func (s *SearchServiceOp) LinksByRelevanceInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
-	query := newSearchQuery(q, "link", sorts[sortRelevance], opts)
-
-	root, resp, err := s.search(ctx, subreddit, query)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return root.getLinks(), resp, nil
-}
-
-// LinksByHottestInSubreddit searches for the hottest links in the specified subreddit
-func (s *SearchServiceOp) LinksByHottestInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
-	query := newSearchQuery(q, "link", sorts[sortHot], opts)
-
-	root, resp, err := s.search(ctx, subreddit, query)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return root.getLinks(), resp, nil
-}
-
-// LinksByTopInSubreddit searches for the top links in the specified subreddit
-func (s *SearchServiceOp) LinksByTopInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
-	query := newSearchQuery(q, "link", sorts[sortTop], opts)
-
-	root, resp, err := s.search(ctx, subreddit, query)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return root.getLinks(), resp, nil
-}
-
-// LinksByCommentsInSubreddit searches for links with the highest number of comments in the specified subreddit
-func (s *SearchServiceOp) LinksByCommentsInSubreddit(ctx context.Context, subreddit, q string, opts *ListOptions) (*Links, *Response, error) {
-	query := newSearchQuery(q, "link", sorts[sortComments], opts)
-
-	root, resp, err := s.search(ctx, subreddit, query)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return root.getLinks(), resp, nil
-}
-
-// Subreddits searches for subreddits
-func (s *SearchServiceOp) Subreddits(ctx context.Context, q string, opts *ListOptions) (*Subreddits, *Response, error) {
-	query := newSearchQuery(q, "sr", "", opts)
-
-	root, resp, err := s.search(ctx, "", query)
+	root := new(rootListing)
+	resp, err := b.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -189,64 +187,48 @@ func (s *SearchServiceOp) Subreddits(ctx context.Context, q string, opts *ListOp
 	return root.getSubreddits(), resp, nil
 }
 
-// SubredditNames searches for subreddits with names beginning with the query provided
-func (s *SearchServiceOp) SubredditNames(ctx context.Context, q string) ([]string, *Response, error) {
-	path := fmt.Sprintf("api/search_reddit_names?query=%s", q)
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(subredditNamesRoot)
-	resp, err := s.client.Do(ctx, req, root)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return root.Names, resp, nil
+// UserSearchBuilder helps conducts searches that return posts.
+type UserSearchBuilder struct {
+	client *Client
+	opts   searchOpts
 }
 
-// SubredditInfo searches for subreddits with names beginning with the query provided
-// They hold a bit more info that just the name
-func (s *SearchServiceOp) SubredditInfo(ctx context.Context, q string) ([]SubredditShort, *Response, error) {
-	path := fmt.Sprintf("api/search_subreddits?query=%s", q)
-
-	req, err := s.client.NewRequest(http.MethodPost, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(subredditShortsRoot)
-	resp, err := s.client.Do(ctx, req, root)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return root.Subreddits, resp, nil
+// After sets the after option.
+func (b *UserSearchBuilder) After(after string) *UserSearchBuilder {
+	b.opts.After = after
+	return b
 }
 
-func (s *SearchServiceOp) search(ctx context.Context, subreddit string, opts *searchQuery) (*rootListing, *Response, error) {
+// Before sets the before option.
+func (b *UserSearchBuilder) Before(before string) *UserSearchBuilder {
+	b.opts.Before = before
+	return b
+}
+
+// Limit sets the limit option.
+func (b *UserSearchBuilder) Limit(limit int) *UserSearchBuilder {
+	b.opts.Limit = limit
+	return b
+}
+
+// Do conducts the search.
+func (b *UserSearchBuilder) Do(ctx context.Context) (*Users, *Response, error) {
 	path := "search"
-	if subreddit != "" {
-		path = fmt.Sprintf("r/%s/search?restrict_sr=true", subreddit)
-	}
-
-	path, err := addOptions(path, opts)
+	path, err := addOptions(path, b.opts)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	req, err := b.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	root := new(rootListing)
-	resp, err := s.client.Do(ctx, req, root)
+	resp, err := b.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root, resp, nil
+	return root.getUsers(), resp, nil
 }

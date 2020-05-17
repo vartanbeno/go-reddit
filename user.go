@@ -191,25 +191,25 @@ func (s *UserServiceOp) GetControversialLinks(ctx context.Context, opts *ListOpt
 
 // GetHotLinksOf returns a list of the user's hottest submissions
 func (s *UserServiceOp) GetHotLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, sorts[sortHot])
+	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, SortHot)
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetNewLinksOf returns a list of the user's newest submissions
 func (s *UserServiceOp) GetNewLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, sorts[sortNew])
+	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, SortNew)
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetTopLinksOf returns a list of the user's top submissions
 func (s *UserServiceOp) GetTopLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, sorts[sortTop])
+	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, SortTop)
 	return s.getLinks(ctx, path, opts)
 }
 
 // GetControversialLinksOf returns a list of the user's most controversial submissions
 func (s *UserServiceOp) GetControversialLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, sorts[sortControversial])
+	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, SortControversial)
 	return s.getLinks(ctx, path, opts)
 }
 
@@ -265,25 +265,25 @@ func (s *UserServiceOp) GetControversialComments(ctx context.Context, opts *List
 
 // GetHotCommentsOf returns a list of the user's hottest comments
 func (s *UserServiceOp) GetHotCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
-	path := fmt.Sprintf("user/%s/comments?sort=%s", username, sorts[sortHot])
+	path := fmt.Sprintf("user/%s/comments?sort=%s", username, SortHot)
 	return s.getComments(ctx, path, opts)
 }
 
 // GetNewCommentsOf returns a list of the user's newest comments
 func (s *UserServiceOp) GetNewCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
-	path := fmt.Sprintf("user/%s/comments?sort=%s", username, sorts[sortNew])
+	path := fmt.Sprintf("user/%s/comments?sort=%s", username, SortNew)
 	return s.getComments(ctx, path, opts)
 }
 
 // GetTopCommentsOf returns a list of the user's top comments
 func (s *UserServiceOp) GetTopCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
-	path := fmt.Sprintf("user/%s/comments?sort=%s", username, sorts[sortTop])
+	path := fmt.Sprintf("user/%s/comments?sort=%s", username, SortTop)
 	return s.getComments(ctx, path, opts)
 }
 
 // GetControversialCommentsOf returns a list of the user's most controversial comments
 func (s *UserServiceOp) GetControversialCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
-	path := fmt.Sprintf("user/%s/comments?sort=%s", username, sorts[sortControversial])
+	path := fmt.Sprintf("user/%s/comments?sort=%s", username, SortControversial)
 	return s.getComments(ctx, path, opts)
 }
 
