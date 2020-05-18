@@ -17,35 +17,17 @@ type UserService interface {
 	Overview(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
 	OverviewOf(ctx context.Context, username string, opts *ListOptions) (*CommentsLinks, *Response, error)
 
-	// returns the client's links
-	GetHotLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
-	GetNewLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
-	GetTopLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
-	GetControversialLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
+	GetPosts() *UserPostFinder
+	GetPostsOf(username string) *UserPostFinder
 
-	// returns the links of the user with the username
-	GetHotLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error)
-	GetNewLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error)
-	GetTopLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error)
-	GetControversialLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error)
+	GetComments() *UserCommentFinder
+	GetCommentsOf(username string) *UserCommentFinder
 
-	GetUpvoted(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
-	GetDownvoted(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
-	GetHidden(ctx context.Context, opts *ListOptions) (*Links, *Response, error)
+	GetUpvoted() *UserPostFinder
+	GetDownvoted() *UserPostFinder
+	GetHidden() *UserPostFinder
 	GetSaved(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
 	GetGilded(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
-
-	// returns the client's comments
-	GetHotComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error)
-	GetNewComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error)
-	GetTopComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error)
-	GetControversialComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error)
-
-	// returns the comments of the user with the username
-	GetHotCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error)
-	GetNewCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error)
-	GetTopCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error)
-	GetControversialCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error)
 
 	Friend(ctx context.Context, username string, note string) (interface{}, *Response, error)
 	Unblock(ctx context.Context, username string) (*Response, error)
@@ -169,66 +151,42 @@ func (s *UserServiceOp) OverviewOf(ctx context.Context, username string, opts *L
 	return s.getCommentsAndLinks(ctx, path, opts)
 }
 
-// GetHotLinks returns a list of the client's hottest submissions
-func (s *UserServiceOp) GetHotLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
-	return s.GetHotLinksOf(ctx, s.client.Username, opts)
+// GetPosts returns a list of the client's posts.
+func (s *UserServiceOp) GetPosts() *UserPostFinder {
+	return s.GetPostsOf(s.client.Username)
 }
 
-// GetNewLinks returns a list of the client's newest submissions
-func (s *UserServiceOp) GetNewLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
-	return s.GetNewLinksOf(ctx, s.client.Username, opts)
+// GetPostsOf returns a list of the user's posts.
+func (s *UserServiceOp) GetPostsOf(username string) *UserPostFinder {
+	return newUserPostFinder(s.client, username, "submitted")
 }
 
-// GetTopLinks returns a list of the client's top submissions
-func (s *UserServiceOp) GetTopLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
-	return s.GetTopLinksOf(ctx, s.client.Username, opts)
+// GetComments returns a list of the client's comments.
+func (s *UserServiceOp) GetComments() *UserCommentFinder {
+	return s.GetCommentsOf(s.client.Username)
 }
 
-// GetControversialLinks returns a list of the client's most controversial submissions
-func (s *UserServiceOp) GetControversialLinks(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
-	return s.GetControversialLinksOf(ctx, s.client.Username, opts)
-}
-
-// GetHotLinksOf returns a list of the user's hottest submissions
-func (s *UserServiceOp) GetHotLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, SortHot)
-	return s.getLinks(ctx, path, opts)
-}
-
-// GetNewLinksOf returns a list of the user's newest submissions
-func (s *UserServiceOp) GetNewLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, SortNew)
-	return s.getLinks(ctx, path, opts)
-}
-
-// GetTopLinksOf returns a list of the user's top submissions
-func (s *UserServiceOp) GetTopLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, SortTop)
-	return s.getLinks(ctx, path, opts)
-}
-
-// GetControversialLinksOf returns a list of the user's most controversial submissions
-func (s *UserServiceOp) GetControversialLinksOf(ctx context.Context, username string, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/submitted?sort=%s", username, SortControversial)
-	return s.getLinks(ctx, path, opts)
+// GetCommentsOf returns a list of a user's comments.
+func (s *UserServiceOp) GetCommentsOf(username string) *UserCommentFinder {
+	f := new(UserCommentFinder)
+	f.client = s.client
+	f.username = username
+	return f
 }
 
 // GetUpvoted returns a list of the client's upvoted submissions
-func (s *UserServiceOp) GetUpvoted(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/upvoted", s.client.Username)
-	return s.getLinks(ctx, path, opts)
+func (s *UserServiceOp) GetUpvoted() *UserPostFinder {
+	return newUserPostFinder(s.client, s.client.Username, "upvoted")
 }
 
 // GetDownvoted returns a list of the client's downvoted submissions
-func (s *UserServiceOp) GetDownvoted(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/downvoted", s.client.Username)
-	return s.getLinks(ctx, path, opts)
+func (s *UserServiceOp) GetDownvoted() *UserPostFinder {
+	return newUserPostFinder(s.client, s.client.Username, "downvoted")
 }
 
 // GetHidden returns a list of the client's hidden submissions
-func (s *UserServiceOp) GetHidden(ctx context.Context, opts *ListOptions) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/hidden", s.client.Username)
-	return s.getLinks(ctx, path, opts)
+func (s *UserServiceOp) GetHidden() *UserPostFinder {
+	return newUserPostFinder(s.client, s.client.Username, "hidden")
 }
 
 // GetSaved returns a list of the client's saved comments and links
@@ -241,50 +199,6 @@ func (s *UserServiceOp) GetSaved(ctx context.Context, opts *ListOptions) (*Comme
 func (s *UserServiceOp) GetGilded(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error) {
 	path := fmt.Sprintf("user/%s/gilded", s.client.Username)
 	return s.getCommentsAndLinks(ctx, path, opts)
-}
-
-// GetHotComments returns a list of the client's hottest comments
-func (s *UserServiceOp) GetHotComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error) {
-	return s.GetHotCommentsOf(ctx, s.client.Username, opts)
-}
-
-// GetNewComments returns a list of the client's newest comments
-func (s *UserServiceOp) GetNewComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error) {
-	return s.GetNewCommentsOf(ctx, s.client.Username, opts)
-}
-
-// GetTopComments returns a list of the client's top comments
-func (s *UserServiceOp) GetTopComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error) {
-	return s.GetTopCommentsOf(ctx, s.client.Username, opts)
-}
-
-// GetControversialComments returns a list of the client's most controversial comments
-func (s *UserServiceOp) GetControversialComments(ctx context.Context, opts *ListOptions) (*Comments, *Response, error) {
-	return s.GetControversialCommentsOf(ctx, s.client.Username, opts)
-}
-
-// GetHotCommentsOf returns a list of the user's hottest comments
-func (s *UserServiceOp) GetHotCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
-	path := fmt.Sprintf("user/%s/comments?sort=%s", username, SortHot)
-	return s.getComments(ctx, path, opts)
-}
-
-// GetNewCommentsOf returns a list of the user's newest comments
-func (s *UserServiceOp) GetNewCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
-	path := fmt.Sprintf("user/%s/comments?sort=%s", username, SortNew)
-	return s.getComments(ctx, path, opts)
-}
-
-// GetTopCommentsOf returns a list of the user's top comments
-func (s *UserServiceOp) GetTopCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
-	path := fmt.Sprintf("user/%s/comments?sort=%s", username, SortTop)
-	return s.getComments(ctx, path, opts)
-}
-
-// GetControversialCommentsOf returns a list of the user's most controversial comments
-func (s *UserServiceOp) GetControversialCommentsOf(ctx context.Context, username string, opts *ListOptions) (*Comments, *Response, error) {
-	path := fmt.Sprintf("user/%s/comments?sort=%s", username, SortControversial)
-	return s.getComments(ctx, path, opts)
 }
 
 // Friend creates or updates a "friend" relationship
@@ -386,4 +300,137 @@ func (s *UserServiceOp) getListing(ctx context.Context, path string, opts *ListO
 	}
 
 	return root, resp, err
+}
+
+// UserPostFinder finds the posts of a user.
+type UserPostFinder struct {
+	client   *Client
+	username string
+	// where can be submitted, upvoted, downvoted, hidden
+	// https://www.reddit.com/dev/api/#GET_user_{username}_{where}
+	where string
+	opts  struct {
+		After  string `url:"after,omitempty"`
+		Before string `url:"before,omitempty"`
+		Limit  int    `url:"limit,omitempty"`
+		Sort   string `url:"sort,omitempty"`
+	}
+}
+
+func newUserPostFinder(cli *Client, username string, where string) *UserPostFinder {
+	f := new(UserPostFinder)
+	f.client = cli
+	f.username = username
+	f.where = where
+	return f
+}
+
+// After sets the after option.
+func (f *UserPostFinder) After(after string) *UserPostFinder {
+	f.opts.After = after
+	return f
+}
+
+// Before sets the before option.
+func (f *UserPostFinder) Before(before string) *UserPostFinder {
+	f.opts.Before = before
+	return f
+}
+
+// Limit sets the limit option.
+func (f *UserPostFinder) Limit(limit int) *UserPostFinder {
+	f.opts.Limit = limit
+	return f
+}
+
+// Sort sets the sort option.
+func (f *UserPostFinder) Sort(sort Sort) *UserPostFinder {
+	f.opts.Sort = sort.String()
+	return f
+}
+
+// Do conducts the search.
+func (f *UserPostFinder) Do(ctx context.Context) (*Links, *Response, error) {
+	path := fmt.Sprintf("user/%s/%s", f.username, f.where)
+	path, err := addOptions(path, f.opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := f.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := f.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.getLinks(), resp, nil
+}
+
+// UserCommentFinder finds the comments of a user.
+type UserCommentFinder struct {
+	client   *Client
+	username string
+	opts     struct {
+		After  string `url:"after,omitempty"`
+		Before string `url:"before,omitempty"`
+		Limit  int    `url:"limit,omitempty"`
+		Sort   string `url:"sort,omitempty"`
+	}
+}
+
+// OfUser specified the user we want to get the comments of.
+func (f *UserCommentFinder) OfUser(username string) *UserCommentFinder {
+	f.username = username
+	return f
+}
+
+// After sets the after option.
+func (f *UserCommentFinder) After(after string) *UserCommentFinder {
+	f.opts.After = after
+	return f
+}
+
+// Before sets the before option.
+func (f *UserCommentFinder) Before(before string) *UserCommentFinder {
+	f.opts.Before = before
+	return f
+}
+
+// Limit sets the limit option.
+func (f *UserCommentFinder) Limit(limit int) *UserCommentFinder {
+	f.opts.Limit = limit
+	return f
+}
+
+// Sort sets the sort option.
+func (f *UserCommentFinder) Sort(sort Sort) *UserCommentFinder {
+	f.opts.Sort = sort.String()
+	return f
+}
+
+// Do conducts the search.
+func (f *UserCommentFinder) Do(ctx context.Context) (*Comments, *Response, error) {
+	path := fmt.Sprintf("user/%s/comments", f.username)
+	path, err := addOptions(path, f.opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := f.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := f.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.getComments(), resp, nil
 }
