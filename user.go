@@ -55,6 +55,7 @@ type User struct {
 	IsEmployee       bool `json:"is_employee"`
 	HasVerifiedEmail bool `json:"has_verified_email"`
 	NSFW             bool `json:"over_18"`
+	IsSuspended      bool `json:"is_suspended"`
 }
 
 // UserShort represents a Reddit user, but contains fewer pieces of information
