@@ -181,6 +181,9 @@ type Comment struct {
 	ParentID  string `json:"parent_id,omitempty"`
 	Permalink string `json:"permalink,omitempty"`
 
+	Created *Timestamp `json:"created_utc,omitempty"`
+	Edited  *Timestamp `json:"edited,omitempty"`
+
 	Body            string `json:"body,omitempty"`
 	Author          string `json:"author,omitempty"`
 	AuthorID        string `json:"author_fullname,omitempty"`
@@ -197,9 +200,6 @@ type Comment struct {
 
 	Score            int `json:"score"`
 	Controversiality int `json:"controversiality"`
-
-	Created *Timestamp `json:"created_utc,omitempty"`
-	Edited  *Timestamp `json:"edited,omitempty"`
 
 	LinkID string `json:"link_id,omitempty"`
 

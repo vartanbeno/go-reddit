@@ -14,18 +14,18 @@ type UserService interface {
 	GetMultipleByID(ctx context.Context, ids ...string) (map[string]*UserShort, *Response, error)
 	UsernameAvailable(ctx context.Context, username string) (bool, *Response, error)
 
-	Overview(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
-	OverviewOf(ctx context.Context, username string, opts *ListOptions) (*CommentsLinks, *Response, error)
+	Overview(opts ...SearchOpt) *UserCommentPostSearcher
+	OverviewOf(username string, opts ...SearchOpt) *UserCommentPostSearcher
 
-	GetPosts() *UserPostFinder
-	GetPostsOf(username string) *UserPostFinder
+	Posts(opts ...SearchOpt) *UserPostSearcher
+	PostsOf(username string, opts ...SearchOpt) *UserPostSearcher
 
-	GetComments() *UserCommentFinder
-	GetCommentsOf(username string) *UserCommentFinder
+	Comments(opts ...SearchOpt) *UserCommentSearcher
+	CommentsOf(username string, opts ...SearchOpt) *UserCommentSearcher
 
-	GetUpvoted() *UserPostFinder
-	GetDownvoted() *UserPostFinder
-	GetHidden() *UserPostFinder
+	GetUpvoted(opts ...SearchOpt) *UserPostSearcher
+	GetDownvoted(opts ...SearchOpt) *UserPostSearcher
+	GetHidden(opts ...SearchOpt) *UserPostSearcher
 	GetSaved(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
 	GetGilded(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error)
 
@@ -142,61 +142,98 @@ func (s *UserServiceOp) UsernameAvailable(ctx context.Context, username string) 
 }
 
 // Overview returns a list of the client's comments and links
-func (s *UserServiceOp) Overview(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error) {
-	return s.OverviewOf(ctx, s.client.Username, opts)
+func (s *UserServiceOp) Overview(opts ...SearchOpt) *UserCommentPostSearcher {
+	return s.OverviewOf(s.client.Username, opts...)
 }
 
 // OverviewOf returns a list of the user's comments and links
-func (s *UserServiceOp) OverviewOf(ctx context.Context, username string, opts *ListOptions) (*CommentsLinks, *Response, error) {
-	path := fmt.Sprintf("user/%s/overview", username)
-	return s.getCommentsAndLinks(ctx, path, opts)
+func (s *UserServiceOp) OverviewOf(username string, opts ...SearchOpt) *UserCommentPostSearcher {
+	sr := new(UserCommentPostSearcher)
+	sr.client = s.client
+	sr.username = username
+	sr.where = "overview"
+	for _, opt := range opts {
+		opt(sr)
+	}
+	return sr
 }
 
-// GetPosts returns a list of the client's posts.
-func (s *UserServiceOp) GetPosts() *UserPostFinder {
-	return s.GetPostsOf(s.client.Username)
+// Posts returns a list of the client's posts.
+func (s *UserServiceOp) Posts(opts ...SearchOpt) *UserPostSearcher {
+	return s.PostsOf(s.client.Username, opts...)
 }
 
-// GetPostsOf returns a list of the user's posts.
-func (s *UserServiceOp) GetPostsOf(username string) *UserPostFinder {
-	return newUserPostFinder(s.client, username, "submitted")
+// PostsOf returns a list of the user's posts.
+func (s *UserServiceOp) PostsOf(username string, opts ...SearchOpt) *UserPostSearcher {
+	sr := new(UserPostSearcher)
+	sr.client = s.client
+	sr.username = username
+	sr.where = "submitted"
+	for _, opt := range opts {
+		opt(sr)
+	}
+	return sr
 }
 
-// GetComments returns a list of the client's comments.
-func (s *UserServiceOp) GetComments() *UserCommentFinder {
-	return s.GetCommentsOf(s.client.Username)
+// Comments returns a list of the client's comments.
+func (s *UserServiceOp) Comments(opts ...SearchOpt) *UserCommentSearcher {
+	return s.CommentsOf(s.client.Username, opts...)
 }
 
-// GetCommentsOf returns a list of a user's comments.
-func (s *UserServiceOp) GetCommentsOf(username string) *UserCommentFinder {
-	f := new(UserCommentFinder)
-	f.client = s.client
-	f.username = username
-	return f
+// CommentsOf returns a list of a user's comments.
+func (s *UserServiceOp) CommentsOf(username string, opts ...SearchOpt) *UserCommentSearcher {
+	sr := new(UserCommentSearcher)
+	sr.client = s.client
+	sr.username = username
+	for _, opt := range opts {
+		opt(sr)
+	}
+	return sr
 }
 
-// GetUpvoted returns a list of the client's upvoted submissions
-func (s *UserServiceOp) GetUpvoted() *UserPostFinder {
-	return newUserPostFinder(s.client, s.client.Username, "upvoted")
+// GetUpvoted returns a list of the client's upvoted submissions.
+func (s *UserServiceOp) GetUpvoted(opts ...SearchOpt) *UserPostSearcher {
+	sr := new(UserPostSearcher)
+	sr.client = s.client
+	sr.username = s.client.Username
+	sr.where = "upvoted"
+	for _, opt := range opts {
+		opt(sr)
+	}
+	return sr
 }
 
-// GetDownvoted returns a list of the client's downvoted submissions
-func (s *UserServiceOp) GetDownvoted() *UserPostFinder {
-	return newUserPostFinder(s.client, s.client.Username, "downvoted")
+// GetDownvoted returns a list of the client's downvoted submissions.
+func (s *UserServiceOp) GetDownvoted(opts ...SearchOpt) *UserPostSearcher {
+	sr := new(UserPostSearcher)
+	sr.client = s.client
+	sr.username = s.client.Username
+	sr.where = "downvoted"
+	for _, opt := range opts {
+		opt(sr)
+	}
+	return sr
 }
 
-// GetHidden returns a list of the client's hidden submissions
-func (s *UserServiceOp) GetHidden() *UserPostFinder {
-	return newUserPostFinder(s.client, s.client.Username, "hidden")
+// GetHidden returns a list of the client's hidden submissions.
+func (s *UserServiceOp) GetHidden(opts ...SearchOpt) *UserPostSearcher {
+	sr := new(UserPostSearcher)
+	sr.client = s.client
+	sr.username = s.client.Username
+	sr.where = "hidden"
+	for _, opt := range opts {
+		opt(sr)
+	}
+	return sr
 }
 
-// GetSaved returns a list of the client's saved comments and links
+// GetSaved returns a list of the client's saved comments and links.
 func (s *UserServiceOp) GetSaved(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error) {
 	path := fmt.Sprintf("user/%s/saved", s.client.Username)
 	return s.getCommentsAndLinks(ctx, path, opts)
 }
 
-// GetGilded returns a list of the client's gilded comments and links
+// GetGilded returns a list of the client's gilded comments and links.
 func (s *UserServiceOp) GetGilded(ctx context.Context, opts *ListOptions) (*CommentsLinks, *Response, error) {
 	path := fmt.Sprintf("user/%s/gilded", s.client.Username)
 	return s.getCommentsAndLinks(ctx, path, opts)
@@ -303,135 +340,260 @@ func (s *UserServiceOp) getListing(ctx context.Context, path string, opts *ListO
 	return root, resp, err
 }
 
-// UserPostFinder finds the posts of a user.
-type UserPostFinder struct {
-	client   *Client
+// UserPostSearcher finds the posts of a user.
+type UserPostSearcher struct {
+	clientSearcher
 	username string
 	// where can be submitted, upvoted, downvoted, hidden
 	// https://www.reddit.com/dev/api/#GET_user_{username}_{where}
-	where string
-	opts  struct {
-		After  string `url:"after,omitempty"`
-		Before string `url:"before,omitempty"`
-		Limit  int    `url:"limit,omitempty"`
-		Sort   string `url:"sort,omitempty"`
-	}
+	where   string
+	after   string
+	Results []Link
 }
 
-func newUserPostFinder(cli *Client, username string, where string) *UserPostFinder {
-	f := new(UserPostFinder)
-	f.client = cli
-	f.username = username
-	f.where = where
-	return f
-}
-
-// After sets the after option.
-func (f *UserPostFinder) After(after string) *UserPostFinder {
-	f.opts.After = after
-	return f
-}
-
-// Before sets the before option.
-func (f *UserPostFinder) Before(before string) *UserPostFinder {
-	f.opts.Before = before
-	return f
-}
-
-// Limit sets the limit option.
-func (f *UserPostFinder) Limit(limit int) *UserPostFinder {
-	f.opts.Limit = limit
-	return f
-}
-
-// Sort sets the sort option.
-func (f *UserPostFinder) Sort(sort Sort) *UserPostFinder {
-	f.opts.Sort = sort.String()
-	return f
-}
-
-// Do conducts the search.
-func (f *UserPostFinder) Do(ctx context.Context) (*Links, *Response, error) {
-	path := fmt.Sprintf("user/%s/%s", f.username, f.where)
-	path, err := addOptions(path, f.opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := f.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(rootListing)
-	resp, err := f.client.Do(ctx, req, root)
+func (s *UserPostSearcher) search(ctx context.Context) (*Links, *Response, error) {
+	path := fmt.Sprintf("user/%s/%s", s.username, s.where)
+	root, resp, err := s.clientSearcher.Do(ctx, path)
 	if err != nil {
 		return nil, resp, err
 	}
-
 	return root.getLinks(), resp, nil
 }
 
-// UserCommentFinder finds the comments of a user.
-type UserCommentFinder struct {
-	client   *Client
+// Search runs the searcher.
+// The first return value tells the user if there are
+// more results that were cut off (due to the limit).
+func (s *UserPostSearcher) Search(ctx context.Context) (bool, *Response, error) {
+	root, resp, err := s.search(ctx)
+	if err != nil {
+		return false, resp, err
+	}
+
+	s.Results = root.Links
+	s.after = root.After
+
+	// if the "after" value is non-empty, it
+	// means there are more results to come.
+	moreResultsExist := s.after != ""
+
+	return moreResultsExist, resp, nil
+}
+
+// More runs the searcher again and adds to the results.
+// The first return value tells the user if there are
+// more results that were cut off (due to the limit).
+func (s *UserPostSearcher) More(ctx context.Context) (bool, *Response, error) {
+	if s.after == "" {
+		return s.Search(ctx)
+	}
+
+	s.setAfter(s.after)
+
+	root, resp, err := s.search(ctx)
+	if err != nil {
+		return false, resp, err
+	}
+
+	s.Results = append(s.Results, root.Links...)
+	s.after = root.After
+
+	// if the "after" value is non-empty, it
+	// means there are more results to come.
+	moreResultsExist := s.after != ""
+
+	return moreResultsExist, resp, nil
+}
+
+// All runs the searcher until it yields no more results.
+// The limit is set to 100, just to make the least amount
+// of requests possible. It is reset to its original value after.
+func (s *UserPostSearcher) All(ctx context.Context) error {
+	limit := s.opts.Limit
+
+	s.setLimit(100)
+	defer s.setLimit(limit)
+
+	var ok = true
+	var err error
+
+	for ok {
+		ok, _, err = s.More(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// UserCommentSearcher finds the comments of a user.
+type UserCommentSearcher struct {
+	clientSearcher
 	username string
-	opts     struct {
-		After  string `url:"after,omitempty"`
-		Before string `url:"before,omitempty"`
-		Limit  int    `url:"limit,omitempty"`
-		Sort   string `url:"sort,omitempty"`
-	}
+	after    string
+	Results  []Comment
 }
 
-// OfUser specified the user we want to get the comments of.
-func (f *UserCommentFinder) OfUser(username string) *UserCommentFinder {
-	f.username = username
-	return f
-}
-
-// After sets the after option.
-func (f *UserCommentFinder) After(after string) *UserCommentFinder {
-	f.opts.After = after
-	return f
-}
-
-// Before sets the before option.
-func (f *UserCommentFinder) Before(before string) *UserCommentFinder {
-	f.opts.Before = before
-	return f
-}
-
-// Limit sets the limit option.
-func (f *UserCommentFinder) Limit(limit int) *UserCommentFinder {
-	f.opts.Limit = limit
-	return f
-}
-
-// Sort sets the sort option.
-func (f *UserCommentFinder) Sort(sort Sort) *UserCommentFinder {
-	f.opts.Sort = sort.String()
-	return f
-}
-
-// Do conducts the search.
-func (f *UserCommentFinder) Do(ctx context.Context) (*Comments, *Response, error) {
-	path := fmt.Sprintf("user/%s/comments", f.username)
-	path, err := addOptions(path, f.opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := f.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(rootListing)
-	resp, err := f.client.Do(ctx, req, root)
+func (s *UserCommentSearcher) search(ctx context.Context) (*Comments, *Response, error) {
+	path := fmt.Sprintf("user/%s/comments", s.username)
+	root, resp, err := s.clientSearcher.Do(ctx, path)
 	if err != nil {
 		return nil, resp, err
 	}
-
 	return root.getComments(), resp, nil
+}
+
+// Search runs the searcher.
+// The first return value tells the user if there are
+// more results that were cut off (due to the limit).
+func (s *UserCommentSearcher) Search(ctx context.Context) (bool, *Response, error) {
+	root, resp, err := s.search(ctx)
+	if err != nil {
+		return false, resp, err
+	}
+
+	s.Results = root.Comments
+	s.after = root.After
+
+	// if the "after" value is non-empty, it
+	// means there are more results to come.
+	moreResultsExist := s.after != ""
+
+	return moreResultsExist, resp, nil
+}
+
+// More runs the searcher again and adds to the results.
+// The first return value tells the user if there are
+// more results that were cut off (due to the limit).
+func (s *UserCommentSearcher) More(ctx context.Context) (bool, *Response, error) {
+	if s.after == "" {
+		return s.Search(ctx)
+	}
+
+	s.setAfter(s.after)
+
+	root, resp, err := s.search(ctx)
+	if err != nil {
+		return false, resp, err
+	}
+
+	s.Results = append(s.Results, root.Comments...)
+	s.after = root.After
+
+	// if the "after" value is non-empty, it
+	// means there are more results to come.
+	moreResultsExist := s.after != ""
+
+	return moreResultsExist, resp, nil
+}
+
+// All runs the searcher until it yields no more results.
+// The limit is set to 100, just to make the least amount
+// of requests possible. It is reset to its original value after.
+func (s *UserCommentSearcher) All(ctx context.Context) error {
+	limit := s.opts.Limit
+
+	s.setLimit(100)
+	defer s.setLimit(limit)
+
+	var ok = true
+	var err error
+
+	for ok {
+		ok, _, err = s.More(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// UserCommentPostSearcher finds the comments and posts of a user.
+type UserCommentPostSearcher struct {
+	clientSearcher
+	username string
+	where    string
+	after    string
+	Results  struct {
+		Comments []Comment `json:"comments"`
+		Posts    []Link    `json:"posts"`
+	}
+}
+
+func (s *UserCommentPostSearcher) search(ctx context.Context) (*Comments, *Links, *Response, error) {
+	path := fmt.Sprintf("user/%s/%s", s.username, s.where)
+	root, resp, err := s.clientSearcher.Do(ctx, path)
+	if err != nil {
+		return nil, nil, resp, err
+	}
+	return root.getComments(), root.getLinks(), resp, nil
+}
+
+// Search runs the searcher.
+// The first return value tells the user if there are
+// more results that were cut off (due to the limit).
+func (s *UserCommentPostSearcher) Search(ctx context.Context) (bool, *Response, error) {
+	rootComments, rootPosts, resp, err := s.search(ctx)
+	if err != nil {
+		return false, resp, err
+	}
+
+	s.Results.Comments = rootComments.Comments
+	s.Results.Posts = rootPosts.Links
+	s.after = rootComments.After
+
+	// if the "after" value is non-empty, it
+	// means there are more results to come.
+	moreResultsExist := s.after != ""
+
+	return moreResultsExist, resp, nil
+}
+
+// More runs the searcher again and adds to the results.
+// The first return value tells the user if there are
+// more results that were cut off (due to the limit).
+func (s *UserCommentPostSearcher) More(ctx context.Context) (bool, *Response, error) {
+	if s.after == "" {
+		return s.Search(ctx)
+	}
+
+	s.setAfter(s.after)
+
+	rootComments, rootPosts, resp, err := s.search(ctx)
+	if err != nil {
+		return false, resp, err
+	}
+
+	s.Results.Comments = append(s.Results.Comments, rootComments.Comments...)
+	s.Results.Posts = append(s.Results.Posts, rootPosts.Links...)
+	s.after = rootComments.After
+
+	// if the "after" value is non-empty, it
+	// means there are more results to come.
+	moreResultsExist := s.after != ""
+
+	return moreResultsExist, resp, nil
+}
+
+// All runs the searcher until it yields no more results.
+// The limit is set to 100, just to make the least amount
+// of requests possible. It is reset to its original value after.
+func (s *UserCommentPostSearcher) All(ctx context.Context) error {
+	limit := s.opts.Limit
+
+	s.setLimit(100)
+	defer s.setLimit(limit)
+
+	var ok = true
+	var err error
+
+	for ok {
+		ok, _, err = s.More(ctx)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

@@ -306,8 +306,6 @@ func CheckResponse(r *http.Response) error {
 
 // ListOptions are the optional parameters to the various endpoints that return lists
 type ListOptions struct {
-	Type string `url:"type,omitempty"` // links or comments
-
 	// For getting submissions
 	// all, year, month, week, day, hour
 	Timespan string `url:"t,omitempty"`
@@ -315,7 +313,7 @@ type ListOptions struct {
 	// Common for all listing endpoints
 	After  string `url:"after,omitempty"`
 	Before string `url:"before,omitempty"`
-	Limit  int    `url:"limit,omitempty"` // default: 25
+	Limit  int    `url:"limit,omitempty"` // default: 25, max: 100
 }
 
 func addOptions(s string, opt interface{}) (string, error) {
