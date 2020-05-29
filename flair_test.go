@@ -3,8 +3,9 @@ package geddit
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var expectedFlairs = []Flair{
@@ -46,18 +47,13 @@ func TestFlairServiceOp_GetFlairs(t *testing.T) {
 	flairsBlob := readFileContents(t, "testdata/flairs.json")
 
 	mux.HandleFunc("/r/subreddit/api/user_flair", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, http.MethodGet)
+		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, flairsBlob)
 	})
 
 	flairs, _, err := client.Flair.GetFromSubreddit(ctx, "subreddit")
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
-
-	if expect, actual := expectedFlairs, flairs; !reflect.DeepEqual(expect, actual) {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, expectedFlairs, flairs)
 }
 
 func TestFlairServiceOp_GetFlairsV2(t *testing.T) {
@@ -67,16 +63,11 @@ func TestFlairServiceOp_GetFlairsV2(t *testing.T) {
 	flairsV2Blob := readFileContents(t, "testdata/flairs-v2.json")
 
 	mux.HandleFunc("/r/subreddit/api/user_flair_v2", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, http.MethodGet)
+		assert.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, flairsV2Blob)
 	})
 
 	flairs, _, err := client.Flair.GetFromSubredditV2(ctx, "subreddit")
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
-
-	if expect, actual := expectedFlairsV2, flairs; !reflect.DeepEqual(expect, actual) {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, expectedFlairsV2, flairs)
 }

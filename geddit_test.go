@@ -10,6 +10,8 @@ import (
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -45,12 +47,6 @@ func setup() {
 
 func teardown() {
 	server.Close()
-}
-
-func testMethod(t *testing.T, r *http.Request, expected string) {
-	if expected != r.Method {
-		t.Fatalf("Request method = %v, expected %v", r.Method, expected)
-	}
 }
 
 func readFileContents(t *testing.T, filepath string) string {
@@ -102,9 +98,7 @@ func testClientDefaults(t *testing.T, c *Client) {
 
 func TestNewClient(t *testing.T) {
 	c, err := NewClient(nil)
-	if err != nil {
-		t.Fatalf("got unexpected error: %+v", err)
-	}
+	assert.NoError(t, err)
 	testClientDefaults(t, c)
 }
 
@@ -114,11 +108,5 @@ func TestNewClient_Error(t *testing.T) {
 	}
 
 	_, err := NewClient(nil, errorOpt)
-	if err == nil {
-		t.Fatal("expected error, got nothing instead")
-	}
-
-	if expect, actual := "foo", err.Error(); expect != actual {
-		t.Fatalf("got unexpected error\nexpect: %+v\nactual: %+v", Stringify(expect), Stringify(actual))
-	}
+	assert.EqualError(t, err, "foo")
 }

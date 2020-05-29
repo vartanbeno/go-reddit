@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"reflect"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var expectedCommentSubmitOrEdit = &Comment{
@@ -19,15 +20,19 @@ var expectedCommentSubmitOrEdit = &Comment{
 	Author:          "reddit_username",
 	AuthorID:        "t2_user1",
 	AuthorFlairText: "Flair",
+	AuthorFlairID:   "024b2b66-05ca-11e1-96f4-12313d096aae",
 
 	Subreddit:             "subreddit",
 	SubredditNamePrefixed: "r/subreddit",
 	SubredditID:           "t5_test",
 
+	Likes: Bool(true),
+
 	Score:            1,
 	Controversiality: 0,
 
-	Created: &Timestamp{time.Date(2020, 4, 28, 20, 9, 47, 0, time.UTC)},
+	Created: &Timestamp{time.Date(2020, 4, 29, 0, 9, 47, 0, time.UTC)},
+	Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
 	LinkID: "t3_link1",
 }
@@ -39,7 +44,7 @@ func TestCommentServiceOp_Submit(t *testing.T) {
 	commentBlob := readFileContents(t, "testdata/comment-submit-edit.json")
 
 	mux.HandleFunc("/api/comment", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, http.MethodPost)
+		assert.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("api_type", "json")
@@ -47,22 +52,16 @@ func TestCommentServiceOp_Submit(t *testing.T) {
 		form.Set("parent", "t1_test")
 		form.Set("text", "test comment")
 
-		_ = r.ParseForm()
-		if expect, actual := form, r.PostForm; !reflect.DeepEqual(expect, actual) {
-			t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-		}
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, commentBlob)
 	})
 
 	comment, _, err := client.Comment.Submit(ctx, "t1_test", "test comment")
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
-
-	if expect, actual := expectedCommentSubmitOrEdit, comment; !reflect.DeepEqual(expect, actual) {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, expectedCommentSubmitOrEdit, comment)
 }
 
 func TestCommentServiceOp_Edit(t *testing.T) {
@@ -72,7 +71,7 @@ func TestCommentServiceOp_Edit(t *testing.T) {
 	commentBlob := readFileContents(t, "testdata/comment-submit-edit.json")
 
 	mux.HandleFunc("/api/editusertext", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, http.MethodPost)
+		assert.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("api_type", "json")
@@ -80,30 +79,19 @@ func TestCommentServiceOp_Edit(t *testing.T) {
 		form.Set("thing_id", "t1_test")
 		form.Set("text", "test comment")
 
-		_ = r.ParseForm()
-		if expect, actual := form, r.PostForm; !reflect.DeepEqual(expect, actual) {
-			t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-		}
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, commentBlob)
 	})
 
 	_, _, err := client.Comment.Edit(ctx, "t3_test", "test comment")
-	if err == nil {
-		t.Fatal("expected error, got nothing instead")
-	}
-	if expect, actual := `must provide comment id (starting with t1_); id provided: "t3_test"`, err.Error(); expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.EqualError(t, err, `must provide comment id (starting with t1_); id provided: "t3_test"`)
 
 	comment, _, err := client.Comment.Edit(ctx, "t1_test", "test comment")
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
-
-	if expect, actual := expectedCommentSubmitOrEdit, comment; !reflect.DeepEqual(expect, actual) {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, expectedCommentSubmitOrEdit, comment)
 }
 
 func TestCommentServiceOp_Delete(t *testing.T) {
@@ -111,35 +99,24 @@ func TestCommentServiceOp_Delete(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/del", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, http.MethodPost)
+		assert.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 
-		_ = r.ParseForm()
-		if expect, actual := form, r.PostForm; !reflect.DeepEqual(expect, actual) {
-			t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-		}
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, `{}`)
 	})
 
 	_, err := client.Comment.Delete(ctx, "t3_test")
-	if err == nil {
-		t.Fatal("expected error, got nothing instead")
-	}
-	if expect, actual := `must provide comment id (starting with t1_); id provided: "t3_test"`, err.Error(); expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.EqualError(t, err, `must provide comment id (starting with t1_); id provided: "t3_test"`)
 
 	res, err := client.Comment.Delete(ctx, "t1_test")
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
-
-	if expect, actual := http.StatusOK, res.StatusCode; expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentServiceOp_Save(t *testing.T) {
@@ -147,35 +124,24 @@ func TestCommentServiceOp_Save(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/save", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, http.MethodPost)
+		assert.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 
-		_ = r.ParseForm()
-		if expect, actual := form, r.PostForm; !reflect.DeepEqual(expect, actual) {
-			t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-		}
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, `{}`)
 	})
 
 	_, err := client.Comment.Save(ctx, "t3_test")
-	if err == nil {
-		t.Fatal("expected error, got nothing instead")
-	}
-	if expect, actual := `must provide comment id (starting with t1_); id provided: "t3_test"`, err.Error(); expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.EqualError(t, err, `must provide comment id (starting with t1_); id provided: "t3_test"`)
 
 	res, err := client.Comment.Save(ctx, "t1_test")
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
-
-	if expect, actual := http.StatusOK, res.StatusCode; expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentServiceOp_Unsave(t *testing.T) {
@@ -183,33 +149,22 @@ func TestCommentServiceOp_Unsave(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/unsave", func(w http.ResponseWriter, r *http.Request) {
-		testMethod(t, r, http.MethodPost)
+		assert.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 
-		_ = r.ParseForm()
-		if expect, actual := form, r.PostForm; !reflect.DeepEqual(expect, actual) {
-			t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-		}
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, `{}`)
 	})
 
 	_, err := client.Comment.Unsave(ctx, "t3_test")
-	if err == nil {
-		t.Fatal("expected error, got nothing instead")
-	}
-	if expect, actual := `must provide comment id (starting with t1_); id provided: "t3_test"`, err.Error(); expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.EqualError(t, err, `must provide comment id (starting with t1_); id provided: "t3_test"`)
 
 	res, err := client.Comment.Unsave(ctx, "t1_test")
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
-
-	if expect, actual := http.StatusOK, res.StatusCode; expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
