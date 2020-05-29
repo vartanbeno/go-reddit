@@ -341,3 +341,10 @@ func addOptions(s string, opt interface{}) (string, error) {
 	origURL.RawQuery = origValues.Encode()
 	return origURL.String(), nil
 }
+
+func addQuery(url string, query url.Values) string {
+	if query == nil || len(query) == 0 {
+		return url
+	}
+	return url + "?" + query.Encode()
+}

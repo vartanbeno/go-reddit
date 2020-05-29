@@ -3,6 +3,8 @@ package geddit
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -14,9 +16,9 @@ import (
 // Note: The "limit" parameter in searches is prone to inconsistent
 // behaviour.
 type SearchService interface {
-	Posts(query string, opts ...SearchOpt) *PostSearcher
-	Subreddits(query string, opts ...SearchOpt) *SubredditSearcher
-	Users(query string, opts ...SearchOpt) *UserSearcher
+	Posts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Links, *Response, error)
+	Subreddits(ctx context.Context, query string, opts ...SearchOptionSetter) (*Subreddits, *Response, error)
+	Users(ctx context.Context, query string, opts ...SearchOptionSetter) (*Users, *Response, error)
 }
 
 // SearchServiceOp implements the VoteService interface
@@ -26,60 +28,96 @@ type SearchServiceOp struct {
 
 var _ SearchService = &SearchServiceOp{}
 
+// SearchOptions define options used in search queries.
+type SearchOptions = url.Values
+
+func newSearchOptions(opts ...SearchOptionSetter) SearchOptions {
+	searchOptions := make(SearchOptions)
+	for _, opt := range opts {
+		opt(searchOptions)
+	}
+	return searchOptions
+}
+
+// SearchOptionSetter sets values for the options.
+type SearchOptionSetter func(opts SearchOptions)
+
+// SetAfter sets the after option.
+func SetAfter(v string) SearchOptionSetter {
+	return func(opts SearchOptions) {
+		opts.Set("after", v)
+	}
+}
+
+// SetBefore sets the before option.
+func SetBefore(v string) SearchOptionSetter {
+	return func(opts SearchOptions) {
+		opts.Set("before", v)
+	}
+}
+
+// SetLimit sets the limit option.
+// Warning: It seems like setting the limit to 1 sometimes returns 0 results.
+func SetLimit(v int) SearchOptionSetter {
+	return func(opts SearchOptions) {
+		opts.Set("limit", fmt.Sprint(v))
+	}
+}
+
+// SetSort sets the sort option.
+func SetSort(v Sort) SearchOptionSetter {
+	return func(opts SearchOptions) {
+		opts.Set("sort", v.String())
+	}
+}
+
+// SetTimespan sets the timespan option.
+func SetTimespan(v Timespan) SearchOptionSetter {
+	return func(opts SearchOptions) {
+		opts.Set("timespan", v.String())
+	}
+}
+
+// setType sets the type option.
+func setType(v string) SearchOptionSetter {
+	return func(opts SearchOptions) {
+		opts.Set("type", v)
+	}
+}
+
+// setQuery sets the q option.
+func setQuery(v string) SearchOptionSetter {
+	return func(opts SearchOptions) {
+		opts.Set("q", v)
+	}
+}
+
+// setRestrict sets the restrict_sr option.
+func setRestrict(opts SearchOptions) {
+	opts.Set("restruct_sr", "true")
+}
+
 // Posts searches for posts.
-// By default, it searches for the most relevant posts of all time.
-func (s *SearchServiceOp) Posts(query string, opts ...SearchOpt) *PostSearcher {
-	sr := new(PostSearcher)
-	sr.client = s.client
-	sr.opts.Query = query
-	sr.opts.Type = "link"
-	sr.opts.Sort = SortRelevance.String()
-	sr.opts.Timespan = TimespanAll.String()
-	for _, opt := range opts {
-		opt(sr)
-	}
-	return sr
-}
+// If the list of subreddits is empty, the search is run against r/all.
+func (s *SearchServiceOp) Posts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Links, *Response, error) {
+	opts = append(opts, setType("link"), setQuery(query))
 
-// Subreddits searches for subreddits.
-func (s *SearchServiceOp) Subreddits(query string, opts ...SearchOpt) *SubredditSearcher {
-	sr := new(SubredditSearcher)
-	sr.client = s.client
-	sr.opts.Query = query
-	sr.opts.Type = "sr"
-	for _, opt := range opts {
-		opt(sr)
-	}
-	return sr
-}
-
-// Users searches for users.
-func (s *SearchServiceOp) Users(query string, opts ...SearchOpt) *UserSearcher {
-	sr := new(UserSearcher)
-	sr.client = s.client
-	sr.opts.Query = query
-	sr.opts.Type = "user"
-	for _, opt := range opts {
-		opt(sr)
-	}
-	return sr
-}
-
-// PostSearcher helps conducts searches that return posts.
-type PostSearcher struct {
-	clientSearcher
-	subreddits []string
-	after      string
-	Results    []Link
-}
-
-func (s *PostSearcher) search(ctx context.Context) (*Links, *Response, error) {
 	path := "search"
-	if len(s.subreddits) > 0 {
-		path = fmt.Sprintf("r/%s/search", strings.Join(s.subreddits, "+"))
+	if len(subreddits) > 0 {
+		path = fmt.Sprintf("r/%s/search", strings.Join(subreddits, "+"))
+		opts = append(opts, setRestrict)
 	}
 
-	root, resp, err := s.clientSearcher.Do(ctx, path)
+	form := newSearchOptions(opts...)
+	path = addQuery(path, form)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
@@ -87,232 +125,48 @@ func (s *PostSearcher) search(ctx context.Context) (*Links, *Response, error) {
 	return root.getLinks(), resp, nil
 }
 
-// Search runs the searcher.
-// The first return value tells the user if there are
-// more results that were cut off (due to the limit).
-func (s *PostSearcher) Search(ctx context.Context) (bool, *Response, error) {
-	root, resp, err := s.search(ctx)
-	if err != nil {
-		return false, resp, err
-	}
+// Subreddits searches for subreddits.
+// The Sort and Timespan options don't affect the results for this search.
+func (s *SearchServiceOp) Subreddits(ctx context.Context, query string, opts ...SearchOptionSetter) (*Subreddits, *Response, error) {
+	opts = append(opts, setType("sr"), setQuery(query))
+	form := newSearchOptions(opts...)
 
-	s.Results = root.Links
-	s.after = root.After
-
-	// if the "after" value is non-empty, it
-	// means there are more results to come.
-	moreResultsExist := s.after != ""
-
-	return moreResultsExist, resp, nil
-}
-
-// More runs the searcher again and adds to the results.
-// The first return value tells the user if there are
-// more results that were cut off (due to the limit).
-func (s *PostSearcher) More(ctx context.Context) (bool, *Response, error) {
-	if s.after == "" {
-		return s.Search(ctx)
-	}
-
-	s.setAfter(s.after)
-
-	root, resp, err := s.search(ctx)
-	if err != nil {
-		return false, resp, err
-	}
-
-	s.Results = append(s.Results, root.Links...)
-	s.after = root.After
-
-	// if the "after" value is non-empty, it
-	// means there are more results to come.
-	moreResultsExist := s.after != ""
-
-	return moreResultsExist, resp, nil
-}
-
-// All runs the searcher until it yields no more results.
-// The limit is set to 100, just to make the least amount
-// of requests possible. It is reset to its original value after.
-func (s *PostSearcher) All(ctx context.Context) error {
-	limit := s.opts.Limit
-
-	s.setLimit(100)
-	defer s.setLimit(limit)
-
-	var ok = true
-	var err error
-
-	for ok {
-		ok, _, err = s.More(ctx)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// SubredditSearcher helps conducts searches that return subreddits.
-type SubredditSearcher struct {
-	clientSearcher
-	after   string
-	Results []Subreddit
-}
-
-func (s *SubredditSearcher) search(ctx context.Context) (*Subreddits, *Response, error) {
 	path := "search"
-	root, resp, err := s.clientSearcher.Do(ctx, path)
+	path = addQuery(path, form)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
+
 	return root.getSubreddits(), resp, nil
 }
 
-// Search runs the searcher.
-// The first return value tells the user if there are
-// more results that were cut off (due to the limit).
-func (s *SubredditSearcher) Search(ctx context.Context) (bool, *Response, error) {
-	root, resp, err := s.search(ctx)
-	if err != nil {
-		return false, resp, err
-	}
+// Users searches for users.
+// The Sort and Timespan options don't affect the results for this search.
+func (s *SearchServiceOp) Users(ctx context.Context, query string, opts ...SearchOptionSetter) (*Users, *Response, error) {
+	opts = append(opts, setType("user"), setQuery(query))
+	form := newSearchOptions(opts...)
 
-	s.Results = root.Subreddits
-	s.after = root.After
-
-	// if the "after" value is non-empty, it
-	// means there are more results to come.
-	moreResultsExist := s.after != ""
-
-	return moreResultsExist, resp, nil
-}
-
-// More runs the searcher again and adds to the results.
-// The first return value tells the user if there are
-// more results that were cut off (due to the limit).
-func (s *SubredditSearcher) More(ctx context.Context) (bool, *Response, error) {
-	if s.after == "" {
-		return s.Search(ctx)
-	}
-
-	s.setAfter(s.after)
-
-	root, resp, err := s.search(ctx)
-	if err != nil {
-		return false, resp, err
-	}
-
-	s.Results = append(s.Results, root.Subreddits...)
-	s.after = root.After
-
-	// if the "after" value is non-empty, it
-	// means there are more results to come.
-	moreResultsExist := s.after != ""
-
-	return moreResultsExist, resp, nil
-}
-
-// All runs the searcher until it yields no more results.
-// The limit is set to 100, just to make the least amount
-// of requests possible. It is reset to its original value after.
-func (s *SubredditSearcher) All(ctx context.Context) error {
-	limit := s.opts.Limit
-
-	s.setLimit(100)
-	defer s.setLimit(limit)
-
-	var ok = true
-	var err error
-
-	for ok {
-		ok, _, err = s.More(ctx)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// UserSearcher helps conducts searches that return users.
-type UserSearcher struct {
-	clientSearcher
-	after   string
-	Results []User
-}
-
-func (s *UserSearcher) search(ctx context.Context) (*Users, *Response, error) {
 	path := "search"
-	root, resp, err := s.clientSearcher.Do(ctx, path)
+	path = addQuery(path, form)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
+
 	return root.getUsers(), resp, nil
-}
-
-// Search runs the searcher.
-// The first return value tells the user if there are
-// more results that were cut off (due to the limit).
-func (s *UserSearcher) Search(ctx context.Context) (bool, *Response, error) {
-	root, resp, err := s.search(ctx)
-	if err != nil {
-		return false, resp, err
-	}
-
-	s.Results = root.Users
-	s.after = root.After
-
-	// if the "after" value is non-empty, it
-	// means there are more results to come.
-	moreResultsExist := s.after != ""
-
-	return moreResultsExist, resp, nil
-}
-
-// More runs the searcher again and adds to the results.
-// The first return value tells the user if there are
-// more results that were cut off (due to the limit).
-func (s *UserSearcher) More(ctx context.Context) (bool, *Response, error) {
-	if s.after == "" {
-		return s.Search(ctx)
-	}
-
-	s.setAfter(s.after)
-
-	root, resp, err := s.search(ctx)
-	if err != nil {
-		return false, resp, err
-	}
-
-	s.Results = append(s.Results, root.Users...)
-	s.after = root.After
-
-	// if the "after" value is non-empty, it
-	// means there are more results to come.
-	moreResultsExist := s.after != ""
-
-	return moreResultsExist, resp, nil
-}
-
-// All runs the searcher until it yields no more results.
-// The limit is set to 100, just to make the least amount
-// of requests possible. It is reset to its original value after.
-func (s *UserSearcher) All(ctx context.Context) error {
-	limit := s.opts.Limit
-
-	s.setLimit(100)
-	defer s.setLimit(limit)
-
-	var ok = true
-	var err error
-
-	for ok {
-		ok, _, err = s.More(ctx)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
