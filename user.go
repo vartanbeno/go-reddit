@@ -43,7 +43,7 @@ var _ UserService = &UserServiceOp{}
 
 // User represents a Reddit user
 type User struct {
-	// is not the full ID, watch out
+	// this is not the full ID, watch out
 	ID      string     `json:"id,omitempty"`
 	Name    string     `json:"name,omitempty"`
 	Created *Timestamp `json:"created_utc,omitempty"`
@@ -105,13 +105,13 @@ func (s *UserServiceOp) GetMultipleByID(ctx context.Context, ids ...string) (map
 		return nil, nil, err
 	}
 
-	root := make(map[string]*UserShort)
+	root := new(map[string]*UserShort)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root, resp, nil
+	return *root, resp, nil
 }
 
 // UsernameAvailable checks whether a username is available for registration
@@ -323,6 +323,28 @@ func (s *UserServiceOp) Gilded(ctx context.Context, opts ...SearchOptionSetter) 
 
 	return root.getLinks(), resp, nil
 }
+
+// // Friend creates or updates a "friend" relationship
+// // Request body contains JSON data with:
+// //   name: existing Reddit username
+// //   note: a string no longer than 300 characters
+// func (s *UserServiceOp) Friend(ctx context.Context, username string, note string) (interface{}, *Response, error) {
+// 	type request struct {
+// 		Username string `url:"name"`
+// 		Note     string `url:"note"`
+// 	}
+
+// 	path := fmt.Sprintf("api/v1/me/friends/%s", username)
+// 	body := request{Username: username, Note: note}
+
+// 	_, err := s.client.NewRequest(http.MethodPut, path, body)
+// 	if err != nil {
+// 		return false, nil, err
+// 	}
+
+// 	// todo: requires gold
+// 	return nil, nil, nil
+// }
 
 // Friend creates or updates a "friend" relationship
 // Request body contains JSON data with:

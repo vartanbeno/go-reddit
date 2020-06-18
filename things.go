@@ -176,13 +176,13 @@ func (l *Things) UnmarshalJSON(b []byte) error {
 
 // Comment is a comment posted by a user
 type Comment struct {
-	ID        string `json:"id,omitempty"`
-	FullID    string `json:"name,omitempty"`
-	ParentID  string `json:"parent_id,omitempty"`
-	Permalink string `json:"permalink,omitempty"`
-
+	ID      string     `json:"id,omitempty"`
+	FullID  string     `json:"name,omitempty"`
 	Created *Timestamp `json:"created_utc,omitempty"`
 	Edited  *Timestamp `json:"edited,omitempty"`
+
+	ParentID  string `json:"parent_id,omitempty"`
+	Permalink string `json:"permalink,omitempty"`
 
 	Body            string `json:"body,omitempty"`
 	Author          string `json:"author,omitempty"`
