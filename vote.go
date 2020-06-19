@@ -43,12 +43,7 @@ func (s *VoteServiceOp) vote(ctx context.Context, id string, vote vote) (*Respon
 		return nil, err
 	}
 
-	resp, err := s.client.Do(ctx, req, nil)
-	if err != nil {
-		return resp, err
-	}
-
-	return resp, nil
+	return s.client.Do(ctx, req, nil)
 }
 
 // Up upvotes a link or a comment

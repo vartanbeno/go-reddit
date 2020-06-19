@@ -1,6 +1,7 @@
 package geddit
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -100,6 +101,24 @@ var expectedComment = Comment{
 	LinkPermalink:   "https://www.reddit.com/r/apple/comments/d7ejpn/im_giving_away_an_iphone_11_pro_to_a_commenter_at/",
 	LinkAuthor:      "iamthatis",
 	LinkNumComments: 89751,
+}
+
+var expectedFriendship = &Friendship{
+	ID:       "r9_tqfqp8",
+	Friend:   "test123",
+	FriendID: "t2_7b8q1eob",
+	Created:  &Timestamp{time.Date(2020, 6, 18, 20, 36, 34, 0, time.UTC)},
+}
+
+var expectedBlocked = &Blocked{
+	Blocked:   "test123",
+	BlockedID: "t2_3v9o1yoi",
+	Created:   &Timestamp{time.Date(2020, 6, 16, 16, 49, 50, 0, time.UTC)},
+}
+
+var expectedTrophies = Trophies{
+	{Name: "Three-Year Club"},
+	{Name: "Verified Email"},
 }
 
 func TestUserService_Get(t *testing.T) {
@@ -563,4 +582,186 @@ func TestUserService_Gilded(t *testing.T) {
 	assert.Equal(t, expectedPost, posts.Links[0])
 	assert.Equal(t, "t3_gczwql", posts.After)
 	assert.Equal(t, "", posts.Before)
+}
+
+func TestUserService_GetFriendship(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/user/friend.json")
+
+	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	friendship, _, err := client.User.GetFriendship(ctx, "test123")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedFriendship, friendship)
+}
+
+func TestUserService_Friend(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/user/friend.json")
+
+	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPut, r.Method)
+
+		type request struct {
+			Username string `json:"name"`
+		}
+
+		var req request
+		err := json.NewDecoder(r.Body).Decode(&req)
+		assert.NoError(t, err)
+		assert.Equal(t, "test123", req.Username)
+
+		fmt.Fprint(w, blob)
+	})
+
+	friendship, _, err := client.User.Friend(ctx, "test123")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedFriendship, friendship)
+}
+
+func TestUserService_Unfriend(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodDelete, r.Method)
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	res, err := client.User.Unfriend(ctx, "test123")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusNoContent, res.StatusCode)
+}
+
+func TestUserService_Block(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/user/block.json")
+
+	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("name", "test123")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	blocked, _, err := client.User.Block(ctx, "test123")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedBlocked, blocked)
+}
+
+// func TestUserService_BlockByID(t *testing.T) {
+// 	setup()
+// 	defer teardown()
+
+// 	blob := readFileContents(t, "testdata/user/block.json")
+
+// 	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
+// 		assert.Equal(t, http.MethodPost, r.Method)
+
+// 		form := url.Values{}
+// 		form.Set("account_id", "abc123")
+
+// 		err := r.ParseForm()
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, form, r.Form)
+
+// 		fmt.Fprint(w, blob)
+// 	})
+
+// 	blocked, _, err := client.User.BlockByID(ctx, "abc123")
+// 	assert.NoError(t, err)
+// 	assert.Equal(t, expectedBlocked, blocked)
+// }
+
+func TestUserService_Unblock(t *testing.T) {
+	setup()
+	defer teardown()
+
+	client.redditID = "self123"
+
+	mux.HandleFunc("/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("name", "test123")
+		form.Set("type", "enemy")
+		form.Set("container", client.redditID)
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.User.Unblock(ctx, "test123")
+	assert.NoError(t, err)
+}
+
+// func TestUserService_UnblockByID(t *testing.T) {
+// 	setup()
+// 	defer teardown()
+
+// 	client.redditID = "self123"
+
+// 	mux.HandleFunc("/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
+// 		assert.Equal(t, http.MethodPost, r.Method)
+
+// 		form := url.Values{}
+// 		form.Set("id", "abc123")
+// 		form.Set("type", "enemy")
+// 		form.Set("container", client.redditID)
+
+// 		err := r.ParseForm()
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, form, r.Form)
+// 	})
+
+// 	_, err := client.User.UnblockByID(ctx, "abc123")
+// 	assert.NoError(t, err)
+// }
+
+func TestUserService_GetTrophies(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/user/trophies.json")
+
+	mux.HandleFunc("/api/v1/user/user1/trophies", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	trophies, _, err := client.User.GetTrophies(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedTrophies, trophies)
+}
+
+func TestUserService_GetTrophiesOf(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/user/trophies.json")
+
+	mux.HandleFunc("/api/v1/user/test123/trophies", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	trophies, _, err := client.User.GetTrophiesOf(ctx, "test123")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedTrophies, trophies)
 }

@@ -46,7 +46,7 @@ func cloneRequest(r *http.Request) *http.Request {
 	return r2
 }
 
-// sets the User-Agent header for requests
+// Sets the User-Agent header for requests.
 type userAgentTransport struct {
 	ua   string
 	Base http.RoundTripper
@@ -70,12 +70,12 @@ func (t *userAgentTransport) base() http.RoundTripper {
 	return http.DefaultTransport
 }
 
-// RequestCompletionCallback defines the type of the request callback function
+// RequestCompletionCallback defines the type of the request callback function.
 type RequestCompletionCallback func(*http.Request, *http.Response)
 
-// Client manages communication with the Reddit API
+// Client manages communication with the Reddit API.
 type Client struct {
-	// HTTP client used to communicate with the Reddit API
+	// HTTP client used to communicate with the Reddit API.
 	client *http.Client
 
 	BaseURL  *url.URL
@@ -87,6 +87,9 @@ type Client struct {
 	Secret   string
 	Username string
 	Password string
+
+	// This is the client's user ID in Reddit's database.
+	redditID string
 
 	Comment   CommentService
 	Flair     FlairService
@@ -102,7 +105,7 @@ type Client struct {
 	onRequestCompleted RequestCompletionCallback
 }
 
-// OnRequestCompleted sets the client's request completion callback
+// OnRequestCompleted sets the client's request completion callback.
 func (c *Client) OnRequestCompleted(rc RequestCompletionCallback) {
 	c.onRequestCompleted = rc
 }
@@ -129,7 +132,7 @@ func newClient(httpClient *http.Client) *Client {
 	return c
 }
 
-// NewClient returns a client that can make requests to the Reddit API
+// NewClient returns a client that can make requests to the Reddit API.
 func NewClient(httpClient *http.Client, opts ...Opt) (c *Client, err error) {
 	c = newClient(httpClient)
 
@@ -158,9 +161,9 @@ func NewClient(httpClient *http.Client, opts ...Opt) (c *Client, err error) {
 	return
 }
 
-// NewRequest creates an API request
-// The path is the relative URL which will be resolves to the BaseURL of the Client
-// It should always be specified without a preceding slash
+// NewRequest creates an API request.
+// The path is the relative URL which will be resolves to the BaseURL of the Client.
+// It should always be specified without a preceding slash.
 func (c *Client) NewRequest(method, path string, body interface{}) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(path)
 	if err != nil {
@@ -187,9 +190,9 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	return req, nil
 }
 
-// NewPostForm creates an API request with a POST form
-// The path is the relative URL which will be resolves to the BaseURL of the Client
-// It should always be specified without a preceding slash
+// NewPostForm creates an API request with a POST form.
+// The path is the relative URL which will be resolves to the BaseURL of the Client.
+// It should always be specified without a preceding slash.
 func (c *Client) NewPostForm(path string, form url.Values) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(path)
 	if err != nil {
@@ -212,7 +215,7 @@ type Response struct {
 	*http.Response
 }
 
-// newResponse creates a new Response for the provided http.Response
+// newResponse creates a new Response for the provided http.Response.
 func newResponse(r *http.Response) *Response {
 	response := Response{Response: r}
 	return &response
@@ -260,6 +263,21 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	return response, err
 }
 
+// GetRedditID returns the client's Reddit ID.
+func (c *Client) GetRedditID(ctx context.Context) (string, error) {
+	if c.redditID != "" {
+		return c.redditID, nil
+	}
+
+	self, _, err := c.User.Get(ctx, c.Username)
+	if err != nil {
+		return "", err
+	}
+
+	c.redditID = fmt.Sprintf("%s_%s", kindAccount, self.ID)
+	return c.redditID, nil
+}
+
 // DoRequest submits an HTTP request.
 func DoRequest(ctx context.Context, req *http.Request) (*http.Response, error) {
 	return DoRequestWithClient(ctx, http.DefaultClient, req)
@@ -304,7 +322,7 @@ func CheckResponse(r *http.Response) error {
 	return errorResponse
 }
 
-// ListOptions are the optional parameters to the various endpoints that return lists
+// ListOptions are the optional parameters to the various endpoints that return lists.
 type ListOptions struct {
 	// For getting submissions
 	// all, year, month, week, day, hour

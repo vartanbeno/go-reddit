@@ -6,15 +6,16 @@ import (
 )
 
 const (
-	kindComment   = "t1"
-	kindAccount   = "t2"
-	kindLink      = "t3"
-	kindMessage   = "t4"
-	kindSubreddit = "t5"
-	kindAward     = "t6"
-	kindListing   = "Listing"
-	kindUserList  = "UserList"
-	kindMode      = "more"
+	kindComment    = "t1"
+	kindAccount    = "t2"
+	kindLink       = "t3"
+	kindMessage    = "t4"
+	kindSubreddit  = "t5"
+	kindAward      = "t6"
+	kindListing    = "Listing"
+	kingTrophyList = "TrophyList"
+	kindUserList   = "UserList"
+	kindMode       = "more"
 )
 
 // Sort is a sorting option.

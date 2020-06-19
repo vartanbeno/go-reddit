@@ -1,0 +1,31 @@
+{
+  "kind": "TrophyList",
+  "data": {
+    "trophies": [
+      {
+        "kind": "t6",
+        "data": {
+          "icon_70": "https://www.redditstatic.com/awards2/3_year_club-70.png",
+          "name": "Three-Year Club",
+          "url": null,
+          "icon_40": "https://www.redditstatic.com/awards2/3_year_club-40.png",
+          "award_id": null,
+          "id": null,
+          "description": null
+        }
+      },
+      {
+        "kind": "t6",
+        "data": {
+          "icon_70": "https://www.redditstatic.com/awards2/verified_email-70.png",
+          "name": "Verified Email",
+          "url": null,
+          "icon_40": "https://www.redditstatic.com/awards2/verified_email-40.png",
+          "award_id": "o",
+          "id": "1q1tez",
+          "description": null
+        }
+      }
+    ]
+  }
+}

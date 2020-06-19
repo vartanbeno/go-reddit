@@ -2,6 +2,8 @@ package geddit
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -29,9 +31,17 @@ type UserService interface {
 	Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error)
 	Gilded(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error)
 
-	Friend(ctx context.Context, username string, note string) (interface{}, *Response, error)
-	Unblock(ctx context.Context, username string) (*Response, error)
+	GetFriendship(ctx context.Context, username string) (*Friendship, *Response, error)
+	Friend(ctx context.Context, username string) (*Friendship, *Response, error)
 	Unfriend(ctx context.Context, username string) (*Response, error)
+
+	Block(ctx context.Context, username string) (*Blocked, *Response, error)
+	// BlockByID(ctx context.Context, id string) (*Blocked, *Response, error)
+	Unblock(ctx context.Context, username string) (*Response, error)
+	// UnblockByID(ctx context.Context, id string) (*Response, error)
+
+	GetTrophies(ctx context.Context) (Trophies, *Response, error)
+	GetTrophiesOf(ctx context.Context, username string) (Trophies, *Response, error)
 }
 
 // UserServiceOp implements the UserService interface
@@ -68,6 +78,79 @@ type UserShort struct {
 	CommentKarma int `json:"comment_karma"`
 
 	NSFW bool `json:"profile_over_18"`
+}
+
+// Friendship represents a friend relationship.
+type Friendship struct {
+	ID       string     `json:"rel_id,omitempty"`
+	Friend   string     `json:"name,omitempty"`
+	FriendID string     `json:"id,omitempty"`
+	Created  *Timestamp `json:"date,omitempty"`
+}
+
+// Blocked represents a blocked relationship.
+type Blocked struct {
+	Blocked   string     `json:"name,omitempty"`
+	BlockedID string     `json:"id,omitempty"`
+	Created   *Timestamp `json:"date,omitempty"`
+}
+
+type rootTrophyListing struct {
+	Kind     string   `json:"kind,omitempty"`
+	Trophies Trophies `json:"data"`
+}
+
+// Trophy is a Reddit award.
+type Trophy struct {
+	Name string `json:"name"`
+}
+
+// Trophies is a list of trophies.
+type Trophies []Trophy
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (t *Trophies) UnmarshalJSON(b []byte) error {
+	var data map[string]interface{}
+	if err := json.Unmarshal(b, &data); err != nil {
+		return err
+	}
+
+	trophies, ok := data["trophies"]
+	if !ok {
+		return errors.New("data does not contain trophies")
+	}
+
+	trophyList, ok := trophies.([]interface{})
+	if !ok {
+		return errors.New("unexpected type for list of trophies")
+	}
+
+	for _, trophyData := range trophyList {
+		trophyInfo, ok := trophyData.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		info, ok := trophyInfo["data"]
+		if !ok {
+			continue
+		}
+
+		infoBytes, err := json.Marshal(info)
+		if err != nil {
+			continue
+		}
+
+		var trophy Trophy
+		err = json.Unmarshal(infoBytes, &trophy)
+		if err != nil {
+			continue
+		}
+
+		*t = append(*t, trophy)
+	}
+
+	return nil
 }
 
 // Get returns information about the user
@@ -324,58 +407,113 @@ func (s *UserServiceOp) Gilded(ctx context.Context, opts ...SearchOptionSetter) 
 	return root.getLinks(), resp, nil
 }
 
-// // Friend creates or updates a "friend" relationship
-// // Request body contains JSON data with:
-// //   name: existing Reddit username
-// //   note: a string no longer than 300 characters
-// func (s *UserServiceOp) Friend(ctx context.Context, username string, note string) (interface{}, *Response, error) {
-// 	type request struct {
-// 		Username string `url:"name"`
-// 		Note     string `url:"note"`
-// 	}
+// GetFriendship returns friendship details with the specified user.
+// If the user is not your friend, it will return an error.
+func (s *UserServiceOp) GetFriendship(ctx context.Context, username string) (*Friendship, *Response, error) {
+	path := fmt.Sprintf("api/v1/me/friends/%s", username)
 
-// 	path := fmt.Sprintf("api/v1/me/friends/%s", username)
-// 	body := request{Username: username, Note: note}
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
 
-// 	_, err := s.client.NewRequest(http.MethodPut, path, body)
-// 	if err != nil {
-// 		return false, nil, err
-// 	}
+	root := new(Friendship)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
 
-// 	// todo: requires gold
-// 	return nil, nil, nil
-// }
+	return root, resp, nil
+}
 
-// Friend creates or updates a "friend" relationship
-// Request body contains JSON data with:
-//   name: existing Reddit username
-//   note: a string no longer than 300 characters
-func (s *UserServiceOp) Friend(ctx context.Context, username string, note string) (interface{}, *Response, error) {
+// Friend friends a user.
+func (s *UserServiceOp) Friend(ctx context.Context, username string) (*Friendship, *Response, error) {
 	type request struct {
-		Username string `url:"name"`
-		Note     string `url:"note"`
+		Username string `json:"name"`
 	}
 
 	path := fmt.Sprintf("api/v1/me/friends/%s", username)
-	body := request{Username: username, Note: note}
+	body := request{username}
 
-	_, err := s.client.NewRequest(http.MethodPut, path, body)
+	req, err := s.client.NewRequest(http.MethodPut, path, body)
 	if err != nil {
-		return false, nil, err
+		return nil, nil, err
 	}
 
-	// todo: requires gold
-	return nil, nil, nil
+	root := new(Friendship)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, nil
 }
 
-// Unblock unblocks a user
+// Unfriend unfriends a user.
+func (s *UserServiceOp) Unfriend(ctx context.Context, username string) (*Response, error) {
+	path := fmt.Sprintf("api/v1/me/friends/%s", username)
+	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.Do(ctx, req, nil)
+}
+
+// Block blocks a user.
+func (s *UserServiceOp) Block(ctx context.Context, username string) (*Blocked, *Response, error) {
+	path := "api/block_user"
+
+	form := url.Values{}
+	form.Set("name", username)
+
+	req, err := s.client.NewPostForm(path, form)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(Blocked)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, nil
+}
+
+// // BlockByID blocks a user via their full id.
+// func (s *UserServiceOp) BlockByID(ctx context.Context, id string) (*Blocked, *Response, error) {
+// 	path := "api/block_user"
+
+// 	form := url.Values{}
+// 	form.Set("account_id", id)
+
+// 	req, err := s.client.NewPostForm(path, form)
+// 	if err != nil {
+// 		return nil, nil, err
+// 	}
+
+// 	root := new(Blocked)
+// 	resp, err := s.client.Do(ctx, req, root)
+// 	if err != nil {
+// 		return nil, resp, err
+// 	}
+
+// 	return root, resp, nil
+// }
+
+// Unblock unblocks a user.
 func (s *UserServiceOp) Unblock(ctx context.Context, username string) (*Response, error) {
+	selfID, err := s.client.GetRedditID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	path := "api/unfriend"
 
 	form := url.Values{}
 	form.Set("name", username)
 	form.Set("type", "enemy")
-	form.Set("container", "todo: this should be the current user's full id")
+	form.Set("container", selfID)
 
 	req, err := s.client.NewPostForm(path, form)
 	if err != nil {
@@ -385,13 +523,47 @@ func (s *UserServiceOp) Unblock(ctx context.Context, username string) (*Response
 	return s.client.Do(ctx, req, nil)
 }
 
-// Unfriend unfriends a user
-func (s *UserServiceOp) Unfriend(ctx context.Context, username string) (*Response, error) {
-	path := fmt.Sprintf("api/v1/me/friends/%s", username)
-	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
+// // UnblockByID unblocks a user via their full id.
+// func (s *UserServiceOp) UnblockByID(ctx context.Context, id string) (*Response, error) {
+// 	selfID, err := s.client.GetRedditID(ctx)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	path := "api/unfriend"
+
+// 	form := url.Values{}
+// 	form.Set("id", id)
+// 	form.Set("type", "enemy")
+// 	form.Set("container", selfID)
+
+// 	req, err := s.client.NewPostForm(path, form)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	return s.client.Do(ctx, req, nil)
+// }
+
+// GetTrophies returns a list of your trophies.
+func (s *UserServiceOp) GetTrophies(ctx context.Context) (Trophies, *Response, error) {
+	return s.GetTrophiesOf(ctx, s.client.Username)
+}
+
+// GetTrophiesOf returns a list of the specified user's trophies.
+func (s *UserServiceOp) GetTrophiesOf(ctx context.Context, username string) (Trophies, *Response, error) {
+	path := fmt.Sprintf("api/v1/user/%s/trophies", username)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return s.client.Do(ctx, req, nil)
+	root := new(rootTrophyListing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Trophies, resp, nil
 }
