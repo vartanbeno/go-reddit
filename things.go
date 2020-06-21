@@ -287,7 +287,7 @@ type Subreddit struct {
 	Name                 string `json:"display_name,omitempty"`
 	NamePrefixed         string `json:"display_name_prefixed,omitempty"`
 	Title                string `json:"title,omitempty"`
-	PublicDescription    string `json:"public_description,omitempty"`
+	Description          string `json:"public_description,omitempty"`
 	Type                 string `json:"subreddit_type,omitempty"`
 	SuggestedCommentSort string `json:"suggested_comment_sort,omitempty"`
 
