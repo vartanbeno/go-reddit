@@ -81,6 +81,35 @@ var expectedSubreddits = &Subreddits{
 	},
 }
 
+var expectedStickyPost = &LinkAndComments{
+	Link: Link{
+		ID:      "hcl9gq",
+		FullID:  "t3_hcl9gq",
+		Created: &Timestamp{time.Date(2020, 6, 20, 12, 8, 57, 0, time.UTC)},
+		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+		Permalink: "/r/nba/comments/hcl9gq/daily_discussion_thread_freetalk_and_other/",
+		URL:       "https://www.reddit.com/r/nba/comments/hcl9gq/daily_discussion_thread_freetalk_and_other/",
+
+		Title: "Daily Discussion Thread | Free-Talk and Other Updates - June 20, 2020",
+		Body:  "Talk about whatever is on your mind, basketball related or not.\n\n# Useful Links \u0026amp; Other Resources\n\n[List of All #NBATogether Live Classic Games Streamed to Date](https://www.youtube.com/results?search_query=%23NBATogetherLive)\n\n[r/nba Discord Server](https://www.discord.gg/nba)\n\n[r/nba Twitter](https://twitter.com/nba_reddit)\n\n[Read Our Community's Rules and Guidelines](https://www.reddit.com/r/nba/wiki/rules)",
+
+		Score:            16,
+		UpvoteRatio:      0.82,
+		NumberOfComments: 25,
+
+		SubredditID:           "t5_2qo4s",
+		SubredditName:         "nba",
+		SubredditNamePrefixed: "r/nba",
+
+		AuthorID:   "t2_6l4z3",
+		AuthorName: "AutoModerator",
+
+		IsSelfPost: true,
+		Stickied:   true,
+	},
+}
+
 func TestSubredditServiceOp_GetByName(t *testing.T) {
 	setup()
 	defer teardown()
@@ -159,4 +188,76 @@ func TestSubredditServiceOp_GetDefault(t *testing.T) {
 	subreddits, _, err := client.Subreddit.GetDefault(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddits, subreddits)
+}
+
+func TestSubredditServiceOp_GetSubscribed(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/subreddit/list.json")
+
+	mux.HandleFunc("/subreddits/mine/subscriber", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	subreddits, _, err := client.Subreddit.GetSubscribed(ctx, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSubreddits, subreddits)
+}
+
+func TestSubredditServiceOp_GetApproved(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/subreddit/list.json")
+
+	mux.HandleFunc("/subreddits/mine/contributor", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	subreddits, _, err := client.Subreddit.GetApproved(ctx, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSubreddits, subreddits)
+}
+
+func TestSubredditServiceOp_GetModerated(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/subreddit/list.json")
+
+	mux.HandleFunc("/subreddits/mine/moderator", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	subreddits, _, err := client.Subreddit.GetModerated(ctx, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSubreddits, subreddits)
+}
+
+// todo: WIP
+func TestSubredditServiceOp_GetSticky1(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/subreddit/sticky.json")
+
+	mux.HandleFunc("/r/nba/about/sticky", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, "1", r.Form.Get("num"))
+
+		fmt.Fprint(w, blob)
+	})
+
+	post, _, err := client.Subreddit.GetSticky1(ctx, "nba")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedStickyPost.Link, post.Link)
+	// b, _ := json.MarshalIndent(post.Comments, "", "  ")
+	// fmt.Println(string(b))
 }

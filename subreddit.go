@@ -21,10 +21,9 @@ type SubredditService interface {
 	GetGold(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
 	GetDefault(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
 
-	GetMineWhereSubscriber(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-	GetMineWhereContributor(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-	GetMineWhereModerator(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-	GetMineWhereStreams(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
+	GetSubscribed(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
+	GetApproved(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
+	GetModerated(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
 
 	GetSticky1(ctx context.Context, subreddit string) (*LinkAndComments, *Response, error)
 	GetSticky2(ctx context.Context, subreddit string) (*LinkAndComments, *Response, error)
@@ -91,58 +90,53 @@ func (s *SubredditServiceOp) GetByName(ctx context.Context, subreddit string) (*
 	return root.Data, resp, nil
 }
 
-// GetPopular returns popular subreddits
+// GetPopular returns popular subreddits.
 func (s *SubredditServiceOp) GetPopular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/popular", opts)
 }
 
-// GetNew returns new subreddits
+// GetNew returns new subreddits.
 func (s *SubredditServiceOp) GetNew(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/new", opts)
 }
 
-// GetGold returns gold subreddits
+// GetGold returns gold subreddits.
 func (s *SubredditServiceOp) GetGold(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/gold", opts)
 }
 
-// GetDefault returns default subreddits
+// GetDefault returns default subreddits.
 func (s *SubredditServiceOp) GetDefault(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/default", opts)
 }
 
-// GetMineWhereSubscriber returns the list of subreddits the client is subscribed to
-func (s *SubredditServiceOp) GetMineWhereSubscriber(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+// GetSubscribed returns the list of subreddits the client is subscribed to.
+func (s *SubredditServiceOp) GetSubscribed(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/subscriber", opts)
 }
 
-// GetMineWhereContributor returns the list of subreddits the client is a contributor to
-func (s *SubredditServiceOp) GetMineWhereContributor(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+// GetApproved returns the list of subreddits the client is an approved user in.
+func (s *SubredditServiceOp) GetApproved(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
 }
 
-// GetMineWhereModerator returns the list of subreddits the client is a moderator in
-func (s *SubredditServiceOp) GetMineWhereModerator(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
-	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
+// GetModerated returns the list of subreddits the client is a moderator of.
+func (s *SubredditServiceOp) GetModerated(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+	return s.getSubreddits(ctx, "subreddits/mine/moderator", opts)
 }
 
-// GetMineWhereStreams returns the list of subreddits the client is subscribed to and has hosted videos in
-func (s *SubredditServiceOp) GetMineWhereStreams(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
-	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
-}
-
-// GetSticky1 returns the first stickied post on a subreddit (if it exists)
+// GetSticky1 returns the first stickied post on a subreddit (if it exists).
 func (s *SubredditServiceOp) GetSticky1(ctx context.Context, name string) (*LinkAndComments, *Response, error) {
 	return s.getSticky(ctx, name, sticky1)
 }
 
-// GetSticky2 returns the second stickied post on a subreddit (if it exists)
+// GetSticky2 returns the second stickied post on a subreddit (if it exists).
 func (s *SubredditServiceOp) GetSticky2(ctx context.Context, name string) (*LinkAndComments, *Response, error) {
 	return s.getSticky(ctx, name, sticky2)
 }
 
-// Subscribe subscribes to subreddits based on their names
-// Returns {} on success
+// Subscribe subscribes to subreddits based on their names.
+// Returns {} on success.
 func (s *SubredditServiceOp) Subscribe(ctx context.Context, subreddits ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "sub")
@@ -150,8 +144,8 @@ func (s *SubredditServiceOp) Subscribe(ctx context.Context, subreddits ...string
 	return s.handleSubscription(ctx, form)
 }
 
-// SubscribeByID subscribes to subreddits based on their id
-// Returns {} on success
+// SubscribeByID subscribes to subreddits based on their id.
+// Returns {} on success.
 func (s *SubredditServiceOp) SubscribeByID(ctx context.Context, ids ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "sub")
@@ -159,8 +153,8 @@ func (s *SubredditServiceOp) SubscribeByID(ctx context.Context, ids ...string) (
 	return s.handleSubscription(ctx, form)
 }
 
-// Unsubscribe unsubscribes from subreddits based on their names
-// Returns {} on success
+// Unsubscribe unsubscribes from subreddits based on their names.
+// Returns {} on success.
 func (s *SubredditServiceOp) Unsubscribe(ctx context.Context, subreddits ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "unsub")
@@ -168,8 +162,8 @@ func (s *SubredditServiceOp) Unsubscribe(ctx context.Context, subreddits ...stri
 	return s.handleSubscription(ctx, form)
 }
 
-// UnsubscribeByID unsubscribes from subreddits based on their id
-// Returns {} on success
+// UnsubscribeByID unsubscribes from subreddits based on their id.
+// Returns {} on success.
 func (s *SubredditServiceOp) UnsubscribeByID(ctx context.Context, ids ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "unsub")
@@ -177,7 +171,7 @@ func (s *SubredditServiceOp) UnsubscribeByID(ctx context.Context, ids ...string)
 	return s.handleSubscription(ctx, form)
 }
 
-// SearchSubredditNames searches for subreddits with names beginning with the query provided
+// SearchSubredditNames searches for subreddits with names beginning with the query provided.
 func (s *SubredditServiceOp) SearchSubredditNames(ctx context.Context, query string) ([]string, *Response, error) {
 	path := fmt.Sprintf("api/search_reddit_names?query=%s", query)
 
@@ -257,10 +251,10 @@ func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opt
 	return l, resp, nil
 }
 
-// getSticky returns one of the 2 stickied posts of the subreddit (if they exist)
-// Num should be equal to 1 or 2, depending on which one you want
-// If it's <= 1, it's 1
-// If it's >= 2, it's 2
+// getSticky returns one of the 2 stickied posts of the subreddit (if they exist).
+// Num should be equal to 1 or 2, depending on which one you want.
+// If it's <= 1, it's 1.
+// If it's >= 2, it's 2.
 func (s *SubredditServiceOp) getSticky(ctx context.Context, subreddit string, num sticky) (*LinkAndComments, *Response, error) {
 	type query struct {
 		Num sticky `url:"num"`

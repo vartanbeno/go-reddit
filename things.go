@@ -82,6 +82,7 @@ func (t Timespan) String() string {
 	return timespans[t]
 }
 
+// todo: remove this, it is not needed
 type sticky int
 
 const (
