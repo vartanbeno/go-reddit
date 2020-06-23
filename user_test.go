@@ -734,7 +734,7 @@ func TestUserService_Unblock(t *testing.T) {
 // 	assert.NoError(t, err)
 // }
 
-func TestUserService_GetTrophies(t *testing.T) {
+func TestUserService_Trophies(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -745,12 +745,12 @@ func TestUserService_GetTrophies(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	trophies, _, err := client.User.GetTrophies(ctx)
+	trophies, _, err := client.User.Trophies(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedTrophies, trophies)
 }
 
-func TestUserService_GetTrophiesOf(t *testing.T) {
+func TestUserService_TrophiesOf(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -761,7 +761,7 @@ func TestUserService_GetTrophiesOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	trophies, _, err := client.User.GetTrophiesOf(ctx, "test123")
+	trophies, _, err := client.User.TrophiesOf(ctx, "test123")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedTrophies, trophies)
 }

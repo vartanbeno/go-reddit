@@ -40,8 +40,8 @@ type UserService interface {
 	Unblock(ctx context.Context, username string) (*Response, error)
 	// UnblockByID(ctx context.Context, id string) (*Response, error)
 
-	GetTrophies(ctx context.Context) (Trophies, *Response, error)
-	GetTrophiesOf(ctx context.Context, username string) (Trophies, *Response, error)
+	Trophies(ctx context.Context) (Trophies, *Response, error)
+	TrophiesOf(ctx context.Context, username string) (Trophies, *Response, error)
 }
 
 // UserServiceOp implements the UserService interface
@@ -545,13 +545,13 @@ func (s *UserServiceOp) Unblock(ctx context.Context, username string) (*Response
 // 	return s.client.Do(ctx, req, nil)
 // }
 
-// GetTrophies returns a list of your trophies.
-func (s *UserServiceOp) GetTrophies(ctx context.Context) (Trophies, *Response, error) {
-	return s.GetTrophiesOf(ctx, s.client.Username)
+// Trophies returns a list of your trophies.
+func (s *UserServiceOp) Trophies(ctx context.Context) (Trophies, *Response, error) {
+	return s.TrophiesOf(ctx, s.client.Username)
 }
 
-// GetTrophiesOf returns a list of the specified user's trophies.
-func (s *UserServiceOp) GetTrophiesOf(ctx context.Context, username string) (Trophies, *Response, error) {
+// TrophiesOf returns a list of the specified user's trophies.
+func (s *UserServiceOp) TrophiesOf(ctx context.Context, username string) (Trophies, *Response, error) {
 	path := fmt.Sprintf("api/v1/user/%s/trophies", username)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
