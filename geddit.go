@@ -93,8 +93,8 @@ type Client struct {
 
 	Comment   CommentService
 	Flair     FlairService
-	Link      LinkService
 	Listings  ListingsService
+	Post      PostService
 	Search    SearchService
 	Subreddit SubredditService
 	User      UserService
@@ -122,8 +122,8 @@ func newClient(httpClient *http.Client) *Client {
 
 	c.Comment = &CommentServiceOp{client: c}
 	c.Flair = &FlairServiceOp{client: c}
-	c.Link = &LinkServiceOp{client: c}
 	c.Listings = &ListingsServiceOp{client: c}
+	c.Post = &PostServiceOp{client: c}
 	c.Search = &SearchServiceOp{client: c}
 	c.Subreddit = &SubredditServiceOp{client: c}
 	c.User = &UserServiceOp{client: c}

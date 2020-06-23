@@ -9,9 +9,9 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// LinkService handles communication with the link (post)
-// related methods of the Reddit API
-type LinkService interface {
+// PostService handles communication with the link (post)
+// related methods of the Reddit API.
+type PostService interface {
 	SubmitSelf(ctx context.Context, opts SubmitSelfOptions) (*Submitted, *Response, error)
 	SubmitURL(ctx context.Context, opts SubmitURLOptions) (*Submitted, *Response, error)
 
@@ -28,12 +28,12 @@ type LinkService interface {
 	Unhide(ctx context.Context, ids ...string) (*Response, error)
 }
 
-// LinkServiceOp implements the LinkService interface
-type LinkServiceOp struct {
+// PostServiceOp implements the PostService interface.
+type PostServiceOp struct {
 	client *Client
 }
 
-var _ LinkService = &LinkServiceOp{}
+var _ PostService = &PostServiceOp{}
 
 type submittedLinkRoot struct {
 	JSON struct {
@@ -41,14 +41,14 @@ type submittedLinkRoot struct {
 	} `json:"json"`
 }
 
-// Submitted is a newly submitted post on Reddit
+// Submitted is a newly submitted post on Reddit.
 type Submitted struct {
 	ID     string `json:"id,omitempty"`
 	FullID string `json:"name,omitempty"`
 	URL    string `json:"url,omitempty"`
 }
 
-// SubmitSelfOptions are options used for selftext posts
+// SubmitSelfOptions are options used for selftext posts.
 type SubmitSelfOptions struct {
 	Subreddit string `url:"sr,omitempty"`
 	Title     string `url:"title,omitempty"`
@@ -62,7 +62,7 @@ type SubmitSelfOptions struct {
 	Spoiler     bool  `url:"spoiler,omitempty"`
 }
 
-// SubmitURLOptions are options used for link posts
+// SubmitURLOptions are options used for link posts.
 type SubmitURLOptions struct {
 	Subreddit string `url:"sr,omitempty"`
 	Title     string `url:"title,omitempty"`
@@ -77,8 +77,8 @@ type SubmitURLOptions struct {
 	Spoiler     bool  `url:"spoiler,omitempty"`
 }
 
-// SubmitSelf submits a self text post
-func (s *LinkServiceOp) SubmitSelf(ctx context.Context, opts SubmitSelfOptions) (*Submitted, *Response, error) {
+// SubmitSelf submits a self text post.
+func (s *PostServiceOp) SubmitSelf(ctx context.Context, opts SubmitSelfOptions) (*Submitted, *Response, error) {
 	type submit struct {
 		SubmitSelfOptions
 		Kind string `url:"kind,omitempty"`
@@ -86,8 +86,8 @@ func (s *LinkServiceOp) SubmitSelf(ctx context.Context, opts SubmitSelfOptions) 
 	return s.submit(ctx, &submit{opts, "self"})
 }
 
-// SubmitURL submits a link post
-func (s *LinkServiceOp) SubmitURL(ctx context.Context, opts SubmitURLOptions) (*Submitted, *Response, error) {
+// SubmitURL submits a link post.
+func (s *PostServiceOp) SubmitURL(ctx context.Context, opts SubmitURLOptions) (*Submitted, *Response, error) {
 	type submit struct {
 		SubmitURLOptions
 		Kind string `url:"kind,omitempty"`
@@ -95,7 +95,7 @@ func (s *LinkServiceOp) SubmitURL(ctx context.Context, opts SubmitURLOptions) (*
 	return s.submit(ctx, &submit{opts, "link"})
 }
 
-func (s *LinkServiceOp) submit(ctx context.Context, v interface{}) (*Submitted, *Response, error) {
+func (s *PostServiceOp) submit(ctx context.Context, v interface{}) (*Submitted, *Response, error) {
 	path := "api/submit"
 
 	form, err := query.Values(v)
@@ -118,9 +118,8 @@ func (s *LinkServiceOp) submit(ctx context.Context, v interface{}) (*Submitted, 
 	return root.JSON.Data, resp, nil
 }
 
-// EnableReplies enables inbox replies for a thing created by the client
-// Always returns {}
-func (s *LinkServiceOp) EnableReplies(ctx context.Context, id string) (*Response, error) {
+// EnableReplies enables inbox replies for a thing created by the client.
+func (s *PostServiceOp) EnableReplies(ctx context.Context, id string) (*Response, error) {
 	path := "api/sendreplies"
 
 	form := url.Values{}
@@ -135,9 +134,8 @@ func (s *LinkServiceOp) EnableReplies(ctx context.Context, id string) (*Response
 	return s.client.Do(ctx, req, nil)
 }
 
-// DisableReplies dsables inbox replies for a thing created by the client
-// Always returns {}
-func (s *LinkServiceOp) DisableReplies(ctx context.Context, id string) (*Response, error) {
+// DisableReplies dsables inbox replies for a thing created by the client.
+func (s *PostServiceOp) DisableReplies(ctx context.Context, id string) (*Response, error) {
 	path := "api/sendreplies"
 
 	form := url.Values{}
@@ -152,9 +150,8 @@ func (s *LinkServiceOp) DisableReplies(ctx context.Context, id string) (*Respons
 	return s.client.Do(ctx, req, nil)
 }
 
-// MarkNSFW marks a post as NSFW
-// {} on success
-func (s *LinkServiceOp) MarkNSFW(ctx context.Context, id string) (*Response, error) {
+// MarkNSFW marks a post as NSFW.
+func (s *PostServiceOp) MarkNSFW(ctx context.Context, id string) (*Response, error) {
 	path := "api/marknsfw"
 
 	form := url.Values{}
@@ -168,9 +165,8 @@ func (s *LinkServiceOp) MarkNSFW(ctx context.Context, id string) (*Response, err
 	return s.client.Do(ctx, req, nil)
 }
 
-// UnmarkNSFW unmarks a post as NSFW
-// {} on success
-func (s *LinkServiceOp) UnmarkNSFW(ctx context.Context, id string) (*Response, error) {
+// UnmarkNSFW unmarks a post as NSFW.
+func (s *PostServiceOp) UnmarkNSFW(ctx context.Context, id string) (*Response, error) {
 	path := "api/unmarknsfw"
 
 	form := url.Values{}
@@ -184,9 +180,8 @@ func (s *LinkServiceOp) UnmarkNSFW(ctx context.Context, id string) (*Response, e
 	return s.client.Do(ctx, req, nil)
 }
 
-// Spoiler marks a post as a spoiler
-// {} on success
-func (s *LinkServiceOp) Spoiler(ctx context.Context, id string) (*Response, error) {
+// Spoiler marks a post as a spoiler.
+func (s *PostServiceOp) Spoiler(ctx context.Context, id string) (*Response, error) {
 	path := "api/spoiler"
 
 	form := url.Values{}
@@ -200,9 +195,8 @@ func (s *LinkServiceOp) Spoiler(ctx context.Context, id string) (*Response, erro
 	return s.client.Do(ctx, req, nil)
 }
 
-// Unspoiler unmarks a post as a spoiler
-// {} on success
-func (s *LinkServiceOp) Unspoiler(ctx context.Context, id string) (*Response, error) {
+// Unspoiler unmarks a post as a spoiler.
+func (s *PostServiceOp) Unspoiler(ctx context.Context, id string) (*Response, error) {
 	path := "api/unspoiler"
 
 	form := url.Values{}
@@ -216,9 +210,8 @@ func (s *LinkServiceOp) Unspoiler(ctx context.Context, id string) (*Response, er
 	return s.client.Do(ctx, req, nil)
 }
 
-// Hide hides links with the specified ids
-// On successful calls, it just returns {}
-func (s *LinkServiceOp) Hide(ctx context.Context, ids ...string) (*Response, error) {
+// Hide hides links with the specified ids.
+func (s *PostServiceOp) Hide(ctx context.Context, ids ...string) (*Response, error) {
 	if len(ids) == 0 {
 		return nil, errors.New("must provide at least 1 id")
 	}
@@ -236,9 +229,8 @@ func (s *LinkServiceOp) Hide(ctx context.Context, ids ...string) (*Response, err
 	return s.client.Do(ctx, req, nil)
 }
 
-// Unhide unhides links with the specified ids
-// On successful calls, it just returns {}
-func (s *LinkServiceOp) Unhide(ctx context.Context, ids ...string) (*Response, error) {
+// Unhide unhides links with the specified ids.
+func (s *PostServiceOp) Unhide(ctx context.Context, ids ...string) (*Response, error) {
 	if len(ids) == 0 {
 		return nil, errors.New("must provide at least 1 id")
 	}

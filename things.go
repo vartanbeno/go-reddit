@@ -8,7 +8,7 @@ import (
 const (
 	kindComment    = "t1"
 	kindAccount    = "t2"
-	kindLink       = "t3"
+	kindLink       = "t3" // a link is a post
 	kindMessage    = "t4"
 	kindSubreddit  = "t5"
 	kindAward      = "t6"
@@ -108,11 +108,11 @@ type Listing struct {
 	Before string `json:"before"`
 }
 
-// Things are stuff!
+// Things are objects/entities coming from the Reddit API.
 type Things struct {
 	Comments   []Comment   `json:"comments,omitempty"`
 	Users      []User      `json:"users,omitempty"`
-	Links      []Link      `json:"links,omitempty"`
+	Posts      []Post      `json:"posts,omitempty"`
 	Subreddits []Subreddit `json:"subreddits,omitempty"`
 	// todo: add the other kinds of things
 }
@@ -127,9 +127,9 @@ type userRoot struct {
 	Data *User  `json:"data,omitempty"`
 }
 
-type linkRoot struct {
+type postRoot struct {
 	Kind string `json:"kind,omitempty"`
-	Data *Link  `json:"data,omitempty"`
+	Data *Post  `json:"data,omitempty"`
 }
 
 type subredditRoot struct {
@@ -138,7 +138,7 @@ type subredditRoot struct {
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
-func (l *Things) UnmarshalJSON(b []byte) error {
+func (t *Things) UnmarshalJSON(b []byte) error {
 	var children []map[string]interface{}
 	if err := json.Unmarshal(b, &children); err != nil {
 		return err
@@ -151,23 +151,23 @@ func (l *Things) UnmarshalJSON(b []byte) error {
 		case kindComment:
 			root := new(commentRoot)
 			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
-				l.Comments = append(l.Comments, *root.Data)
+				t.Comments = append(t.Comments, *root.Data)
 			}
 		case kindAccount:
 			root := new(userRoot)
 			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
-				l.Users = append(l.Users, *root.Data)
+				t.Users = append(t.Users, *root.Data)
 			}
 		case kindLink:
-			root := new(linkRoot)
+			root := new(postRoot)
 			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
-				l.Links = append(l.Links, *root.Data)
+				t.Posts = append(t.Posts, *root.Data)
 			}
 		case kindMessage:
 		case kindSubreddit:
 			root := new(subredditRoot)
 			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
-				l.Subreddits = append(l.Subreddits, *root.Data)
+				t.Subreddits = append(t.Subreddits, *root.Data)
 			}
 		case kindAward:
 		}
@@ -203,13 +203,13 @@ type Comment struct {
 	Score            int `json:"score"`
 	Controversiality int `json:"controversiality"`
 
-	LinkID string `json:"link_id,omitempty"`
+	PostID string `json:"link_id,omitempty"`
 
 	// These don't appear when submitting a comment
-	LinkTitle       string `json:"link_title,omitempty"`
-	LinkPermalink   string `json:"link_permalink,omitempty"`
-	LinkAuthor      string `json:"link_author,omitempty"`
-	LinkNumComments int    `json:"num_comments"`
+	PostTitle       string `json:"link_title,omitempty"`
+	PostPermalink   string `json:"link_permalink,omitempty"`
+	PostAuthor      string `json:"link_author,omitempty"`
+	PostNumComments int    `json:"num_comments"`
 
 	IsSubmitter bool `json:"is_submitter"`
 	ScoreHidden bool `json:"score_hidden"`
@@ -242,8 +242,8 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// Link is a submitted post on Reddit
-type Link struct {
+// Post is a submitted post on Reddit.
+type Post struct {
 	ID      string     `json:"id,omitempty"`
 	FullID  string     `json:"name,omitempty"`
 	Created *Timestamp `json:"created_utc,omitempty"`
@@ -332,10 +332,10 @@ func (rl *rootListing) getUsers() *Users {
 	return v
 }
 
-func (rl *rootListing) getLinks() *Links {
-	v := new(Links)
+func (rl *rootListing) getPosts() *Posts {
+	v := new(Posts)
 	if rl != nil && rl.Data != nil {
-		v.Links = rl.Data.Things.Links
+		v.Posts = rl.Data.Things.Posts
 		v.After = rl.Data.After
 		v.Before = rl.Data.Before
 	}
@@ -373,31 +373,16 @@ type Subreddits struct {
 	Before     string      `json:"before"`
 }
 
-// Links is a list of links
-type Links struct {
-	Links  []Link `json:"submissions,omitempty"`
+// Posts is a list of posts.
+type Posts struct {
+	Posts  []Post `json:"submissions,omitempty"`
 	After  string `json:"after"`
 	Before string `json:"before"`
 }
 
-// CommentsLinks is a list of comments and links
-type CommentsLinks struct {
-	Comments []Comment `json:"comments,omitempty"`
-	Links    []Link    `json:"links,omitempty"`
-	After    string    `json:"after"`
-	Before   string    `json:"before"`
-}
-
-// CommentsLinksSubreddits is a list of comments, links, and subreddits
-type CommentsLinksSubreddits struct {
-	Comments   []Comment   `json:"comments,omitempty"`
-	Links      []Link      `json:"links,omitempty"`
-	Subreddits []Subreddit `json:"subreddits,omitempty"`
-}
-
-// LinkAndComments is a link and its comments
-type LinkAndComments struct {
-	Link     Link      `json:"link,omitempty"`
+// PostAndComments is a post and its comments
+type PostAndComments struct {
+	Post     Post      `json:"post,omitempty"`
 	Comments []Comment `json:"comments,omitempty"`
 }
 
@@ -405,7 +390,7 @@ type LinkAndComments struct {
 // When getting a sticky post, you get an array of 2 Listings
 // The 1st one contains the single post in its children array
 // The 2nd one contains the comments to the post
-func (rl *LinkAndComments) UnmarshalJSON(data []byte) error {
+func (pc *PostAndComments) UnmarshalJSON(data []byte) error {
 	var l []rootListing
 
 	err := json.Unmarshal(data, &l)
@@ -414,14 +399,14 @@ func (rl *LinkAndComments) UnmarshalJSON(data []byte) error {
 	}
 
 	if len(l) < 2 {
-		return errors.New("unexpected json response when getting link")
+		return errors.New("unexpected json response when getting post")
 	}
 
-	stickyLink := l[0].getLinks().Links[0]
-	stickyComments := l[1].getComments().Comments
+	post := l[0].getPosts().Posts[0]
+	comments := l[1].getComments().Comments
 
-	rl.Link = stickyLink
-	rl.Comments = stickyComments
+	pc.Post = post
+	pc.Comments = comments
 
 	return nil
 }

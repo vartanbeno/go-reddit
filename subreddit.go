@@ -25,8 +25,8 @@ type SubredditService interface {
 	GetApproved(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
 	GetModerated(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
 
-	GetSticky1(ctx context.Context, subreddit string) (*LinkAndComments, *Response, error)
-	GetSticky2(ctx context.Context, subreddit string) (*LinkAndComments, *Response, error)
+	GetSticky1(ctx context.Context, subreddit string) (*PostAndComments, *Response, error)
+	GetSticky2(ctx context.Context, subreddit string) (*PostAndComments, *Response, error)
 
 	Subscribe(ctx context.Context, subreddits ...string) (*Response, error)
 	SubscribeByID(ctx context.Context, ids ...string) (*Response, error)
@@ -126,17 +126,16 @@ func (s *SubredditServiceOp) GetModerated(ctx context.Context, opts *ListOptions
 }
 
 // GetSticky1 returns the first stickied post on a subreddit (if it exists).
-func (s *SubredditServiceOp) GetSticky1(ctx context.Context, name string) (*LinkAndComments, *Response, error) {
+func (s *SubredditServiceOp) GetSticky1(ctx context.Context, name string) (*PostAndComments, *Response, error) {
 	return s.getSticky(ctx, name, sticky1)
 }
 
 // GetSticky2 returns the second stickied post on a subreddit (if it exists).
-func (s *SubredditServiceOp) GetSticky2(ctx context.Context, name string) (*LinkAndComments, *Response, error) {
+func (s *SubredditServiceOp) GetSticky2(ctx context.Context, name string) (*PostAndComments, *Response, error) {
 	return s.getSticky(ctx, name, sticky2)
 }
 
 // Subscribe subscribes to subreddits based on their names.
-// Returns {} on success.
 func (s *SubredditServiceOp) Subscribe(ctx context.Context, subreddits ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "sub")
@@ -145,7 +144,6 @@ func (s *SubredditServiceOp) Subscribe(ctx context.Context, subreddits ...string
 }
 
 // SubscribeByID subscribes to subreddits based on their id.
-// Returns {} on success.
 func (s *SubredditServiceOp) SubscribeByID(ctx context.Context, ids ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "sub")
@@ -154,7 +152,6 @@ func (s *SubredditServiceOp) SubscribeByID(ctx context.Context, ids ...string) (
 }
 
 // Unsubscribe unsubscribes from subreddits based on their names.
-// Returns {} on success.
 func (s *SubredditServiceOp) Unsubscribe(ctx context.Context, subreddits ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "unsub")
@@ -163,7 +160,6 @@ func (s *SubredditServiceOp) Unsubscribe(ctx context.Context, subreddits ...stri
 }
 
 // UnsubscribeByID unsubscribes from subreddits based on their id.
-// Returns {} on success.
 func (s *SubredditServiceOp) UnsubscribeByID(ctx context.Context, ids ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "unsub")
@@ -255,7 +251,7 @@ func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opt
 // Num should be equal to 1 or 2, depending on which one you want.
 // If it's <= 1, it's 1.
 // If it's >= 2, it's 2.
-func (s *SubredditServiceOp) getSticky(ctx context.Context, subreddit string, num sticky) (*LinkAndComments, *Response, error) {
+func (s *SubredditServiceOp) getSticky(ctx context.Context, subreddit string, num sticky) (*PostAndComments, *Response, error) {
 	type query struct {
 		Num sticky `url:"num"`
 	}
@@ -271,7 +267,7 @@ func (s *SubredditServiceOp) getSticky(ctx context.Context, subreddit string, nu
 		return nil, nil, err
 	}
 
-	root := new(LinkAndComments)
+	root := new(PostAndComments)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
@@ -337,7 +333,7 @@ func (f *PostFinder) Timespan(timespan Timespan) *PostFinder {
 }
 
 // Do conducts the search.
-func (f *PostFinder) Do(ctx context.Context) (*Links, *Response, error) {
+func (f *PostFinder) Do(ctx context.Context) (*Posts, *Response, error) {
 	path := f.sort
 	if len(f.subreddits) > 0 {
 		path = fmt.Sprintf("r/%s/%s", strings.Join(f.subreddits, "+"), f.sort)
@@ -359,5 +355,5 @@ func (f *PostFinder) Do(ctx context.Context) (*Links, *Response, error) {
 		return nil, resp, err
 	}
 
-	return root.getLinks(), resp, nil
+	return root.getPosts(), resp, nil
 }

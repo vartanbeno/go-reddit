@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLinkServiceOp_Hide(t *testing.T) {
+func TestPostServiceOp_Hide(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -26,15 +26,15 @@ func TestLinkServiceOp_Hide(t *testing.T) {
 		fmt.Fprint(w, `{}`)
 	})
 
-	_, err := client.Link.Hide(ctx)
+	_, err := client.Post.Hide(ctx)
 	assert.EqualError(t, err, "must provide at least 1 id")
 
-	res, err := client.Link.Hide(ctx, "1", "2", "3")
+	res, err := client.Post.Hide(ctx, "1", "2", "3")
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func TestLinkServiceOp_Unhide(t *testing.T) {
+func TestPostServiceOp_Unhide(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -51,10 +51,10 @@ func TestLinkServiceOp_Unhide(t *testing.T) {
 		fmt.Fprint(w, `{}`)
 	})
 
-	_, err := client.Link.Unhide(ctx)
+	_, err := client.Post.Unhide(ctx)
 	assert.EqualError(t, err, "must provide at least 1 id")
 
-	res, err := client.Link.Unhide(ctx, "1", "2", "3")
+	res, err := client.Post.Unhide(ctx, "1", "2", "3")
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }

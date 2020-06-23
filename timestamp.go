@@ -26,7 +26,7 @@ func (t *Timestamp) MarshalJSON() ([]byte, error) {
 func (t *Timestamp) UnmarshalJSON(data []byte) (err error) {
 	str := string(data)
 
-	// "edited" for comments and links is either false, or a timestamp
+	// "edited" for posts and comments is either false, or a timestamp.
 	if str == "false" {
 		return
 	}

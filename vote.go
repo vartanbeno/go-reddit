@@ -7,14 +7,14 @@ import (
 )
 
 // VoteService handles communication with the upvote/downvote
-// related methods of the Reddit API
+// related methods of the Reddit API.
 type VoteService interface {
 	Up(ctx context.Context, id string) (*Response, error)
 	Down(ctx context.Context, id string) (*Response, error)
 	Remove(ctx context.Context, id string) (*Response, error)
 }
 
-// VoteServiceOp implements the Vote interface
+// VoteServiceOp implements the Vote interface.
 type VoteServiceOp struct {
 	client *Client
 }
@@ -46,17 +46,17 @@ func (s *VoteServiceOp) vote(ctx context.Context, id string, vote vote) (*Respon
 	return s.client.Do(ctx, req, nil)
 }
 
-// Up upvotes a link or a comment
+// Up upvotes a post or a comment.
 func (s *VoteServiceOp) Up(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, upvote)
 }
 
-// Down downvotes a link or a comment
+// Down downvotes a post or a comment.
 func (s *VoteServiceOp) Down(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, downvote)
 }
 
-// Remove removes the user's vote on a link or a comment
+// Remove removes the user's vote on a post or a comment.
 func (s *VoteServiceOp) Remove(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, novote)
 }

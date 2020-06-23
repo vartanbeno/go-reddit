@@ -32,9 +32,10 @@ var expectedCommentSubmitOrEdit = &Comment{
 	Controversiality: 0,
 
 	Created: &Timestamp{time.Date(2020, 4, 29, 0, 9, 47, 0, time.UTC)},
-	Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+	// todo: this should just be nil
+	Edited: &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-	LinkID: "t3_link1",
+	PostID: "t3_link1",
 }
 
 func TestCommentServiceOp_Submit(t *testing.T) {

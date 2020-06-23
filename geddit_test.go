@@ -68,8 +68,8 @@ func testClientServices(t *testing.T, c *Client) {
 	services := []string{
 		"Comment",
 		"Flair",
-		"Link",
 		"Listings",
+		"Post",
 		"Subreddit",
 		"User",
 		"Vote",

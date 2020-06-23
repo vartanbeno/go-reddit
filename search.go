@@ -16,7 +16,7 @@ import (
 // Note: The "limit" parameter in searches is prone to inconsistent
 // behaviour.
 type SearchService interface {
-	Posts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Links, *Response, error)
+	Posts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error)
 	Subreddits(ctx context.Context, query string, opts ...SearchOptionSetter) (*Subreddits, *Response, error)
 	Users(ctx context.Context, query string, opts ...SearchOptionSetter) (*Users, *Response, error)
 }
@@ -99,7 +99,7 @@ func setRestrict(opts SearchOptions) {
 
 // Posts searches for posts.
 // If the list of subreddits is empty, the search is run against r/all.
-func (s *SearchServiceOp) Posts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Links, *Response, error) {
+func (s *SearchServiceOp) Posts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	opts = append(opts, setType("link"), setQuery(query))
 
 	path := "search"
@@ -122,7 +122,7 @@ func (s *SearchServiceOp) Posts(ctx context.Context, query string, subreddits []
 		return nil, resp, err
 	}
 
-	return root.getLinks(), resp, nil
+	return root.getPosts(), resp, nil
 }
 
 // Subreddits searches for subreddits.

@@ -81,8 +81,8 @@ var expectedSubreddits = &Subreddits{
 	},
 }
 
-var expectedStickyPost = &LinkAndComments{
-	Link: Link{
+var expectedSticky = &PostAndComments{
+	Post: Post{
 		ID:      "hcl9gq",
 		FullID:  "t3_hcl9gq",
 		Created: &Timestamp{time.Date(2020, 6, 20, 12, 8, 57, 0, time.UTC)},
@@ -255,9 +255,9 @@ func TestSubredditServiceOp_GetSticky1(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	post, _, err := client.Subreddit.GetSticky1(ctx, "nba")
+	sticky, _, err := client.Subreddit.GetSticky1(ctx, "nba")
 	assert.NoError(t, err)
-	assert.Equal(t, expectedStickyPost.Link, post.Link)
-	// b, _ := json.MarshalIndent(post.Comments, "", "  ")
+	assert.Equal(t, expectedSticky.Post, sticky.Post)
+	// b, _ := json.MarshalIndent(sticky.Comments, "", "  ")
 	// fmt.Println(string(b))
 }

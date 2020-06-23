@@ -16,7 +16,7 @@ var expectedUser = &User{
 	Name:    "Test_User",
 	Created: &Timestamp{time.Date(2012, 10, 18, 10, 11, 11, 0, time.UTC)},
 
-	LinkKarma:    8239,
+	PostKarma:    8239,
 	CommentKarma: 130514,
 
 	HasVerifiedEmail: true,
@@ -26,27 +26,27 @@ var expectedUsers = map[string]*UserShort{
 	"t2_1": {
 		Name:         "test_user_1",
 		Created:      &Timestamp{time.Date(2017, 3, 12, 2, 1, 47, 0, time.UTC)},
-		LinkKarma:    488,
+		PostKarma:    488,
 		CommentKarma: 22223,
 		NSFW:         false,
 	},
 	"t2_2": {
 		Name:         "test_user_2",
 		Created:      &Timestamp{time.Date(2015, 12, 20, 18, 12, 51, 0, time.UTC)},
-		LinkKarma:    8277,
+		PostKarma:    8277,
 		CommentKarma: 131948,
 		NSFW:         false,
 	},
 	"t2_3": {
 		Name:         "test_user_3",
 		Created:      &Timestamp{time.Date(2013, 3, 4, 15, 46, 31, 0, time.UTC)},
-		LinkKarma:    126887,
+		PostKarma:    126887,
 		CommentKarma: 81918,
 		NSFW:         true,
 	},
 }
 
-var expectedPost = Link{
+var expectedPost = Post{
 	ID:      "gczwql",
 	FullID:  "t3_gczwql",
 	Created: &Timestamp{time.Date(2020, 5, 3, 22, 46, 25, 0, time.UTC)},
@@ -96,11 +96,11 @@ var expectedComment = Comment{
 	Score:            1,
 	Controversiality: 0,
 
-	LinkID:          "t3_d7ejpn",
-	LinkTitle:       "I'm giving away an iPhone 11 Pro to a commenter at random to celebrate Apollo for Reddit's new iOS 13 update and as a thank you to the community! Just leave a comment on this post and the winner will be selected randomly and announced tomorrow at 8 PM GMT. Details inside, and good luck!",
-	LinkPermalink:   "https://www.reddit.com/r/apple/comments/d7ejpn/im_giving_away_an_iphone_11_pro_to_a_commenter_at/",
-	LinkAuthor:      "iamthatis",
-	LinkNumComments: 89751,
+	PostID:          "t3_d7ejpn",
+	PostTitle:       "I'm giving away an iPhone 11 Pro to a commenter at random to celebrate Apollo for Reddit's new iOS 13 update and as a thank you to the community! Just leave a comment on this post and the winner will be selected randomly and announced tomorrow at 8 PM GMT. Details inside, and good luck!",
+	PostPermalink:   "https://www.reddit.com/r/apple/comments/d7ejpn/im_giving_away_an_iphone_11_pro_to_a_commenter_at/",
+	PostAuthor:      "iamthatis",
+	PostNumComments: 89751,
 }
 
 var expectedFriendship = &Friendship{
@@ -200,8 +200,8 @@ func TestUserService_Overview(t *testing.T) {
 	assert.NotNil(t, posts)
 	assert.NotNil(t, comments)
 
-	assert.Len(t, posts.Links, 1)
-	assert.Equal(t, expectedPost, posts.Links[0])
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
 	assert.Equal(t, "t1_f0zsa37", posts.After)
 	assert.Equal(t, "", posts.Before)
 
@@ -227,8 +227,8 @@ func TestUserService_OverviewOf(t *testing.T) {
 	assert.NotNil(t, posts)
 	assert.NotNil(t, comments)
 
-	assert.Len(t, posts.Links, 1)
-	assert.Equal(t, expectedPost, posts.Links[0])
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
 	assert.Equal(t, "t1_f0zsa37", posts.After)
 	assert.Equal(t, "", posts.Before)
 
@@ -278,8 +278,8 @@ func TestUserService_Posts(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, posts)
 
-	assert.Len(t, posts.Links, 1)
-	assert.Equal(t, expectedPost, posts.Links[0])
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
 	assert.Equal(t, "t3_gczwql", posts.After)
 	assert.Equal(t, "", posts.Before)
 }
@@ -299,8 +299,8 @@ func TestUserService_PostsOf(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, posts)
 
-	assert.Len(t, posts.Links, 1)
-	assert.Equal(t, expectedPost, posts.Links[0])
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
 	assert.Equal(t, "t3_gczwql", posts.After)
 	assert.Equal(t, "", posts.Before)
 }
@@ -412,8 +412,8 @@ func TestUserService_Saved(t *testing.T) {
 	assert.NotNil(t, posts)
 	assert.NotNil(t, comments)
 
-	assert.Len(t, posts.Links, 1)
-	assert.Equal(t, expectedPost, posts.Links[0])
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
 	assert.Equal(t, "t1_f0zsa37", posts.After)
 	assert.Equal(t, "", posts.Before)
 
@@ -463,8 +463,8 @@ func TestUserService_Upvoted(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, posts)
 
-	assert.Len(t, posts.Links, 1)
-	assert.Equal(t, expectedPost, posts.Links[0])
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
 	assert.Equal(t, "t3_gczwql", posts.After)
 	assert.Equal(t, "", posts.Before)
 }
@@ -509,8 +509,8 @@ func TestUserService_Downvoted(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, posts)
 
-	assert.Len(t, posts.Links, 1)
-	assert.Equal(t, expectedPost, posts.Links[0])
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
 	assert.Equal(t, "t3_gczwql", posts.After)
 	assert.Equal(t, "", posts.Before)
 }
@@ -556,8 +556,8 @@ func TestUserService_Hidden(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, posts)
 
-	assert.Len(t, posts.Links, 1)
-	assert.Equal(t, expectedPost, posts.Links[0])
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
 	assert.Equal(t, "t3_gczwql", posts.After)
 	assert.Equal(t, "", posts.Before)
 }
@@ -578,8 +578,8 @@ func TestUserService_Gilded(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotNil(t, posts)
 
-	assert.Len(t, posts.Links, 1)
-	assert.Equal(t, expectedPost, posts.Links[0])
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
 	assert.Equal(t, "t3_gczwql", posts.After)
 	assert.Equal(t, "", posts.Before)
 }

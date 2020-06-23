@@ -10,26 +10,26 @@ import (
 )
 
 // UserService handles communication with the user
-// related methods of the Reddit API
+// related methods of the Reddit API.
 type UserService interface {
 	Get(ctx context.Context, username string) (*User, *Response, error)
 	GetMultipleByID(ctx context.Context, ids ...string) (map[string]*UserShort, *Response, error)
 	UsernameAvailable(ctx context.Context, username string) (bool, *Response, error)
 
-	Overview(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Comments, *Response, error)
-	OverviewOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Links, *Comments, *Response, error)
+	Overview(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error)
+	OverviewOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error)
 
-	Posts(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error)
-	PostsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Links, *Response, error)
+	Posts(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
+	PostsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error)
 
 	Comments(ctx context.Context, opts ...SearchOptionSetter) (*Comments, *Response, error)
 	CommentsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Comments, *Response, error)
 
-	Saved(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Comments, *Response, error)
-	Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error)
-	Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error)
-	Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error)
-	Gilded(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error)
+	Saved(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error)
+	Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
+	Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
+	Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
+	Gilded(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
 
 	GetFriendship(ctx context.Context, username string) (*Friendship, *Response, error)
 	Friend(ctx context.Context, username string) (*Friendship, *Response, error)
@@ -44,21 +44,21 @@ type UserService interface {
 	TrophiesOf(ctx context.Context, username string) (Trophies, *Response, error)
 }
 
-// UserServiceOp implements the UserService interface
+// UserServiceOp implements the UserService interface.
 type UserServiceOp struct {
 	client *Client
 }
 
 var _ UserService = &UserServiceOp{}
 
-// User represents a Reddit user
+// User represents a Reddit user.
 type User struct {
-	// this is not the full ID, watch out
+	// this is not the full ID, watch out.
 	ID      string     `json:"id,omitempty"`
 	Name    string     `json:"name,omitempty"`
 	Created *Timestamp `json:"created_utc,omitempty"`
 
-	LinkKarma    int `json:"link_karma"`
+	PostKarma    int `json:"link_karma"`
 	CommentKarma int `json:"comment_karma"`
 
 	IsFriend         bool `json:"is_friend"`
@@ -68,13 +68,13 @@ type User struct {
 	IsSuspended      bool `json:"is_suspended"`
 }
 
-// UserShort represents a Reddit user, but contains fewer pieces of information
-// It is returned from the GET /api/user_data_by_account_ids endpoint
+// UserShort represents a Reddit user, but
+// contains fewer pieces of information.
 type UserShort struct {
 	Name    string     `json:"name,omitempty"`
 	Created *Timestamp `json:"created_utc,omitempty"`
 
-	LinkKarma    int `json:"link_karma"`
+	PostKarma    int `json:"link_karma"`
 	CommentKarma int `json:"comment_karma"`
 
 	NSFW bool `json:"profile_over_18"`
@@ -153,7 +153,7 @@ func (t *Trophies) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Get returns information about the user
+// Get returns information about the user.
 func (s *UserServiceOp) Get(ctx context.Context, username string) (*User, *Response, error) {
 	path := fmt.Sprintf("user/%s/about", username)
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -170,7 +170,7 @@ func (s *UserServiceOp) Get(ctx context.Context, username string) (*User, *Respo
 	return root.Data, resp, nil
 }
 
-// GetMultipleByID returns multiple users from their full IDs
+// GetMultipleByID returns multiple users from their full IDs.
 // The response body is a map where the keys are the IDs (if they exist), and the value is the user
 func (s *UserServiceOp) GetMultipleByID(ctx context.Context, ids ...string) (map[string]*UserShort, *Response, error) {
 	type query struct {
@@ -197,8 +197,7 @@ func (s *UserServiceOp) GetMultipleByID(ctx context.Context, ids ...string) (map
 	return *root, resp, nil
 }
 
-// UsernameAvailable checks whether a username is available for registration
-// If a valid username is provided, this endpoint returns a body with just "true" or "false"
+// UsernameAvailable checks whether a username is available for registration.
 func (s *UserServiceOp) UsernameAvailable(ctx context.Context, username string) (bool, *Response, error) {
 	type query struct {
 		User string `url:"user,omitempty"`
@@ -224,13 +223,13 @@ func (s *UserServiceOp) UsernameAvailable(ctx context.Context, username string) 
 	return *root, resp, nil
 }
 
-// Overview returns a list of the client's comments and links
-func (s *UserServiceOp) Overview(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Comments, *Response, error) {
+// Overview returns a list of the client's posts and comments.
+func (s *UserServiceOp) Overview(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
 	return s.OverviewOf(ctx, s.client.Username, opts...)
 }
 
-// OverviewOf returns a list of the user's comments and links
-func (s *UserServiceOp) OverviewOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Links, *Comments, *Response, error) {
+// OverviewOf returns a list of the user's posts and comments.
+func (s *UserServiceOp) OverviewOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/overview", username)
@@ -247,16 +246,16 @@ func (s *UserServiceOp) OverviewOf(ctx context.Context, username string, opts ..
 		return nil, nil, resp, err
 	}
 
-	return root.getLinks(), root.getComments(), resp, nil
+	return root.getPosts(), root.getComments(), resp, nil
 }
 
 // Posts returns a list of the client's posts.
-func (s *UserServiceOp) Posts(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error) {
+func (s *UserServiceOp) Posts(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	return s.PostsOf(ctx, s.client.Username, opts...)
 }
 
 // PostsOf returns a list of the user's posts.
-func (s *UserServiceOp) PostsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Links, *Response, error) {
+func (s *UserServiceOp) PostsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/submitted", username)
@@ -273,7 +272,7 @@ func (s *UserServiceOp) PostsOf(ctx context.Context, username string, opts ...Se
 		return nil, resp, err
 	}
 
-	return root.getLinks(), resp, nil
+	return root.getPosts(), resp, nil
 }
 
 // Comments returns a list of the client's comments.
@@ -303,7 +302,7 @@ func (s *UserServiceOp) CommentsOf(ctx context.Context, username string, opts ..
 }
 
 // Saved returns a list of the user's saved posts and comments.
-func (s *UserServiceOp) Saved(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Comments, *Response, error) {
+func (s *UserServiceOp) Saved(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/saved", s.client.Username)
@@ -320,11 +319,11 @@ func (s *UserServiceOp) Saved(ctx context.Context, opts ...SearchOptionSetter) (
 		return nil, nil, resp, err
 	}
 
-	return root.getLinks(), root.getComments(), resp, nil
+	return root.getPosts(), root.getComments(), resp, nil
 }
 
 // Upvoted returns a list of the user's upvoted posts.
-func (s *UserServiceOp) Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error) {
+func (s *UserServiceOp) Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/upvoted", s.client.Username)
@@ -341,11 +340,11 @@ func (s *UserServiceOp) Upvoted(ctx context.Context, opts ...SearchOptionSetter)
 		return nil, resp, err
 	}
 
-	return root.getLinks(), resp, nil
+	return root.getPosts(), resp, nil
 }
 
 // Downvoted returns a list of the user's downvoted posts.
-func (s *UserServiceOp) Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error) {
+func (s *UserServiceOp) Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/downvoted", s.client.Username)
@@ -362,11 +361,11 @@ func (s *UserServiceOp) Downvoted(ctx context.Context, opts ...SearchOptionSette
 		return nil, resp, err
 	}
 
-	return root.getLinks(), resp, nil
+	return root.getPosts(), resp, nil
 }
 
 // Hidden returns a list of the user's hidden posts.
-func (s *UserServiceOp) Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error) {
+func (s *UserServiceOp) Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/hidden", s.client.Username)
@@ -383,11 +382,11 @@ func (s *UserServiceOp) Hidden(ctx context.Context, opts ...SearchOptionSetter) 
 		return nil, resp, err
 	}
 
-	return root.getLinks(), resp, nil
+	return root.getPosts(), resp, nil
 }
 
 // Gilded returns a list of the user's gilded posts.
-func (s *UserServiceOp) Gilded(ctx context.Context, opts ...SearchOptionSetter) (*Links, *Response, error) {
+func (s *UserServiceOp) Gilded(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/gilded", s.client.Username)
@@ -404,7 +403,7 @@ func (s *UserServiceOp) Gilded(ctx context.Context, opts ...SearchOptionSetter) 
 		return nil, resp, err
 	}
 
-	return root.getLinks(), resp, nil
+	return root.getPosts(), resp, nil
 }
 
 // GetFriendship returns friendship details with the specified user.
