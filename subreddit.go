@@ -127,12 +127,12 @@ func (s *SubredditServiceOp) GetModerated(ctx context.Context, opts *ListOptions
 
 // GetSticky1 returns the first stickied post on a subreddit (if it exists).
 func (s *SubredditServiceOp) GetSticky1(ctx context.Context, name string) (*PostAndComments, *Response, error) {
-	return s.getSticky(ctx, name, sticky1)
+	return s.getSticky(ctx, name, 1)
 }
 
 // GetSticky2 returns the second stickied post on a subreddit (if it exists).
 func (s *SubredditServiceOp) GetSticky2(ctx context.Context, name string) (*PostAndComments, *Response, error) {
-	return s.getSticky(ctx, name, sticky2)
+	return s.getSticky(ctx, name, 2)
 }
 
 // Subscribe subscribes to subreddits based on their names.
@@ -249,11 +249,9 @@ func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opt
 
 // getSticky returns one of the 2 stickied posts of the subreddit (if they exist).
 // Num should be equal to 1 or 2, depending on which one you want.
-// If it's <= 1, it's 1.
-// If it's >= 2, it's 2.
-func (s *SubredditServiceOp) getSticky(ctx context.Context, subreddit string, num sticky) (*PostAndComments, *Response, error) {
+func (s *SubredditServiceOp) getSticky(ctx context.Context, subreddit string, num int) (*PostAndComments, *Response, error) {
 	type query struct {
-		Num sticky `url:"num"`
+		Num int `url:"num"`
 	}
 
 	path := fmt.Sprintf("r/%s/about/sticky", subreddit)

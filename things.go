@@ -82,14 +82,6 @@ func (t Timespan) String() string {
 	return timespans[t]
 }
 
-// todo: remove this, it is not needed
-type sticky int
-
-const (
-	sticky1 sticky = iota + 1
-	sticky2
-)
-
 type root struct {
 	Kind string      `json:"kind,omitempty"`
 	Data interface{} `json:"data,omitempty"`
