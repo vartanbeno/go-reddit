@@ -26,6 +26,7 @@ type UserService interface {
 	CommentsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Comments, *Response, error)
 
 	Saved(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error)
+	// todo: votes can be public (they're private by default) so make UpvotedOf and DownvotedOf as well
 	Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
 	Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
 	Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
@@ -36,6 +37,7 @@ type UserService interface {
 	Unfriend(ctx context.Context, username string) (*Response, error)
 
 	Block(ctx context.Context, username string) (*Blocked, *Response, error)
+	// todo: decide if you wanna keep these
 	// BlockByID(ctx context.Context, id string) (*Blocked, *Response, error)
 	Unblock(ctx context.Context, username string) (*Response, error)
 	// UnblockByID(ctx context.Context, id string) (*Response, error)
@@ -107,6 +109,8 @@ type Trophy struct {
 
 // Trophies is a list of trophies.
 type Trophies []Trophy
+
+// todo: we don't really need this. just make a rootTrophyListingData struct or something and use the default unmarshaler for that
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (t *Trophies) UnmarshalJSON(b []byte) error {

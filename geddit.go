@@ -91,6 +91,7 @@ type Client struct {
 	// This is the client's user ID in Reddit's database.
 	redditID string
 
+	Account   AccountService
 	Comment   CommentService
 	Flair     FlairService
 	Listings  ListingsService
@@ -120,6 +121,7 @@ func newClient(httpClient *http.Client) *Client {
 
 	c := &Client{client: httpClient, BaseURL: baseURL, TokenURL: tokenURL}
 
+	c.Account = &AccountServiceOp{client: c}
 	c.Comment = &CommentServiceOp{client: c}
 	c.Flair = &FlairServiceOp{client: c}
 	c.Listings = &ListingsServiceOp{client: c}

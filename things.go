@@ -13,6 +13,7 @@ const (
 	kindSubreddit  = "t5"
 	kindAward      = "t6"
 	kindListing    = "Listing"
+	kingKarmaList  = "KarmaList"
 	kingTrophyList = "TrophyList"
 	kindUserList   = "UserList"
 	kindMode       = "more"
