@@ -42,7 +42,7 @@
   "min_link_score": null,
   "media_preview": "off",
   "show_location_based_recommendations": false,
-  "nightmode": false,
+  "nightmode": true,
   "highlight_controversial": true,
   "geopopular": "GLOBAL",
   "third_party_site_data_personalized_ads": false,
@@ -63,7 +63,7 @@
   "send_welcome_messages": true,
   "show_gold_expiration": false,
   "highlight_new_comments": true,
-  "email_unsubscribe_all": false,
+  "email_unsubscribe_all": true,
   "default_comment_sort": "top",
   "accept_pms": "everyone"
 }
