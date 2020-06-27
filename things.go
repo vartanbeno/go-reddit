@@ -83,6 +83,20 @@ func (t Timespan) String() string {
 	return timespans[t]
 }
 
+// Permalink is the link to a post or comment.
+type Permalink string
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (p *Permalink) UnmarshalJSON(data []byte) error {
+	var v string
+	err := json.Unmarshal(data, &v)
+	if err != nil {
+		return err
+	}
+	*p = Permalink("https://www.reddit.com" + v)
+	return nil
+}
+
 type root struct {
 	Kind string      `json:"kind,omitempty"`
 	Data interface{} `json:"data,omitempty"`
@@ -130,8 +144,25 @@ type subredditRoot struct {
 	Data *Subreddit `json:"data,omitempty"`
 }
 
+func (t *Things) init() {
+	if t.Comments == nil {
+		t.Comments = make([]Comment, 0)
+	}
+	if t.Users == nil {
+		t.Users = make([]User, 0)
+	}
+	if t.Posts == nil {
+		t.Posts = make([]Post, 0)
+	}
+	if t.Subreddits == nil {
+		t.Subreddits = make([]Subreddit, 0)
+	}
+}
+
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (t *Things) UnmarshalJSON(b []byte) error {
+	t.init()
+
 	var children []map[string]interface{}
 	if err := json.Unmarshal(b, &children); err != nil {
 		return err
@@ -176,8 +207,8 @@ type Comment struct {
 	Created *Timestamp `json:"created_utc,omitempty"`
 	Edited  *Timestamp `json:"edited,omitempty"`
 
-	ParentID  string `json:"parent_id,omitempty"`
-	Permalink string `json:"permalink,omitempty"`
+	ParentID  string    `json:"parent_id,omitempty"`
+	Permalink Permalink `json:"permalink,omitempty"`
 
 	Body            string `json:"body,omitempty"`
 	Author          string `json:"author,omitempty"`
@@ -199,10 +230,10 @@ type Comment struct {
 	PostID string `json:"link_id,omitempty"`
 
 	// These don't appear when submitting a comment
-	PostTitle       string `json:"link_title,omitempty"`
-	PostPermalink   string `json:"link_permalink,omitempty"`
-	PostAuthor      string `json:"link_author,omitempty"`
-	PostNumComments int    `json:"num_comments"`
+	PostTitle       string    `json:"link_title,omitempty"`
+	PostPermalink   Permalink `json:"link_permalink,omitempty"`
+	PostAuthor      string    `json:"link_author,omitempty"`
+	PostNumComments int       `json:"num_comments"`
 
 	IsSubmitter bool `json:"is_submitter"`
 	ScoreHidden bool `json:"score_hidden"`
@@ -215,7 +246,7 @@ type Comment struct {
 	Replies Replies `json:"replies"`
 }
 
-// Replies are replies to a comment
+// Replies are replies to a comment.
 type Replies []Comment
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -242,8 +273,8 @@ type Post struct {
 	Created *Timestamp `json:"created_utc,omitempty"`
 	Edited  *Timestamp `json:"edited,omitempty"`
 
-	Permalink string `json:"permalink,omitempty"`
-	URL       string `json:"url,omitempty"`
+	Permalink Permalink `json:"permalink,omitempty"`
+	URL       string    `json:"url,omitempty"`
 
 	Title string `json:"title,omitempty"`
 	Body  string `json:"selftext,omitempty"`
@@ -347,36 +378,36 @@ func (rl *rootListing) getSubreddits() *Subreddits {
 
 // Comments is a list of comments
 type Comments struct {
-	Comments []Comment `json:"comments,omitempty"`
+	Comments []Comment `json:"comments"`
 	After    string    `json:"after"`
 	Before   string    `json:"before"`
 }
 
 // Users is a list of users
 type Users struct {
-	Users  []User `json:"users,omitempty"`
+	Users  []User `json:"users"`
 	After  string `json:"after"`
 	Before string `json:"before"`
 }
 
 // Subreddits is a list of subreddits
 type Subreddits struct {
-	Subreddits []Subreddit `json:"subreddits,omitempty"`
+	Subreddits []Subreddit `json:"subreddits"`
 	After      string      `json:"after"`
 	Before     string      `json:"before"`
 }
 
 // Posts is a list of posts.
 type Posts struct {
-	Posts  []Post `json:"submissions,omitempty"`
+	Posts  []Post `json:"posts"`
 	After  string `json:"after"`
 	Before string `json:"before"`
 }
 
 // PostAndComments is a post and its comments
 type PostAndComments struct {
-	Post     Post      `json:"post,omitempty"`
-	Comments []Comment `json:"comments,omitempty"`
+	Post     Post      `json:"post"`
+	Comments []Comment `json:"comments"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
