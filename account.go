@@ -8,6 +8,7 @@ import (
 // AccountService handles communication with the account
 // related methods of the Reddit API.
 type AccountService interface {
+	Info(ctx context.Context) (*User, *Response, error)
 	Karma(ctx context.Context) ([]SubredditKarma, *Response, error)
 	Settings(ctx context.Context) (*Settings, *Response, error)
 	UpdateSettings(ctx context.Context, settings *Settings) (*Settings, *Response, error)
@@ -214,6 +215,24 @@ type Settings struct {
 
 	UseGlobalDefaults   *bool `json:"use_global_defaults,omitempty"`
 	EnableVideoAutoplay *bool `json:"video_autoplay,omitempty"`
+}
+
+// Info returns some general information about your account.
+func (s *AccountServiceOp) Info(ctx context.Context) (*User, *Response, error) {
+	path := "api/v1/me"
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(User)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, nil
 }
 
 // Karma returns a breakdown of your karma per subreddit.

@@ -5,9 +5,20 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
+
+var expectedInfo = &User{
+	ID:               "164ab8",
+	Name:             "v_95",
+	Created:          &Timestamp{time.Date(2017, 3, 12, 4, 56, 47, 0, time.UTC)},
+	PostKarma:        488,
+	CommentKarma:     22223,
+	HasVerifiedEmail: true,
+	NSFW:             true,
+}
 
 var expectedKarma = []SubredditKarma{
 	{Subreddit: "nba", PostKarma: 144, CommentKarma: 21999},
@@ -84,6 +95,22 @@ var expectedSettings = &Settings{
 	TopKarmaSubreddits:                            Bool(false),
 	UseGlobalDefaults:                             Bool(false),
 	EnableVideoAutoplay:                           Bool(true),
+}
+
+func TestAccountServiceOp_Info(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/account/info.json")
+
+	mux.HandleFunc("/api/v1/me", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	info, _, err := client.Account.Info(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedInfo, info)
 }
 
 func TestAccountServiceOp_Karma(t *testing.T) {
