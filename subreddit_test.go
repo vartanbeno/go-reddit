@@ -88,7 +88,7 @@ var expectedSticky = &PostAndComments{
 		Created: &Timestamp{time.Date(2020, 6, 20, 12, 8, 57, 0, time.UTC)},
 		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-		Permalink: "/r/nba/comments/hcl9gq/daily_discussion_thread_freetalk_and_other/",
+		Permalink: "https://www.reddit.com/r/nba/comments/hcl9gq/daily_discussion_thread_freetalk_and_other/",
 		URL:       "https://www.reddit.com/r/nba/comments/hcl9gq/daily_discussion_thread_freetalk_and_other/",
 
 		Title: "Daily Discussion Thread | Free-Talk and Other Updates - June 20, 2020",

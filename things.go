@@ -13,8 +13,8 @@ const (
 	kindSubreddit  = "t5"
 	kindAward      = "t6"
 	kindListing    = "Listing"
-	kingKarmaList  = "KarmaList"
-	kingTrophyList = "TrophyList"
+	kindKarmaList  = "KarmaList"
+	kindTrophyList = "TrophyList"
 	kindUserList   = "UserList"
 	kindMode       = "more"
 )
@@ -230,10 +230,10 @@ type Comment struct {
 	PostID string `json:"link_id,omitempty"`
 
 	// These don't appear when submitting a comment
-	PostTitle       string    `json:"link_title,omitempty"`
-	PostPermalink   Permalink `json:"link_permalink,omitempty"`
-	PostAuthor      string    `json:"link_author,omitempty"`
-	PostNumComments int       `json:"num_comments"`
+	PostTitle       string `json:"link_title,omitempty"`
+	PostPermalink   string `json:"link_permalink,omitempty"`
+	PostAuthor      string `json:"link_author,omitempty"`
+	PostNumComments int    `json:"num_comments"`
 
 	IsSubmitter bool `json:"is_submitter"`
 	ScoreHidden bool `json:"score_hidden"`

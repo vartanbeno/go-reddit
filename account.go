@@ -12,6 +12,7 @@ type AccountService interface {
 	Karma(ctx context.Context) ([]SubredditKarma, *Response, error)
 	Settings(ctx context.Context) (*Settings, *Response, error)
 	UpdateSettings(ctx context.Context, settings *Settings) (*Settings, *Response, error)
+	Trophies(ctx context.Context) ([]Trophy, *Response, error)
 }
 
 // AccountServiceOp implements the AccountService interface.
@@ -287,4 +288,27 @@ func (s *AccountServiceOp) UpdateSettings(ctx context.Context, settings *Setting
 	}
 
 	return root, resp, nil
+}
+
+// Trophies returns a list of your trophies.
+func (s *AccountServiceOp) Trophies(ctx context.Context) ([]Trophy, *Response, error) {
+	path := "api/v1/me/trophies"
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootTrophyListing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	var trophies []Trophy
+	for _, trophy := range root.Data.Trophies {
+		trophies = append(trophies, trophy.Data)
+	}
+
+	return trophies, resp, nil
 }

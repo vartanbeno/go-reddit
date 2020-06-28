@@ -167,3 +167,19 @@ func TestAccountServiceOp_UpdateSettings(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSettings, settings)
 }
+
+func TestAccountService_Trophies(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/account/trophies.json")
+
+	mux.HandleFunc("/api/v1/me/trophies", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	trophies, _, err := client.Account.Trophies(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedTrophies, trophies)
+}

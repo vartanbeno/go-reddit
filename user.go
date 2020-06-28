@@ -2,8 +2,6 @@ package geddit
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -42,8 +40,8 @@ type UserService interface {
 	Unblock(ctx context.Context, username string) (*Response, error)
 	// UnblockByID(ctx context.Context, id string) (*Response, error)
 
-	Trophies(ctx context.Context) (Trophies, *Response, error)
-	TrophiesOf(ctx context.Context, username string) (Trophies, *Response, error)
+	Trophies(ctx context.Context) ([]Trophy, *Response, error)
+	TrophiesOf(ctx context.Context, username string) ([]Trophy, *Response, error)
 }
 
 // UserServiceOp implements the UserService interface.
@@ -98,63 +96,22 @@ type Blocked struct {
 }
 
 type rootTrophyListing struct {
-	Kind     string   `json:"kind,omitempty"`
-	Trophies Trophies `json:"data"`
+	Kind string `json:"kind,omitempty"`
+	Data struct {
+		Trophies []rootTrophy `json:"trophies"`
+	} `json:"data"`
+}
+
+type rootTrophy struct {
+	Kind string `json:"kind,omitempty"`
+	Data Trophy `json:"data"`
 }
 
 // Trophy is a Reddit award.
 type Trophy struct {
-	Name string `json:"name"`
-}
-
-// Trophies is a list of trophies.
-type Trophies []Trophy
-
-// todo: we don't really need this. just make a rootTrophyListingData struct or something and use the default unmarshaler for that
-
-// UnmarshalJSON implements the json.Unmarshaler interface.
-func (t *Trophies) UnmarshalJSON(b []byte) error {
-	var data map[string]interface{}
-	if err := json.Unmarshal(b, &data); err != nil {
-		return err
-	}
-
-	trophies, ok := data["trophies"]
-	if !ok {
-		return errors.New("data does not contain trophies")
-	}
-
-	trophyList, ok := trophies.([]interface{})
-	if !ok {
-		return errors.New("unexpected type for list of trophies")
-	}
-
-	for _, trophyData := range trophyList {
-		trophyInfo, ok := trophyData.(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		info, ok := trophyInfo["data"]
-		if !ok {
-			continue
-		}
-
-		infoBytes, err := json.Marshal(info)
-		if err != nil {
-			continue
-		}
-
-		var trophy Trophy
-		err = json.Unmarshal(infoBytes, &trophy)
-		if err != nil {
-			continue
-		}
-
-		*t = append(*t, trophy)
-	}
-
-	return nil
+	ID          string `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 // Get returns information about the user.
@@ -549,12 +506,12 @@ func (s *UserServiceOp) Unblock(ctx context.Context, username string) (*Response
 // }
 
 // Trophies returns a list of your trophies.
-func (s *UserServiceOp) Trophies(ctx context.Context) (Trophies, *Response, error) {
+func (s *UserServiceOp) Trophies(ctx context.Context) ([]Trophy, *Response, error) {
 	return s.TrophiesOf(ctx, s.client.Username)
 }
 
 // TrophiesOf returns a list of the specified user's trophies.
-func (s *UserServiceOp) TrophiesOf(ctx context.Context, username string) (Trophies, *Response, error) {
+func (s *UserServiceOp) TrophiesOf(ctx context.Context, username string) ([]Trophy, *Response, error) {
 	path := fmt.Sprintf("api/v1/user/%s/trophies", username)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -568,5 +525,10 @@ func (s *UserServiceOp) TrophiesOf(ctx context.Context, username string) (Trophi
 		return nil, resp, err
 	}
 
-	return root.Trophies, resp, nil
+	var trophies []Trophy
+	for _, trophy := range root.Data.Trophies {
+		trophies = append(trophies, trophy.Data)
+	}
+
+	return trophies, resp, nil
 }
