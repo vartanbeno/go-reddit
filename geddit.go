@@ -91,19 +91,26 @@ type Client struct {
 	// This is the client's user ID in Reddit's database.
 	redditID string
 
-	Account   AccountService
-	Comment   CommentService
-	Flair     FlairService
-	Listings  ListingsService
-	Post      PostService
-	Search    SearchService
-	Subreddit SubredditService
-	User      UserService
-	Vote      VoteService
+	// Reuse a single struct instead of allocating one for each service on the heap.
+	common service
+
+	Account   *AccountService
+	Comment   *CommentService
+	Flair     *FlairService
+	Listings  *ListingsService
+	Post      *PostService
+	Search    *SearchService
+	Subreddit *SubredditService
+	User      *UserService
+	Vote      *VoteService
 
 	oauth2Transport *oauth2.Transport
 
 	onRequestCompleted RequestCompletionCallback
+}
+
+type service struct {
+	client *Client
 }
 
 // OnRequestCompleted sets the client's request completion callback.
@@ -121,15 +128,16 @@ func newClient(httpClient *http.Client) *Client {
 
 	c := &Client{client: httpClient, BaseURL: baseURL, TokenURL: tokenURL}
 
-	c.Account = &AccountServiceOp{client: c}
-	c.Comment = &CommentServiceOp{client: c}
-	c.Flair = &FlairServiceOp{client: c}
-	c.Listings = &ListingsServiceOp{client: c}
-	c.Post = &PostServiceOp{client: c}
-	c.Search = &SearchServiceOp{client: c}
-	c.Subreddit = &SubredditServiceOp{client: c}
-	c.User = &UserServiceOp{client: c}
-	c.Vote = &VoteServiceOp{client: c}
+	c.common.client = c
+	c.Account = (*AccountService)(&c.common)
+	c.Comment = (*CommentService)(&c.common)
+	c.Flair = (*FlairService)(&c.common)
+	c.Listings = (*ListingsService)(&c.common)
+	c.Post = (*PostService)(&c.common)
+	c.Search = (*SearchService)(&c.common)
+	c.Subreddit = (*SubredditService)(&c.common)
+	c.User = (*UserService)(&c.common)
+	c.Vote = (*VoteService)(&c.common)
 
 	return c
 }

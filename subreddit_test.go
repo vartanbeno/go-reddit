@@ -110,7 +110,7 @@ var expectedSticky = &PostAndComments{
 	},
 }
 
-func TestSubredditServiceOp_GetByName(t *testing.T) {
+func TestSubredditService_GetByName(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -126,7 +126,7 @@ func TestSubredditServiceOp_GetByName(t *testing.T) {
 	assert.Equal(t, expectedSubreddit, subreddit)
 }
 
-func TestSubredditServiceOp_GetPopular(t *testing.T) {
+func TestSubredditService_GetPopular(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -142,7 +142,7 @@ func TestSubredditServiceOp_GetPopular(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditServiceOp_GetNew(t *testing.T) {
+func TestSubredditService_GetNew(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -158,7 +158,7 @@ func TestSubredditServiceOp_GetNew(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditServiceOp_GetGold(t *testing.T) {
+func TestSubredditService_GetGold(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -174,7 +174,7 @@ func TestSubredditServiceOp_GetGold(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditServiceOp_GetDefault(t *testing.T) {
+func TestSubredditService_GetDefault(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -190,7 +190,7 @@ func TestSubredditServiceOp_GetDefault(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditServiceOp_GetSubscribed(t *testing.T) {
+func TestSubredditService_GetSubscribed(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -206,7 +206,7 @@ func TestSubredditServiceOp_GetSubscribed(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditServiceOp_GetApproved(t *testing.T) {
+func TestSubredditService_GetApproved(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -222,7 +222,7 @@ func TestSubredditServiceOp_GetApproved(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditServiceOp_GetModerated(t *testing.T) {
+func TestSubredditService_GetModerated(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -239,7 +239,7 @@ func TestSubredditServiceOp_GetModerated(t *testing.T) {
 }
 
 // todo: WIP
-func TestSubredditServiceOp_GetSticky1(t *testing.T) {
+func TestSubredditService_GetSticky1(t *testing.T) {
 	setup()
 	defer teardown()
 

@@ -40,15 +40,15 @@ var expectedFlairsV2 = []FlairV2{
 	},
 }
 
-func TestFlairServiceOp_GetFlairs(t *testing.T) {
+func TestFlairService_GetFlairs(t *testing.T) {
 	setup()
 	defer teardown()
 
-	flairsBlob := readFileContents(t, "testdata/flairs.json")
+	blob := readFileContents(t, "testdata/flairs.json")
 
 	mux.HandleFunc("/r/subreddit/api/user_flair", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, flairsBlob)
+		fmt.Fprint(w, blob)
 	})
 
 	flairs, _, err := client.Flair.GetFromSubreddit(ctx, "subreddit")
@@ -56,15 +56,15 @@ func TestFlairServiceOp_GetFlairs(t *testing.T) {
 	assert.Equal(t, expectedFlairs, flairs)
 }
 
-func TestFlairServiceOp_GetFlairsV2(t *testing.T) {
+func TestFlairService_GetFlairsV2(t *testing.T) {
 	setup()
 	defer teardown()
 
-	flairsV2Blob := readFileContents(t, "testdata/flairs-v2.json")
+	blob := readFileContents(t, "testdata/flairs-v2.json")
 
 	mux.HandleFunc("/r/subreddit/api/user_flair_v2", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, flairsV2Blob)
+		fmt.Fprint(w, blob)
 	})
 
 	flairs, _, err := client.Flair.GetFromSubredditV2(ctx, "subreddit")

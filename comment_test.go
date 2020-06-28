@@ -38,11 +38,11 @@ var expectedCommentSubmitOrEdit = &Comment{
 	PostID: "t3_link1",
 }
 
-func TestCommentServiceOp_Submit(t *testing.T) {
+func TestCommentService_Submit(t *testing.T) {
 	setup()
 	defer teardown()
 
-	commentBlob := readFileContents(t, "testdata/comment-submit-edit.json")
+	blob := readFileContents(t, "testdata/comment-submit-edit.json")
 
 	mux.HandleFunc("/api/comment", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -57,7 +57,7 @@ func TestCommentServiceOp_Submit(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, form, r.PostForm)
 
-		fmt.Fprint(w, commentBlob)
+		fmt.Fprint(w, blob)
 	})
 
 	comment, _, err := client.Comment.Submit(ctx, "t1_test", "test comment")
@@ -65,11 +65,11 @@ func TestCommentServiceOp_Submit(t *testing.T) {
 	assert.Equal(t, expectedCommentSubmitOrEdit, comment)
 }
 
-func TestCommentServiceOp_Edit(t *testing.T) {
+func TestCommentService_Edit(t *testing.T) {
 	setup()
 	defer teardown()
 
-	commentBlob := readFileContents(t, "testdata/comment-submit-edit.json")
+	blob := readFileContents(t, "testdata/comment-submit-edit.json")
 
 	mux.HandleFunc("/api/editusertext", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -84,7 +84,7 @@ func TestCommentServiceOp_Edit(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, form, r.PostForm)
 
-		fmt.Fprint(w, commentBlob)
+		fmt.Fprint(w, blob)
 	})
 
 	_, _, err := client.Comment.Edit(ctx, "t3_test", "test comment")
@@ -95,7 +95,7 @@ func TestCommentServiceOp_Edit(t *testing.T) {
 	assert.Equal(t, expectedCommentSubmitOrEdit, comment)
 }
 
-func TestCommentServiceOp_Delete(t *testing.T) {
+func TestCommentService_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -120,7 +120,7 @@ func TestCommentServiceOp_Delete(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func TestCommentServiceOp_Save(t *testing.T) {
+func TestCommentService_Save(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -133,8 +133,6 @@ func TestCommentServiceOp_Save(t *testing.T) {
 		err := r.ParseForm()
 		assert.NoError(t, err)
 		assert.Equal(t, form, r.PostForm)
-
-		fmt.Fprint(w, `{}`)
 	})
 
 	_, err := client.Comment.Save(ctx, "t3_test")
@@ -145,7 +143,7 @@ func TestCommentServiceOp_Save(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func TestCommentServiceOp_Unsave(t *testing.T) {
+func TestCommentService_Unsave(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -158,8 +156,6 @@ func TestCommentServiceOp_Unsave(t *testing.T) {
 		err := r.ParseForm()
 		assert.NoError(t, err)
 		assert.Equal(t, form, r.PostForm)
-
-		fmt.Fprint(w, `{}`)
 	})
 
 	_, err := client.Comment.Unsave(ctx, "t3_test")

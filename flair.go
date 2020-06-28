@@ -6,19 +6,11 @@ import (
 	"net/http"
 )
 
-// FlairService handles communication with the user
-// related methods of the Reddit API
-type FlairService interface {
-	GetFromSubreddit(ctx context.Context, name string) ([]Flair, *Response, error)
-	GetFromSubredditV2(ctx context.Context, name string) ([]FlairV2, *Response, error)
-}
-
-// FlairServiceOp implements the FlairService interface
-type FlairServiceOp struct {
-	client *Client
-}
-
-var _ FlairService = &FlairServiceOp{}
+// FlairService handles communication with the flair
+// related methods of the Reddit API.
+//
+// Reddit API docs: https://www.reddit.com/dev/api/#section_flair
+type FlairService service
 
 // Flair is a flair on Reddit
 type Flair struct {
@@ -38,7 +30,7 @@ type FlairV2 struct {
 }
 
 // GetFromSubreddit returns the flairs from the subreddit
-func (s *FlairServiceOp) GetFromSubreddit(ctx context.Context, name string) ([]Flair, *Response, error) {
+func (s *FlairService) GetFromSubreddit(ctx context.Context, name string) ([]Flair, *Response, error) {
 	path := fmt.Sprintf("r/%s/api/user_flair", name)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -56,7 +48,7 @@ func (s *FlairServiceOp) GetFromSubreddit(ctx context.Context, name string) ([]F
 }
 
 // GetFromSubredditV2 returns the flairs from the subreddit
-func (s *FlairServiceOp) GetFromSubredditV2(ctx context.Context, name string) ([]FlairV2, *Response, error) {
+func (s *FlairService) GetFromSubredditV2(ctx context.Context, name string) ([]FlairV2, *Response, error) {
 	path := fmt.Sprintf("r/%s/api/user_flair_v2", name)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)

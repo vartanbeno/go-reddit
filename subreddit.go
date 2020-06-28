@@ -10,39 +10,10 @@ import (
 )
 
 // SubredditService handles communication with the subreddit
-// related methods of the Reddit API
-type SubredditService interface {
-	GetPosts() *PostFinder
-
-	GetByName(ctx context.Context, subreddit string) (*Subreddit, *Response, error)
-
-	GetPopular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-	GetNew(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-	GetGold(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-	GetDefault(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-
-	GetSubscribed(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-	GetApproved(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-	GetModerated(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error)
-
-	GetSticky1(ctx context.Context, subreddit string) (*PostAndComments, *Response, error)
-	GetSticky2(ctx context.Context, subreddit string) (*PostAndComments, *Response, error)
-
-	Subscribe(ctx context.Context, subreddits ...string) (*Response, error)
-	SubscribeByID(ctx context.Context, ids ...string) (*Response, error)
-	Unsubscribe(ctx context.Context, subreddits ...string) (*Response, error)
-	UnsubscribeByID(ctx context.Context, ids ...string) (*Response, error)
-
-	SearchSubredditNames(ctx context.Context, query string) ([]string, *Response, error)
-	SearchSubredditInfo(ctx context.Context, query string) ([]SubredditShort, *Response, error)
-}
-
-// SubredditServiceOp implements the SubredditService interface
-type SubredditServiceOp struct {
-	client *Client
-}
-
-var _ SubredditService = &SubredditServiceOp{}
+// related methods of the Reddit API.
+//
+// Reddit API docs: https://www.reddit.com/dev/api/#section_subreddits
+type SubredditService service
 
 type subredditNamesRoot struct {
 	Names []string `json:"names,omitempty"`
@@ -63,14 +34,14 @@ type SubredditShort struct {
 // By default, it'll look for the hottest posts from r/all.
 // Note: when looking for hot posts in a subreddit, it will include the
 // sticked posts (if any) PLUS posts from the limit parameter (25 by default).
-func (s *SubredditServiceOp) GetPosts() *PostFinder {
+func (s *SubredditService) GetPosts() *PostFinder {
 	f := new(PostFinder)
 	f.client = s.client
 	return f.Sort(SortHot).FromAll()
 }
 
 // GetByName gets a subreddit by name
-func (s *SubredditServiceOp) GetByName(ctx context.Context, subreddit string) (*Subreddit, *Response, error) {
+func (s *SubredditService) GetByName(ctx context.Context, subreddit string) (*Subreddit, *Response, error) {
 	if subreddit == "" {
 		return nil, nil, errors.New("empty subreddit name provided")
 	}
@@ -91,52 +62,52 @@ func (s *SubredditServiceOp) GetByName(ctx context.Context, subreddit string) (*
 }
 
 // GetPopular returns popular subreddits.
-func (s *SubredditServiceOp) GetPopular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+func (s *SubredditService) GetPopular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/popular", opts)
 }
 
 // GetNew returns new subreddits.
-func (s *SubredditServiceOp) GetNew(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+func (s *SubredditService) GetNew(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/new", opts)
 }
 
 // GetGold returns gold subreddits.
-func (s *SubredditServiceOp) GetGold(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+func (s *SubredditService) GetGold(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/gold", opts)
 }
 
 // GetDefault returns default subreddits.
-func (s *SubredditServiceOp) GetDefault(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+func (s *SubredditService) GetDefault(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/default", opts)
 }
 
 // GetSubscribed returns the list of subreddits the client is subscribed to.
-func (s *SubredditServiceOp) GetSubscribed(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+func (s *SubredditService) GetSubscribed(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/subscriber", opts)
 }
 
 // GetApproved returns the list of subreddits the client is an approved user in.
-func (s *SubredditServiceOp) GetApproved(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+func (s *SubredditService) GetApproved(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
 }
 
 // GetModerated returns the list of subreddits the client is a moderator of.
-func (s *SubredditServiceOp) GetModerated(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+func (s *SubredditService) GetModerated(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/moderator", opts)
 }
 
 // GetSticky1 returns the first stickied post on a subreddit (if it exists).
-func (s *SubredditServiceOp) GetSticky1(ctx context.Context, name string) (*PostAndComments, *Response, error) {
+func (s *SubredditService) GetSticky1(ctx context.Context, name string) (*PostAndComments, *Response, error) {
 	return s.getSticky(ctx, name, 1)
 }
 
 // GetSticky2 returns the second stickied post on a subreddit (if it exists).
-func (s *SubredditServiceOp) GetSticky2(ctx context.Context, name string) (*PostAndComments, *Response, error) {
+func (s *SubredditService) GetSticky2(ctx context.Context, name string) (*PostAndComments, *Response, error) {
 	return s.getSticky(ctx, name, 2)
 }
 
 // Subscribe subscribes to subreddits based on their names.
-func (s *SubredditServiceOp) Subscribe(ctx context.Context, subreddits ...string) (*Response, error) {
+func (s *SubredditService) Subscribe(ctx context.Context, subreddits ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "sub")
 	form.Set("sr_name", strings.Join(subreddits, ","))
@@ -144,7 +115,7 @@ func (s *SubredditServiceOp) Subscribe(ctx context.Context, subreddits ...string
 }
 
 // SubscribeByID subscribes to subreddits based on their id.
-func (s *SubredditServiceOp) SubscribeByID(ctx context.Context, ids ...string) (*Response, error) {
+func (s *SubredditService) SubscribeByID(ctx context.Context, ids ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "sub")
 	form.Set("sr", strings.Join(ids, ","))
@@ -152,7 +123,7 @@ func (s *SubredditServiceOp) SubscribeByID(ctx context.Context, ids ...string) (
 }
 
 // Unsubscribe unsubscribes from subreddits based on their names.
-func (s *SubredditServiceOp) Unsubscribe(ctx context.Context, subreddits ...string) (*Response, error) {
+func (s *SubredditService) Unsubscribe(ctx context.Context, subreddits ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "unsub")
 	form.Set("sr_name", strings.Join(subreddits, ","))
@@ -160,7 +131,7 @@ func (s *SubredditServiceOp) Unsubscribe(ctx context.Context, subreddits ...stri
 }
 
 // UnsubscribeByID unsubscribes from subreddits based on their id.
-func (s *SubredditServiceOp) UnsubscribeByID(ctx context.Context, ids ...string) (*Response, error) {
+func (s *SubredditService) UnsubscribeByID(ctx context.Context, ids ...string) (*Response, error) {
 	form := url.Values{}
 	form.Set("action", "unsub")
 	form.Set("sr", strings.Join(ids, ","))
@@ -168,7 +139,7 @@ func (s *SubredditServiceOp) UnsubscribeByID(ctx context.Context, ids ...string)
 }
 
 // SearchSubredditNames searches for subreddits with names beginning with the query provided.
-func (s *SubredditServiceOp) SearchSubredditNames(ctx context.Context, query string) ([]string, *Response, error) {
+func (s *SubredditService) SearchSubredditNames(ctx context.Context, query string) ([]string, *Response, error) {
 	path := fmt.Sprintf("api/search_reddit_names?query=%s", query)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -187,7 +158,7 @@ func (s *SubredditServiceOp) SearchSubredditNames(ctx context.Context, query str
 
 // SearchSubredditInfo searches for subreddits with names beginning with the query provided.
 // They hold a bit more info that just the name, but still not much.
-func (s *SubredditServiceOp) SearchSubredditInfo(ctx context.Context, query string) ([]SubredditShort, *Response, error) {
+func (s *SubredditService) SearchSubredditInfo(ctx context.Context, query string) ([]SubredditShort, *Response, error) {
 	path := fmt.Sprintf("api/search_subreddits?query=%s", query)
 
 	req, err := s.client.NewRequest(http.MethodPost, path, nil)
@@ -204,7 +175,7 @@ func (s *SubredditServiceOp) SearchSubredditInfo(ctx context.Context, query stri
 	return root.Subreddits, resp, nil
 }
 
-func (s *SubredditServiceOp) handleSubscription(ctx context.Context, form url.Values) (*Response, error) {
+func (s *SubredditService) handleSubscription(ctx context.Context, form url.Values) (*Response, error) {
 	path := "api/subscribe"
 	req, err := s.client.NewPostForm(path, form)
 	if err != nil {
@@ -219,7 +190,7 @@ func (s *SubredditServiceOp) handleSubscription(ctx context.Context, form url.Va
 	return resp, nil
 }
 
-func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opts *ListOptions) (*Subreddits, *Response, error) {
+func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts *ListOptions) (*Subreddits, *Response, error) {
 	path, err := addOptions(path, opts)
 	if err != nil {
 		return nil, nil, err
@@ -249,7 +220,7 @@ func (s *SubredditServiceOp) getSubreddits(ctx context.Context, path string, opt
 
 // getSticky returns one of the 2 stickied posts of the subreddit (if they exist).
 // Num should be equal to 1 or 2, depending on which one you want.
-func (s *SubredditServiceOp) getSticky(ctx context.Context, subreddit string, num int) (*PostAndComments, *Response, error) {
+func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num int) (*PostAndComments, *Response, error) {
 	type query struct {
 		Num int `url:"num"`
 	}

@@ -9,28 +9,14 @@ import (
 
 // CommentService handles communication with the comment
 // related methods of the Reddit API.
-type CommentService interface {
-	Submit(ctx context.Context, id string, text string) (*Comment, *Response, error)
-	Edit(ctx context.Context, id string, text string) (*Comment, *Response, error)
-	Delete(ctx context.Context, id string) (*Response, error)
+type CommentService service
 
-	Save(ctx context.Context, id string) (*Response, error)
-	Unsave(ctx context.Context, id string) (*Response, error)
-}
-
-// CommentServiceOp implements the CommentService interface.
-type CommentServiceOp struct {
-	client *Client
-}
-
-var _ CommentService = &CommentServiceOp{}
-
-func (s *CommentServiceOp) isCommentID(id string) bool {
+func (s *CommentService) isCommentID(id string) bool {
 	return strings.HasPrefix(id, kindComment+"_")
 }
 
 // Submit submits a comment as a reply to a post or to another comment.
-func (s *CommentServiceOp) Submit(ctx context.Context, id string, text string) (*Comment, *Response, error) {
+func (s *CommentService) Submit(ctx context.Context, id string, text string) (*Comment, *Response, error) {
 	path := "api/comment"
 
 	form := url.Values{}
@@ -55,7 +41,7 @@ func (s *CommentServiceOp) Submit(ctx context.Context, id string, text string) (
 
 // Edit edits the comment with the id provided.
 // todo: don't forget to do this for posts
-func (s *CommentServiceOp) Edit(ctx context.Context, id string, text string) (*Comment, *Response, error) {
+func (s *CommentService) Edit(ctx context.Context, id string, text string) (*Comment, *Response, error) {
 	if !s.isCommentID(id) {
 		return nil, nil, fmt.Errorf("must provide comment id (starting with %s_); id provided: %q", kindComment, id)
 	}
@@ -84,7 +70,7 @@ func (s *CommentServiceOp) Edit(ctx context.Context, id string, text string) (*C
 
 // Delete deletes a comment via the id.
 // todo: don't forget to do this for posts.
-func (s *CommentServiceOp) Delete(ctx context.Context, id string) (*Response, error) {
+func (s *CommentService) Delete(ctx context.Context, id string) (*Response, error) {
 	if !s.isCommentID(id) {
 		return nil, fmt.Errorf("must provide comment id (starting with %s_); id provided: %q", kindComment, id)
 	}
@@ -108,7 +94,7 @@ func (s *CommentServiceOp) Delete(ctx context.Context, id string) (*Response, er
 }
 
 // Save saves a comment.
-func (s *CommentServiceOp) Save(ctx context.Context, id string) (*Response, error) {
+func (s *CommentService) Save(ctx context.Context, id string) (*Response, error) {
 	if !s.isCommentID(id) {
 		return nil, fmt.Errorf("must provide comment id (starting with %s_); id provided: %q", kindComment, id)
 	}
@@ -132,7 +118,7 @@ func (s *CommentServiceOp) Save(ctx context.Context, id string) (*Response, erro
 }
 
 // Unsave unsaves a comment.
-func (s *CommentServiceOp) Unsave(ctx context.Context, id string) (*Response, error) {
+func (s *CommentService) Unsave(ctx context.Context, id string) (*Response, error) {
 	if !s.isCommentID(id) {
 		return nil, fmt.Errorf("must provide comment id (starting with t1_); id provided: %q", id)
 	}

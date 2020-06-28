@@ -9,47 +9,9 @@ import (
 
 // UserService handles communication with the user
 // related methods of the Reddit API.
-type UserService interface {
-	Get(ctx context.Context, username string) (*User, *Response, error)
-	GetMultipleByID(ctx context.Context, ids ...string) (map[string]*UserShort, *Response, error)
-	UsernameAvailable(ctx context.Context, username string) (bool, *Response, error)
-
-	Overview(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error)
-	OverviewOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error)
-
-	Posts(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
-	PostsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error)
-
-	Comments(ctx context.Context, opts ...SearchOptionSetter) (*Comments, *Response, error)
-	CommentsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Comments, *Response, error)
-
-	Saved(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error)
-	// todo: votes can be public (they're private by default) so make UpvotedOf and DownvotedOf as well
-	Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
-	Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
-	Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
-	Gilded(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error)
-
-	GetFriendship(ctx context.Context, username string) (*Friendship, *Response, error)
-	Friend(ctx context.Context, username string) (*Friendship, *Response, error)
-	Unfriend(ctx context.Context, username string) (*Response, error)
-
-	Block(ctx context.Context, username string) (*Blocked, *Response, error)
-	// todo: decide if you wanna keep these
-	// BlockByID(ctx context.Context, id string) (*Blocked, *Response, error)
-	Unblock(ctx context.Context, username string) (*Response, error)
-	// UnblockByID(ctx context.Context, id string) (*Response, error)
-
-	Trophies(ctx context.Context) ([]Trophy, *Response, error)
-	TrophiesOf(ctx context.Context, username string) ([]Trophy, *Response, error)
-}
-
-// UserServiceOp implements the UserService interface.
-type UserServiceOp struct {
-	client *Client
-}
-
-var _ UserService = &UserServiceOp{}
+//
+// Reddit API docs: https://www.reddit.com/dev/api/#section_users
+type UserService service
 
 // User represents a Reddit user.
 type User struct {
@@ -115,7 +77,7 @@ type Trophy struct {
 }
 
 // Get returns information about the user.
-func (s *UserServiceOp) Get(ctx context.Context, username string) (*User, *Response, error) {
+func (s *UserService) Get(ctx context.Context, username string) (*User, *Response, error) {
 	path := fmt.Sprintf("user/%s/about", username)
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -133,7 +95,7 @@ func (s *UserServiceOp) Get(ctx context.Context, username string) (*User, *Respo
 
 // GetMultipleByID returns multiple users from their full IDs.
 // The response body is a map where the keys are the IDs (if they exist), and the value is the user
-func (s *UserServiceOp) GetMultipleByID(ctx context.Context, ids ...string) (map[string]*UserShort, *Response, error) {
+func (s *UserService) GetMultipleByID(ctx context.Context, ids ...string) (map[string]*UserShort, *Response, error) {
 	type query struct {
 		IDs []string `url:"ids,omitempty,comma"`
 	}
@@ -159,7 +121,7 @@ func (s *UserServiceOp) GetMultipleByID(ctx context.Context, ids ...string) (map
 }
 
 // UsernameAvailable checks whether a username is available for registration.
-func (s *UserServiceOp) UsernameAvailable(ctx context.Context, username string) (bool, *Response, error) {
+func (s *UserService) UsernameAvailable(ctx context.Context, username string) (bool, *Response, error) {
 	type query struct {
 		User string `url:"user,omitempty"`
 	}
@@ -185,12 +147,12 @@ func (s *UserServiceOp) UsernameAvailable(ctx context.Context, username string) 
 }
 
 // Overview returns a list of the client's posts and comments.
-func (s *UserServiceOp) Overview(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
+func (s *UserService) Overview(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
 	return s.OverviewOf(ctx, s.client.Username, opts...)
 }
 
 // OverviewOf returns a list of the user's posts and comments.
-func (s *UserServiceOp) OverviewOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
+func (s *UserService) OverviewOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/overview", username)
@@ -211,12 +173,12 @@ func (s *UserServiceOp) OverviewOf(ctx context.Context, username string, opts ..
 }
 
 // Posts returns a list of the client's posts.
-func (s *UserServiceOp) Posts(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *UserService) Posts(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	return s.PostsOf(ctx, s.client.Username, opts...)
 }
 
 // PostsOf returns a list of the user's posts.
-func (s *UserServiceOp) PostsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *UserService) PostsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/submitted", username)
@@ -237,12 +199,12 @@ func (s *UserServiceOp) PostsOf(ctx context.Context, username string, opts ...Se
 }
 
 // Comments returns a list of the client's comments.
-func (s *UserServiceOp) Comments(ctx context.Context, opts ...SearchOptionSetter) (*Comments, *Response, error) {
+func (s *UserService) Comments(ctx context.Context, opts ...SearchOptionSetter) (*Comments, *Response, error) {
 	return s.CommentsOf(ctx, s.client.Username, opts...)
 }
 
 // CommentsOf returns a list of the user's comments.
-func (s *UserServiceOp) CommentsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Comments, *Response, error) {
+func (s *UserService) CommentsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Comments, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/comments", username)
@@ -263,7 +225,7 @@ func (s *UserServiceOp) CommentsOf(ctx context.Context, username string, opts ..
 }
 
 // Saved returns a list of the user's saved posts and comments.
-func (s *UserServiceOp) Saved(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
+func (s *UserService) Saved(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/saved", s.client.Username)
@@ -284,7 +246,7 @@ func (s *UserServiceOp) Saved(ctx context.Context, opts ...SearchOptionSetter) (
 }
 
 // Upvoted returns a list of the user's upvoted posts.
-func (s *UserServiceOp) Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *UserService) Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/upvoted", s.client.Username)
@@ -305,7 +267,7 @@ func (s *UserServiceOp) Upvoted(ctx context.Context, opts ...SearchOptionSetter)
 }
 
 // Downvoted returns a list of the user's downvoted posts.
-func (s *UserServiceOp) Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *UserService) Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/downvoted", s.client.Username)
@@ -326,7 +288,7 @@ func (s *UserServiceOp) Downvoted(ctx context.Context, opts ...SearchOptionSette
 }
 
 // Hidden returns a list of the user's hidden posts.
-func (s *UserServiceOp) Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *UserService) Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/hidden", s.client.Username)
@@ -347,7 +309,7 @@ func (s *UserServiceOp) Hidden(ctx context.Context, opts ...SearchOptionSetter) 
 }
 
 // Gilded returns a list of the user's gilded posts.
-func (s *UserServiceOp) Gilded(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *UserService) Gilded(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
 	path := fmt.Sprintf("user/%s/gilded", s.client.Username)
@@ -369,7 +331,7 @@ func (s *UserServiceOp) Gilded(ctx context.Context, opts ...SearchOptionSetter) 
 
 // GetFriendship returns friendship details with the specified user.
 // If the user is not your friend, it will return an error.
-func (s *UserServiceOp) GetFriendship(ctx context.Context, username string) (*Friendship, *Response, error) {
+func (s *UserService) GetFriendship(ctx context.Context, username string) (*Friendship, *Response, error) {
 	path := fmt.Sprintf("api/v1/me/friends/%s", username)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -387,7 +349,7 @@ func (s *UserServiceOp) GetFriendship(ctx context.Context, username string) (*Fr
 }
 
 // Friend friends a user.
-func (s *UserServiceOp) Friend(ctx context.Context, username string) (*Friendship, *Response, error) {
+func (s *UserService) Friend(ctx context.Context, username string) (*Friendship, *Response, error) {
 	type request struct {
 		Username string `json:"name"`
 	}
@@ -410,7 +372,7 @@ func (s *UserServiceOp) Friend(ctx context.Context, username string) (*Friendshi
 }
 
 // Unfriend unfriends a user.
-func (s *UserServiceOp) Unfriend(ctx context.Context, username string) (*Response, error) {
+func (s *UserService) Unfriend(ctx context.Context, username string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/me/friends/%s", username)
 	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
 	if err != nil {
@@ -420,7 +382,7 @@ func (s *UserServiceOp) Unfriend(ctx context.Context, username string) (*Respons
 }
 
 // Block blocks a user.
-func (s *UserServiceOp) Block(ctx context.Context, username string) (*Blocked, *Response, error) {
+func (s *UserService) Block(ctx context.Context, username string) (*Blocked, *Response, error) {
 	path := "api/block_user"
 
 	form := url.Values{}
@@ -441,7 +403,7 @@ func (s *UserServiceOp) Block(ctx context.Context, username string) (*Blocked, *
 }
 
 // // BlockByID blocks a user via their full id.
-// func (s *UserServiceOp) BlockByID(ctx context.Context, id string) (*Blocked, *Response, error) {
+// func (s *UserService) BlockByID(ctx context.Context, id string) (*Blocked, *Response, error) {
 // 	path := "api/block_user"
 
 // 	form := url.Values{}
@@ -462,7 +424,7 @@ func (s *UserServiceOp) Block(ctx context.Context, username string) (*Blocked, *
 // }
 
 // Unblock unblocks a user.
-func (s *UserServiceOp) Unblock(ctx context.Context, username string) (*Response, error) {
+func (s *UserService) Unblock(ctx context.Context, username string) (*Response, error) {
 	selfID, err := s.client.GetRedditID(ctx)
 	if err != nil {
 		return nil, err
@@ -484,7 +446,7 @@ func (s *UserServiceOp) Unblock(ctx context.Context, username string) (*Response
 }
 
 // // UnblockByID unblocks a user via their full id.
-// func (s *UserServiceOp) UnblockByID(ctx context.Context, id string) (*Response, error) {
+// func (s *UserService) UnblockByID(ctx context.Context, id string) (*Response, error) {
 // 	selfID, err := s.client.GetRedditID(ctx)
 // 	if err != nil {
 // 		return nil, err
@@ -506,12 +468,12 @@ func (s *UserServiceOp) Unblock(ctx context.Context, username string) (*Response
 // }
 
 // Trophies returns a list of your trophies.
-func (s *UserServiceOp) Trophies(ctx context.Context) ([]Trophy, *Response, error) {
+func (s *UserService) Trophies(ctx context.Context) ([]Trophy, *Response, error) {
 	return s.TrophiesOf(ctx, s.client.Username)
 }
 
 // TrophiesOf returns a list of the specified user's trophies.
-func (s *UserServiceOp) TrophiesOf(ctx context.Context, username string) ([]Trophy, *Response, error) {
+func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]Trophy, *Response, error) {
 	path := fmt.Sprintf("api/v1/user/%s/trophies", username)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)

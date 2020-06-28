@@ -97,7 +97,7 @@ var expectedSettings = &Settings{
 	EnableVideoAutoplay:                           Bool(true),
 }
 
-func TestAccountServiceOp_Info(t *testing.T) {
+func TestAccountService_Info(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -113,7 +113,7 @@ func TestAccountServiceOp_Info(t *testing.T) {
 	assert.Equal(t, expectedInfo, info)
 }
 
-func TestAccountServiceOp_Karma(t *testing.T) {
+func TestAccountService_Karma(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -129,7 +129,7 @@ func TestAccountServiceOp_Karma(t *testing.T) {
 	assert.Equal(t, expectedKarma, karma)
 }
 
-func TestAccountServiceOp_Settings(t *testing.T) {
+func TestAccountService_Settings(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -145,7 +145,7 @@ func TestAccountServiceOp_Settings(t *testing.T) {
 	assert.Equal(t, expectedSettings, settings)
 }
 
-func TestAccountServiceOp_UpdateSettings(t *testing.T) {
+func TestAccountService_UpdateSettings(t *testing.T) {
 	setup()
 	defer teardown()
 

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVoteServiceOp_Up(t *testing.T) {
+func TestVoteService_Up(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -24,8 +24,6 @@ func TestVoteServiceOp_Up(t *testing.T) {
 		err := r.ParseForm()
 		assert.NoError(t, err)
 		assert.Equal(t, form, r.PostForm)
-
-		fmt.Fprint(w, `{}`)
 	})
 
 	res, err := client.Vote.Up(ctx, "t3_test")
@@ -33,7 +31,7 @@ func TestVoteServiceOp_Up(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func TestVoteServiceOp_Down(t *testing.T) {
+func TestVoteService_Down(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -48,8 +46,6 @@ func TestVoteServiceOp_Down(t *testing.T) {
 		err := r.ParseForm()
 		assert.NoError(t, err)
 		assert.Equal(t, form, r.PostForm)
-
-		fmt.Fprint(w, `{}`)
 	})
 
 	res, err := client.Vote.Down(ctx, "t3_test")
@@ -57,7 +53,7 @@ func TestVoteServiceOp_Down(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func TestVoteServiceOp_Remove(t *testing.T) {
+func TestVoteService_Remove(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -72,8 +68,6 @@ func TestVoteServiceOp_Remove(t *testing.T) {
 		err := r.ParseForm()
 		assert.NoError(t, err)
 		assert.Equal(t, form, r.PostForm)
-
-		fmt.Fprint(w, `{}`)
 	})
 
 	res, err := client.Vote.Remove(ctx, "t3_test")

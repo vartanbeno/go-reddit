@@ -8,18 +8,9 @@ import (
 
 // VoteService handles communication with the upvote/downvote
 // related methods of the Reddit API.
-type VoteService interface {
-	Up(ctx context.Context, id string) (*Response, error)
-	Down(ctx context.Context, id string) (*Response, error)
-	Remove(ctx context.Context, id string) (*Response, error)
-}
-
-// VoteServiceOp implements the Vote interface.
-type VoteServiceOp struct {
-	client *Client
-}
-
-var _ VoteService = &VoteServiceOp{}
+//
+// Reddit API docs: https://www.reddit.com/dev/api/#POST_api_vote
+type VoteService service
 
 type vote int
 
@@ -30,7 +21,7 @@ const (
 	upvote
 )
 
-func (s *VoteServiceOp) vote(ctx context.Context, id string, vote vote) (*Response, error) {
+func (s *VoteService) vote(ctx context.Context, id string, vote vote) (*Response, error) {
 	path := "api/vote"
 
 	form := url.Values{}
@@ -47,16 +38,16 @@ func (s *VoteServiceOp) vote(ctx context.Context, id string, vote vote) (*Respon
 }
 
 // Up upvotes a post or a comment.
-func (s *VoteServiceOp) Up(ctx context.Context, id string) (*Response, error) {
+func (s *VoteService) Up(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, upvote)
 }
 
 // Down downvotes a post or a comment.
-func (s *VoteServiceOp) Down(ctx context.Context, id string) (*Response, error) {
+func (s *VoteService) Down(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, downvote)
 }
 
 // Remove removes the user's vote on a post or a comment.
-func (s *VoteServiceOp) Remove(ctx context.Context, id string) (*Response, error) {
+func (s *VoteService) Remove(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, novote)
 }

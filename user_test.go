@@ -205,8 +205,6 @@ func TestUserService_Overview(t *testing.T) {
 
 	posts, comments, _, err := client.User.Overview(ctx)
 	assert.NoError(t, err)
-	assert.NotNil(t, posts)
-	assert.NotNil(t, comments)
 
 	assert.Len(t, posts.Posts, 1)
 	assert.Equal(t, expectedPost, posts.Posts[0])
@@ -232,8 +230,6 @@ func TestUserService_OverviewOf(t *testing.T) {
 
 	posts, comments, _, err := client.User.OverviewOf(ctx, "user2")
 	assert.NoError(t, err)
-	assert.NotNil(t, posts)
-	assert.NotNil(t, comments)
 
 	assert.Len(t, posts.Posts, 1)
 	assert.Equal(t, expectedPost, posts.Posts[0])
@@ -284,7 +280,6 @@ func TestUserService_Posts(t *testing.T) {
 
 	posts, _, err := client.User.Posts(ctx)
 	assert.NoError(t, err)
-	assert.NotNil(t, posts)
 
 	assert.Len(t, posts.Posts, 1)
 	assert.Equal(t, expectedPost, posts.Posts[0])
@@ -305,7 +300,6 @@ func TestUserService_PostsOf(t *testing.T) {
 
 	posts, _, err := client.User.PostsOf(ctx, "user2")
 	assert.NoError(t, err)
-	assert.NotNil(t, posts)
 
 	assert.Len(t, posts.Posts, 1)
 	assert.Equal(t, expectedPost, posts.Posts[0])
@@ -350,7 +344,6 @@ func TestUserService_Comments(t *testing.T) {
 
 	comments, _, err := client.User.Comments(ctx)
 	assert.NoError(t, err)
-	assert.NotNil(t, comments)
 
 	assert.Len(t, comments.Comments, 1)
 	assert.Equal(t, expectedComment, comments.Comments[0])
@@ -371,7 +364,6 @@ func TestUserService_CommentsOf(t *testing.T) {
 
 	comments, _, err := client.User.CommentsOf(ctx, "user2")
 	assert.NoError(t, err)
-	assert.NotNil(t, comments)
 
 	assert.Len(t, comments.Comments, 1)
 	assert.Equal(t, expectedComment, comments.Comments[0])
@@ -417,8 +409,6 @@ func TestUserService_Saved(t *testing.T) {
 
 	posts, comments, _, err := client.User.Saved(ctx)
 	assert.NoError(t, err)
-	assert.NotNil(t, posts)
-	assert.NotNil(t, comments)
 
 	assert.Len(t, posts.Posts, 1)
 	assert.Equal(t, expectedPost, posts.Posts[0])
@@ -469,7 +459,6 @@ func TestUserService_Upvoted(t *testing.T) {
 
 	posts, _, err := client.User.Upvoted(ctx)
 	assert.NoError(t, err)
-	assert.NotNil(t, posts)
 
 	assert.Len(t, posts.Posts, 1)
 	assert.Equal(t, expectedPost, posts.Posts[0])
@@ -515,7 +504,6 @@ func TestUserService_Downvoted(t *testing.T) {
 
 	posts, _, err := client.User.Downvoted(ctx)
 	assert.NoError(t, err)
-	assert.NotNil(t, posts)
 
 	assert.Len(t, posts.Posts, 1)
 	assert.Equal(t, expectedPost, posts.Posts[0])
@@ -562,7 +550,6 @@ func TestUserService_Hidden(t *testing.T) {
 
 	posts, _, err := client.User.Hidden(ctx)
 	assert.NoError(t, err)
-	assert.NotNil(t, posts)
 
 	assert.Len(t, posts.Posts, 1)
 	assert.Equal(t, expectedPost, posts.Posts[0])
@@ -584,7 +571,6 @@ func TestUserService_Gilded(t *testing.T) {
 
 	posts, _, err := client.User.Gilded(ctx)
 	assert.NoError(t, err)
-	assert.NotNil(t, posts)
 
 	assert.Len(t, posts.Posts, 1)
 	assert.Equal(t, expectedPost, posts.Posts[0])

@@ -8,23 +8,14 @@ import (
 	"strings"
 )
 
-// ListingsService handles communication with the post
+// ListingsService handles communication with the listing
 // related methods of the Reddit API.
-type ListingsService interface {
-	Get(ctx context.Context, ids ...string) ([]Post, []Comment, []Subreddit, *Response, error)
-	GetPosts(ctx context.Context, ids ...string) ([]Post, *Response, error)
-	GetPost(ctx context.Context, id string) (*PostAndComments, *Response, error)
-}
-
-// ListingsServiceOp implements the Vote interface.
-type ListingsServiceOp struct {
-	client *Client
-}
-
-var _ ListingsService = &ListingsServiceOp{}
+//
+// Reddit API docs: https://www.reddit.com/dev/api/#section_listings
+type ListingsService service
 
 // Get returns posts, comments, and subreddits from their IDs.
-func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) ([]Post, []Comment, []Subreddit, *Response, error) {
+func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]Post, []Comment, []Subreddit, *Response, error) {
 	type query struct {
 		IDs []string `url:"id,comma"`
 	}
@@ -54,7 +45,7 @@ func (s *ListingsServiceOp) Get(ctx context.Context, ids ...string) ([]Post, []C
 }
 
 // GetPosts returns posts from their full IDs.
-func (s *ListingsServiceOp) GetPosts(ctx context.Context, ids ...string) ([]Post, *Response, error) {
+func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]Post, *Response, error) {
 	if len(ids) == 0 {
 		return nil, nil, errors.New("must provide at least 1 id")
 	}
@@ -77,7 +68,7 @@ func (s *ListingsServiceOp) GetPosts(ctx context.Context, ids ...string) ([]Post
 // GetPost returns a post with its comments.
 // The id here is the ID36 of the post, not its full id.
 // Example: instead of t3_abc123, use abc123.
-func (s *ListingsServiceOp) GetPost(ctx context.Context, id string) (*PostAndComments, *Response, error) {
+func (s *ListingsService) GetPost(ctx context.Context, id string) (*PostAndComments, *Response, error) {
 	path := fmt.Sprintf("comments/%s", id)
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {

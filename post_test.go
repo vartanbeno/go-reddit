@@ -1,7 +1,6 @@
 package geddit
 
 import (
-	"fmt"
 	"net/http"
 	"net/url"
 	"testing"
@@ -9,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestPostServiceOp_Hide(t *testing.T) {
+func TestPostService_Hide(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -22,8 +21,6 @@ func TestPostServiceOp_Hide(t *testing.T) {
 		err := r.ParseForm()
 		assert.NoError(t, err)
 		assert.Equal(t, form, r.PostForm)
-
-		fmt.Fprint(w, `{}`)
 	})
 
 	_, err := client.Post.Hide(ctx)
@@ -34,7 +31,7 @@ func TestPostServiceOp_Hide(t *testing.T) {
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func TestPostServiceOp_Unhide(t *testing.T) {
+func TestPostService_Unhide(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -47,8 +44,6 @@ func TestPostServiceOp_Unhide(t *testing.T) {
 		err := r.ParseForm()
 		assert.NoError(t, err)
 		assert.Equal(t, form, r.PostForm)
-
-		fmt.Fprint(w, `{}`)
 	})
 
 	_, err := client.Post.Unhide(ctx)

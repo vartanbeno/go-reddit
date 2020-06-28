@@ -7,20 +7,9 @@ import (
 
 // AccountService handles communication with the account
 // related methods of the Reddit API.
-type AccountService interface {
-	Info(ctx context.Context) (*User, *Response, error)
-	Karma(ctx context.Context) ([]SubredditKarma, *Response, error)
-	Settings(ctx context.Context) (*Settings, *Response, error)
-	UpdateSettings(ctx context.Context, settings *Settings) (*Settings, *Response, error)
-	Trophies(ctx context.Context) ([]Trophy, *Response, error)
-}
-
-// AccountServiceOp implements the AccountService interface.
-type AccountServiceOp struct {
-	client *Client
-}
-
-var _ AccountService = &AccountServiceOp{}
+//
+// Reddit API docs: https://www.reddit.com/dev/api/#section_account
+type AccountService service
 
 type rootSubredditKarma struct {
 	Kind string           `json:"kind,omitempty"`
@@ -219,7 +208,7 @@ type Settings struct {
 }
 
 // Info returns some general information about your account.
-func (s *AccountServiceOp) Info(ctx context.Context) (*User, *Response, error) {
+func (s *AccountService) Info(ctx context.Context) (*User, *Response, error) {
 	path := "api/v1/me"
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -237,7 +226,7 @@ func (s *AccountServiceOp) Info(ctx context.Context) (*User, *Response, error) {
 }
 
 // Karma returns a breakdown of your karma per subreddit.
-func (s *AccountServiceOp) Karma(ctx context.Context) ([]SubredditKarma, *Response, error) {
+func (s *AccountService) Karma(ctx context.Context) ([]SubredditKarma, *Response, error) {
 	path := "api/v1/me/karma"
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -255,7 +244,7 @@ func (s *AccountServiceOp) Karma(ctx context.Context) ([]SubredditKarma, *Respon
 }
 
 // Settings returns your account settings.
-func (s *AccountServiceOp) Settings(ctx context.Context) (*Settings, *Response, error) {
+func (s *AccountService) Settings(ctx context.Context) (*Settings, *Response, error) {
 	path := "api/v1/me/prefs"
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -273,7 +262,7 @@ func (s *AccountServiceOp) Settings(ctx context.Context) (*Settings, *Response, 
 }
 
 // UpdateSettings updates your account settings and returns the modified version.
-func (s *AccountServiceOp) UpdateSettings(ctx context.Context, settings *Settings) (*Settings, *Response, error) {
+func (s *AccountService) UpdateSettings(ctx context.Context, settings *Settings) (*Settings, *Response, error) {
 	path := "api/v1/me/prefs"
 
 	req, err := s.client.NewRequest(http.MethodPatch, path, settings)
@@ -291,7 +280,7 @@ func (s *AccountServiceOp) UpdateSettings(ctx context.Context, settings *Setting
 }
 
 // Trophies returns a list of your trophies.
-func (s *AccountServiceOp) Trophies(ctx context.Context) ([]Trophy, *Response, error) {
+func (s *AccountService) Trophies(ctx context.Context) ([]Trophy, *Response, error) {
 	path := "api/v1/me/trophies"
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)

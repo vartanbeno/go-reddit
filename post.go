@@ -9,31 +9,9 @@ import (
 	"github.com/google/go-querystring/query"
 )
 
-// PostService handles communication with the link (post)
+// PostService handles communication with the post
 // related methods of the Reddit API.
-type PostService interface {
-	SubmitSelf(ctx context.Context, opts SubmitSelfOptions) (*Submitted, *Response, error)
-	SubmitURL(ctx context.Context, opts SubmitURLOptions) (*Submitted, *Response, error)
-
-	EnableReplies(ctx context.Context, id string) (*Response, error)
-	DisableReplies(ctx context.Context, id string) (*Response, error)
-
-	MarkNSFW(ctx context.Context, id string) (*Response, error)
-	UnmarkNSFW(ctx context.Context, id string) (*Response, error)
-
-	Spoiler(ctx context.Context, id string) (*Response, error)
-	Unspoiler(ctx context.Context, id string) (*Response, error)
-
-	Hide(ctx context.Context, ids ...string) (*Response, error)
-	Unhide(ctx context.Context, ids ...string) (*Response, error)
-}
-
-// PostServiceOp implements the PostService interface.
-type PostServiceOp struct {
-	client *Client
-}
-
-var _ PostService = &PostServiceOp{}
+type PostService service
 
 type submittedLinkRoot struct {
 	JSON struct {
@@ -78,7 +56,7 @@ type SubmitURLOptions struct {
 }
 
 // SubmitSelf submits a self text post.
-func (s *PostServiceOp) SubmitSelf(ctx context.Context, opts SubmitSelfOptions) (*Submitted, *Response, error) {
+func (s *PostService) SubmitSelf(ctx context.Context, opts SubmitSelfOptions) (*Submitted, *Response, error) {
 	type submit struct {
 		SubmitSelfOptions
 		Kind string `url:"kind,omitempty"`
@@ -87,7 +65,7 @@ func (s *PostServiceOp) SubmitSelf(ctx context.Context, opts SubmitSelfOptions) 
 }
 
 // SubmitURL submits a link post.
-func (s *PostServiceOp) SubmitURL(ctx context.Context, opts SubmitURLOptions) (*Submitted, *Response, error) {
+func (s *PostService) SubmitURL(ctx context.Context, opts SubmitURLOptions) (*Submitted, *Response, error) {
 	type submit struct {
 		SubmitURLOptions
 		Kind string `url:"kind,omitempty"`
@@ -95,7 +73,7 @@ func (s *PostServiceOp) SubmitURL(ctx context.Context, opts SubmitURLOptions) (*
 	return s.submit(ctx, &submit{opts, "link"})
 }
 
-func (s *PostServiceOp) submit(ctx context.Context, v interface{}) (*Submitted, *Response, error) {
+func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *Response, error) {
 	path := "api/submit"
 
 	form, err := query.Values(v)
@@ -119,7 +97,7 @@ func (s *PostServiceOp) submit(ctx context.Context, v interface{}) (*Submitted, 
 }
 
 // EnableReplies enables inbox replies for a thing created by the client.
-func (s *PostServiceOp) EnableReplies(ctx context.Context, id string) (*Response, error) {
+func (s *PostService) EnableReplies(ctx context.Context, id string) (*Response, error) {
 	path := "api/sendreplies"
 
 	form := url.Values{}
@@ -135,7 +113,7 @@ func (s *PostServiceOp) EnableReplies(ctx context.Context, id string) (*Response
 }
 
 // DisableReplies dsables inbox replies for a thing created by the client.
-func (s *PostServiceOp) DisableReplies(ctx context.Context, id string) (*Response, error) {
+func (s *PostService) DisableReplies(ctx context.Context, id string) (*Response, error) {
 	path := "api/sendreplies"
 
 	form := url.Values{}
@@ -151,7 +129,7 @@ func (s *PostServiceOp) DisableReplies(ctx context.Context, id string) (*Respons
 }
 
 // MarkNSFW marks a post as NSFW.
-func (s *PostServiceOp) MarkNSFW(ctx context.Context, id string) (*Response, error) {
+func (s *PostService) MarkNSFW(ctx context.Context, id string) (*Response, error) {
 	path := "api/marknsfw"
 
 	form := url.Values{}
@@ -166,7 +144,7 @@ func (s *PostServiceOp) MarkNSFW(ctx context.Context, id string) (*Response, err
 }
 
 // UnmarkNSFW unmarks a post as NSFW.
-func (s *PostServiceOp) UnmarkNSFW(ctx context.Context, id string) (*Response, error) {
+func (s *PostService) UnmarkNSFW(ctx context.Context, id string) (*Response, error) {
 	path := "api/unmarknsfw"
 
 	form := url.Values{}
@@ -181,7 +159,7 @@ func (s *PostServiceOp) UnmarkNSFW(ctx context.Context, id string) (*Response, e
 }
 
 // Spoiler marks a post as a spoiler.
-func (s *PostServiceOp) Spoiler(ctx context.Context, id string) (*Response, error) {
+func (s *PostService) Spoiler(ctx context.Context, id string) (*Response, error) {
 	path := "api/spoiler"
 
 	form := url.Values{}
@@ -196,7 +174,7 @@ func (s *PostServiceOp) Spoiler(ctx context.Context, id string) (*Response, erro
 }
 
 // Unspoiler unmarks a post as a spoiler.
-func (s *PostServiceOp) Unspoiler(ctx context.Context, id string) (*Response, error) {
+func (s *PostService) Unspoiler(ctx context.Context, id string) (*Response, error) {
 	path := "api/unspoiler"
 
 	form := url.Values{}
@@ -211,7 +189,7 @@ func (s *PostServiceOp) Unspoiler(ctx context.Context, id string) (*Response, er
 }
 
 // Hide hides links with the specified ids.
-func (s *PostServiceOp) Hide(ctx context.Context, ids ...string) (*Response, error) {
+func (s *PostService) Hide(ctx context.Context, ids ...string) (*Response, error) {
 	if len(ids) == 0 {
 		return nil, errors.New("must provide at least 1 id")
 	}
@@ -230,7 +208,7 @@ func (s *PostServiceOp) Hide(ctx context.Context, ids ...string) (*Response, err
 }
 
 // Unhide unhides links with the specified ids.
-func (s *PostServiceOp) Unhide(ctx context.Context, ids ...string) (*Response, error) {
+func (s *PostService) Unhide(ctx context.Context, ids ...string) (*Response, error) {
 	if len(ids) == 0 {
 		return nil, errors.New("must provide at least 1 id")
 	}

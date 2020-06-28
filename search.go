@@ -9,24 +9,16 @@ import (
 )
 
 // SearchService handles communication with the search
-// related methods of the Reddit API
-// IMPORTANT: for searches to include NSFW results, the
-// user must check the following in their preferences:
+// related methods of the Reddit API.
+//
+// For searches to include NSFW results, the user must
+// enable the following setting in their preferences:
 // "include not safe for work (NSFW) search results in searches"
 // Note: The "limit" parameter in searches is prone to inconsistent
-// behaviour.
-type SearchService interface {
-	Posts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error)
-	Subreddits(ctx context.Context, query string, opts ...SearchOptionSetter) (*Subreddits, *Response, error)
-	Users(ctx context.Context, query string, opts ...SearchOptionSetter) (*Users, *Response, error)
-}
-
-// SearchServiceOp implements the VoteService interface
-type SearchServiceOp struct {
-	client *Client
-}
-
-var _ SearchService = &SearchServiceOp{}
+// behaviour, e.g. sometimes limit=1 returns nothing when it should.
+//
+// Reddit API docs: https://www.reddit.com/dev/api/#section_search
+type SearchService service
 
 // SearchOptions define options used in search queries.
 type SearchOptions = url.Values
@@ -98,8 +90,8 @@ func setRestrict(opts SearchOptions) {
 }
 
 // Posts searches for posts.
-// If the list of subreddits is empty, the search is run against r/all.
-func (s *SearchServiceOp) Posts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+// If the list of subreddits provided is empty, the search is run against r/all.
+func (s *SearchService) Posts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	opts = append(opts, setType("link"), setQuery(query))
 
 	path := "search"
@@ -127,7 +119,7 @@ func (s *SearchServiceOp) Posts(ctx context.Context, query string, subreddits []
 
 // Subreddits searches for subreddits.
 // The Sort and Timespan options don't affect the results for this search.
-func (s *SearchServiceOp) Subreddits(ctx context.Context, query string, opts ...SearchOptionSetter) (*Subreddits, *Response, error) {
+func (s *SearchService) Subreddits(ctx context.Context, query string, opts ...SearchOptionSetter) (*Subreddits, *Response, error) {
 	opts = append(opts, setType("sr"), setQuery(query))
 	form := newSearchOptions(opts...)
 
@@ -150,7 +142,7 @@ func (s *SearchServiceOp) Subreddits(ctx context.Context, query string, opts ...
 
 // Users searches for users.
 // The Sort and Timespan options don't affect the results for this search.
-func (s *SearchServiceOp) Users(ctx context.Context, query string, opts ...SearchOptionSetter) (*Users, *Response, error) {
+func (s *SearchService) Users(ctx context.Context, query string, opts ...SearchOptionSetter) (*Users, *Response, error) {
 	opts = append(opts, setType("user"), setQuery(query))
 	form := newSearchOptions(opts...)
 
