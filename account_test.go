@@ -97,6 +97,21 @@ var expectedSettings = &Settings{
 	EnableVideoAutoplay:                           Bool(true),
 }
 
+var expectedFriends = []Friendship{
+	{
+		ID:       "r9_1r4879",
+		Friend:   "test1",
+		FriendID: "t2_test1",
+		Created:  &Timestamp{time.Date(2020, 6, 28, 16, 43, 55, 0, time.UTC)},
+	},
+	{
+		ID:       "r9_1re930",
+		Friend:   "test2",
+		FriendID: "t2_test2",
+		Created:  &Timestamp{time.Date(2020, 6, 28, 16, 44, 2, 0, time.UTC)},
+	},
+}
+
 func TestAccountService_Info(t *testing.T) {
 	setup()
 	defer teardown()
@@ -182,4 +197,20 @@ func TestAccountService_Trophies(t *testing.T) {
 	trophies, _, err := client.Account.Trophies(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedTrophies, trophies)
+}
+
+func TestAccountService_Friends(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/account/friends.json")
+
+	mux.HandleFunc("/prefs/friends", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	friends, _, err := client.Account.Friends(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedFriends, friends)
 }

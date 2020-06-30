@@ -3,6 +3,8 @@ package geddit
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 )
 
 const (
@@ -229,11 +231,14 @@ type Comment struct {
 
 	PostID string `json:"link_id,omitempty"`
 
-	// These don't appear when submitting a comment
-	PostTitle       string `json:"link_title,omitempty"`
-	PostPermalink   string `json:"link_permalink,omitempty"`
-	PostAuthor      string `json:"link_author,omitempty"`
-	PostNumComments int    `json:"num_comments"`
+	// This doesn't appear when submitting a comment.
+	PostTitle string `json:"link_title,omitempty"`
+	// This doesn't appear when submitting a comment.
+	PostPermalink string `json:"link_permalink,omitempty"`
+	// This doesn't appear when submitting a comment.
+	PostAuthor string `json:"link_author,omitempty"`
+	// This doesn't appear when submitting a comment.
+	PostNumComments int `json:"num_comments"`
 
 	IsSubmitter bool `json:"is_submitter"`
 	ScoreHidden bool `json:"score_hidden"`
@@ -300,6 +305,18 @@ type Post struct {
 	IsSelfPost bool `json:"is_self"`
 	Saved      bool `json:"saved"`
 	Stickied   bool `json:"stickied"`
+}
+
+func (p Post) String() string {
+	chunks := []string{
+		fmt.Sprintf("[%d]", p.Score),
+		p.SubredditNamePrefixed,
+		"-",
+		p.Title,
+		"-",
+		string(p.Permalink),
+	}
+	return strings.Join(chunks, " ")
 }
 
 // Subreddit holds information about a subreddit

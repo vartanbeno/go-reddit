@@ -2,6 +2,8 @@ package geddit
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"net/http"
 )
 
@@ -300,4 +302,68 @@ func (s *AccountService) Trophies(ctx context.Context) ([]Trophy, *Response, err
 	}
 
 	return trophies, resp, nil
+}
+
+type rootFriendList struct {
+	Friends []Friendship
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (l *rootFriendList) UnmarshalJSON(b []byte) error {
+	var resBody []interface{}
+	err := json.Unmarshal(b, &resBody)
+	if err != nil {
+		return err
+	}
+
+	if len(resBody) == 0 {
+		return errors.New("unexpected data length received")
+	}
+
+	data, ok := resBody[0].(map[string]interface{})
+	if !ok {
+		return errors.New("unexpected data type received")
+	}
+
+	dataMap, ok := data["data"].(map[string]interface{})
+	if !ok {
+		return errors.New("data does not contain expected field")
+	}
+
+	children, ok := dataMap["children"].([]interface{})
+	if !ok {
+		return errors.New("data does not contain expected field")
+	}
+
+	byteValue, err := json.Marshal(children)
+	if err != nil {
+		return nil
+	}
+
+	var friends []Friendship
+	err = json.Unmarshal(byteValue, &friends)
+	if err != nil {
+		return err
+	}
+
+	l.Friends = friends
+	return nil
+}
+
+// Friends returns a list of your friends.
+func (s *AccountService) Friends(ctx context.Context) ([]Friendship, *Response, error) {
+	path := "prefs/friends"
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootFriendList)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Friends, resp, nil
 }
