@@ -367,3 +367,28 @@ func (s *AccountService) Friends(ctx context.Context) ([]Relationship, *Response
 
 	return root.Friends, resp, nil
 }
+
+type rootBlockedListing struct {
+	Kind string `json:"kind,omitempty"`
+	Data struct {
+		Blocked []Relationship `json:"children"`
+	} `json:"data"`
+}
+
+// Blocked returns a list of your blocked users.
+func (s *AccountService) Blocked(ctx context.Context) ([]Relationship, *Response, error) {
+	path := "prefs/blocked"
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootBlockedListing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Data.Blocked, resp, nil
+}

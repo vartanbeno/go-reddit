@@ -97,7 +97,7 @@ var expectedSettings = &Settings{
 	EnableVideoAutoplay:                           Bool(true),
 }
 
-var expectedFriends = []Relationship{
+var expectedRelationships = []Relationship{
 	{
 		ID:      "r9_1r4879",
 		User:    "test1",
@@ -210,7 +210,23 @@ func TestAccountService_Friends(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	friends, _, err := client.Account.Friends(ctx)
+	relationships, _, err := client.Account.Friends(ctx)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedFriends, friends)
+	assert.Equal(t, expectedRelationships, relationships)
+}
+
+func TestAccountService_Blocked(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/account/blocked.json")
+
+	mux.HandleFunc("/prefs/blocked", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	relationships, _, err := client.Account.Blocked(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedRelationships, relationships)
 }

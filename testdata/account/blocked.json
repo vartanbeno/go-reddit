@@ -1,0 +1,19 @@
+{
+  "kind": "UserList",
+  "data": {
+    "children": [
+      {
+        "date": 1593362635,
+        "rel_id": "r9_1r4879",
+        "name": "test1",
+        "id": "t2_test1"
+      },
+      {
+        "date": 1593362642,
+        "rel_id": "r9_1re930",
+        "name": "test2",
+        "id": "t2_test2"
+      }
+    ]
+  }
+}
