@@ -305,7 +305,7 @@ func (s *AccountService) Trophies(ctx context.Context) ([]Trophy, *Response, err
 }
 
 type rootFriendList struct {
-	Friends []Friendship
+	Friends []Relationship
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -340,7 +340,7 @@ func (l *rootFriendList) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 
-	var friends []Friendship
+	var friends []Relationship
 	err = json.Unmarshal(byteValue, &friends)
 	if err != nil {
 		return err
@@ -351,7 +351,7 @@ func (l *rootFriendList) UnmarshalJSON(b []byte) error {
 }
 
 // Friends returns a list of your friends.
-func (s *AccountService) Friends(ctx context.Context) ([]Friendship, *Response, error) {
+func (s *AccountService) Friends(ctx context.Context) ([]Relationship, *Response, error) {
 	path := "prefs/friends"
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)

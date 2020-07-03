@@ -42,12 +42,12 @@ type UserShort struct {
 	NSFW bool `json:"profile_over_18"`
 }
 
-// Friendship represents a friend relationship.
-type Friendship struct {
-	ID       string     `json:"rel_id,omitempty"`
-	Friend   string     `json:"name,omitempty"`
-	FriendID string     `json:"id,omitempty"`
-	Created  *Timestamp `json:"date,omitempty"`
+// Relationship holds information about a relationship (friend/blocked).
+type Relationship struct {
+	ID      string     `json:"rel_id,omitempty"`
+	User    string     `json:"name,omitempty"`
+	UserID  string     `json:"id,omitempty"`
+	Created *Timestamp `json:"date,omitempty"`
 }
 
 // Blocked represents a blocked relationship.
@@ -329,9 +329,9 @@ func (s *UserService) Gilded(ctx context.Context, opts ...SearchOptionSetter) (*
 	return root.getPosts(), resp, nil
 }
 
-// GetFriendship returns friendship details with the specified user.
+// GetFriendship returns relationship details with the specified user.
 // If the user is not your friend, it will return an error.
-func (s *UserService) GetFriendship(ctx context.Context, username string) (*Friendship, *Response, error) {
+func (s *UserService) GetFriendship(ctx context.Context, username string) (*Relationship, *Response, error) {
 	path := fmt.Sprintf("api/v1/me/friends/%s", username)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -339,7 +339,7 @@ func (s *UserService) GetFriendship(ctx context.Context, username string) (*Frie
 		return nil, nil, err
 	}
 
-	root := new(Friendship)
+	root := new(Relationship)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
@@ -349,7 +349,7 @@ func (s *UserService) GetFriendship(ctx context.Context, username string) (*Frie
 }
 
 // Friend friends a user.
-func (s *UserService) Friend(ctx context.Context, username string) (*Friendship, *Response, error) {
+func (s *UserService) Friend(ctx context.Context, username string) (*Relationship, *Response, error) {
 	type request struct {
 		Username string `json:"name"`
 	}
@@ -362,7 +362,7 @@ func (s *UserService) Friend(ctx context.Context, username string) (*Friendship,
 		return nil, nil, err
 	}
 
-	root := new(Friendship)
+	root := new(Relationship)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err

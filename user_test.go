@@ -103,11 +103,11 @@ var expectedComment = Comment{
 	PostNumComments: 89751,
 }
 
-var expectedFriendship = &Friendship{
-	ID:       "r9_tqfqp8",
-	Friend:   "test123",
-	FriendID: "t2_7b8q1eob",
-	Created:  &Timestamp{time.Date(2020, 6, 18, 20, 36, 34, 0, time.UTC)},
+var expectedRelationship = &Relationship{
+	ID:      "r9_tqfqp8",
+	User:    "test123",
+	UserID:  "t2_7b8q1eob",
+	Created: &Timestamp{time.Date(2020, 6, 18, 20, 36, 34, 0, time.UTC)},
 }
 
 var expectedBlocked = &Blocked{
@@ -589,9 +589,9 @@ func TestUserService_GetFriendship(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	friendship, _, err := client.User.GetFriendship(ctx, "test123")
+	relationship, _, err := client.User.GetFriendship(ctx, "test123")
 	assert.NoError(t, err)
-	assert.Equal(t, expectedFriendship, friendship)
+	assert.Equal(t, expectedRelationship, relationship)
 }
 
 func TestUserService_Friend(t *testing.T) {
@@ -615,9 +615,9 @@ func TestUserService_Friend(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	friendship, _, err := client.User.Friend(ctx, "test123")
+	relationship, _, err := client.User.Friend(ctx, "test123")
 	assert.NoError(t, err)
-	assert.Equal(t, expectedFriendship, friendship)
+	assert.Equal(t, expectedRelationship, relationship)
 }
 
 func TestUserService_Unfriend(t *testing.T) {

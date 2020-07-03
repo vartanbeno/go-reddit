@@ -97,18 +97,18 @@ var expectedSettings = &Settings{
 	EnableVideoAutoplay:                           Bool(true),
 }
 
-var expectedFriends = []Friendship{
+var expectedFriends = []Relationship{
 	{
-		ID:       "r9_1r4879",
-		Friend:   "test1",
-		FriendID: "t2_test1",
-		Created:  &Timestamp{time.Date(2020, 6, 28, 16, 43, 55, 0, time.UTC)},
+		ID:      "r9_1r4879",
+		User:    "test1",
+		UserID:  "t2_test1",
+		Created: &Timestamp{time.Date(2020, 6, 28, 16, 43, 55, 0, time.UTC)},
 	},
 	{
-		ID:       "r9_1re930",
-		Friend:   "test2",
-		FriendID: "t2_test2",
-		Created:  &Timestamp{time.Date(2020, 6, 28, 16, 44, 2, 0, time.UTC)},
+		ID:      "r9_1re930",
+		User:    "test2",
+		UserID:  "t2_test2",
+		Created: &Timestamp{time.Date(2020, 6, 28, 16, 44, 2, 0, time.UTC)},
 	},
 }
 
