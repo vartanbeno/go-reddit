@@ -490,6 +490,28 @@ func TestUserService_Upvoted_Options(t *testing.T) {
 	_, _, err := client.User.Upvoted(ctx, SetLimit(30), SetAfter("t3_after"))
 	assert.NoError(t, err)
 }
+
+func TestUserService_UpvotedOf(t *testing.T) {
+	setup()
+	defer teardown()
+
+	// we'll use this, similar payloads
+	blob := readFileContents(t, "testdata/user/submitted.json")
+
+	mux.HandleFunc("/user/user2/upvoted", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.User.UpvotedOf(ctx, "user2")
+	assert.NoError(t, err)
+
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
+	assert.Equal(t, "t3_gczwql", posts.After)
+	assert.Equal(t, "", posts.Before)
+}
+
 func TestUserService_Downvoted(t *testing.T) {
 	setup()
 	defer teardown()
@@ -534,6 +556,27 @@ func TestUserService_Downvoted_Options(t *testing.T) {
 
 	_, _, err := client.User.Downvoted(ctx, SetLimit(20), SetBefore("t3_before"))
 	assert.NoError(t, err)
+}
+
+func TestUserService_DownvotedOf(t *testing.T) {
+	setup()
+	defer teardown()
+
+	// we'll use this, similar payloads
+	blob := readFileContents(t, "testdata/user/submitted.json")
+
+	mux.HandleFunc("/user/user2/downvoted", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.User.DownvotedOf(ctx, "user2")
+	assert.NoError(t, err)
+
+	assert.Len(t, posts.Posts, 1)
+	assert.Equal(t, expectedPost, posts.Posts[0])
+	assert.Equal(t, "t3_gczwql", posts.After)
+	assert.Equal(t, "", posts.Before)
 }
 
 func TestUserService_Hidden(t *testing.T) {

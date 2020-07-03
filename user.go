@@ -245,11 +245,17 @@ func (s *UserService) Saved(ctx context.Context, opts ...SearchOptionSetter) (*P
 	return root.getPosts(), root.getComments(), resp, nil
 }
 
-// Upvoted returns a list of the user's upvoted posts.
+// Upvoted returns a list of your upvoted posts.
 func (s *UserService) Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	return s.UpvotedOf(ctx, s.client.Username, opts...)
+}
+
+// UpvotedOf returns a list of the user's upvoted posts.
+// The user's votes must be public for this to work.
+func (s *UserService) UpvotedOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
-	path := fmt.Sprintf("user/%s/upvoted", s.client.Username)
+	path := fmt.Sprintf("user/%s/upvoted", username)
 	path = addQuery(path, form)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -266,11 +272,17 @@ func (s *UserService) Upvoted(ctx context.Context, opts ...SearchOptionSetter) (
 	return root.getPosts(), resp, nil
 }
 
-// Downvoted returns a list of the user's downvoted posts.
+// Downvoted returns a list of your downvoted posts.
 func (s *UserService) Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	return s.DownvotedOf(ctx, s.client.Username, opts...)
+}
+
+// DownvotedOf returns a list of the user's downvoted posts.
+// The user's votes must be public for this to work.
+func (s *UserService) DownvotedOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	form := newSearchOptions(opts...)
 
-	path := fmt.Sprintf("user/%s/downvoted", s.client.Username)
+	path := fmt.Sprintf("user/%s/downvoted", username)
 	path = addQuery(path, form)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
