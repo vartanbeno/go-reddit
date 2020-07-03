@@ -2,9 +2,8 @@ package geddit
 
 import (
 	"context"
-	"encoding/json"
-	"errors"
 	"net/http"
+	"net/url"
 )
 
 // AccountService handles communication with the account
@@ -28,9 +27,10 @@ type SubredditKarma struct {
 // Settings are the user's account settings.
 // Some of the fields' descriptions are taken from:
 // https://praw.readthedocs.io/en/latest/code_overview/other/preferences.html#praw.models.Preferences.update
-// todo: these should probably be pointers with omitempty
 type Settings struct {
-	// Control whose private messages you see: "everyone" or "whitelisted".
+	// Control whose private messages you see.
+	// - "everyone": everyone except blocked users
+	// - "whitelisted": only trusted users
 	AcceptPrivateMessages *string `json:"accept_pms,omitempty"`
 	// Allow Reddit to use your activity on Reddit to show you more relevant advertisements.
 	ActivityRelevantAds *bool `json:"activity_relevant_ads,omitempty"`
@@ -209,6 +209,13 @@ type Settings struct {
 	EnableVideoAutoplay *bool `json:"video_autoplay,omitempty"`
 }
 
+type rootRelationshipList struct {
+	Kind string `json:"kind,omitempty"`
+	Data struct {
+		Relationships []Relationship `json:"children"`
+	} `json:"data"`
+}
+
 // Info returns some general information about your account.
 func (s *AccountService) Info(ctx context.Context) (*User, *Response, error) {
 	path := "api/v1/me"
@@ -296,58 +303,13 @@ func (s *AccountService) Trophies(ctx context.Context) ([]Trophy, *Response, err
 		return nil, resp, err
 	}
 
+	// todo: use Things struct
 	var trophies []Trophy
 	for _, trophy := range root.Data.Trophies {
 		trophies = append(trophies, trophy.Data)
 	}
 
 	return trophies, resp, nil
-}
-
-type rootFriendList struct {
-	Friends []Relationship
-}
-
-// UnmarshalJSON implements the json.Unmarshaler interface.
-func (l *rootFriendList) UnmarshalJSON(b []byte) error {
-	var resBody []interface{}
-	err := json.Unmarshal(b, &resBody)
-	if err != nil {
-		return err
-	}
-
-	if len(resBody) == 0 {
-		return errors.New("unexpected data length received")
-	}
-
-	data, ok := resBody[0].(map[string]interface{})
-	if !ok {
-		return errors.New("unexpected data type received")
-	}
-
-	dataMap, ok := data["data"].(map[string]interface{})
-	if !ok {
-		return errors.New("data does not contain expected field")
-	}
-
-	children, ok := dataMap["children"].([]interface{})
-	if !ok {
-		return errors.New("data does not contain expected field")
-	}
-
-	byteValue, err := json.Marshal(children)
-	if err != nil {
-		return nil
-	}
-
-	var friends []Relationship
-	err = json.Unmarshal(byteValue, &friends)
-	if err != nil {
-		return err
-	}
-
-	l.Friends = friends
-	return nil
 }
 
 // Friends returns a list of your friends.
@@ -359,20 +321,13 @@ func (s *AccountService) Friends(ctx context.Context) ([]Relationship, *Response
 		return nil, nil, err
 	}
 
-	root := new(rootFriendList)
-	resp, err := s.client.Do(ctx, req, root)
+	root := make([]rootRelationshipList, 2)
+	resp, err := s.client.Do(ctx, req, &root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Friends, resp, nil
-}
-
-type rootBlockedListing struct {
-	Kind string `json:"kind,omitempty"`
-	Data struct {
-		Blocked []Relationship `json:"children"`
-	} `json:"data"`
+	return root[0].Data.Relationships, resp, nil
 }
 
 // Blocked returns a list of your blocked users.
@@ -384,11 +339,85 @@ func (s *AccountService) Blocked(ctx context.Context) ([]Relationship, *Response
 		return nil, nil, err
 	}
 
-	root := new(rootBlockedListing)
+	root := new(rootRelationshipList)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Data.Blocked, resp, nil
+	return root.Data.Relationships, resp, nil
+}
+
+// Messaging returns blocked users and trusted users, respectively.
+func (s *AccountService) Messaging(ctx context.Context) ([]Relationship, []Relationship, *Response, error) {
+	path := "prefs/messaging"
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	root := make([]rootRelationshipList, 2)
+	resp, err := s.client.Do(ctx, req, &root)
+	if err != nil {
+		return nil, nil, resp, err
+	}
+
+	blocked := root[0].Data.Relationships
+	trusted := root[1].Data.Relationships
+
+	return blocked, trusted, resp, nil
+}
+
+// Trusted returns a list of your trusted users.
+func (s *AccountService) Trusted(ctx context.Context) ([]Relationship, *Response, error) {
+	path := "prefs/trusted"
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootRelationshipList)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Data.Relationships, resp, nil
+}
+
+// AddTrusted adds a user to your trusted users.
+// This is not visible in the Reddit API docs.
+func (s *AccountService) AddTrusted(ctx context.Context, username string) (*Response, error) {
+	path := "api/add_whitelisted"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	// todo: you can also do this with the user id. form.Set("id", id). should we? or is this enough?
+
+	req, err := s.client.NewPostForm(path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// RemoveTrusted removes a user from your trusted users.
+// This is not visible in the Reddit API docs.
+func (s *AccountService) RemoveTrusted(ctx context.Context, username string) (*Response, error) {
+	path := "api/remove_whitelisted"
+
+	form := url.Values{}
+	form.Set("name", username)
+	// todo: you can also do this with the user id. form.Set("id", id). should we? or is this enough?
+
+	req, err := s.client.NewPostForm(path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }

@@ -14,7 +14,7 @@ type RedditError struct {
 }
 
 func (e *RedditError) Error() string {
-	return fmt.Sprintf("%s: %s because of field %q", e.Label, e.Reason, e.Field)
+	return fmt.Sprintf("field %q caused %s: %s", e.Field, e.Label, e.Reason)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.

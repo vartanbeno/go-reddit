@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -109,6 +110,15 @@ var expectedRelationships = []Relationship{
 		User:    "test2",
 		UserID:  "t2_test2",
 		Created: &Timestamp{time.Date(2020, 6, 28, 16, 44, 2, 0, time.UTC)},
+	},
+}
+
+var expectedRelationships2 = []Relationship{
+	{
+		ID:      "r9_1re60i",
+		User:    "test3",
+		UserID:  "t2_test3",
+		Created: &Timestamp{time.Date(2020, 3, 6, 2, 27, 0, 0, time.UTC)},
 	},
 }
 
@@ -229,4 +239,76 @@ func TestAccountService_Blocked(t *testing.T) {
 	relationships, _, err := client.Account.Blocked(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedRelationships, relationships)
+}
+
+func TestAccountService_Messaging(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/account/messaging.json")
+
+	mux.HandleFunc("/prefs/messaging", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	blocked, trusted, _, err := client.Account.Messaging(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedRelationships, blocked)
+	assert.Equal(t, expectedRelationships2, trusted)
+}
+
+func TestAccountService_Trusted(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/account/trusted.json")
+
+	mux.HandleFunc("/prefs/trusted", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	relationships, _, err := client.Account.Trusted(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedRelationships, relationships)
+}
+
+func TestAccountService_AddTrusted(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/add_whitelisted", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "test123")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Account.AddTrusted(ctx, "test123")
+	assert.NoError(t, err)
+}
+
+func TestAccountService_RemoveTrusted(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/remove_whitelisted", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("name", "test123")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Account.RemoveTrusted(ctx, "test123")
+	assert.NoError(t, err)
 }
