@@ -86,7 +86,7 @@ func setQuery(v string) SearchOptionSetter {
 
 // setRestrict sets the restrict_sr option.
 func setRestrict(opts SearchOptions) {
-	opts.Set("restruct_sr", "true")
+	opts.Set("restrict_sr", "true")
 }
 
 // Posts searches for posts.
