@@ -45,6 +45,7 @@ var expectedSubreddits = &Subreddits{
 			Subscribers: 15336,
 			NSFW:        false,
 			UserIsMod:   false,
+			Favorite:    false,
 		},
 		{
 			ID:      "2qh1i",
@@ -61,6 +62,7 @@ var expectedSubreddits = &Subreddits{
 			Subscribers: 28449174,
 			NSFW:        false,
 			UserIsMod:   false,
+			Favorite:    true,
 		},
 		{
 			ID:      "2qh0u",
@@ -77,6 +79,7 @@ var expectedSubreddits = &Subreddits{
 			Subscribers: 24987753,
 			NSFW:        false,
 			UserIsMod:   false,
+			Favorite:    false,
 		},
 	},
 }
