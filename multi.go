@@ -24,15 +24,16 @@ type multiRoot struct {
 // Users can create multis for custom navigation, instead of browsing
 // one subreddit or all subreddits at a time.
 type Multi struct {
-	Name        string         `json:"name,omitempty"`
-	DisplayName string         `json:"display_name,omitempty"`
+	Name        string `json:"name,omitempty"`
+	DisplayName string `json:"display_name,omitempty"`
+	// Format: user/{username}/m/{multiname}
 	Path        string         `json:"path,omitempty"`
 	Description string         `json:"description_md,omitempty"`
 	Subreddits  SubredditNames `json:"subreddits"`
-	CopedFrom   *string        `json:"copied_from"`
+	CopiedFrom  *string        `json:"copied_from"`
 
 	Owner   string     `json:"owner,omitempty"`
-	OwnerID string     `json:"ownerID,omitempty"`
+	OwnerID string     `json:"owner_id,omitempty"`
 	Created *Timestamp `json:"created_utc,omitempty"`
 
 	NumberOfSubscribers int    `json:"num_subscribers"`
@@ -66,10 +67,23 @@ func (n *SubredditNames) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (n *SubredditNames) MarshalJSON() ([]byte, error) {
+	var subreddits []map[string]string
+
+	for _, sr := range *n {
+		subreddits = append(subreddits, map[string]string{
+			"name": sr,
+		})
+	}
+
+	return json.Marshal(subreddits)
+}
+
 // MultiCopyRequest represents a request to copy a multireddit.
 type MultiCopyRequest struct {
-	From string
-	To   string
+	FromPath string
+	ToPath   string
 	// Raw markdown text.
 	Description string
 	// No longer than 50 characters.
@@ -79,27 +93,36 @@ type MultiCopyRequest struct {
 // Form parameterizes the fields and returns the form.
 func (r *MultiCopyRequest) Form() url.Values {
 	form := url.Values{}
-	form.Set("from", r.From)
-	form.Set("to", r.To)
+	form.Set("from", r.FromPath)
+	form.Set("to", r.ToPath)
 	form.Set("description_md", r.Description)
 	form.Set("display_name", r.DisplayName)
 	return form
 }
 
-// MultiCreateRequest represents a request to create a multireddit.
-type MultiCreateRequest struct {
-	Description string   `json:"description_md,omitempty"`
-	DisplayName string   `json:"display_name,omitempty"`
-	Subreddits  []string `json:"subreddits"`
-	Visibility  string   `json:"visibility,omitempty"`
+// MultiCreateOrUpdateRequest represents a request to create/update a multireddit.
+type MultiCreateOrUpdateRequest struct {
+	// For updates, this is the display name, i.e. the header of the multi.
+	// Not part of the path necessarily.
+	Name        string         `json:"display_name,omitempty"`
+	Description string         `json:"description_md,omitempty"`
+	Subreddits  SubredditNames `json:"subreddits,omitempty"`
+	// One of: private, public, hidden
+	Visibility string `json:"visibility,omitempty"`
 }
 
 // Form parameterizes the fields and returns the form.
-func (r *MultiCreateRequest) Form() url.Values {
+func (r *MultiCreateOrUpdateRequest) Form() url.Values {
 	byteValue, _ := json.Marshal(r)
 	form := url.Values{}
 	form.Set("model", string(byteValue))
 	return form
+}
+
+type rootMultiDescription struct {
+	Data struct {
+		Body string `json:"body_md"`
+	} `json:"data"`
 }
 
 // Get gets information about the multireddit from its url path.
@@ -144,6 +167,7 @@ func (s *MultiService) Mine(ctx context.Context) ([]Multi, *Response, error) {
 }
 
 // Of returns the user's public multireddits.
+// Or, if the user is you, all of your multireddits.
 func (s *MultiService) Of(ctx context.Context, username string) ([]Multi, *Response, error) {
 	path := fmt.Sprintf("api/multi/user/%s", username)
 
@@ -172,7 +196,7 @@ func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) 
 		return nil, nil, errors.New("copyRequest cannot be nil")
 	}
 
-	path := fmt.Sprintf("api/multi/copy")
+	path := "api/multi/copy"
 
 	req, err := s.client.NewPostForm(path, copyRequest.Form())
 	if err != nil {
@@ -189,14 +213,14 @@ func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) 
 }
 
 // Create creates a multireddit.
-func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateRequest) (*Multi, *Response, error) {
+func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrUpdateRequest) (*Multi, *Response, error) {
 	if createRequest == nil {
 		return nil, nil, errors.New("createRequest cannot be nil")
 	}
 
-	path := fmt.Sprintf("api/multi/copy")
+	path := "api/multi"
 
-	req, err := s.client.NewRequest(http.MethodPost, path, createRequest)
+	req, err := s.client.NewPostForm(path, createRequest.Form())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -210,9 +234,104 @@ func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateReq
 	return root.Data, resp, nil
 }
 
+// Update updates a multireddit.
+// If the multireddit does not exist, it will be created.
+func (s *MultiService) Update(ctx context.Context, multiPath string, updateRequest *MultiCreateOrUpdateRequest) (*Multi, *Response, error) {
+	if updateRequest == nil {
+		return nil, nil, errors.New("updateRequest cannot be nil")
+	}
+
+	path := fmt.Sprintf("api/multi/%s", multiPath)
+
+	req, err := s.client.NewPostForm(path, updateRequest.Form())
+	if err != nil {
+		return nil, nil, err
+	}
+	// todo: fix this
+	req.Method = http.MethodPut
+
+	root := new(multiRoot)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Data, resp, nil
+}
+
 // Delete deletes a multireddit.
 func (s *MultiService) Delete(ctx context.Context, multiPath string) (*Response, error) {
 	path := fmt.Sprintf("api/multi/%s", multiPath)
+
+	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// GetDescription gets a multireddit's description.
+func (s *MultiService) GetDescription(ctx context.Context, multiPath string) (string, *Response, error) {
+	path := fmt.Sprintf("api/multi/%s/description", multiPath)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return "", nil, err
+	}
+
+	root := new(rootMultiDescription)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return "", resp, err
+	}
+
+	return root.Data.Body, resp, nil
+}
+
+// UpdateDescription updates a multireddit's description.
+func (s *MultiService) UpdateDescription(ctx context.Context, multiPath string, description string) (string, *Response, error) {
+	path := fmt.Sprintf("api/multi/%s/description", multiPath)
+
+	form := url.Values{}
+	form.Set("model", fmt.Sprintf(`{"body_md":"%s"}`, description))
+
+	req, err := s.client.NewPostForm(path, form)
+	if err != nil {
+		return "", nil, err
+	}
+	// todo: fix this
+	req.Method = http.MethodPut
+
+	root := new(rootMultiDescription)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return "", resp, err
+	}
+
+	return root.Data.Body, resp, nil
+}
+
+// AddSubreddit adds a subreddit to a multireddit.
+func (s *MultiService) AddSubreddit(ctx context.Context, multiPath string, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("api/multi/%s/r/%s", multiPath, subreddit)
+
+	form := url.Values{}
+	form.Set("model", fmt.Sprintf(`{"name":"%s"}`, subreddit))
+
+	req, err := s.client.NewPostForm(path, form)
+	if err != nil {
+		return nil, err
+	}
+	// todo: fix this
+	req.Method = http.MethodPut
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// DeleteSubreddit removes a subreddit from a multireddit.
+func (s *MultiService) DeleteSubreddit(ctx context.Context, multiPath string, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("api/multi/%s/r/%s", multiPath, subreddit)
 
 	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
 	if err != nil {

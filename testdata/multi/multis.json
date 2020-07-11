@@ -1,0 +1,64 @@
+[
+  {
+    "kind": "LabeledMulti",
+    "data": {
+      "can_edit": true,
+      "display_name": "test",
+      "name": "test",
+      "description_html": "",
+      "num_subscribers": 0,
+      "copied_from": null,
+      "icon_url": "https://www.redditstatic.com/custom_feeds/custom_feed_default_3.png",
+      "subreddits": [
+        {
+          "name": "nba"
+        },
+        {
+          "name": "golang"
+        }
+      ],
+      "created_utc": 1594443312.0,
+      "visibility": "private",
+      "created": 1594472112.0,
+      "over_18": false,
+      "path": "/user/v_95/m/test/",
+      "owner": "v_95",
+      "key_color": null,
+      "is_subscriber": false,
+      "owner_id": "t2_164ab8",
+      "description_md": "",
+      "is_favorited": false
+    }
+  },
+  {
+    "kind": "LabeledMulti",
+    "data": {
+      "can_edit": true,
+      "display_name": "test2",
+      "name": "test2",
+      "description_html": "",
+      "num_subscribers": 0,
+      "copied_from": null,
+      "icon_url": "https://www.redditstatic.com/custom_feeds/custom_feed_default_5.png",
+      "subreddits": [
+        {
+          "name": "redditdev"
+        },
+        {
+          "name": "test"
+        }
+      ],
+      "created_utc": 1594443423.0,
+      "visibility": "private",
+      "created": 1594472223.0,
+      "over_18": false,
+      "path": "/user/v_95/m/test2/",
+      "owner": "v_95",
+      "key_color": null,
+      "is_subscriber": false,
+      "owner_id": "t2_164ab8",
+      "description_md": "",
+      "is_favorited": false
+    }
+  }
+]

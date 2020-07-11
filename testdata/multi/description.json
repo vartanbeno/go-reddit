@@ -1,0 +1,7 @@
+{
+  "kind": "LabeledMultiDescription",
+  "data": {
+    "body_html": "&lt;!-- SC_OFF --&gt;&lt;div class=\"md\"&gt;&lt;p&gt;hello world&lt;/p&gt;\n&lt;/div&gt;&lt;!-- SC_ON --&gt;",
+    "body_md": "hello world"
+  }
+}
