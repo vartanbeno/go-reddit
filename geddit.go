@@ -1,4 +1,4 @@
-package geddit
+package reddit
 
 import (
 	"bytes"
@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	libraryName    = "github.com/vartanbeno/geddit"
+	libraryName    = "github.com/vartanbeno/go-reddit"
 	libraryVersion = "0.0.1"
 
 	defaultBaseURL  = "https://oauth.reddit.com"

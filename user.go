@@ -1,4 +1,4 @@
-package geddit
+package reddit
 
 import (
 	"context"

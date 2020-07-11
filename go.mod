@@ -1,4 +1,4 @@
-module github.com/vartanbeno/geddit
+module github.com/vartanbeno/go-reddit
 
 go 1.14
 

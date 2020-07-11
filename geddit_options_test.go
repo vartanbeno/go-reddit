@@ -1,4 +1,4 @@
-package geddit
+package reddit
 
 import (
 	"os"
@@ -7,17 +7,17 @@ import (
 )
 
 func TestFromEnv(t *testing.T) {
-	os.Setenv("GEDDIT_CLIENT_ID", "id1")
-	defer os.Unsetenv("GEDDIT_CLIENT_ID")
+	os.Setenv("GO_REDDIT_CLIENT_ID", "id1")
+	defer os.Unsetenv("GO_REDDIT_CLIENT_ID")
 
-	os.Setenv("GEDDIT_CLIENT_SECRET", "secret1")
-	defer os.Unsetenv("GEDDIT_CLIENT_SECRET")
+	os.Setenv("GO_REDDIT_CLIENT_SECRET", "secret1")
+	defer os.Unsetenv("GO_REDDIT_CLIENT_SECRET")
 
-	os.Setenv("GEDDIT_CLIENT_USERNAME", "username1")
-	defer os.Unsetenv("GEDDIT_CLIENT_USERNAME")
+	os.Setenv("GO_REDDIT_CLIENT_USERNAME", "username1")
+	defer os.Unsetenv("GO_REDDIT_CLIENT_USERNAME")
 
-	os.Setenv("GEDDIT_CLIENT_PASSWORD", "password1")
-	defer os.Unsetenv("GEDDIT_CLIENT_PASSWORD")
+	os.Setenv("GO_REDDIT_CLIENT_PASSWORD", "password1")
+	defer os.Unsetenv("GO_REDDIT_CLIENT_PASSWORD")
 
 	c, err := NewClient(nil, FromEnv)
 	if err != nil {

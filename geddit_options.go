@@ -1,4 +1,4 @@
-package geddit
+package reddit
 
 import (
 	"net/url"
@@ -11,24 +11,24 @@ type Opt func(*Client) error
 // FromEnv configures the client with values from environment variables.
 //
 // Supported environment variables:
-// GEDDIT_CLIENT_ID to set the client's id.
-// GEDDIT_CLIENT_SECRET to set the client's secret.
-// GEDDIT_CLIENT_USERNAME to set the client's username.
-// GEDDIT_CLIENT_PASSWORD to set the client's password.
+// GO_REDDIT_CLIENT_ID to set the client's id.
+// GO_REDDIT_CLIENT_SECRET to set the client's secret.
+// GO_REDDIT_CLIENT_USERNAME to set the client's username.
+// GO_REDDIT_CLIENT_PASSWORD to set the client's password.
 func FromEnv(c *Client) error {
-	if v, ok := os.LookupEnv("GEDDIT_CLIENT_ID"); ok {
+	if v, ok := os.LookupEnv("GO_REDDIT_CLIENT_ID"); ok {
 		c.ID = v
 	}
 
-	if v, ok := os.LookupEnv("GEDDIT_CLIENT_SECRET"); ok {
+	if v, ok := os.LookupEnv("GO_REDDIT_CLIENT_SECRET"); ok {
 		c.Secret = v
 	}
 
-	if v, ok := os.LookupEnv("GEDDIT_CLIENT_USERNAME"); ok {
+	if v, ok := os.LookupEnv("GO_REDDIT_CLIENT_USERNAME"); ok {
 		c.Username = v
 	}
 
-	if v, ok := os.LookupEnv("GEDDIT_CLIENT_PASSWORD"); ok {
+	if v, ok := os.LookupEnv("GO_REDDIT_CLIENT_PASSWORD"); ok {
 		c.Password = v
 	}
 

@@ -31,7 +31,7 @@ to https://www.reddit.com/api/v1/access_token with the following form values:
 }
 */
 
-package geddit
+package reddit
 
 import (
 	"context"
