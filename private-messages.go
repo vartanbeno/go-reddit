@@ -2,6 +2,7 @@ package reddit
 
 import (
 	"context"
+	"net/http"
 	"net/url"
 )
 
@@ -25,7 +26,7 @@ func (s *PrivateMessageServiceOp) BlockUser(ctx context.Context, messageID strin
 	form := url.Values{}
 	form.Set("id", messageID)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil
 	}

@@ -198,7 +198,7 @@ func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) 
 
 	path := "api/multi/copy"
 
-	req, err := s.client.NewPostForm(path, copyRequest.Form())
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, copyRequest.Form())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -220,7 +220,7 @@ func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrU
 
 	path := "api/multi"
 
-	req, err := s.client.NewPostForm(path, createRequest.Form())
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, createRequest.Form())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -243,12 +243,10 @@ func (s *MultiService) Update(ctx context.Context, multiPath string, updateReque
 
 	path := fmt.Sprintf("api/multi/%s", multiPath)
 
-	req, err := s.client.NewPostForm(path, updateRequest.Form())
+	req, err := s.client.NewRequestWithForm(http.MethodPut, path, updateRequest.Form())
 	if err != nil {
 		return nil, nil, err
 	}
-	// todo: fix this
-	req.Method = http.MethodPut
 
 	root := new(multiRoot)
 	resp, err := s.client.Do(ctx, req, root)
@@ -296,12 +294,10 @@ func (s *MultiService) UpdateDescription(ctx context.Context, multiPath string, 
 	form := url.Values{}
 	form.Set("model", fmt.Sprintf(`{"body_md":"%s"}`, description))
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPut, path, form)
 	if err != nil {
 		return "", nil, err
 	}
-	// todo: fix this
-	req.Method = http.MethodPut
 
 	root := new(rootMultiDescription)
 	resp, err := s.client.Do(ctx, req, root)
@@ -319,12 +315,10 @@ func (s *MultiService) AddSubreddit(ctx context.Context, multiPath string, subre
 	form := url.Values{}
 	form.Set("model", fmt.Sprintf(`{"name":"%s"}`, subreddit))
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPut, path, form)
 	if err != nil {
 		return nil, err
 	}
-	// todo: fix this
-	req.Method = http.MethodPut
 
 	return s.client.Do(ctx, req, nil)
 }

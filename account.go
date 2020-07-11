@@ -397,7 +397,7 @@ func (s *AccountService) AddTrusted(ctx context.Context, username string) (*Resp
 	form.Set("name", username)
 	// todo: you can also do this with the user id. form.Set("id", id). should we? or is this enough?
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -414,7 +414,7 @@ func (s *AccountService) RemoveTrusted(ctx context.Context, username string) (*R
 	form.Set("name", username)
 	// todo: you can also do this with the user id. form.Set("id", id). should we? or is this enough?
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

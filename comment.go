@@ -3,6 +3,7 @@ package reddit
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 )
@@ -25,7 +26,7 @@ func (s *CommentService) Submit(ctx context.Context, id string, text string) (*C
 	form.Set("parent", id)
 	form.Set("text", text)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -54,7 +55,7 @@ func (s *CommentService) Edit(ctx context.Context, id string, text string) (*Com
 	form.Set("thing_id", id)
 	form.Set("text", text)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -80,7 +81,7 @@ func (s *CommentService) Delete(ctx context.Context, id string) (*Response, erro
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +105,7 @@ func (s *CommentService) Save(ctx context.Context, id string) (*Response, error)
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +129,7 @@ func (s *CommentService) Unsave(ctx context.Context, id string) (*Response, erro
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

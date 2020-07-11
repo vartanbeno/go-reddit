@@ -176,7 +176,7 @@ func NewClient(httpClient *http.Client, opts ...Opt) (c *Client, err error) {
 // NewRequest creates an API request.
 // The path is the relative URL which will be resolves to the BaseURL of the Client.
 // It should always be specified without a preceding slash.
-func (c *Client) NewRequest(method, path string, body interface{}) (*http.Request, error) {
+func (c *Client) NewRequest(method string, path string, body interface{}) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(path)
 	if err != nil {
 		return nil, err
@@ -202,16 +202,16 @@ func (c *Client) NewRequest(method, path string, body interface{}) (*http.Reques
 	return req, nil
 }
 
-// NewPostForm creates an API request with a POST form.
+// NewRequestWithForm creates an API request with form data.
 // The path is the relative URL which will be resolves to the BaseURL of the Client.
 // It should always be specified without a preceding slash.
-func (c *Client) NewPostForm(path string, form url.Values) (*http.Request, error) {
+func (c *Client) NewRequestWithForm(method string, path string, form url.Values) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(path)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, u.String(), strings.NewReader(form.Encode()))
+	req, err := http.NewRequest(method, u.String(), strings.NewReader(form.Encode()))
 	if err != nil {
 		return nil, err
 	}

@@ -6,19 +6,19 @@ import (
 	"net/http"
 )
 
-// RedditError is an error coming from Reddit
-type RedditError struct {
+// APIError is an error coming from Reddit
+type APIError struct {
 	Label  string
 	Reason string
 	Field  string
 }
 
-func (e *RedditError) Error() string {
+func (e *APIError) Error() string {
 	return fmt.Sprintf("field %q caused %s: %s", e.Field, e.Label, e.Reason)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
-func (e *RedditError) UnmarshalJSON(data []byte) error {
+func (e *APIError) UnmarshalJSON(data []byte) error {
 	var info []string
 
 	err := json.Unmarshal(data, &info)
@@ -43,7 +43,7 @@ type JSONErrorResponse struct {
 	Response *http.Response `json:"-"`
 
 	JSON *struct {
-		Errors []RedditError `json:"errors,omitempty"`
+		Errors []APIError `json:"errors,omitempty"`
 	} `json:"json,omitempty"`
 }
 

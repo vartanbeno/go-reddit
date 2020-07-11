@@ -3,6 +3,7 @@ package reddit
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 )
 
@@ -29,7 +30,7 @@ func (s *VoteService) vote(ctx context.Context, id string, vote vote) (*Response
 	form.Set("dir", fmt.Sprint(vote))
 	form.Set("rank", "10")
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

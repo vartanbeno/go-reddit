@@ -3,6 +3,7 @@ package reddit
 import (
 	"context"
 	"errors"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -82,7 +83,7 @@ func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *R
 	}
 	form.Set("api_type", "json")
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -104,7 +105,7 @@ func (s *PostService) EnableReplies(ctx context.Context, id string) (*Response, 
 	form.Set("id", id)
 	form.Set("state", "true")
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +121,7 @@ func (s *PostService) DisableReplies(ctx context.Context, id string) (*Response,
 	form.Set("id", id)
 	form.Set("state", "false")
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +136,7 @@ func (s *PostService) MarkNSFW(ctx context.Context, id string) (*Response, error
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +151,7 @@ func (s *PostService) UnmarkNSFW(ctx context.Context, id string) (*Response, err
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +166,7 @@ func (s *PostService) Spoiler(ctx context.Context, id string) (*Response, error)
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -180,7 +181,7 @@ func (s *PostService) Unspoiler(ctx context.Context, id string) (*Response, erro
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +200,7 @@ func (s *PostService) Hide(ctx context.Context, ids ...string) (*Response, error
 	form := url.Values{}
 	form.Set("id", strings.Join(ids, ","))
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -218,7 +219,7 @@ func (s *PostService) Unhide(ctx context.Context, ids ...string) (*Response, err
 	form := url.Values{}
 	form.Set("id", strings.Join(ids, ","))
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

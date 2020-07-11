@@ -400,7 +400,7 @@ func (s *UserService) Block(ctx context.Context, username string) (*Blocked, *Re
 	form := url.Values{}
 	form.Set("name", username)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -449,7 +449,7 @@ func (s *UserService) Unblock(ctx context.Context, username string) (*Response, 
 	form.Set("type", "enemy")
 	form.Set("container", selfID)
 
-	req, err := s.client.NewPostForm(path, form)
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

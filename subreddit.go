@@ -177,7 +177,8 @@ func (s *SubredditService) SearchSubredditInfo(ctx context.Context, query string
 
 func (s *SubredditService) handleSubscription(ctx context.Context, form url.Values) (*Response, error) {
 	path := "api/subscribe"
-	req, err := s.client.NewPostForm(path, form)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
