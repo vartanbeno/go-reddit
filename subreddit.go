@@ -30,6 +30,20 @@ type SubredditShort struct {
 	ActiveUsers int    `json:"active_user_count"`
 }
 
+type rootModeratorList struct {
+	Kind string `json:"kind,omitempty"`
+	Data struct {
+		Moderators []Moderator `json:"children"`
+	} `json:"data"`
+}
+
+// Moderator is a user who moderates a subreddit.
+type Moderator struct {
+	ID          string   `json:"id,omitempty"`
+	Name        string   `json:"name,omitempty"`
+	Permissions []string `json:"mod_permissions"`
+}
+
 // GetPosts returns posts.
 // By default, it'll look for the hottest posts from r/all.
 // Note: when looking for hot posts in a subreddit, it will include the
@@ -326,4 +340,22 @@ func (f *PostFinder) Do(ctx context.Context) (*Posts, *Response, error) {
 	}
 
 	return root.getPosts(), resp, nil
+}
+
+// Moderators returns the moderators of a subreddit.
+func (s *SubredditService) Moderators(ctx context.Context, subreddit string) (interface{}, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/moderators", subreddit)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootModeratorList)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Data.Moderators, resp, nil
 }

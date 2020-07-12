@@ -1,0 +1,25 @@
+{
+  "kind": "UserList",
+  "data": {
+    "children": [
+      {
+        "name": "testuser1",
+        "author_flair_text": "[test1]",
+        "mod_permissions": ["all"],
+        "date": 1375130667.0,
+        "rel_id": "rb_tmatb9",
+        "id": "t2_test1",
+        "author_flair_css_class": "test1"
+      },
+      {
+        "name": "testuser2",
+        "author_flair_text": "[test2]",
+        "mod_permissions": ["all"],
+        "date": 1393697633.0,
+        "rel_id": "rb_5c9s4d",
+        "id": "t2_test2",
+        "author_flair_css_class": "test2"
+      }
+    ]
+  }
+}

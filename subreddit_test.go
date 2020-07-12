@@ -113,6 +113,11 @@ var expectedSticky = &PostAndComments{
 	},
 }
 
+var expectedModerators = []Moderator{
+	{ID: "t2_test1", Name: "testuser1", Permissions: []string{"all"}},
+	{ID: "t2_test2", Name: "testuser2", Permissions: []string{"all"}},
+}
+
 func TestSubredditService_GetByName(t *testing.T) {
 	setup()
 	defer teardown()
@@ -263,4 +268,20 @@ func TestSubredditService_GetSticky1(t *testing.T) {
 	assert.Equal(t, expectedSticky.Post, sticky.Post)
 	// b, _ := json.MarshalIndent(sticky.Comments, "", "  ")
 	// fmt.Println(string(b))
+}
+
+func TestSubredditService_Moderators(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/subreddit/moderators.json")
+
+	mux.HandleFunc("/r/test/about/moderators", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	moderators, _, err := client.Subreddit.Moderators(ctx, "test")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedModerators, moderators)
 }
