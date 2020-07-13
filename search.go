@@ -68,6 +68,8 @@ func SetTimespan(v Timespan) SearchOptionSetter {
 }
 
 // setType sets the type option.
+// It could be user, link, sr (subreddit).
+// For mod actions, it's for the type of action (e.g. "banuser", "spamcomment").
 func setType(v string) SearchOptionSetter {
 	return func(opts url.Values) {
 		opts.Set("type", v)
