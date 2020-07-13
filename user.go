@@ -13,6 +13,11 @@ import (
 // Reddit API docs: https://www.reddit.com/dev/api/#section_users
 type UserService service
 
+type rootUser struct {
+	Kind string `json:"kind,omitempty"`
+	Data *User  `json:"data,omitempty"`
+}
+
 // User represents a Reddit user.
 type User struct {
 	// this is not the full ID, watch out.
@@ -65,8 +70,8 @@ type rootTrophyListing struct {
 }
 
 type rootTrophy struct {
-	Kind string `json:"kind,omitempty"`
-	Data Trophy `json:"data"`
+	Kind string  `json:"kind,omitempty"`
+	Data *Trophy `json:"data,omitempty"`
 }
 
 // Trophy is a Reddit award.
@@ -84,7 +89,7 @@ func (s *UserService) Get(ctx context.Context, username string) (*User, *Respons
 		return nil, nil, err
 	}
 
-	root := new(userRoot)
+	root := new(rootUser)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
@@ -501,7 +506,9 @@ func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]Trophy
 
 	var trophies []Trophy
 	for _, trophy := range root.Data.Trophies {
-		trophies = append(trophies, trophy.Data)
+		if trophy.Data != nil {
+			trophies = append(trophies, *trophy.Data)
+		}
 	}
 
 	return trophies, resp, nil

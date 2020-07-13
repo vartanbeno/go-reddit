@@ -18,7 +18,8 @@ const (
 	kindKarmaList  = "KarmaList"
 	kindTrophyList = "TrophyList"
 	kindUserList   = "UserList"
-	kindMode       = "more"
+	kindMore       = "more"
+	kindModAction  = "modaction"
 )
 
 // Sort is a sorting option.
@@ -123,27 +124,8 @@ type Things struct {
 	Users      []User      `json:"users,omitempty"`
 	Posts      []Post      `json:"posts,omitempty"`
 	Subreddits []Subreddit `json:"subreddits,omitempty"`
+	ModActions []ModAction `json:"moderationActions,omitempty"`
 	// todo: add the other kinds of things
-}
-
-type commentRoot struct {
-	Kind string   `json:"kind,omitempty"`
-	Data *Comment `json:"data,omitempty"`
-}
-
-type userRoot struct {
-	Kind string `json:"kind,omitempty"`
-	Data *User  `json:"data,omitempty"`
-}
-
-type postRoot struct {
-	Kind string `json:"kind,omitempty"`
-	Data *Post  `json:"data,omitempty"`
-}
-
-type subredditRoot struct {
-	Kind string     `json:"kind,omitempty"`
-	Data *Subreddit `json:"data,omitempty"`
 }
 
 func (t *Things) init() {
@@ -159,6 +141,9 @@ func (t *Things) init() {
 	if t.Subreddits == nil {
 		t.Subreddits = make([]Subreddit, 0)
 	}
+	if t.ModActions == nil {
+		t.ModActions = make([]ModAction, 0)
+	}
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -171,31 +156,38 @@ func (t *Things) UnmarshalJSON(b []byte) error {
 	}
 
 	for _, child := range children {
-		byteValue, _ := json.Marshal(child)
+		data := child["data"]
+		byteValue, _ := json.Marshal(data)
+
 		switch child["kind"] {
 		// todo: kindMore
 		case kindComment:
-			root := new(commentRoot)
-			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
-				t.Comments = append(t.Comments, *root.Data)
+			v := new(Comment)
+			if err := json.Unmarshal(byteValue, v); err == nil && v != nil {
+				t.Comments = append(t.Comments, *v)
 			}
 		case kindAccount:
-			root := new(userRoot)
-			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
-				t.Users = append(t.Users, *root.Data)
+			v := new(User)
+			if err := json.Unmarshal(byteValue, v); err == nil && v != nil {
+				t.Users = append(t.Users, *v)
 			}
 		case kindLink:
-			root := new(postRoot)
-			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
-				t.Posts = append(t.Posts, *root.Data)
+			v := new(Post)
+			if err := json.Unmarshal(byteValue, v); err == nil && v != nil {
+				t.Posts = append(t.Posts, *v)
 			}
 		case kindMessage:
 		case kindSubreddit:
-			root := new(subredditRoot)
-			if err := json.Unmarshal(byteValue, root); err == nil && root.Data != nil {
-				t.Subreddits = append(t.Subreddits, *root.Data)
+			v := new(Subreddit)
+			if err := json.Unmarshal(byteValue, v); err == nil && v != nil {
+				t.Subreddits = append(t.Subreddits, *v)
 			}
 		case kindAward:
+		case kindModAction:
+			v := new(ModAction)
+			if err := json.Unmarshal(byteValue, v); err == nil && v != nil {
+				t.ModActions = append(t.ModActions, *v)
+			}
 		}
 	}
 
@@ -394,6 +386,16 @@ func (rl *rootListing) getSubreddits() *Subreddits {
 	return v
 }
 
+func (rl *rootListing) getModeratorActions() *ModActions {
+	v := new(ModActions)
+	if rl != nil && rl.Data != nil {
+		v.ModActions = rl.Data.Things.ModActions
+		v.After = rl.Data.After
+		v.Before = rl.Data.Before
+	}
+	return v
+}
+
 // Comments is a list of comments
 type Comments struct {
 	Comments []Comment `json:"comments"`
@@ -420,6 +422,13 @@ type Posts struct {
 	Posts  []Post `json:"posts"`
 	After  string `json:"after"`
 	Before string `json:"before"`
+}
+
+// ModActions is a list of moderator action.
+type ModActions struct {
+	ModActions []ModAction `json:"moderator_actions"`
+	After      string      `json:"after"`
+	Before     string      `json:"before"`
 }
 
 // PostAndComments is a post and its comments

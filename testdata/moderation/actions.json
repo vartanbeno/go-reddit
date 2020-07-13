@@ -1,0 +1,51 @@
+{
+  "kind": "Listing",
+  "data": {
+    "modhash": null,
+    "dist": null,
+    "children": [
+      {
+        "kind": "modaction",
+        "data": {
+          "description": null,
+          "target_body": "hi",
+          "mod_id36": "164ab8",
+          "created_utc": 1594606094.0,
+          "subreddit": "helloworldtestt",
+          "target_title": null,
+          "target_permalink": "/r/helloworldtestt/comments/hq6r3t/yo/fxw10aa/",
+          "subreddit_name_prefixed": "r/helloworldtestt",
+          "details": "spam",
+          "action": "spamcomment",
+          "target_author": "testuser",
+          "target_fullname": "t1_fxw10aa",
+          "sr_id36": "2uquw1",
+          "id": "ModAction_b4e7979a-c4ad-11ea-8440-0ea1b7c2b8f9",
+          "mod": "v_95"
+        }
+      },
+      {
+        "kind": "modaction",
+        "data": {
+          "description": null,
+          "target_body": null,
+          "mod_id36": "164ab8",
+          "created_utc": 1594606058.0,
+          "subreddit": "helloworldtestt",
+          "target_title": "yo",
+          "target_permalink": "/r/helloworldtestt/comments/hq6r3t/yo/",
+          "subreddit_name_prefixed": "r/helloworldtestt",
+          "details": null,
+          "action": "sticky",
+          "target_author": "testuser",
+          "target_fullname": "t3_hq6r3t",
+          "sr_id36": "2uquw1",
+          "id": "ModAction_a0408162-c4ad-11ea-8239-0e3b48262e8b",
+          "mod": "v_95"
+        }
+      }
+    ],
+    "after": "ModAction_a0408162-c4ad-11ea-8239-0e3b48262e8b",
+    "before": null
+  }
+}

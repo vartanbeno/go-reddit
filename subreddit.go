@@ -15,11 +15,16 @@ import (
 // Reddit API docs: https://www.reddit.com/dev/api/#section_subreddits
 type SubredditService service
 
-type subredditNamesRoot struct {
+type rootSubreddit struct {
+	Kind string     `json:"kind,omitempty"`
+	Data *Subreddit `json:"data,omitempty"`
+}
+
+type rootSubredditNames struct {
 	Names []string `json:"names,omitempty"`
 }
 
-type subredditShortsRoot struct {
+type rootSubredditShorts struct {
 	Subreddits []SubredditShort `json:"subreddits,omitempty"`
 }
 
@@ -66,7 +71,7 @@ func (s *SubredditService) GetByName(ctx context.Context, subreddit string) (*Su
 		return nil, nil, err
 	}
 
-	root := new(subredditRoot)
+	root := new(rootSubreddit)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
@@ -161,7 +166,7 @@ func (s *SubredditService) SearchSubredditNames(ctx context.Context, query strin
 		return nil, nil, err
 	}
 
-	root := new(subredditNamesRoot)
+	root := new(rootSubredditNames)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
@@ -180,7 +185,7 @@ func (s *SubredditService) SearchSubredditInfo(ctx context.Context, query string
 		return nil, nil, err
 	}
 
-	root := new(subredditShortsRoot)
+	root := new(rootSubredditShorts)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err

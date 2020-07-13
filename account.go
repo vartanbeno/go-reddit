@@ -303,10 +303,11 @@ func (s *AccountService) Trophies(ctx context.Context) ([]Trophy, *Response, err
 		return nil, resp, err
 	}
 
-	// todo: use Things struct
 	var trophies []Trophy
 	for _, trophy := range root.Data.Trophies {
-		trophies = append(trophies, trophy.Data)
+		if trophy.Data != nil {
+			trophies = append(trophies, *trophy.Data)
+		}
 	}
 
 	return trophies, resp, nil

@@ -20,11 +20,8 @@ import (
 // Reddit API docs: https://www.reddit.com/dev/api/#section_search
 type SearchService service
 
-// SearchOptions define options used in search queries.
-type SearchOptions = url.Values
-
-func newSearchOptions(opts ...SearchOptionSetter) SearchOptions {
-	searchOptions := make(SearchOptions)
+func newSearchOptions(opts ...SearchOptionSetter) url.Values {
+	searchOptions := make(url.Values)
 	for _, opt := range opts {
 		opt(searchOptions)
 	}
@@ -32,18 +29,18 @@ func newSearchOptions(opts ...SearchOptionSetter) SearchOptions {
 }
 
 // SearchOptionSetter sets values for the options.
-type SearchOptionSetter func(opts SearchOptions)
+type SearchOptionSetter func(opts url.Values)
 
 // SetAfter sets the after option.
 func SetAfter(v string) SearchOptionSetter {
-	return func(opts SearchOptions) {
+	return func(opts url.Values) {
 		opts.Set("after", v)
 	}
 }
 
 // SetBefore sets the before option.
 func SetBefore(v string) SearchOptionSetter {
-	return func(opts SearchOptions) {
+	return func(opts url.Values) {
 		opts.Set("before", v)
 	}
 }
@@ -51,41 +48,41 @@ func SetBefore(v string) SearchOptionSetter {
 // SetLimit sets the limit option.
 // Warning: It seems like setting the limit to 1 sometimes returns 0 results.
 func SetLimit(v int) SearchOptionSetter {
-	return func(opts SearchOptions) {
+	return func(opts url.Values) {
 		opts.Set("limit", fmt.Sprint(v))
 	}
 }
 
 // SetSort sets the sort option.
 func SetSort(v Sort) SearchOptionSetter {
-	return func(opts SearchOptions) {
+	return func(opts url.Values) {
 		opts.Set("sort", v.String())
 	}
 }
 
 // SetTimespan sets the timespan option.
 func SetTimespan(v Timespan) SearchOptionSetter {
-	return func(opts SearchOptions) {
+	return func(opts url.Values) {
 		opts.Set("timespan", v.String())
 	}
 }
 
 // setType sets the type option.
 func setType(v string) SearchOptionSetter {
-	return func(opts SearchOptions) {
+	return func(opts url.Values) {
 		opts.Set("type", v)
 	}
 }
 
 // setQuery sets the q option.
 func setQuery(v string) SearchOptionSetter {
-	return func(opts SearchOptions) {
+	return func(opts url.Values) {
 		opts.Set("q", v)
 	}
 }
 
 // setRestrict sets the restrict_sr option.
-func setRestrict(opts SearchOptions) {
+func setRestrict(opts url.Values) {
 	opts.Set("restrict_sr", "true")
 }
 
