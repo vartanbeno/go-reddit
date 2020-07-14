@@ -94,17 +94,17 @@ type Client struct {
 	// Reuse a single struct instead of allocating one for each service on the heap.
 	common service
 
-	Account    *AccountService
-	Comment    *CommentService
-	Flair      *FlairService
-	Listings   *ListingsService
-	Moderation *ModerationService
-	Multi      *MultiService
-	Post       *PostService
-	Search     *SearchService
-	Subreddit  *SubredditService
-	User       *UserService
-	Vote       *VoteService
+	Account        *AccountService
+	Comment        *CommentService
+	Flair          *FlairService
+	Listings       *ListingsService
+	Moderation     *ModerationService
+	Multi          *MultiService
+	Post           *PostService
+	PostAndComment *PostAndCommentService
+	Search         *SearchService
+	Subreddit      *SubredditService
+	User           *UserService
 
 	oauth2Transport *oauth2.Transport
 
@@ -138,10 +138,10 @@ func newClient(httpClient *http.Client) *Client {
 	c.Moderation = (*ModerationService)(&c.common)
 	c.Multi = (*MultiService)(&c.common)
 	c.Post = (*PostService)(&c.common)
+	c.PostAndComment = (*PostAndCommentService)(&c.common)
 	c.Search = (*SearchService)(&c.common)
 	c.Subreddit = (*SubredditService)(&c.common)
 	c.User = (*UserService)(&c.common)
-	c.Vote = (*VoteService)(&c.common)
 
 	return c
 }

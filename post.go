@@ -12,6 +12,8 @@ import (
 
 // PostService handles communication with the post
 // related methods of the Reddit API.
+//
+// Reddit API docs: https://www.reddit.com/dev/api/#section_links_and_comments
 type PostService service
 
 type submittedLinkRoot struct {
@@ -27,8 +29,8 @@ type Submitted struct {
 	URL    string `json:"url,omitempty"`
 }
 
-// SubmitSelfOptions are options used for selftext posts.
-type SubmitSelfOptions struct {
+// SubmitTextOptions are options used for text posts.
+type SubmitTextOptions struct {
 	Subreddit string `url:"sr,omitempty"`
 	Title     string `url:"title,omitempty"`
 	Text      string `url:"text,omitempty"`
@@ -41,8 +43,8 @@ type SubmitSelfOptions struct {
 	Spoiler     bool  `url:"spoiler,omitempty"`
 }
 
-// SubmitURLOptions are options used for link posts.
-type SubmitURLOptions struct {
+// SubmitLinkOptions are options used for link posts.
+type SubmitLinkOptions struct {
 	Subreddit string `url:"sr,omitempty"`
 	Title     string `url:"title,omitempty"`
 	URL       string `url:"url,omitempty"`
@@ -54,24 +56,6 @@ type SubmitURLOptions struct {
 	Resubmit    bool  `url:"resubmit,omitempty"`
 	NSFW        bool  `url:"nsfw,omitempty"`
 	Spoiler     bool  `url:"spoiler,omitempty"`
-}
-
-// SubmitSelf submits a self text post.
-func (s *PostService) SubmitSelf(ctx context.Context, opts SubmitSelfOptions) (*Submitted, *Response, error) {
-	type submit struct {
-		SubmitSelfOptions
-		Kind string `url:"kind,omitempty"`
-	}
-	return s.submit(ctx, &submit{opts, "self"})
-}
-
-// SubmitURL submits a link post.
-func (s *PostService) SubmitURL(ctx context.Context, opts SubmitURLOptions) (*Submitted, *Response, error) {
-	type submit struct {
-		SubmitURLOptions
-		Kind string `url:"kind,omitempty"`
-	}
-	return s.submit(ctx, &submit{opts, "link"})
 }
 
 func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *Response, error) {
@@ -97,13 +81,58 @@ func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *R
 	return root.JSON.Data, resp, nil
 }
 
-// EnableReplies enables inbox replies for a thing created by the client.
-func (s *PostService) EnableReplies(ctx context.Context, id string) (*Response, error) {
-	path := "api/sendreplies"
+// SubmitText submits a text post.
+func (s *PostService) SubmitText(ctx context.Context, opts SubmitTextOptions) (*Submitted, *Response, error) {
+	type submit struct {
+		SubmitTextOptions
+		Kind string `url:"kind,omitempty"`
+	}
+	return s.submit(ctx, &submit{opts, "self"})
+}
+
+// SubmitLink submits a link post.
+func (s *PostService) SubmitLink(ctx context.Context, opts SubmitLinkOptions) (*Submitted, *Response, error) {
+	type submit struct {
+		SubmitLinkOptions
+		Kind string `url:"kind,omitempty"`
+	}
+	return s.submit(ctx, &submit{opts, "link"})
+}
+
+// Edit edits a post.
+func (s *PostService) Edit(ctx context.Context, id string, text string) (*Post, *Response, error) {
+	path := "api/editusertext"
 
 	form := url.Values{}
-	form.Set("id", id)
-	form.Set("state", "true")
+	form.Set("api_type", "json")
+	form.Set("return_rtjson", "true")
+	form.Set("thing_id", id)
+	form.Set("text", text)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(Post)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, nil
+}
+
+// Hide hides posts.
+func (s *PostService) Hide(ctx context.Context, ids ...string) (*Response, error) {
+	if len(ids) == 0 {
+		return nil, errors.New("must provide at least 1 id")
+	}
+
+	path := "api/hide"
+
+	form := url.Values{}
+	form.Set("id", strings.Join(ids, ","))
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
@@ -113,13 +142,16 @@ func (s *PostService) EnableReplies(ctx context.Context, id string) (*Response, 
 	return s.client.Do(ctx, req, nil)
 }
 
-// DisableReplies dsables inbox replies for a thing created by the client.
-func (s *PostService) DisableReplies(ctx context.Context, id string) (*Response, error) {
-	path := "api/sendreplies"
+// Unhide unhides posts.
+func (s *PostService) Unhide(ctx context.Context, ids ...string) (*Response, error) {
+	if len(ids) == 0 {
+		return nil, errors.New("must provide at least 1 id")
+	}
+
+	path := "api/unhide"
 
 	form := url.Values{}
-	form.Set("id", id)
-	form.Set("state", "false")
+	form.Set("id", strings.Join(ids, ","))
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
@@ -180,44 +212,6 @@ func (s *PostService) Unspoiler(ctx context.Context, id string) (*Response, erro
 
 	form := url.Values{}
 	form.Set("id", id)
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
-}
-
-// Hide hides links with the specified ids.
-func (s *PostService) Hide(ctx context.Context, ids ...string) (*Response, error) {
-	if len(ids) == 0 {
-		return nil, errors.New("must provide at least 1 id")
-	}
-
-	path := "api/hide"
-
-	form := url.Values{}
-	form.Set("id", strings.Join(ids, ","))
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
-}
-
-// Unhide unhides links with the specified ids.
-func (s *PostService) Unhide(ctx context.Context, ids ...string) (*Response, error) {
-	if len(ids) == 0 {
-		return nil, errors.New("must provide at least 1 id")
-	}
-
-	path := "api/unhide"
-
-	form := url.Values{}
-	form.Set("id", strings.Join(ids, ","))
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {

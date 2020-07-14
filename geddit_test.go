@@ -70,11 +70,13 @@ func testClientServices(t *testing.T, c *Client) {
 		"Comment",
 		"Flair",
 		"Listings",
+		"Moderation",
+		"Multi",
 		"Post",
+		"PostAndComment",
 		"Search",
 		"Subreddit",
 		"User",
-		"Vote",
 	}
 
 	cp := reflect.ValueOf(c)

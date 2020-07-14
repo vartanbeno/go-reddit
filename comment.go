@@ -10,20 +10,26 @@ import (
 
 // CommentService handles communication with the comment
 // related methods of the Reddit API.
+//
+// Reddit API docs: https://www.reddit.com/dev/api/#section_links_and_comments
 type CommentService service
 
-func (s *CommentService) isCommentID(id string) bool {
-	return strings.HasPrefix(id, kindComment+"_")
+func (s *CommentService) validateCommentID(id string) error {
+	if strings.HasPrefix(id, kindComment+"_") {
+		return nil
+	}
+	return fmt.Errorf("comment id %s does not start with %s_", id, kindComment)
 }
 
-// Submit submits a comment as a reply to a post or to another comment.
-func (s *CommentService) Submit(ctx context.Context, id string, text string) (*Comment, *Response, error) {
+// Submit submits a comment as a reply to a post, comment, or message.
+// parentID is the full ID of the thing being replied to.
+func (s *CommentService) Submit(ctx context.Context, parentID string, text string) (*Comment, *Response, error) {
 	path := "api/comment"
 
 	form := url.Values{}
 	form.Set("api_type", "json")
 	form.Set("return_rtjson", "true")
-	form.Set("parent", id)
+	form.Set("parent", parentID)
 	form.Set("text", text)
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
@@ -40,13 +46,8 @@ func (s *CommentService) Submit(ctx context.Context, id string, text string) (*C
 	return root, resp, nil
 }
 
-// Edit edits the comment with the id provided.
-// todo: don't forget to do this for posts
+// Edit edits a comment.
 func (s *CommentService) Edit(ctx context.Context, id string, text string) (*Comment, *Response, error) {
-	if !s.isCommentID(id) {
-		return nil, nil, fmt.Errorf("must provide comment id (starting with %s_); id provided: %q", kindComment, id)
-	}
-
 	path := "api/editusertext"
 
 	form := url.Values{}
@@ -67,77 +68,4 @@ func (s *CommentService) Edit(ctx context.Context, id string, text string) (*Com
 	}
 
 	return root, resp, nil
-}
-
-// Delete deletes a comment via the id.
-// todo: don't forget to do this for posts.
-func (s *CommentService) Delete(ctx context.Context, id string) (*Response, error) {
-	if !s.isCommentID(id) {
-		return nil, fmt.Errorf("must provide comment id (starting with %s_); id provided: %q", kindComment, id)
-	}
-
-	path := "api/del"
-
-	form := url.Values{}
-	form.Set("id", id)
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := s.client.Do(ctx, req, nil)
-	if err != nil {
-		return resp, err
-	}
-
-	return resp, nil
-}
-
-// Save saves a comment.
-func (s *CommentService) Save(ctx context.Context, id string) (*Response, error) {
-	if !s.isCommentID(id) {
-		return nil, fmt.Errorf("must provide comment id (starting with %s_); id provided: %q", kindComment, id)
-	}
-
-	path := "api/save"
-
-	form := url.Values{}
-	form.Set("id", id)
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := s.client.Do(ctx, req, nil)
-	if err != nil {
-		return resp, err
-	}
-
-	return resp, nil
-}
-
-// Unsave unsaves a comment.
-func (s *CommentService) Unsave(ctx context.Context, id string) (*Response, error) {
-	if !s.isCommentID(id) {
-		return nil, fmt.Errorf("must provide comment id (starting with t1_); id provided: %q", id)
-	}
-
-	path := "api/unsave"
-
-	form := url.Values{}
-	form.Set("id", id)
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := s.client.Do(ctx, req, nil)
-	if err != nil {
-		return resp, err
-	}
-
-	return resp, nil
 }

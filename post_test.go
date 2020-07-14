@@ -53,3 +53,83 @@ func TestPostService_Unhide(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
+
+func TestPostService_MarkNSFW(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/marknsfw", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("id", "t1_test")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.MarkNSFW(ctx, "t1_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_UnmarkNSFW(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/unmarknsfw", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("id", "t1_test")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.UnmarkNSFW(ctx, "t1_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_Spoiler(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/spoiler", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("id", "t1_test")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.Spoiler(ctx, "t1_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_Unspoiler(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/unspoiler", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("id", "t1_test")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.Unspoiler(ctx, "t1_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
