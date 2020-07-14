@@ -2,10 +2,8 @@ package reddit
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 // CommentService handles communication with the comment
@@ -13,13 +11,6 @@ import (
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_links_and_comments
 type CommentService service
-
-func (s *CommentService) validateCommentID(id string) error {
-	if strings.HasPrefix(id, kindComment+"_") {
-		return nil
-	}
-	return fmt.Errorf("comment id %s does not start with %s_", id, kindComment)
-}
 
 // Submit submits a comment as a reply to a post, comment, or message.
 // parentID is the full ID of the thing being replied to.
