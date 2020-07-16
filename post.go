@@ -220,3 +220,93 @@ func (s *PostService) Unspoiler(ctx context.Context, id string) (*Response, erro
 
 	return s.client.Do(ctx, req, nil)
 }
+
+// Sticky stickies a post in its subreddit.
+// When bottom is true, the post will be set as the bottom sticky (the 2nd one).
+// If no top sticky exists, the post will become the top sticky regardless.
+// When attempting to sticky a post that's already stickied, it will return a 409 Conflict error.
+func (s *PostService) Sticky(ctx context.Context, id string, bottom bool) (*Response, error) {
+	path := "api/set_subreddit_sticky"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", id)
+	form.Set("state", "true")
+	if !bottom {
+		form.Set("num", "1")
+	}
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Unsticky unstickies a post in its subreddit.
+func (s *PostService) Unsticky(ctx context.Context, id string) (*Response, error) {
+	path := "api/set_subreddit_sticky"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", id)
+	form.Set("state", "false")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// PinToProfile pins one of your posts to your profile.
+// TODO: very inconsistent behaviour, not sure I'm ready to include this parameter yet.
+// The pos parameter should be a number between 1-4 (inclusive), indicating the position at which
+// the post should appear on your profile.
+// Note: The position will be bumped upward if there's space. E.g. if you only have 1 pinned post,
+// and you try to pin another post to position 3, it will be pinned at 2.
+// When attempting to pin a post that's already pinned, it will return a 409 Conflict error.
+func (s *PostService) PinToProfile(ctx context.Context, id string) (*Response, error) {
+	path := "api/set_subreddit_sticky"
+
+	// if pos < 1 {
+	// 	pos = 1
+	// }
+	// if pos > 4 {
+	// 	pos = 4
+	// }
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", id)
+	form.Set("state", "true")
+	form.Set("to_profile", "true")
+	// form.Set("num", fmt.Sprint(pos))
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// UnpinFromProfile unpins one of your posts from your profile.
+func (s *PostService) UnpinFromProfile(ctx context.Context, id string) (*Response, error) {
+	path := "api/set_subreddit_sticky"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", id)
+	form.Set("state", "false")
+	form.Set("to_profile", "true")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
