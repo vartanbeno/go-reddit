@@ -224,3 +224,201 @@ func TestPostService_UnpinFromProfile(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
+
+func TestPostService_SetSuggestedSortBest(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("sort", "confidence")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.SetSuggestedSortBest(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_SetSuggestedSortTop(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("sort", "top")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.SetSuggestedSortTop(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_SetSuggestedSortNew(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("sort", "new")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.SetSuggestedSortNew(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_SetSuggestedSortControversial(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("sort", "controversial")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.SetSuggestedSortControversial(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_SetSuggestedSortOld(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("sort", "old")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.SetSuggestedSortOld(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_SetSuggestedSortRandom(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("sort", "random")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.SetSuggestedSortRandom(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_SetSuggestedSortAMA(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("sort", "qa")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.SetSuggestedSortAMA(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_SetSuggestedSortLive(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("sort", "live")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.SetSuggestedSortLive(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_ClearSuggestedSort(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("sort", "")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.ClearSuggestedSort(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}

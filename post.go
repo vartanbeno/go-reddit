@@ -310,3 +310,67 @@ func (s *PostService) UnpinFromProfile(ctx context.Context, id string) (*Respons
 
 	return s.client.Do(ctx, req, nil)
 }
+
+// setSuggestedSort sets the suggested comment sort for the post.
+// sort must be one of: confidence (i.e. best), top, new, controversial, old, random, qa, live
+func (s *PostService) setSuggestedSort(ctx context.Context, id string, sort string) (*Response, error) {
+	path := "api/set_suggested_sort"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", id)
+	form.Set("sort", sort)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// SetSuggestedSortBest sets the suggested comment sort for the post to best.
+func (s *PostService) SetSuggestedSortBest(ctx context.Context, id string) (*Response, error) {
+	return s.setSuggestedSort(ctx, id, "confidence")
+}
+
+// SetSuggestedSortTop sets the suggested comment sort for the post to top.
+func (s *PostService) SetSuggestedSortTop(ctx context.Context, id string) (*Response, error) {
+	return s.setSuggestedSort(ctx, id, "top")
+}
+
+// SetSuggestedSortNew sets the suggested comment sort for the post to new.
+func (s *PostService) SetSuggestedSortNew(ctx context.Context, id string) (*Response, error) {
+	return s.setSuggestedSort(ctx, id, "new")
+}
+
+// SetSuggestedSortControversial sets the suggested comment sort for the post to controversial.
+func (s *PostService) SetSuggestedSortControversial(ctx context.Context, id string) (*Response, error) {
+	return s.setSuggestedSort(ctx, id, "controversial")
+}
+
+// SetSuggestedSortOld sorts the comments on the posts randomly.
+func (s *PostService) SetSuggestedSortOld(ctx context.Context, id string) (*Response, error) {
+	return s.setSuggestedSort(ctx, id, "old")
+}
+
+// SetSuggestedSortRandom sets the suggested comment sort for the post to random.
+func (s *PostService) SetSuggestedSortRandom(ctx context.Context, id string) (*Response, error) {
+	return s.setSuggestedSort(ctx, id, "random")
+}
+
+// SetSuggestedSortAMA sets the suggested comment sort for the post to a Q&A styled fashion.
+func (s *PostService) SetSuggestedSortAMA(ctx context.Context, id string) (*Response, error) {
+	return s.setSuggestedSort(ctx, id, "qa")
+}
+
+// SetSuggestedSortLive sets the suggested comment sort for the post to stream new comments as they're posted.
+// As of now, this is still in beta, so it's not a fully developed feature yet. It just sets the sort as "new" for now.
+func (s *PostService) SetSuggestedSortLive(ctx context.Context, id string) (*Response, error) {
+	return s.setSuggestedSort(ctx, id, "live")
+}
+
+// ClearSuggestedSort clears the suggested comment sort for the post.
+func (s *PostService) ClearSuggestedSort(ctx context.Context, id string) (*Response, error) {
+	return s.setSuggestedSort(ctx, id, "")
+}
