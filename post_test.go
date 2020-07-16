@@ -422,3 +422,47 @@ func TestPostService_ClearSuggestedSort(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
 }
+
+func TestPostService_EnableContestMode(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_contest_mode", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("state", "true")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.EnableContestMode(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_DisableContestMode(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/set_contest_mode", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("id", "t3_test")
+		form.Set("state", "false")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+	})
+
+	res, err := client.Post.DisableContestMode(ctx, "t3_test")
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, res.StatusCode)
+}

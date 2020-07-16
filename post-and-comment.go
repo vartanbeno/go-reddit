@@ -12,6 +12,8 @@ import (
 // This service holds functionality common to both posts and comments.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_links_and_comments
+//
+// todo: this is ugly, find a solution
 type PostAndCommentService service
 
 type vote int

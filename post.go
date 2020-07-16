@@ -374,3 +374,38 @@ func (s *PostService) SetSuggestedSortLive(ctx context.Context, id string) (*Res
 func (s *PostService) ClearSuggestedSort(ctx context.Context, id string) (*Response, error) {
 	return s.setSuggestedSort(ctx, id, "")
 }
+
+// EnableContestMode enables contest mode for the post.
+// Comments will be sorted randomly and regular users cannot see comment scores.
+func (s *PostService) EnableContestMode(ctx context.Context, id string) (*Response, error) {
+	path := "api/set_contest_mode"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", id)
+	form.Set("state", "true")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// DisableContestMode disables contest mode for the post.
+func (s *PostService) DisableContestMode(ctx context.Context, id string) (*Response, error) {
+	path := "api/set_contest_mode"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", id)
+	form.Set("state", "false")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
