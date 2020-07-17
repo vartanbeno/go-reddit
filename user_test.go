@@ -101,6 +101,8 @@ var expectedComment = Comment{
 	PostPermalink:   "https://www.reddit.com/r/apple/comments/d7ejpn/im_giving_away_an_iphone_11_pro_to_a_commenter_at/",
 	PostAuthor:      "iamthatis",
 	PostNumComments: 89751,
+
+	Replies: &Replies{},
 }
 
 var expectedRelationship = &Relationship{

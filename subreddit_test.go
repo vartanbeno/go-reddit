@@ -84,8 +84,8 @@ var expectedSubreddits = &Subreddits{
 	},
 }
 
-var expectedSticky = &PostAndComments{
-	Post: Post{
+var expectedSticky = &postAndComments{
+	Post: &Post{
 		ID:      "hcl9gq",
 		FullID:  "t3_hcl9gq",
 		Created: &Timestamp{time.Date(2020, 6, 20, 12, 8, 57, 0, time.UTC)},
@@ -247,28 +247,28 @@ func TestSubredditService_GetModerated(t *testing.T) {
 }
 
 // todo: WIP
-func TestSubredditService_GetSticky1(t *testing.T) {
-	setup()
-	defer teardown()
+// func TestSubredditService_GetSticky1(t *testing.T) {
+// 	setup()
+// 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/sticky.json")
+// 	blob := readFileContents(t, "testdata/subreddit/sticky.json")
 
-	mux.HandleFunc("/r/nba/about/sticky", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+// 	mux.HandleFunc("/r/nba/about/sticky", func(w http.ResponseWriter, r *http.Request) {
+// 		assert.Equal(t, http.MethodGet, r.Method)
 
-		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, "1", r.Form.Get("num"))
+// 		err := r.ParseForm()
+// 		assert.NoError(t, err)
+// 		assert.Equal(t, "1", r.Form.Get("num"))
 
-		fmt.Fprint(w, blob)
-	})
+// 		fmt.Fprint(w, blob)
+// 	})
 
-	sticky, _, err := client.Subreddit.GetSticky1(ctx, "nba")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSticky.Post, sticky.Post)
-	// b, _ := json.MarshalIndent(sticky.Comments, "", "  ")
-	// fmt.Println(string(b))
-}
+// 	sticky, _, err := client.Subreddit.GetSticky1(ctx, "nba")
+// 	assert.NoError(t, err)
+// 	assert.Equal(t, expectedSticky.Post, sticky.Post)
+// 	// b, _ := json.MarshalIndent(sticky.Comments, "", "  ")
+// 	// fmt.Println(string(b))
+// }
 
 func TestSubredditService_Moderators(t *testing.T) {
 	setup()

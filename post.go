@@ -409,3 +409,33 @@ func (s *PostService) DisableContestMode(ctx context.Context, id string) (*Respo
 
 	return s.client.Do(ctx, req, nil)
 }
+
+// More retrieves more comments that were left out when initially fetching the post.
+// id is the post's full ID.
+// commentIDs are the ID36s of comments.
+func (s *PostService) More(ctx context.Context, id string, commentIDs ...string) (interface{}, *Response, error) {
+	type query struct {
+		PostID  string   `url:"link_id"`
+		IDs     []string `url:"children,comma"`
+		APIType string   `url:"api_type"`
+	}
+
+	path := "api/morechildren"
+	path, err := addOptions(path, query{id, commentIDs, "json"})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(interface{})
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, err
+}

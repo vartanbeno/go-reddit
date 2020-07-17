@@ -68,18 +68,18 @@ func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]Post, 
 // GetPost returns a post with its comments.
 // The id here is the ID36 of the post, not its full id.
 // Example: instead of t3_abc123, use abc123.
-func (s *ListingsService) GetPost(ctx context.Context, id string) (*PostAndComments, *Response, error) {
+func (s *ListingsService) GetPost(ctx context.Context, id string) (*Post, []Comment, *Response, error) {
 	path := fmt.Sprintf("comments/%s", id)
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
-	root := new(PostAndComments)
+	root := new(postAndComments)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
-		return nil, resp, err
+		return nil, nil, resp, err
 	}
 
-	return root, resp, nil
+	return root.Post, root.Comments, resp, nil
 }
