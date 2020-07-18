@@ -3,6 +3,7 @@ package reddit
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
@@ -56,6 +57,25 @@ type SubmitLinkOptions struct {
 	Resubmit    bool  `url:"resubmit,omitempty"`
 	NSFW        bool  `url:"nsfw,omitempty"`
 	Spoiler     bool  `url:"spoiler,omitempty"`
+}
+
+// Get returns a post with its comments.
+// id is the ID36 of the post, not its full id.
+// Example: instead of t3_abc123, use abc123.
+func (s *PostService) Get(ctx context.Context, id string) (*Post, []Comment, *Response, error) {
+	path := fmt.Sprintf("comments/%s", id)
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	root := new(postAndComments)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, nil, resp, err
+	}
+
+	return root.Post, root.Comments, resp, nil
 }
 
 func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *Response, error) {

@@ -8,6 +8,22 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// func TestPostService_Get(t *testing.T) {
+// 	setup()
+// 	defer teardown()
+
+// 	blob := readFileContents(t, "testdata/post/post.json")
+
+// 	mux.HandleFunc("/comments/test", func(w http.ResponseWriter, r *http.Request) {
+// 		assert.Equal(t, http.MethodGet, r.Method)
+// 		fmt.Fprint(w, blob)
+// 	})
+
+// 	post, comments, _, err := client.Post.Get(ctx, "test")
+// 	assert.NoError(t, err)
+// 	assert.Equal(t, http.StatusOK, res.StatusCode)
+// }
+
 func TestPostService_Hide(t *testing.T) {
 	setup()
 	defer teardown()
