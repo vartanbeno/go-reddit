@@ -62,7 +62,7 @@ type SubmitLinkOptions struct {
 // Get returns a post with its comments.
 // id is the ID36 of the post, not its full id.
 // Example: instead of t3_abc123, use abc123.
-func (s *PostService) Get(ctx context.Context, id string) (*Post, []Comment, *Response, error) {
+func (s *PostService) Get(ctx context.Context, id string) (*Post, []*Comment, *Response, error) {
 	path := fmt.Sprintf("comments/%s", id)
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -433,7 +433,22 @@ func (s *PostService) DisableContestMode(ctx context.Context, id string) (*Respo
 // More retrieves more comments that were left out when initially fetching the post.
 // id is the post's full ID.
 // commentIDs are the ID36s of comments.
-func (s *PostService) More(ctx context.Context, id string, commentIDs ...string) (interface{}, *Response, error) {
+func (s *PostService) More(ctx context.Context, comment *Comment) (*Response, error) {
+	if comment == nil {
+		return nil, errors.New("comment: cannot be nil")
+	}
+
+	if comment.Replies.MoreComments == nil {
+		return nil, nil
+	}
+
+	postID := comment.PostID
+	commentIDs := comment.Replies.MoreComments.Children
+
+	if len(commentIDs) == 0 {
+		return nil, nil
+	}
+
 	type query struct {
 		PostID  string   `url:"link_id"`
 		IDs     []string `url:"children,comma"`
@@ -441,21 +456,48 @@ func (s *PostService) More(ctx context.Context, id string, commentIDs ...string)
 	}
 
 	path := "api/morechildren"
-	path, err := addOptions(path, query{id, commentIDs, "json"})
+	path, err := addOptions(path, query{postID, commentIDs, "json"})
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	root := new(interface{})
+	type rootResponse struct {
+		JSON struct {
+			Data struct {
+				Things Things `json:"things"`
+			} `json:"data"`
+		} `json:"json"`
+	}
+
+	root := new(rootResponse)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
-		return nil, resp, err
+		return resp, err
 	}
 
-	return root, resp, err
+	comments := root.JSON.Data.Things.Comments
+	for _, c := range comments {
+		addCommentToReplies(comment, c)
+	}
+
+	comment.Replies.MoreComments = nil
+	return resp, nil
+}
+
+// addCommentToReplies traverses the comment tree to find the one
+// that the 2nd comment is replying to. It then adds it to its replies.
+func addCommentToReplies(parent *Comment, comment *Comment) {
+	if parent.FullID == comment.ParentID {
+		parent.Replies.Comments = append(parent.Replies.Comments, comment)
+		return
+	}
+
+	for _, reply := range parent.Replies.Comments {
+		addCommentToReplies(reply, comment)
+	}
 }

@@ -11,7 +11,7 @@ import (
 )
 
 var expectedModActionsResult = &ModActions{
-	ModActions: []ModAction{
+	ModActions: []*ModAction{
 		{
 			ID:      "ModAction_b4e7979a-c4ad-11ea-8440-0ea1b7c2b8f9",
 			Action:  "spamcomment",

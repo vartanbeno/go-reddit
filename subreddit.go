@@ -116,12 +116,12 @@ func (s *SubredditService) GetModerated(ctx context.Context, opts *ListOptions) 
 }
 
 // GetSticky1 returns the first stickied post on a subreddit (if it exists).
-func (s *SubredditService) GetSticky1(ctx context.Context, name string) (*Post, []Comment, *Response, error) {
+func (s *SubredditService) GetSticky1(ctx context.Context, name string) (*Post, []*Comment, *Response, error) {
 	return s.getSticky(ctx, name, 1)
 }
 
 // GetSticky2 returns the second stickied post on a subreddit (if it exists).
-func (s *SubredditService) GetSticky2(ctx context.Context, name string) (*Post, []Comment, *Response, error) {
+func (s *SubredditService) GetSticky2(ctx context.Context, name string) (*Post, []*Comment, *Response, error) {
 	return s.getSticky(ctx, name, 2)
 }
 
@@ -240,7 +240,7 @@ func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts 
 
 // getSticky returns one of the 2 stickied posts of the subreddit (if they exist).
 // Num should be equal to 1 or 2, depending on which one you want.
-func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num int) (*Post, []Comment, *Response, error) {
+func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num int) (*Post, []*Comment, *Response, error) {
 	type query struct {
 		Num int `url:"num"`
 	}

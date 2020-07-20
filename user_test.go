@@ -46,7 +46,7 @@ var expectedUsers = map[string]*UserShort{
 	},
 }
 
-var expectedPost = Post{
+var expectedPost = &Post{
 	ID:      "gczwql",
 	FullID:  "t3_gczwql",
 	Created: &Timestamp{time.Date(2020, 5, 3, 22, 46, 25, 0, time.UTC)},
@@ -74,7 +74,7 @@ var expectedPost = Post{
 	IsSelfPost: true,
 }
 
-var expectedComment = Comment{
+var expectedComment = &Comment{
 	ID:      "f0zsa37",
 	FullID:  "t1_f0zsa37",
 	Created: &Timestamp{time.Date(2019, 9, 21, 21, 38, 16, 0, time.UTC)},
@@ -101,8 +101,6 @@ var expectedComment = Comment{
 	PostPermalink:   "https://www.reddit.com/r/apple/comments/d7ejpn/im_giving_away_an_iphone_11_pro_to_a_commenter_at/",
 	PostAuthor:      "iamthatis",
 	PostNumComments: 89751,
-
-	Replies: &Replies{},
 }
 
 var expectedRelationship = &Relationship{

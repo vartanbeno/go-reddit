@@ -15,7 +15,7 @@ import (
 type ListingsService service
 
 // Get returns posts, comments, and subreddits from their IDs.
-func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]Post, []Comment, []Subreddit, *Response, error) {
+func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*Comment, []*Subreddit, *Response, error) {
 	type query struct {
 		IDs []string `url:"id,comma"`
 	}
@@ -45,7 +45,7 @@ func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]Post, []Com
 }
 
 // GetPosts returns posts from their full IDs.
-func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]Post, *Response, error) {
+func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]*Post, *Response, error) {
 	if len(ids) == 0 {
 		return nil, nil, errors.New("must provide at least 1 id")
 	}

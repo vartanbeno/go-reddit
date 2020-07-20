@@ -30,7 +30,7 @@ var expectedSubreddit = &Subreddit{
 var expectedSubreddits = &Subreddits{
 	After:  "t5_2qh0u",
 	Before: "",
-	Subreddits: []Subreddit{
+	Subreddits: []*Subreddit{
 		{
 			ID:      "2qs0k",
 			FullID:  "t5_2qs0k",

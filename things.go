@@ -120,34 +120,34 @@ type Listing struct {
 
 // Things are objects/entities coming from the Reddit API.
 type Things struct {
-	Comments     []Comment
-	MoreComments []More
+	Comments     []*Comment
+	MoreComments []*More
 
-	Users      []User
-	Posts      []Post
-	Subreddits []Subreddit
-	ModActions []ModAction
+	Users      []*User
+	Posts      []*Post
+	Subreddits []*Subreddit
+	ModActions []*ModAction
 	// todo: add the other kinds of things
 }
 
 func (t *Things) init() {
 	if t.Comments == nil {
-		t.Comments = make([]Comment, 0)
+		t.Comments = make([]*Comment, 0)
 	}
 	if t.MoreComments == nil {
-		t.MoreComments = make([]More, 0)
+		t.MoreComments = make([]*More, 0)
 	}
 	if t.Users == nil {
-		t.Users = make([]User, 0)
+		t.Users = make([]*User, 0)
 	}
 	if t.Posts == nil {
-		t.Posts = make([]Post, 0)
+		t.Posts = make([]*Post, 0)
 	}
 	if t.Subreddits == nil {
-		t.Subreddits = make([]Subreddit, 0)
+		t.Subreddits = make([]*Subreddit, 0)
 	}
 	if t.ModActions == nil {
-		t.ModActions = make([]ModAction, 0)
+		t.ModActions = make([]*ModAction, 0)
 	}
 }
 
@@ -166,35 +166,35 @@ func (t *Things) UnmarshalJSON(b []byte) error {
 
 		switch child["kind"] {
 		case kindComment:
-			var v Comment
-			if err := json.Unmarshal(byteValue, &v); err == nil {
+			v := new(Comment)
+			if err := json.Unmarshal(byteValue, v); err == nil {
 				t.Comments = append(t.Comments, v)
 			}
 		case kindMore:
-			var v More
-			if err := json.Unmarshal(byteValue, &v); err == nil {
+			v := new(More)
+			if err := json.Unmarshal(byteValue, v); err == nil {
 				t.MoreComments = append(t.MoreComments, v)
 			}
 		case kindAccount:
-			var v User
-			if err := json.Unmarshal(byteValue, &v); err == nil {
+			v := new(User)
+			if err := json.Unmarshal(byteValue, v); err == nil {
 				t.Users = append(t.Users, v)
 			}
 		case kindLink:
-			var v Post
-			if err := json.Unmarshal(byteValue, &v); err == nil {
+			v := new(Post)
+			if err := json.Unmarshal(byteValue, v); err == nil {
 				t.Posts = append(t.Posts, v)
 			}
 		case kindMessage:
 		case kindSubreddit:
-			var v Subreddit
-			if err := json.Unmarshal(byteValue, &v); err == nil {
+			v := new(Subreddit)
+			if err := json.Unmarshal(byteValue, v); err == nil {
 				t.Subreddits = append(t.Subreddits, v)
 			}
 		case kindAward:
 		case kindModAction:
-			var v ModAction
-			if err := json.Unmarshal(byteValue, &v); err == nil {
+			v := new(ModAction)
+			if err := json.Unmarshal(byteValue, v); err == nil {
 				t.ModActions = append(t.ModActions, v)
 			}
 		}
@@ -238,7 +238,8 @@ type Comment struct {
 	PostPermalink string `json:"link_permalink,omitempty"`
 	// This doesn't appear when submitting a comment.
 	PostAuthor string `json:"link_author,omitempty"`
-	// This doesn't appear when submitting a comment.
+	// This doesn't appear when submitting a comment
+	// or when getting a post with its comments.
 	PostNumComments int `json:"num_comments"`
 
 	IsSubmitter bool `json:"is_submitter"`
@@ -249,15 +250,15 @@ type Comment struct {
 	CanGild     bool `json:"can_gild"`
 	NSFW        bool `json:"over_18"`
 
-	Replies *Replies `json:"replies"`
+	Replies Replies `json:"replies"`
 }
 
 // Replies holds replies to a comment.
 // It contains both comments and "more" comments, which are entrypoints to other
 // comments that were left out.
 type Replies struct {
-	Comments     []Comment `json:"comments,omitempty"`
-	MoreComments []More    `json:"more,omitempty"`
+	Comments     []*Comment `json:"comments,omitempty"`
+	MoreComments *More      `json:"more,omitempty"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -276,7 +277,9 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 
 	if root.Data != nil {
 		r.Comments = root.Data.Things.Comments
-		r.MoreComments = root.Data.Things.MoreComments
+		if len(root.Data.Things.MoreComments) > 0 {
+			r.MoreComments = root.Data.Things.MoreComments[0]
+		}
 	}
 
 	return nil
@@ -431,43 +434,43 @@ func (rl *rootListing) getModeratorActions() *ModActions {
 
 // Comments is a list of comments
 type Comments struct {
-	Comments []Comment `json:"comments"`
-	After    string    `json:"after"`
-	Before   string    `json:"before"`
+	Comments []*Comment `json:"comments"`
+	After    string     `json:"after"`
+	Before   string     `json:"before"`
 }
 
 // Users is a list of users
 type Users struct {
-	Users  []User `json:"users"`
-	After  string `json:"after"`
-	Before string `json:"before"`
+	Users  []*User `json:"users"`
+	After  string  `json:"after"`
+	Before string  `json:"before"`
 }
 
 // Subreddits is a list of subreddits
 type Subreddits struct {
-	Subreddits []Subreddit `json:"subreddits"`
-	After      string      `json:"after"`
-	Before     string      `json:"before"`
+	Subreddits []*Subreddit `json:"subreddits"`
+	After      string       `json:"after"`
+	Before     string       `json:"before"`
 }
 
 // Posts is a list of posts.
 type Posts struct {
-	Posts  []Post `json:"posts"`
-	After  string `json:"after"`
-	Before string `json:"before"`
+	Posts  []*Post `json:"posts"`
+	After  string  `json:"after"`
+	Before string  `json:"before"`
 }
 
 // ModActions is a list of moderator action.
 type ModActions struct {
-	ModActions []ModAction `json:"moderator_actions"`
-	After      string      `json:"after"`
-	Before     string      `json:"before"`
+	ModActions []*ModAction `json:"moderator_actions"`
+	After      string       `json:"after"`
+	Before     string       `json:"before"`
 }
 
 // postAndComments is a post and its comments
 type postAndComments struct {
 	Post     *Post
-	Comments []Comment
+	Comments []*Comment
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -489,7 +492,7 @@ func (pc *postAndComments) UnmarshalJSON(data []byte) error {
 	post := l[0].getPosts().Posts[0]
 	comments := l[1].getComments().Comments
 
-	pc.Post = &post
+	pc.Post = post
 	pc.Comments = comments
 
 	return nil
