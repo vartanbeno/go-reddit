@@ -435,7 +435,7 @@ func (s *PostService) DisableContestMode(ctx context.Context, id string) (*Respo
 // commentIDs are the ID36s of comments.
 func (s *PostService) More(ctx context.Context, comment *Comment) (*Response, error) {
 	if comment == nil {
-		return nil, errors.New("comment: cannot be nil")
+		return nil, errors.New("comment: must not be nil")
 	}
 
 	if comment.Replies.MoreComments == nil {
@@ -502,9 +502,7 @@ func addCommentToReplies(parent *Comment, comment *Comment) {
 	}
 }
 
-// RandomFromSubreddits returns a random post and its comments from the subreddits.
-// If no subreddits are provided, it will run the query against your subscriptions.
-func (s *PostService) RandomFromSubreddits(ctx context.Context, subreddits ...string) (*Post, []*Comment, *Response, error) {
+func (s *PostService) random(ctx context.Context, subreddits ...string) (*Post, []*Comment, *Response, error) {
 	path := "random"
 	if len(subreddits) > 0 {
 		path = fmt.Sprintf("r/%s/random", strings.Join(subreddits, "+"))
@@ -524,12 +522,18 @@ func (s *PostService) RandomFromSubreddits(ctx context.Context, subreddits ...st
 	return root.Post, root.Comments, resp, nil
 }
 
+// RandomFromSubreddits returns a random post and its comments from the subreddits.
+// If no subreddits are provided, Reddit runs the query against your subscriptions.
+func (s *PostService) RandomFromSubreddits(ctx context.Context, subreddits ...string) (*Post, []*Comment, *Response, error) {
+	return s.random(ctx, subreddits...)
+}
+
 // Random returns a random post and its comments from all of Reddit.
 func (s *PostService) Random(ctx context.Context) (*Post, []*Comment, *Response, error) {
-	return s.RandomFromSubreddits(ctx, "all")
+	return s.random(ctx, "all")
 }
 
 // RandomFromSubscriptions returns a random post and its comments from your subscriptions.
 func (s *PostService) RandomFromSubscriptions(ctx context.Context) (*Post, []*Comment, *Response, error) {
-	return s.RandomFromSubreddits(ctx)
+	return s.random(ctx)
 }

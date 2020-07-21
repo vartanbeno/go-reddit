@@ -1,28 +1,115 @@
 package reddit
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
 
-// func TestPostService_Get(t *testing.T) {
-// 	setup()
-// 	defer teardown()
+var expectedPost2 = &Post{
+	ID:      "testpost",
+	FullID:  "t3_testpost",
+	Created: &Timestamp{time.Date(2020, 7, 18, 10, 26, 7, 0, time.UTC)},
+	Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-// 	blob := readFileContents(t, "testdata/post/post.json")
+	Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/"),
+	URL:       "https://www.reddit.com/r/test/comments/testpost/test/",
 
-// 	mux.HandleFunc("/comments/test", func(w http.ResponseWriter, r *http.Request) {
-// 		assert.Equal(t, http.MethodGet, r.Method)
-// 		fmt.Fprint(w, blob)
-// 	})
+	Title: "Test",
+	Body:  "Hello",
 
-// 	post, comments, _, err := client.Post.Get(ctx, "test")
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, http.StatusOK, res.StatusCode)
-// }
+	Score:            1,
+	UpvoteRatio:      1,
+	NumberOfComments: 2,
+
+	SubredditID:           "t5_2qh23",
+	SubredditName:         "test",
+	SubredditNamePrefixed: "r/test",
+
+	AuthorID:   "t2_testuser",
+	AuthorName: "testuser",
+
+	IsSelfPost: true,
+}
+
+var expectedComments = []*Comment{
+	{
+		ID:      "testc1",
+		FullID:  "t1_testc1",
+		Created: &Timestamp{time.Date(2020, 7, 18, 10, 31, 59, 0, time.UTC)},
+		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+		ParentID:  "t3_testpost",
+		Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/testc1/"),
+
+		Body:     "Hi",
+		Author:   "testuser",
+		AuthorID: "t2_testuser",
+
+		Subreddit:             "test",
+		SubredditNamePrefixed: "r/test",
+		SubredditID:           "t5_2qh23",
+
+		Score:            1,
+		Controversiality: 0,
+
+		PostID: "t3_testpost",
+
+		IsSubmitter: true,
+		CanGild:     true,
+
+		Replies: Replies{
+			Comments: []*Comment{
+				{
+					ID:      "testc2",
+					FullID:  "t1_testc2",
+					Created: &Timestamp{time.Date(2020, 7, 18, 10, 32, 28, 0, time.UTC)},
+					Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+					ParentID:  "t1_testc1",
+					Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/testc2/"),
+
+					Body:     "Hello",
+					Author:   "testuser",
+					AuthorID: "t2_testuser",
+
+					Subreddit:             "test",
+					SubredditNamePrefixed: "r/test",
+					SubredditID:           "t5_2qh23",
+
+					Score:            1,
+					Controversiality: 0,
+
+					PostID: "t3_testpost",
+
+					IsSubmitter: true,
+					CanGild:     true,
+				},
+			},
+		},
+	},
+}
+
+func TestPostService_Get(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/post/post.json")
+
+	mux.HandleFunc("/comments/test", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	post, comments, _, err := client.Post.Get(ctx, "test")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPost2, post)
+	assert.Equal(t, expectedComments, comments)
+}
 
 func TestPostService_Hide(t *testing.T) {
 	setup()
@@ -481,4 +568,122 @@ func TestPostService_DisableContestMode(t *testing.T) {
 	res, err := client.Post.DisableContestMode(ctx, "t3_test")
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusOK, res.StatusCode)
+}
+
+func TestPostService_More(t *testing.T) {
+	setup()
+	defer teardown()
+
+	parentComment := &Comment{
+		FullID:   "t1_abc",
+		ParentID: "t3_123",
+		PostID:   "t3_123",
+		Replies: Replies{
+			MoreComments: &More{
+				Children: []string{"def,ghi"},
+			},
+		},
+	}
+
+	blob := readFileContents(t, "testdata/post/more.json")
+
+	mux.HandleFunc("/api/morechildren", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("link_id", "t3_123")
+		form.Set("children", "def,ghi")
+		form.Set("api_type", "json")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	_, err := client.Post.More(ctx, parentComment)
+	assert.NoError(t, err)
+	assert.Nil(t, parentComment.Replies.MoreComments)
+	assert.Len(t, parentComment.Replies.Comments, 1)
+	assert.Len(t, parentComment.Replies.Comments[0].Replies.Comments, 1)
+}
+
+func TestPostService_MoreNil(t *testing.T) {
+	setup()
+	defer teardown()
+
+	_, err := client.Post.More(ctx, nil)
+	assert.EqualError(t, err, "comment: must not be nil")
+
+	parentComment := &Comment{
+		Replies: Replies{
+			MoreComments: nil,
+		},
+	}
+
+	// should return nil, nil since comment does not have More struct
+	resp, err := client.Post.More(ctx, parentComment)
+	assert.NoError(t, err)
+	assert.Nil(t, resp)
+
+	parentComment.Replies.MoreComments = &More{
+		Children: []string{},
+	}
+
+	// should return nil, nil since comment's More struct has 0 children
+	resp, err = client.Post.More(ctx, parentComment)
+	assert.NoError(t, err)
+	assert.Nil(t, resp)
+}
+
+func TestPostService_RandomFromSubreddits(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/post/post.json")
+
+	mux.HandleFunc("/r/test/random", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	post, comments, _, err := client.Post.RandomFromSubreddits(ctx, "test")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPost2, post)
+	assert.Equal(t, expectedComments, comments)
+}
+
+func TestPostService_Random(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/post/post.json")
+
+	mux.HandleFunc("/r/all/random", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	post, comments, _, err := client.Post.Random(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPost2, post)
+	assert.Equal(t, expectedComments, comments)
+}
+
+func TestPostService_RandomFromSubscriptions(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/post/post.json")
+
+	mux.HandleFunc("/random", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	post, comments, _, err := client.Post.RandomFromSubscriptions(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPost2, post)
+	assert.Equal(t, expectedComments, comments)
 }

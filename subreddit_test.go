@@ -118,6 +118,20 @@ var expectedModerators = []Moderator{
 	{ID: "t2_test2", Name: "testuser2", Permissions: []string{"all"}},
 }
 
+var expectedRandomSubreddit = &Subreddit{
+	FullID:  "t5_2wi4l",
+	Created: &Timestamp{time.Date(2013, 3, 1, 4, 4, 18, 0, time.UTC)},
+
+	URL:          "/r/GalaxyS8/",
+	Name:         "GalaxyS8",
+	NamePrefixed: "r/GalaxyS8",
+	Title:        "Samsung Galaxy S8",
+	Description:  "The only place for news, discussion, photos, and everything else Samsung Galaxy S8.",
+	Type:         "public",
+
+	Subscribers: 52357,
+}
+
 func TestSubredditService_GetByName(t *testing.T) {
 	setup()
 	defer teardown()
@@ -284,4 +298,48 @@ func TestSubredditService_Moderators(t *testing.T) {
 	moderators, _, err := client.Subreddit.Moderators(ctx, "test")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedModerators, moderators)
+}
+
+func TestSubredditService_Random(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/subreddit/random.json")
+
+	mux.HandleFunc("/r/random", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, "true", r.Form.Get("sr_detail"))
+		assert.Equal(t, "1", r.Form.Get("limit"))
+
+		fmt.Fprint(w, blob)
+	})
+
+	subreddit, _, err := client.Subreddit.Random(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedRandomSubreddit, subreddit)
+}
+
+func TestSubredditService_RandomNSFW(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob := readFileContents(t, "testdata/subreddit/random.json")
+
+	mux.HandleFunc("/r/randnsfw", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, "true", r.Form.Get("sr_detail"))
+		assert.Equal(t, "1", r.Form.Get("limit"))
+
+		fmt.Fprint(w, blob)
+	})
+
+	subreddit, _, err := client.Subreddit.RandomNSFW(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedRandomSubreddit, subreddit)
 }
