@@ -364,3 +364,59 @@ func (s *SubredditService) Moderators(ctx context.Context, subreddit string) (in
 
 	return root.Data.Moderators, resp, nil
 }
+
+// todo: sr_detail's NSFW indicator is over_18 instead of over18
+func (s *SubredditService) random(ctx context.Context, nsfw bool) (*Subreddit, *Response, error) {
+	path := "r/random"
+	if nsfw {
+		path = "r/randnsfw"
+	}
+
+	type query struct {
+		ExpandSubreddit bool `url:"sr_detail"`
+		Limit           int  `url:"limit,omitempty"`
+	}
+
+	path, err := addOptions(path, query{true, 1})
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	type rootResponse struct {
+		Data struct {
+			Children []struct {
+				Data struct {
+					Subreddit *Subreddit `json:"sr_detail"`
+				} `json:"data"`
+			} `json:"children"`
+		} `json:"data"`
+	}
+
+	root := new(rootResponse)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	var sr *Subreddit
+	if len(root.Data.Children) > 0 {
+		sr = root.Data.Children[0].Data.Subreddit
+	}
+
+	return sr, resp, nil
+}
+
+// Random returns a random SFW subreddit.
+func (s *SubredditService) Random(ctx context.Context) (*Subreddit, *Response, error) {
+	return s.random(ctx, false)
+}
+
+// RandomNSFW returns a random NSFW subreddit.
+func (s *SubredditService) RandomNSFW(ctx context.Context) (*Subreddit, *Response, error) {
+	return s.random(ctx, true)
+}

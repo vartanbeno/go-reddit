@@ -285,7 +285,7 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// todo: should we implemented json.Marshaler?
+// todo: should we implement json.Marshaler?
 
 // More holds information
 type More struct {

@@ -501,3 +501,35 @@ func addCommentToReplies(parent *Comment, comment *Comment) {
 		addCommentToReplies(reply, comment)
 	}
 }
+
+// RandomFromSubreddits returns a random post and its comments from the subreddits.
+// If no subreddits are provided, it will run the query against your subscriptions.
+func (s *PostService) RandomFromSubreddits(ctx context.Context, subreddits ...string) (*Post, []*Comment, *Response, error) {
+	path := "random"
+	if len(subreddits) > 0 {
+		path = fmt.Sprintf("r/%s/random", strings.Join(subreddits, "+"))
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	root := new(postAndComments)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, nil, resp, err
+	}
+
+	return root.Post, root.Comments, resp, nil
+}
+
+// Random returns a random post and its comments from all of Reddit.
+func (s *PostService) Random(ctx context.Context) (*Post, []*Comment, *Response, error) {
+	return s.RandomFromSubreddits(ctx, "all")
+}
+
+// RandomFromSubscriptions returns a random post and its comments from your subscriptions.
+func (s *PostService) RandomFromSubscriptions(ctx context.Context) (*Post, []*Comment, *Response, error) {
+	return s.RandomFromSubreddits(ctx)
+}

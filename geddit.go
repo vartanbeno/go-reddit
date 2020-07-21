@@ -125,6 +125,21 @@ func newClient(httpClient *http.Client) *Client {
 		httpClient = &http.Client{}
 	}
 
+	// todo...
+	// getting a random
+	httpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		redirectURL := req.URL.String()
+		redirectURL = strings.Replace(redirectURL, "https://www.reddit.com", defaultBaseURL, 1)
+
+		reqURL, err := url.Parse(redirectURL)
+		if err != nil {
+			return err
+		}
+		req.URL = reqURL
+
+		return nil
+	}
+
 	baseURL, _ := url.Parse(defaultBaseURL)
 	tokenURL, _ := url.Parse(defaultTokenURL)
 
