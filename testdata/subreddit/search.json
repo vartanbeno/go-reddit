@@ -1,0 +1,74 @@
+{
+  "subreddits": [
+    {
+      "active_user_count": 531,
+      "icon_img": "",
+      "key_color": "",
+      "name": "golang",
+      "subscriber_count": 119722,
+      "is_chat_post_feature_enabled": false,
+      "allow_chat_post_creation": false,
+      "allow_images": true
+    },
+    {
+      "active_user_count": 0,
+      "icon_img": "",
+      "key_color": "",
+      "name": "golang_infosec",
+      "subscriber_count": 1776,
+      "is_chat_post_feature_enabled": true,
+      "allow_chat_post_creation": false,
+      "allow_images": true
+    },
+    {
+      "active_user_count": 1,
+      "icon_img": "",
+      "key_color": "",
+      "name": "GolangJobOfferings",
+      "subscriber_count": 863,
+      "is_chat_post_feature_enabled": true,
+      "allow_chat_post_creation": false,
+      "allow_images": true
+    },
+    {
+      "active_user_count": 0,
+      "icon_img": "",
+      "key_color": "#24a0ed",
+      "name": "golang2",
+      "subscriber_count": 626,
+      "is_chat_post_feature_enabled": false,
+      "allow_chat_post_creation": false,
+      "allow_images": true
+    },
+    {
+      "active_user_count": 4,
+      "icon_img": "",
+      "key_color": "",
+      "name": "GolangUnofficial",
+      "subscriber_count": 239,
+      "is_chat_post_feature_enabled": false,
+      "allow_chat_post_creation": false,
+      "allow_images": true
+    },
+    {
+      "active_user_count": 4,
+      "icon_img": "",
+      "key_color": "",
+      "name": "golanguage",
+      "subscriber_count": 247,
+      "is_chat_post_feature_enabled": false,
+      "allow_chat_post_creation": false,
+      "allow_images": true
+    },
+    {
+      "active_user_count": 4,
+      "icon_img": "",
+      "key_color": "",
+      "name": "golang_jobs",
+      "subscriber_count": 16,
+      "is_chat_post_feature_enabled": false,
+      "allow_chat_post_creation": false,
+      "allow_images": true
+    }
+  ]
+}

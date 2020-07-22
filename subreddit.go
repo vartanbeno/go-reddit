@@ -22,19 +22,19 @@ type rootSubreddit struct {
 	Data *Subreddit `json:"data,omitempty"`
 }
 
-type rootSubredditNames struct {
-	Names []string `json:"names,omitempty"`
+type rootSubredditInfoList struct {
+	Subreddits []*SubredditInfo `json:"subreddits,omitempty"`
 }
 
-type rootSubredditShorts struct {
-	Subreddits []SubredditShort `json:"subreddits,omitempty"`
-}
-
-// SubredditShort represents minimal information about a subreddit
-type SubredditShort struct {
+// SubredditInfo represents minimal information about a subreddit.
+type SubredditInfo struct {
 	Name        string `json:"name,omitempty"`
 	Subscribers int    `json:"subscriber_count"`
 	ActiveUsers int    `json:"active_user_count"`
+}
+
+type rootSubredditNames struct {
+	Names []string `json:"names,omitempty"`
 }
 
 type rootModeratorList struct {
@@ -61,13 +61,13 @@ func (s *SubredditService) GetPosts() *PostFinder {
 	return f.Sort(SortHot).FromAll()
 }
 
-// GetByName gets a subreddit by name
-func (s *SubredditService) GetByName(ctx context.Context, subreddit string) (*Subreddit, *Response, error) {
-	if subreddit == "" {
-		return nil, nil, errors.New("empty subreddit name provided")
+// Get gets a subreddit by name.
+func (s *SubredditService) Get(ctx context.Context, name string) (*Subreddit, *Response, error) {
+	if name == "" {
+		return nil, nil, errors.New("name: must not be empty")
 	}
 
-	path := fmt.Sprintf("r/%s/about", subreddit)
+	path := fmt.Sprintf("r/%s/about", name)
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -127,6 +127,17 @@ func (s *SubredditService) GetSticky2(ctx context.Context, name string) (*Post, 
 	return s.getSticky(ctx, name, 2)
 }
 
+func (s *SubredditService) handleSubscription(ctx context.Context, form url.Values) (*Response, error) {
+	path := "api/subscribe"
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
 // Subscribe subscribes to subreddits based on their names.
 func (s *SubredditService) Subscribe(ctx context.Context, subreddits ...string) (*Response, error) {
 	form := url.Values{}
@@ -159,8 +170,30 @@ func (s *SubredditService) UnsubscribeByID(ctx context.Context, ids ...string) (
 	return s.handleSubscription(ctx, form)
 }
 
-// SearchSubredditNames searches for subreddits with names beginning with the query provided.
-func (s *SubredditService) SearchSubredditNames(ctx context.Context, query string) ([]string, *Response, error) {
+// Search searches for subreddits with names beginning with the query provided.
+// They hold a very minimal amount of info.
+func (s *SubredditService) Search(ctx context.Context, query string) ([]*SubredditInfo, *Response, error) {
+	path := "api/search_subreddits"
+
+	form := url.Values{}
+	form.Set("query", query)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootSubredditInfoList)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Subreddits, resp, nil
+}
+
+// SearchNames searches for subreddits with names beginning with the query provided.
+func (s *SubredditService) SearchNames(ctx context.Context, query string) ([]string, *Response, error) {
 	path := fmt.Sprintf("api/search_reddit_names?query=%s", query)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -175,41 +208,6 @@ func (s *SubredditService) SearchSubredditNames(ctx context.Context, query strin
 	}
 
 	return root.Names, resp, nil
-}
-
-// SearchSubredditInfo searches for subreddits with names beginning with the query provided.
-// They hold a bit more info that just the name, but still not much.
-func (s *SubredditService) SearchSubredditInfo(ctx context.Context, query string) ([]SubredditShort, *Response, error) {
-	path := fmt.Sprintf("api/search_subreddits?query=%s", query)
-
-	req, err := s.client.NewRequest(http.MethodPost, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(rootSubredditShorts)
-	resp, err := s.client.Do(ctx, req, root)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return root.Subreddits, resp, nil
-}
-
-func (s *SubredditService) handleSubscription(ctx context.Context, form url.Values) (*Response, error) {
-	path := "api/subscribe"
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	resp, err := s.client.Do(ctx, req, nil)
-	if err != nil {
-		return resp, err
-	}
-
-	return resp, nil
 }
 
 func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts *ListOptions) (*Subreddits, *Response, error) {
@@ -229,15 +227,7 @@ func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts 
 		return nil, resp, err
 	}
 
-	l := new(Subreddits)
-
-	if root.Data != nil {
-		l.Subreddits = root.Data.Things.Subreddits
-		l.After = root.Data.After
-		l.Before = root.Data.Before
-	}
-
-	return l, resp, nil
+	return root.getSubreddits(), resp, nil
 }
 
 // getSticky returns one of the 2 stickied posts of the subreddit (if they exist).

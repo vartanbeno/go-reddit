@@ -3,6 +3,7 @@ package reddit
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 	"time"
 
@@ -113,6 +114,26 @@ var expectedSticky = &postAndComments{
 	},
 }
 
+var expectSubredditInfos = []*SubredditInfo{
+	{Name: "golang", Subscribers: 119_722, ActiveUsers: 531},
+	{Name: "golang_infosec", Subscribers: 1_776, ActiveUsers: 0},
+	{Name: "GolangJobOfferings", Subscribers: 863, ActiveUsers: 1},
+	{Name: "golang2", Subscribers: 626, ActiveUsers: 0},
+	{Name: "GolangUnofficial", Subscribers: 239, ActiveUsers: 4},
+	{Name: "golanguage", Subscribers: 247, ActiveUsers: 4},
+	{Name: "golang_jobs", Subscribers: 16, ActiveUsers: 4},
+}
+
+var expectSubredditNames = []string{
+	"golang",
+	"golang_infosec",
+	"GolangJobOfferings",
+	"golanguage",
+	"golang2",
+	"GolangUnofficial",
+	"golang_jobs",
+}
+
 var expectedModerators = []Moderator{
 	{ID: "t2_test1", Name: "testuser1", Permissions: []string{"all"}},
 	{ID: "t2_test2", Name: "testuser2", Permissions: []string{"all"}},
@@ -132,7 +153,7 @@ var expectedRandomSubreddit = &Subreddit{
 	Subscribers: 52357,
 }
 
-func TestSubredditService_GetByName(t *testing.T) {
+func TestSubredditService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -144,7 +165,10 @@ func TestSubredditService_GetByName(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddit, _, err := client.Subreddit.GetByName(ctx, "golang")
+	_, _, err = client.Subreddit.Get(ctx, "")
+	assert.EqualError(t, err, "name: must not be empty")
+
+	subreddit, _, err := client.Subreddit.Get(ctx, "golang")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddit, subreddit)
 }
@@ -292,6 +316,136 @@ func TestSubredditService_GetModerated(t *testing.T) {
 // 	// b, _ := json.MarshalIndent(sticky.Comments, "", "  ")
 // 	// fmt.Println(string(b))
 // }
+
+func TestSubredditService_Subscribe(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("action", "sub")
+		form.Set("sr_name", "test,golang,nba")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Subreddit.Subscribe(ctx, "test", "golang", "nba")
+	assert.NoError(t, err)
+}
+
+func TestSubredditService_SubscribeByID(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("action", "sub")
+		form.Set("sr", "t5_test1,t5_test2,t5_test3")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Subreddit.SubscribeByID(ctx, "t5_test1", "t5_test2", "t5_test3")
+	assert.NoError(t, err)
+}
+
+func TestSubredditService_Unsubscribe(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("action", "unsub")
+		form.Set("sr_name", "test,golang,nba")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Subreddit.Unsubscribe(ctx, "test", "golang", "nba")
+	assert.NoError(t, err)
+}
+
+func TestSubredditService_UnsubscribeByID(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("action", "unsub")
+		form.Set("sr", "t5_test1,t5_test2,t5_test3")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Subreddit.UnsubscribeByID(ctx, "t5_test1", "t5_test2", "t5_test3")
+	assert.NoError(t, err)
+}
+
+func TestSubredditService_Search(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/search.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/api/search_subreddits", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("query", "golang")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, blob)
+	})
+
+	subreddits, _, err := client.Subreddit.Search(ctx, "golang")
+	assert.NoError(t, err)
+	assert.Equal(t, expectSubredditInfos, subreddits)
+}
+
+func TestSubredditService_SearchNames(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/search-names.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/api/search_reddit_names", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("query", "golang")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	names, _, err := client.Subreddit.SearchNames(ctx, "golang")
+	assert.NoError(t, err)
+	assert.Equal(t, expectSubredditNames, names)
+}
 
 func TestSubredditService_Moderators(t *testing.T) {
 	setup()
