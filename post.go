@@ -15,7 +15,10 @@ import (
 // related methods of the Reddit API.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_links_and_comments
-type PostService service
+type PostService struct {
+	*PostAndCommentService
+	client *Client
+}
 
 type submittedLinkRoot struct {
 	JSON struct {

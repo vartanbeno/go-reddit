@@ -91,28 +91,20 @@ type Client struct {
 	// This is the client's user ID in Reddit's database.
 	redditID string
 
-	// Reuse a single struct instead of allocating one for each service on the heap.
-	common service
-
-	Account        *AccountService
-	Comment        *CommentService
-	Flair          *FlairService
-	Listings       *ListingsService
-	Moderation     *ModerationService
-	Multi          *MultiService
-	Post           *PostService
-	PostAndComment *PostAndCommentService
-	Search         *SearchService
-	Subreddit      *SubredditService
-	User           *UserService
+	Account    *AccountService
+	Comment    *CommentService
+	Flair      *FlairService
+	Listings   *ListingsService
+	Moderation *ModerationService
+	Multi      *MultiService
+	Post       *PostService
+	Search     *SearchService
+	Subreddit  *SubredditService
+	User       *UserService
 
 	oauth2Transport *oauth2.Transport
 
 	onRequestCompleted RequestCompletionCallback
-}
-
-type service struct {
-	client *Client
 }
 
 // OnRequestCompleted sets the client's request completion callback.
@@ -126,7 +118,6 @@ func newClient(httpClient *http.Client) *Client {
 	}
 
 	// todo...
-	// getting a random
 	httpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		redirectURL := req.URL.String()
 		redirectURL = strings.Replace(redirectURL, "https://www.reddit.com", defaultBaseURL, 1)
@@ -145,18 +136,18 @@ func newClient(httpClient *http.Client) *Client {
 
 	c := &Client{client: httpClient, BaseURL: baseURL, TokenURL: tokenURL}
 
-	c.common.client = c
-	c.Account = (*AccountService)(&c.common)
-	c.Comment = (*CommentService)(&c.common)
-	c.Flair = (*FlairService)(&c.common)
-	c.Listings = (*ListingsService)(&c.common)
-	c.Moderation = (*ModerationService)(&c.common)
-	c.Multi = (*MultiService)(&c.common)
-	c.Post = (*PostService)(&c.common)
-	c.PostAndComment = (*PostAndCommentService)(&c.common)
-	c.Search = (*SearchService)(&c.common)
-	c.Subreddit = (*SubredditService)(&c.common)
-	c.User = (*UserService)(&c.common)
+	c.Account = &AccountService{client: c}
+	c.Flair = &FlairService{client: c}
+	c.Listings = &ListingsService{client: c}
+	c.Moderation = &ModerationService{client: c}
+	c.Multi = &MultiService{client: c}
+	c.Search = &SearchService{client: c}
+	c.Subreddit = &SubredditService{client: c}
+	c.User = &UserService{client: c}
+
+	postAndCommentService := &PostAndCommentService{client: c}
+	c.Comment = &CommentService{client: c, PostAndCommentService: postAndCommentService}
+	c.Post = &PostService{client: c, PostAndCommentService: postAndCommentService}
 
 	return c
 }
@@ -292,8 +283,8 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	return response, err
 }
 
-// GetRedditID returns the client's Reddit ID.
-func (c *Client) GetRedditID(ctx context.Context) (string, error) {
+// id returns the client's Reddit ID.
+func (c *Client) id(ctx context.Context) (string, error) {
 	if c.redditID != "" {
 		return c.redditID, nil
 	}

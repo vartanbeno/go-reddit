@@ -18,7 +18,9 @@ import (
 // behaviour, e.g. sometimes limit=1 returns nothing when it should.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_search
-type SearchService service
+type SearchService struct {
+	client *Client
+}
 
 func newSearchOptions(opts ...SearchOptionSetter) url.Values {
 	searchOptions := make(url.Values)

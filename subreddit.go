@@ -13,7 +13,9 @@ import (
 // related methods of the Reddit API.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_subreddits
-type SubredditService service
+type SubredditService struct {
+	client *Client
+}
 
 type rootSubreddit struct {
 	Kind string     `json:"kind,omitempty"`

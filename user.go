@@ -11,7 +11,9 @@ import (
 // related methods of the Reddit API.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_users
-type UserService service
+type UserService struct {
+	client *Client
+}
 
 type rootUser struct {
 	Kind string `json:"kind,omitempty"`
@@ -442,7 +444,7 @@ func (s *UserService) Block(ctx context.Context, username string) (*Blocked, *Re
 
 // Unblock unblocks a user.
 func (s *UserService) Unblock(ctx context.Context, username string) (*Response, error) {
-	selfID, err := s.client.GetRedditID(ctx)
+	selfID, err := s.client.id(ctx)
 	if err != nil {
 		return nil, err
 	}

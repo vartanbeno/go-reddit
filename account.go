@@ -10,7 +10,9 @@ import (
 // related methods of the Reddit API.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_account
-type AccountService service
+type AccountService struct {
+	client *Client
+}
 
 type rootSubredditKarma struct {
 	Kind string           `json:"kind,omitempty"`

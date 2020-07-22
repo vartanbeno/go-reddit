@@ -14,7 +14,9 @@ import (
 // Reddit API docs: https://www.reddit.com/dev/api/#section_links_and_comments
 //
 // todo: this is ugly, find a solution
-type PostAndCommentService service
+type PostAndCommentService struct {
+	client *Client
+}
 
 type vote int
 

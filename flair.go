@@ -10,7 +10,9 @@ import (
 // related methods of the Reddit API.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_flair
-type FlairService service
+type FlairService struct {
+	client *Client
+}
 
 // Flair is a flair on Reddit
 type Flair struct {

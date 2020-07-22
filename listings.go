@@ -12,7 +12,9 @@ import (
 // related methods of the Reddit API.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_listings
-type ListingsService service
+type ListingsService struct {
+	client *Client
+}
 
 // Get returns posts, comments, and subreddits from their IDs.
 func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*Comment, []*Subreddit, *Response, error) {

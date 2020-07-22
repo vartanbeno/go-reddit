@@ -73,7 +73,6 @@ func testClientServices(t *testing.T, c *Client) {
 		"Moderation",
 		"Multi",
 		"Post",
-		"PostAndComment",
 		"Search",
 		"Subreddit",
 		"User",

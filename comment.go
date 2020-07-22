@@ -10,7 +10,10 @@ import (
 // related methods of the Reddit API.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_links_and_comments
-type CommentService service
+type CommentService struct {
+	*PostAndCommentService
+	client *Client
+}
 
 // Submit submits a comment as a reply to a post, comment, or message.
 // parentID is the full ID of the thing being replied to.

@@ -11,7 +11,9 @@ import (
 // related methods of the Reddit API.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_moderation
-type ModerationService service
+type ModerationService struct {
+	client *Client
+}
 
 // ModAction is an action executed by a moderator of a subreddit, such
 // as inviting another user to be a mod, or setting permissions.

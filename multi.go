@@ -13,7 +13,9 @@ import (
 // related methods of the Reddit API.
 //
 // Reddit API docs: https://www.reddit.com/dev/api#section_multis
-type MultiService service
+type MultiService struct {
+	client *Client
+}
 
 type multiRoot struct {
 	Kind string `json:"kind,omitempty"`
