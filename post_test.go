@@ -98,7 +98,8 @@ func TestPostService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/post/post.json")
+	blob, err := readFileContents("testdata/post/post.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/comments/test", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -585,7 +586,8 @@ func TestPostService_More(t *testing.T) {
 		},
 	}
 
-	blob := readFileContents(t, "testdata/post/more.json")
+	blob, err := readFileContents("testdata/post/more.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/morechildren", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -602,7 +604,7 @@ func TestPostService_More(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, err := client.Post.More(ctx, parentComment)
+	_, err = client.Post.More(ctx, parentComment)
 	assert.NoError(t, err)
 	assert.Nil(t, parentComment.Replies.MoreComments)
 	assert.Len(t, parentComment.Replies.Comments, 1)
@@ -641,7 +643,8 @@ func TestPostService_RandomFromSubreddits(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/post/post.json")
+	blob, err := readFileContents("testdata/post/post.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/test/random", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -658,7 +661,8 @@ func TestPostService_Random(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/post/post.json")
+	blob, err := readFileContents("testdata/post/post.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/all/random", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -675,7 +679,8 @@ func TestPostService_RandomFromSubscriptions(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/post/post.json")
+	blob, err := readFileContents("testdata/post/post.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/random", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)

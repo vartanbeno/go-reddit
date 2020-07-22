@@ -126,7 +126,8 @@ func TestAccountService_Info(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/account/info.json")
+	blob, err := readFileContents("testdata/account/info.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -142,7 +143,8 @@ func TestAccountService_Karma(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/account/karma.json")
+	blob, err := readFileContents("testdata/account/karma.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/karma", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -158,7 +160,8 @@ func TestAccountService_Settings(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/account/settings.json")
+	blob, err := readFileContents("testdata/account/settings.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/prefs", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -174,7 +177,9 @@ func TestAccountService_UpdateSettings(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/account/settings.json")
+	blob, err := readFileContents("testdata/account/settings.json")
+	assert.NoError(t, err)
+
 	expectedSettingsBody := &Settings{NumberOfPosts: Int(10), MinimumCommentScore: Int(5), Compress: Bool(true)}
 
 	mux.HandleFunc("/api/v1/me/prefs", func(w http.ResponseWriter, r *http.Request) {
@@ -197,7 +202,8 @@ func TestAccountService_Trophies(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/account/trophies.json")
+	blob, err := readFileContents("testdata/account/trophies.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/trophies", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -213,7 +219,8 @@ func TestAccountService_Friends(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/account/friends.json")
+	blob, err := readFileContents("testdata/account/friends.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/prefs/friends", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -229,7 +236,8 @@ func TestAccountService_Blocked(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/account/blocked.json")
+	blob, err := readFileContents("testdata/account/blocked.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/prefs/blocked", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -245,7 +253,8 @@ func TestAccountService_Messaging(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/account/messaging.json")
+	blob, err := readFileContents("testdata/account/messaging.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/prefs/messaging", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -262,7 +271,8 @@ func TestAccountService_Trusted(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/account/trusted.json")
+	blob, err := readFileContents("testdata/account/trusted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/prefs/trusted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)

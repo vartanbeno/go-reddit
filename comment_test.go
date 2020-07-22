@@ -42,7 +42,8 @@ func TestCommentService_Submit(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/comment-submit-edit.json")
+	blob, err := readFileContents("testdata/comment-submit-edit.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/comment", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -69,7 +70,8 @@ func TestCommentService_Edit(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/comment-submit-edit.json")
+	blob, err := readFileContents("testdata/comment-submit-edit.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/editusertext", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)

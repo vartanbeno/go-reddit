@@ -133,7 +133,8 @@ func TestUserService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/get.json")
+	blob, err := readFileContents("testdata/user/get.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/Test_User/about", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -149,7 +150,8 @@ func TestUserService_GetMultipleByID(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/get-multiple-by-id.json")
+	blob, err := readFileContents("testdata/user/get-multiple-by-id.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/user_data_by_account_ids", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -196,7 +198,8 @@ func TestUserService_Overview(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/overview.json")
+	blob, err := readFileContents("testdata/user/overview.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/overview", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -221,7 +224,8 @@ func TestUserService_OverviewOf(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/overview.json")
+	blob, err := readFileContents("testdata/user/overview.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/overview", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -246,7 +250,8 @@ func TestUserService_Overview_Options(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/overview.json")
+	blob, err := readFileContents("testdata/user/overview.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/overview", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -263,7 +268,7 @@ func TestUserService_Overview_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, _, err := client.User.Overview(ctx, SetLimit(5), SetAfter("t3_after"), SetSort(SortTop))
+	_, _, _, err = client.User.Overview(ctx, SetLimit(5), SetAfter("t3_after"), SetSort(SortTop))
 	assert.NoError(t, err)
 }
 
@@ -271,7 +276,8 @@ func TestUserService_Posts(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/submitted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -291,7 +297,8 @@ func TestUserService_PostsOf(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/submitted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -311,7 +318,8 @@ func TestUserService_Posts_Options(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/submitted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -327,7 +335,7 @@ func TestUserService_Posts_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, err := client.User.Posts(ctx, SetLimit(10), SetSort(SortNew))
+	_, _, err = client.User.Posts(ctx, SetLimit(10), SetSort(SortNew))
 	assert.NoError(t, err)
 }
 
@@ -335,7 +343,8 @@ func TestUserService_Comments(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/comments.json")
+	blob, err := readFileContents("testdata/user/comments.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/comments", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -355,7 +364,8 @@ func TestUserService_CommentsOf(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/comments.json")
+	blob, err := readFileContents("testdata/user/comments.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/comments", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -375,7 +385,8 @@ func TestUserService_Comments_Options(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/comments.json")
+	blob, err := readFileContents("testdata/user/comments.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/comments", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -391,7 +402,7 @@ func TestUserService_Comments_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, err := client.User.Comments(ctx, SetLimit(100), SetBefore("t1_before"))
+	_, _, err = client.User.Comments(ctx, SetLimit(100), SetBefore("t1_before"))
 	assert.NoError(t, err)
 }
 
@@ -400,7 +411,8 @@ func TestUserService_Saved(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/overview.json")
+	blob, err := readFileContents("testdata/user/overview.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/saved", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -426,7 +438,8 @@ func TestUserService_Saved_Options(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/overview.json")
+	blob, err := readFileContents("testdata/user/overview.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/saved", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -442,7 +455,7 @@ func TestUserService_Saved_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, _, err := client.User.Saved(ctx, SetLimit(50), SetSort(SortControversial))
+	_, _, _, err = client.User.Saved(ctx, SetLimit(50), SetSort(SortControversial))
 	assert.NoError(t, err)
 }
 func TestUserService_Upvoted(t *testing.T) {
@@ -450,7 +463,8 @@ func TestUserService_Upvoted(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/upvoted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -471,7 +485,8 @@ func TestUserService_Upvoted_Options(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/upvoted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -487,7 +502,7 @@ func TestUserService_Upvoted_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, err := client.User.Upvoted(ctx, SetLimit(30), SetAfter("t3_after"))
+	_, _, err = client.User.Upvoted(ctx, SetLimit(30), SetAfter("t3_after"))
 	assert.NoError(t, err)
 }
 
@@ -496,7 +511,8 @@ func TestUserService_UpvotedOf(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/upvoted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -517,7 +533,8 @@ func TestUserService_Downvoted(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/downvoted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -538,7 +555,8 @@ func TestUserService_Downvoted_Options(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/downvoted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -554,7 +572,7 @@ func TestUserService_Downvoted_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, err := client.User.Downvoted(ctx, SetLimit(20), SetBefore("t3_before"))
+	_, _, err = client.User.Downvoted(ctx, SetLimit(20), SetBefore("t3_before"))
 	assert.NoError(t, err)
 }
 
@@ -563,7 +581,8 @@ func TestUserService_DownvotedOf(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/downvoted", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -584,7 +603,8 @@ func TestUserService_Hidden(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/hidden", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -605,7 +625,8 @@ func TestUserService_Gilded(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob := readFileContents(t, "testdata/user/submitted.json")
+	blob, err := readFileContents("testdata/user/submitted.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/gilded", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -625,7 +646,8 @@ func TestUserService_GetFriendship(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/friend.json")
+	blob, err := readFileContents("testdata/user/friend.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -641,7 +663,8 @@ func TestUserService_Friend(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/friend.json")
+	blob, err := readFileContents("testdata/user/friend.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPut, r.Method)
@@ -681,7 +704,8 @@ func TestUserService_Block(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/block.json")
+	blob, err := readFileContents("testdata/user/block.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -705,7 +729,8 @@ func TestUserService_Block(t *testing.T) {
 // 	setup()
 // 	defer teardown()
 
-// 	blob := readFileContents(t, "testdata/user/block.json")
+// 	blob, err := readFileContents("testdata/user/block.json")
+//  assert.NoError(t,err)
 
 // 	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
 // 		assert.Equal(t, http.MethodPost, r.Method)
@@ -775,7 +800,8 @@ func TestUserService_Trophies(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/trophies.json")
+	blob, err := readFileContents("testdata/user/trophies.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/user/user1/trophies", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -791,7 +817,8 @@ func TestUserService_TrophiesOf(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/user/trophies.json")
+	blob, err := readFileContents("testdata/user/trophies.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/user/test123/trophies", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)

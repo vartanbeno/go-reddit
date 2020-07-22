@@ -47,7 +47,8 @@ func TestMultiService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/multi/multi.json")
+	blob, err := readFileContents("testdata/multi/multi.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -63,7 +64,8 @@ func TestMultiService_Mine(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/multi/multis.json")
+	blob, err := readFileContents("testdata/multi/multis.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/mine", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -79,7 +81,8 @@ func TestMultiService_Of(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/multi/multis.json")
+	blob, err := readFileContents("testdata/multi/multis.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/test", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -95,7 +98,8 @@ func TestMultiService_Copy(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/multi/multi.json")
+	blob, err := readFileContents("testdata/multi/multi.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/copy", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -127,7 +131,9 @@ func TestMultiService_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/multi/multi.json")
+	blob, err := readFileContents("testdata/multi/multi.json")
+	assert.NoError(t, err)
+
 	createRequest := &MultiCreateOrUpdateRequest{
 		Name:        "testmulti",
 		Description: "this is a multireddit",
@@ -160,7 +166,9 @@ func TestMultiService_Update(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/multi/multi.json")
+	blob, err := readFileContents("testdata/multi/multi.json")
+	assert.NoError(t, err)
+
 	updateRequest := &MultiCreateOrUpdateRequest{
 		Name:        "testmulti",
 		Description: "this is a multireddit",
@@ -204,7 +212,8 @@ func TestMultiService_GetDescription(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/multi/description.json")
+	blob, err := readFileContents("testdata/multi/description.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/description", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -220,7 +229,8 @@ func TestMultiService_UpdateDescription(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/multi/description.json")
+	blob, err := readFileContents("testdata/multi/description.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/description", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPut, r.Method)

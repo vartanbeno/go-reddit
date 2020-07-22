@@ -49,19 +49,19 @@ func teardown() {
 	server.Close()
 }
 
-func readFileContents(t *testing.T, filepath string) string {
-	file, err := os.Open(filepath)
+func readFileContents(path string) (string, error) {
+	file, err := os.Open(path)
 	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
+		return "", err
 	}
 	defer file.Close()
 
 	bytes, err := ioutil.ReadAll(file)
 	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
+		return "", err
 	}
 
-	return string(bytes)
+	return string(bytes), err
 }
 
 func testClientServices(t *testing.T, c *Client) {

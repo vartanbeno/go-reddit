@@ -53,7 +53,8 @@ func TestModerationService_GetActions(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/moderation/actions.json")
+	blob, err := readFileContents("testdata/moderation/actions.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/about/log", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -69,7 +70,8 @@ func TestModerationService_GetActionsByType(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/moderation/actions.json")
+	blob, err := readFileContents("testdata/moderation/actions.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/about/log", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -93,7 +95,8 @@ func TestModerationService_AcceptInvite(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/moderation/actions.json")
+	blob, err := readFileContents("testdata/moderation/actions.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/api/accept_moderator_invite", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodPost, r.Method)
@@ -108,7 +111,7 @@ func TestModerationService_AcceptInvite(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, err := client.Moderation.AcceptInvite(ctx, "testsubreddit")
+	_, err = client.Moderation.AcceptInvite(ctx, "testsubreddit")
 	assert.NoError(t, err)
 }
 

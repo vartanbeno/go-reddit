@@ -136,7 +136,8 @@ func TestSubredditService_GetByName(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/about.json")
+	blob, err := readFileContents("testdata/subreddit/about.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/golang/about", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -152,7 +153,8 @@ func TestSubredditService_GetPopular(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/list.json")
+	blob, err := readFileContents("testdata/subreddit/list.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/popular", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -168,7 +170,8 @@ func TestSubredditService_GetNew(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/list.json")
+	blob, err := readFileContents("testdata/subreddit/list.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/new", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -184,7 +187,8 @@ func TestSubredditService_GetGold(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/list.json")
+	blob, err := readFileContents("testdata/subreddit/list.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/gold", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -200,7 +204,8 @@ func TestSubredditService_GetDefault(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/list.json")
+	blob, err := readFileContents("testdata/subreddit/list.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/default", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -216,7 +221,8 @@ func TestSubredditService_GetSubscribed(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/list.json")
+	blob, err := readFileContents("testdata/subreddit/list.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/mine/subscriber", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -232,7 +238,8 @@ func TestSubredditService_GetApproved(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/list.json")
+	blob, err := readFileContents("testdata/subreddit/list.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/mine/contributor", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -248,7 +255,8 @@ func TestSubredditService_GetModerated(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/list.json")
+	blob, err := readFileContents("testdata/subreddit/list.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/mine/moderator", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -265,7 +273,8 @@ func TestSubredditService_GetModerated(t *testing.T) {
 // 	setup()
 // 	defer teardown()
 
-// 	blob := readFileContents(t, "testdata/subreddit/sticky.json")
+// 	blob, err:= readFileContents( "testdata/subreddit/sticky.json")
+//  assert.NoError(t,err)
 
 // 	mux.HandleFunc("/r/nba/about/sticky", func(w http.ResponseWriter, r *http.Request) {
 // 		assert.Equal(t, http.MethodGet, r.Method)
@@ -288,7 +297,8 @@ func TestSubredditService_Moderators(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/moderators.json")
+	blob, err := readFileContents("testdata/subreddit/moderators.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/moderators", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -304,7 +314,8 @@ func TestSubredditService_Random(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/random.json")
+	blob, err := readFileContents("testdata/subreddit/random.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/random", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -326,7 +337,8 @@ func TestSubredditService_RandomNSFW(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/subreddit/random.json")
+	blob, err := readFileContents("testdata/subreddit/random.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/randnsfw", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)

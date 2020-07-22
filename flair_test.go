@@ -44,7 +44,8 @@ func TestFlairService_GetFlairs(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/flairs.json")
+	blob, err := readFileContents("testdata/flairs.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/subreddit/api/user_flair", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
@@ -60,7 +61,8 @@ func TestFlairService_GetFlairsV2(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob := readFileContents(t, "testdata/flairs-v2.json")
+	blob, err := readFileContents("testdata/flairs-v2.json")
+	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/subreddit/api/user_flair_v2", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
