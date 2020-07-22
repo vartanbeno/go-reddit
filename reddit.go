@@ -118,6 +118,9 @@ func newClient(httpClient *http.Client) *Client {
 	}
 
 	// todo...
+	// Some endpoints (notably the ones to get random subreddits/posts) redirect to a
+	// reddit.com url, which returns a 403 Forbidden for some reason, unless the url's
+	// host is changed to oauth.reddit.com
 	httpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 		redirectURL := req.URL.String()
 		redirectURL = strings.Replace(redirectURL, "https://www.reddit.com", defaultBaseURL, 1)

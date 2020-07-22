@@ -100,6 +100,7 @@ func (p *Permalink) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// todo: rename this to thing
 type root struct {
 	Kind string      `json:"kind,omitempty"`
 	Data interface{} `json:"data,omitempty"`
