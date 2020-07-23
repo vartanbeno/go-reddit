@@ -94,6 +94,41 @@ var expectedComments = []*Comment{
 	},
 }
 
+var expectedSubmittedPost = &Submitted{
+	ID:     "hw6l6a",
+	FullID: "t3_hw6l6a",
+	URL:    "https://www.reddit.com/r/test/comments/hw6l6a/test_title/",
+}
+
+var expectedEditedPost = &Post{
+	ID:      "hw6l6a",
+	FullID:  "t3_hw6l6a",
+	Created: &Timestamp{time.Date(2020, 7, 23, 1, 24, 55, 0, time.UTC)},
+	Edited:  &Timestamp{time.Date(2020, 7, 23, 1, 42, 44, 0, time.UTC)},
+
+	Permalink: "https://www.reddit.com/r/test/comments/hw6l6a/test_title/",
+	URL:       "https://www.reddit.com/r/test/comments/hw6l6a/test_title/",
+
+	Title: "Test Title",
+	Body:  "this is edited",
+
+	Likes: Bool(true),
+
+	Score:            1,
+	UpvoteRatio:      1,
+	NumberOfComments: 0,
+
+	SubredditID:           "t5_2qh23",
+	SubredditName:         "test",
+	SubredditNamePrefixed: "r/test",
+
+	AuthorID:   "t2_164ab8",
+	AuthorName: "v_95",
+
+	Spoiler:    true,
+	IsSelfPost: true,
+}
+
 func TestPostService_Get(t *testing.T) {
 	setup()
 	defer teardown()
@@ -110,6 +145,108 @@ func TestPostService_Get(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPost2, post)
 	assert.Equal(t, expectedComments, comments)
+}
+
+func TestPostService_SubmitText(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/post/submit.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/api/submit", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("kind", "self")
+		form.Set("sr", "test")
+		form.Set("title", "Test Title")
+		form.Set("text", "Test Text")
+		form.Set("spoiler", "true")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	submittedPost, _, err := client.Post.SubmitText(ctx, SubmitTextOptions{
+		Subreddit: "test",
+		Title:     "Test Title",
+		Text:      "Test Text",
+		Spoiler:   true,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSubmittedPost, submittedPost)
+}
+
+func TestPostService_SubmitLink(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/post/submit.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/api/submit", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("kind", "link")
+		form.Set("sr", "test")
+		form.Set("title", "Test Title")
+		form.Set("url", "https://www.example.com")
+		form.Set("sendreplies", "false")
+		form.Set("resubmit", "true")
+		form.Set("nsfw", "true")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	submittedPost, _, err := client.Post.SubmitLink(ctx, SubmitLinkOptions{
+		Subreddit:   "test",
+		Title:       "Test Title",
+		URL:         "https://www.example.com",
+		SendReplies: Bool(false),
+		Resubmit:    true,
+		NSFW:        true,
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSubmittedPost, submittedPost)
+}
+
+func TestPostService_Edit(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/post/edit.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/api/editusertext", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("return_rtjson", "true")
+		form.Set("thing_id", "t3_test")
+		form.Set("text", "test edit")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	editedPost, _, err := client.Post.Edit(ctx, "t3_test", "test edit")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedEditedPost, editedPost)
 }
 
 func TestPostService_Hide(t *testing.T) {
