@@ -292,30 +292,51 @@ func TestSubredditService_GetModerated(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-// todo: WIP
-// func TestSubredditService_GetSticky1(t *testing.T) {
-// 	setup()
-// 	defer teardown()
+func TestSubredditService_GetSticky1(t *testing.T) {
+	setup()
+	defer teardown()
 
-// 	blob, err:= readFileContents( "testdata/subreddit/sticky.json")
-//  assert.NoError(t,err)
+	blob, err := readFileContents("testdata/post/post.json")
+	assert.NoError(t, err)
 
-// 	mux.HandleFunc("/r/nba/about/sticky", func(w http.ResponseWriter, r *http.Request) {
-// 		assert.Equal(t, http.MethodGet, r.Method)
+	mux.HandleFunc("/r/test/about/sticky", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
 
-// 		err := r.ParseForm()
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, "1", r.Form.Get("num"))
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, "1", r.Form.Get("num"))
 
-// 		fmt.Fprint(w, blob)
-// 	})
+		fmt.Fprint(w, blob)
+	})
 
-// 	sticky, _, err := client.Subreddit.GetSticky1(ctx, "nba")
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, expectedSticky.Post, sticky.Post)
-// 	// b, _ := json.MarshalIndent(sticky.Comments, "", "  ")
-// 	// fmt.Println(string(b))
-// }
+	post, comments, _, err := client.Subreddit.GetSticky1(ctx, "test")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPost2, post)
+	assert.Equal(t, expectedComments, comments)
+}
+
+func TestSubredditService_GetSticky2(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/post/post.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/about/sticky", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, "2", r.Form.Get("num"))
+
+		fmt.Fprint(w, blob)
+	})
+
+	post, comments, _, err := client.Subreddit.GetSticky2(ctx, "test")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPost2, post)
+	assert.Equal(t, expectedComments, comments)
+}
 
 func TestSubredditService_Subscribe(t *testing.T) {
 	setup()
