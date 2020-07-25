@@ -51,14 +51,59 @@ type Moderator struct {
 	Permissions []string `json:"mod_permissions"`
 }
 
-// GetPosts returns posts.
-// By default, it'll look for the hottest posts from r/all.
-// Note: when looking for hot posts in a subreddit, it will include the
-// sticked posts (if any) PLUS posts from the limit parameter (25 by default).
-func (s *SubredditService) GetPosts() *PostFinder {
-	f := new(PostFinder)
-	f.client = s.client
-	return f.Sort(SortHot).FromAll()
+func (s *SubredditService) getPosts(ctx context.Context, sort Sort, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	path := sort.String()
+	if len(subreddits) > 0 {
+		path = fmt.Sprintf("r/%s/%s", strings.Join(subreddits, "+"), sort.String())
+	}
+
+	form := newSearchOptions(opts...)
+	path = addQuery(path, form)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.getPosts(), resp, nil
+}
+
+// Hot returns the hottest posts from the specified subreddits.
+// If none are defined, it returns the ones from your subscribed subreddits.
+// Note: when looking for hot posts in a subreddit, it will include the stickied
+// posts (if any) PLUS posts from the limit parameter (25 by default).
+func (s *SubredditService) Hot(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	return s.getPosts(ctx, SortHot, subreddits, opts...)
+}
+
+// New returns the newest posts from the specified subreddits.
+// If none are defined, it returns the ones from your subscribed subreddits.
+func (s *SubredditService) New(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	return s.getPosts(ctx, SortNew, subreddits, opts...)
+}
+
+// Rising returns the rising posts from the specified subreddits.
+// If none are defined, it returns the ones from your subscribed subreddits.
+func (s *SubredditService) Rising(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	return s.getPosts(ctx, SortRising, subreddits, opts...)
+}
+
+// Controversial returns the most controversial posts from the specified subreddits.
+// If none are defined, it returns the ones from your subscribed subreddits.
+func (s *SubredditService) Controversial(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	return s.getPosts(ctx, SortControversial, subreddits, opts...)
+}
+
+// Top returns the top posts from the specified subreddits.
+// If none are defined, it returns the ones from your subscribed subreddits.
+func (s *SubredditService) Top(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	return s.getPosts(ctx, SortTop, subreddits, opts...)
 }
 
 // Get gets a subreddit by name.
@@ -255,88 +300,6 @@ func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num 
 	}
 
 	return root.Post, root.Comments, resp, nil
-}
-
-// PostFinder finds posts from the specified subreddits.
-// If no subreddits are specified, it finds posts from the ones the client is subscribed to.
-type PostFinder struct {
-	client     *Client
-	subreddits []string
-	sort       string
-	opts       struct {
-		After    string `url:"after,omitempty"`
-		Before   string `url:"before,omitempty"`
-		Limit    int    `url:"limit,omitempty"`
-		Timespan string `url:"t,omitempty"`
-	}
-}
-
-// After sets the after option.
-func (f *PostFinder) After(after string) *PostFinder {
-	f.opts.After = after
-	return f
-}
-
-// Before sets the before option.
-func (f *PostFinder) Before(before string) *PostFinder {
-	f.opts.Before = before
-	return f
-}
-
-// Limit sets the limit option.
-func (f *PostFinder) Limit(limit int) *PostFinder {
-	f.opts.Limit = limit
-	return f
-}
-
-// FromSubreddits restricts the search to the subreddits.
-func (f *PostFinder) FromSubreddits(subreddits ...string) *PostFinder {
-	f.subreddits = subreddits
-	return f
-}
-
-// FromAll allows the finder to find posts from r/all.
-func (f *PostFinder) FromAll() *PostFinder {
-	f.subreddits = []string{"all"}
-	return f
-}
-
-// Sort sets the sort option.
-func (f *PostFinder) Sort(sort Sort) *PostFinder {
-	f.sort = sort.String()
-	return f
-}
-
-// Timespan sets the timespan option.
-func (f *PostFinder) Timespan(timespan Timespan) *PostFinder {
-	f.opts.Timespan = timespan.String()
-	return f
-}
-
-// Do conducts the search.
-func (f *PostFinder) Do(ctx context.Context) (*Posts, *Response, error) {
-	path := f.sort
-	if len(f.subreddits) > 0 {
-		path = fmt.Sprintf("r/%s/%s", strings.Join(f.subreddits, "+"), f.sort)
-	}
-
-	path, err := addOptions(path, f.opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := f.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(rootListing)
-	resp, err := f.client.Do(ctx, req, root)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return root.getPosts(), resp, nil
 }
 
 // Moderators returns the moderators of a subreddit.
