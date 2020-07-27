@@ -10,6 +10,61 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+var expectedPosts = &Posts{
+	Posts: []*Post{
+		{
+			ID:      "agi5zf",
+			FullID:  "t3_agi5zf",
+			Created: &Timestamp{time.Date(2019, 1, 16, 5, 57, 51, 0, time.UTC)},
+			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+			Permalink: "https://www.reddit.com/r/test/comments/agi5zf/test/",
+			URL:       "https://www.reddit.com/r/test/comments/agi5zf/test/",
+
+			Title: "test",
+			Body:  "test",
+
+			Score:            253,
+			UpvoteRatio:      0.99,
+			NumberOfComments: 1634,
+
+			SubredditID:           "t5_2qh23",
+			SubredditName:         "test",
+			SubredditNamePrefixed: "r/test",
+
+			AuthorID:   "t2_30a5ktgt",
+			AuthorName: "kmiller0112",
+
+			IsSelfPost: true,
+			Stickied:   true,
+		},
+		{
+			ID:      "hyhquk",
+			FullID:  "t3_hyhquk",
+			Created: &Timestamp{time.Date(2020, 7, 27, 0, 5, 10, 0, time.UTC)},
+			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+			Permalink: "https://www.reddit.com/r/test/comments/hyhquk/veggies/",
+			URL:       "https://i.imgur.com/LrN2mPw.jpg",
+
+			Title: "Veggies",
+
+			Score:            4,
+			UpvoteRatio:      1,
+			NumberOfComments: 0,
+
+			SubredditID:           "t5_2qh23",
+			SubredditName:         "test",
+			SubredditNamePrefixed: "r/test",
+
+			AuthorID:   "t2_6fqntbwq",
+			AuthorName: "MuckleMcDuckle",
+		},
+	},
+	After:  "t3_hyhquk",
+	Before: "",
+}
+
 var expectedSubreddit = &Subreddit{
 	ID:      "2rc7j",
 	FullID:  "t5_2rc7j",
@@ -151,6 +206,91 @@ var expectedRandomSubreddit = &Subreddit{
 	Type:         "public",
 
 	Subscribers: 52357,
+}
+
+func TestSubredditService_Hot(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/posts.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/hot", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.Subreddit.Hot(ctx, []string{"test"})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPosts, posts)
+}
+
+func TestSubredditService_New(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/posts.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/new", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.Subreddit.New(ctx, []string{"test"})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPosts, posts)
+}
+
+func TestSubredditService_Rising(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/posts.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/rising", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.Subreddit.Rising(ctx, []string{"test"})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPosts, posts)
+}
+
+func TestSubredditService_Controversial(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/posts.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/controversial", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.Subreddit.Controversial(ctx, []string{"test"})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPosts, posts)
+}
+
+func TestSubredditService_Top(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/posts.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/top", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.Subreddit.Top(ctx, []string{"test"})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedPosts, posts)
 }
 
 func TestSubredditService_Get(t *testing.T) {
