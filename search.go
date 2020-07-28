@@ -55,11 +55,45 @@ func SetLimit(v int) SearchOptionSetter {
 	}
 }
 
-// SetSort sets the sort option.
-func SetSort(v Sort) SearchOptionSetter {
-	return func(opts url.Values) {
-		opts.Set("sort", v.String())
-	}
+// SortByHot sets the sort option to return the hottest results first.
+func SortByHot(opts url.Values) {
+	opts.Set("sort", "hot")
+}
+
+// SortByBest sets the sort option to return the best results first.
+func SortByBest(opts url.Values) {
+	opts.Set("sort", "best")
+}
+
+// SortByNew sets the sort option to return the newest results first.
+func SortByNew(opts url.Values) {
+	opts.Set("sort", "new")
+}
+
+// SortByRising sets the sort option to return the rising results first.
+func SortByRising(opts url.Values) {
+	opts.Set("sort", "rising")
+}
+
+// SortByControversial sets the sort option to return the most controversial results first.
+func SortByControversial(opts url.Values) {
+	opts.Set("sort", "controversial")
+}
+
+// SortByTop sets the sort option to return the top results first.
+func SortByTop(opts url.Values) {
+	opts.Set("sort", "top")
+}
+
+// SortByRelevance sets the sort option to return the most relevant results first.
+func SortByRelevance(opts url.Values) {
+	opts.Set("sort", "relevance")
+}
+
+// SortByNumberOfComments sets the sort option to return the results with the highest
+// number of comments first.
+func SortByNumberOfComments(opts url.Values) {
+	opts.Set("sort", "comments")
 }
 
 // FromThePastHour sets the timespan option to return results from the past hour.

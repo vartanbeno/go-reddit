@@ -51,10 +51,10 @@ type Moderator struct {
 	Permissions []string `json:"mod_permissions"`
 }
 
-func (s *SubredditService) getPosts(ctx context.Context, sort Sort, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	path := sort.String()
+func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	path := sort
 	if len(subreddits) > 0 {
-		path = fmt.Sprintf("r/%s/%s", strings.Join(subreddits, "+"), sort.String())
+		path = fmt.Sprintf("r/%s/%s", strings.Join(subreddits, "+"), sort)
 	}
 
 	form := newSearchOptions(opts...)
@@ -79,31 +79,31 @@ func (s *SubredditService) getPosts(ctx context.Context, sort Sort, subreddits [
 // Note: when looking for hot posts in a subreddit, it will include the stickied
 // posts (if any) PLUS posts from the limit parameter (25 by default).
 func (s *SubredditService) Hot(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	return s.getPosts(ctx, SortHot, subreddits, opts...)
+	return s.getPosts(ctx, "hot", subreddits, opts...)
 }
 
 // New returns the newest posts from the specified subreddits.
 // If none are defined, it returns the ones from your subscribed subreddits.
 func (s *SubredditService) New(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	return s.getPosts(ctx, SortNew, subreddits, opts...)
+	return s.getPosts(ctx, "new", subreddits, opts...)
 }
 
 // Rising returns the rising posts from the specified subreddits.
 // If none are defined, it returns the ones from your subscribed subreddits.
 func (s *SubredditService) Rising(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	return s.getPosts(ctx, SortRising, subreddits, opts...)
+	return s.getPosts(ctx, "rising", subreddits, opts...)
 }
 
 // Controversial returns the most controversial posts from the specified subreddits.
 // If none are defined, it returns the ones from your subscribed subreddits.
 func (s *SubredditService) Controversial(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	return s.getPosts(ctx, SortControversial, subreddits, opts...)
+	return s.getPosts(ctx, "controversial", subreddits, opts...)
 }
 
 // Top returns the top posts from the specified subreddits.
 // If none are defined, it returns the ones from your subscribed subreddits.
 func (s *SubredditService) Top(ctx context.Context, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	return s.getPosts(ctx, SortTop, subreddits, opts...)
+	return s.getPosts(ctx, "top", subreddits, opts...)
 }
 
 // Get gets a subreddit by name.

@@ -22,39 +22,6 @@ const (
 	kindModAction  = "modaction"
 )
 
-// Sort is a sorting option.
-type Sort int
-
-var sorts = [...]string{
-	"hot",
-	"best",
-	"new",
-	"rising",
-	"controversial",
-	"top",
-	"relevance",
-	"comments",
-}
-
-// Different sorting options.
-const (
-	SortHot Sort = iota
-	SortBest
-	SortNew
-	SortRising
-	SortControversial
-	SortTop
-	SortRelevance
-	SortComments
-)
-
-func (s Sort) String() string {
-	if s < SortHot || s > SortComments {
-		return ""
-	}
-	return sorts[s]
-}
-
 // Permalink is the link to a post or comment.
 type Permalink string
 

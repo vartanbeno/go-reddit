@@ -259,7 +259,7 @@ func TestUserService_Overview_Options(t *testing.T) {
 		form := url.Values{}
 		form.Set("limit", "5")
 		form.Set("after", "t3_after")
-		form.Set("sort", SortTop.String())
+		form.Set("sort", "top")
 
 		err := r.ParseForm()
 		assert.NoError(t, err)
@@ -268,7 +268,7 @@ func TestUserService_Overview_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, _, err = client.User.Overview(ctx, SetLimit(5), SetAfter("t3_after"), SetSort(SortTop))
+	_, _, _, err = client.User.Overview(ctx, SetLimit(5), SetAfter("t3_after"), SortByTop)
 	assert.NoError(t, err)
 }
 
@@ -326,7 +326,7 @@ func TestUserService_Posts_Options(t *testing.T) {
 
 		form := url.Values{}
 		form.Set("limit", "10")
-		form.Set("sort", SortNew.String())
+		form.Set("sort", "new")
 
 		err := r.ParseForm()
 		assert.NoError(t, err)
@@ -335,7 +335,7 @@ func TestUserService_Posts_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, err = client.User.Posts(ctx, SetLimit(10), SetSort(SortNew))
+	_, _, err = client.User.Posts(ctx, SetLimit(10), SortByNew)
 	assert.NoError(t, err)
 }
 
@@ -446,7 +446,7 @@ func TestUserService_Saved_Options(t *testing.T) {
 
 		form := url.Values{}
 		form.Set("limit", "50")
-		form.Set("sort", SortControversial.String())
+		form.Set("sort", "controversial")
 
 		err := r.ParseForm()
 		assert.NoError(t, err)
@@ -455,7 +455,7 @@ func TestUserService_Saved_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, _, err = client.User.Saved(ctx, SetLimit(50), SetSort(SortControversial))
+	_, _, _, err = client.User.Saved(ctx, SetLimit(50), SortByControversial)
 	assert.NoError(t, err)
 }
 func TestUserService_Upvoted(t *testing.T) {
