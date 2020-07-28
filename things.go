@@ -55,37 +55,6 @@ func (s Sort) String() string {
 	return sorts[s]
 }
 
-// Timespan is a timespan option.
-// E.g. "hour" means in the last hour, "all" means all-time.
-// It is used when conducting searches.
-type Timespan int
-
-var timespans = [...]string{
-	"hour",
-	"day",
-	"week",
-	"month",
-	"year",
-	"all",
-}
-
-// Different timespan options.
-const (
-	TimespanHour Timespan = iota
-	TimespanDay
-	TimespanWeek
-	TimespanMonth
-	TimespanYear
-	TimespanAll
-)
-
-func (t Timespan) String() string {
-	if t < TimespanHour || t > TimespanAll {
-		return ""
-	}
-	return timespans[t]
-}
-
 // Permalink is the link to a post or comment.
 type Permalink string
 

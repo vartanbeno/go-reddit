@@ -62,11 +62,34 @@ func SetSort(v Sort) SearchOptionSetter {
 	}
 }
 
-// SetTimespan sets the timespan option.
-func SetTimespan(v Timespan) SearchOptionSetter {
-	return func(opts url.Values) {
-		opts.Set("timespan", v.String())
-	}
+// FromThePastHour sets the timespan option to return results from the past hour.
+func FromThePastHour(opts url.Values) {
+	opts.Set("t", "hour")
+}
+
+// FromThePastDay sets the timespan option to return results from the past day.
+func FromThePastDay(opts url.Values) {
+	opts.Set("t", "day")
+}
+
+// FromThePastWeek sets the timespan option to return results from the past week.
+func FromThePastWeek(opts url.Values) {
+	opts.Set("t", "week")
+}
+
+// FromThePastMonth sets the timespan option to return results from the past month.
+func FromThePastMonth(opts url.Values) {
+	opts.Set("t", "month")
+}
+
+// FromThePastYear sets the timespan option to return results from the past year.
+func FromThePastYear(opts url.Values) {
+	opts.Set("t", "year")
+}
+
+// FromAllTime sets the timespan option to return results from all time.
+func FromAllTime(opts url.Values) {
+	opts.Set("t", "all")
 }
 
 // setType sets the type option.
@@ -119,7 +142,7 @@ func (s *SearchService) Posts(ctx context.Context, query string, subreddits []st
 }
 
 // Subreddits searches for subreddits.
-// The Sort and Timespan options don't affect the results for this search.
+// The sort and timespan options don't affect the results for this search.
 func (s *SearchService) Subreddits(ctx context.Context, query string, opts ...SearchOptionSetter) (*Subreddits, *Response, error) {
 	opts = append(opts, setType("sr"), setQuery(query))
 	form := newSearchOptions(opts...)
@@ -142,7 +165,7 @@ func (s *SearchService) Subreddits(ctx context.Context, query string, opts ...Se
 }
 
 // Users searches for users.
-// The Sort and Timespan options don't affect the results for this search.
+// The sort and timespan options don't affect the results for this search.
 func (s *SearchService) Users(ctx context.Context, query string, opts ...SearchOptionSetter) (*Users, *Response, error) {
 	opts = append(opts, setType("user"), setQuery(query))
 	form := newSearchOptions(opts...)

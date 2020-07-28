@@ -128,6 +128,7 @@ func (s *SubredditService) Get(ctx context.Context, name string) (*Subreddit, *R
 }
 
 // GetPopular returns popular subreddits.
+// todo: use search opts for this
 func (s *SubredditService) GetPopular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/popular", opts)
 }
