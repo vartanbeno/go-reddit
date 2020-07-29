@@ -294,7 +294,7 @@ func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num 
 		return nil, nil, nil, err
 	}
 
-	root := new(postAndComments)
+	root := new(PostAndComments)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, nil, resp, err

@@ -65,20 +65,20 @@ type SubmitLinkOptions struct {
 // Get returns a post with its comments.
 // id is the ID36 of the post, not its full id.
 // Example: instead of t3_abc123, use abc123.
-func (s *PostService) Get(ctx context.Context, id string) (*Post, []*Comment, *Response, error) {
+func (s *PostService) Get(ctx context.Context, id string) (*PostAndComments, *Response, error) {
 	path := fmt.Sprintf("comments/%s", id)
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
-	root := new(postAndComments)
+	root := new(PostAndComments)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
-		return nil, nil, resp, err
+		return nil, resp, err
 	}
 
-	return root.Post, root.Comments, resp, nil
+	return root, resp, nil
 }
 
 func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *Response, error) {
@@ -433,24 +433,18 @@ func (s *PostService) DisableContestMode(ctx context.Context, id string) (*Respo
 	return s.client.Do(ctx, req, nil)
 }
 
-// More retrieves more comments that were left out when initially fetching the post.
-// id is the post's full ID.
-// commentIDs are the ID36s of comments.
-func (s *PostService) More(ctx context.Context, comment *Comment) (*Response, error) {
-	if comment == nil {
-		return nil, errors.New("comment: must not be nil")
+// LoadMoreComments retrieves more comments that were left out when initially fetching the post.
+func (s *PostService) LoadMoreComments(ctx context.Context, pc *PostAndComments) (*Response, error) {
+	if pc == nil {
+		return nil, errors.New("pc: must not be nil")
 	}
 
-	if comment.Replies.MoreComments == nil {
+	if !pc.hasMore() {
 		return nil, nil
 	}
 
-	postID := comment.PostID
-	commentIDs := comment.Replies.MoreComments.Children
-
-	if len(commentIDs) == 0 {
-		return nil, nil
-	}
+	postID := pc.Post.FullID
+	commentIDs := pc.moreComments.Children
 
 	type query struct {
 		PostID  string   `url:"link_id"`
@@ -485,22 +479,20 @@ func (s *PostService) More(ctx context.Context, comment *Comment) (*Response, er
 
 	comments := root.JSON.Data.Things.Comments
 	for _, c := range comments {
-		addCommentToReplies(comment, c)
+		addCommentToTree(pc, c)
 	}
 
-	comment.Replies.MoreComments = nil
+	pc.moreComments = nil
 	return resp, nil
 }
 
-// addCommentToReplies traverses the comment tree to find the one
-// that the 2nd comment is replying to. It then adds it to its replies.
-func addCommentToReplies(parent *Comment, comment *Comment) {
-	if parent.FullID == comment.ParentID {
-		parent.Replies.Comments = append(parent.Replies.Comments, comment)
+func addCommentToTree(pc *PostAndComments, comment *Comment) {
+	if pc.Post.FullID == comment.ParentID {
+		pc.Comments = append(pc.Comments, comment)
 		return
 	}
 
-	for _, reply := range parent.Replies.Comments {
+	for _, reply := range pc.Comments {
 		addCommentToReplies(reply, comment)
 	}
 }
@@ -516,7 +508,7 @@ func (s *PostService) random(ctx context.Context, subreddits ...string) (*Post, 
 		return nil, nil, nil, err
 	}
 
-	root := new(postAndComments)
+	root := new(PostAndComments)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, nil, resp, err

@@ -58,7 +58,7 @@ type Listing struct {
 // Things are objects/entities coming from the Reddit API.
 type Things struct {
 	Comments     []*Comment
-	MoreComments []*More
+	MoreComments *More
 
 	Users      []*User
 	Posts      []*Post
@@ -70,9 +70,6 @@ type Things struct {
 func (t *Things) init() {
 	if t.Comments == nil {
 		t.Comments = make([]*Comment, 0)
-	}
-	if t.MoreComments == nil {
-		t.MoreComments = make([]*More, 0)
 	}
 	if t.Users == nil {
 		t.Users = make([]*User, 0)
@@ -110,7 +107,7 @@ func (t *Things) UnmarshalJSON(b []byte) error {
 		case kindMore:
 			v := new(More)
 			if err := json.Unmarshal(byteValue, v); err == nil {
-				t.MoreComments = append(t.MoreComments, v)
+				t.MoreComments = v
 			}
 		case kindAccount:
 			v := new(User)
@@ -190,6 +187,10 @@ type Comment struct {
 	Replies Replies `json:"replies"`
 }
 
+func (c *Comment) hasMore() bool {
+	return c.Replies.MoreComments != nil && len(c.Replies.MoreComments.Children) > 0
+}
+
 // Replies holds replies to a comment.
 // It contains both comments and "more" comments, which are entrypoints to other
 // comments that were left out.
@@ -214,9 +215,7 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 
 	if root.Data != nil {
 		r.Comments = root.Data.Things.Comments
-		if len(root.Data.Things.MoreComments) > 0 {
-			r.MoreComments = root.Data.Things.MoreComments[0]
-		}
+		r.MoreComments = root.Data.Things.MoreComments
 	}
 
 	return nil
@@ -329,6 +328,13 @@ func (rl *rootListing) getComments() *Comments {
 	return v
 }
 
+func (rl *rootListing) getMoreComments() *More {
+	if rl == nil || rl.Data == nil {
+		return nil
+	}
+	return rl.Data.Things.MoreComments
+}
+
 func (rl *rootListing) getUsers() *Users {
 	v := new(Users)
 	if rl != nil && rl.Data != nil {
@@ -404,17 +410,18 @@ type ModActions struct {
 	Before     string       `json:"before"`
 }
 
-// postAndComments is a post and its comments
-type postAndComments struct {
-	Post     *Post
-	Comments []*Comment
+// PostAndComments is a post and its comments.
+type PostAndComments struct {
+	Post         *Post      `json:"post"`
+	Comments     []*Comment `json:"comments"`
+	moreComments *More
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 // When getting a sticky post, you get an array of 2 Listings
 // The 1st one contains the single post in its children array
 // The 2nd one contains the comments to the post
-func (pc *postAndComments) UnmarshalJSON(data []byte) error {
+func (pc *PostAndComments) UnmarshalJSON(data []byte) error {
 	var l []rootListing
 
 	err := json.Unmarshal(data, &l)
@@ -428,9 +435,17 @@ func (pc *postAndComments) UnmarshalJSON(data []byte) error {
 
 	post := l[0].getPosts().Posts[0]
 	comments := l[1].getComments().Comments
+	moreComments := l[1].getMoreComments()
 
 	pc.Post = post
 	pc.Comments = comments
+	pc.moreComments = moreComments
 
 	return nil
 }
+
+func (pc *PostAndComments) hasMore() bool {
+	return pc.moreComments != nil && len(pc.moreComments.Children) > 0
+}
+
+func (pc *PostAndComments) M() *More { return pc.moreComments }
