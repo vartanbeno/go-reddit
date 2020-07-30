@@ -140,35 +140,6 @@ var expectedSubreddits = &Subreddits{
 	},
 }
 
-var expectedSticky = &postAndComments{
-	Post: &Post{
-		ID:      "hcl9gq",
-		FullID:  "t3_hcl9gq",
-		Created: &Timestamp{time.Date(2020, 6, 20, 12, 8, 57, 0, time.UTC)},
-		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
-
-		Permalink: "https://www.reddit.com/r/nba/comments/hcl9gq/daily_discussion_thread_freetalk_and_other/",
-		URL:       "https://www.reddit.com/r/nba/comments/hcl9gq/daily_discussion_thread_freetalk_and_other/",
-
-		Title: "Daily Discussion Thread | Free-Talk and Other Updates - June 20, 2020",
-		Body:  "Talk about whatever is on your mind, basketball related or not.\n\n# Useful Links \u0026amp; Other Resources\n\n[List of All #NBATogether Live Classic Games Streamed to Date](https://www.youtube.com/results?search_query=%23NBATogetherLive)\n\n[r/nba Discord Server](https://www.discord.gg/nba)\n\n[r/nba Twitter](https://twitter.com/nba_reddit)\n\n[Read Our Community's Rules and Guidelines](https://www.reddit.com/r/nba/wiki/rules)",
-
-		Score:            16,
-		UpvoteRatio:      0.82,
-		NumberOfComments: 25,
-
-		SubredditID:           "t5_2qo4s",
-		SubredditName:         "nba",
-		SubredditNamePrefixed: "r/nba",
-
-		AuthorID:   "t2_6l4z3",
-		AuthorName: "AutoModerator",
-
-		IsSelfPost: true,
-		Stickied:   true,
-	},
-}
-
 var expectSubredditInfos = []*SubredditInfo{
 	{Name: "golang", Subscribers: 119_722, ActiveUsers: 531},
 	{Name: "golang_infosec", Subscribers: 1_776, ActiveUsers: 0},
@@ -449,10 +420,9 @@ func TestSubredditService_GetSticky1(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	post, comments, _, err := client.Subreddit.GetSticky1(ctx, "test")
+	postAndComments, _, err := client.Subreddit.GetSticky1(ctx, "test")
 	assert.NoError(t, err)
-	assert.Equal(t, expectedPost2, post)
-	assert.Equal(t, expectedComments, comments)
+	assert.Equal(t, expectedPostAndComments, postAndComments)
 }
 
 func TestSubredditService_GetSticky2(t *testing.T) {
@@ -472,10 +442,9 @@ func TestSubredditService_GetSticky2(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	post, comments, _, err := client.Subreddit.GetSticky2(ctx, "test")
+	postAndComments, _, err := client.Subreddit.GetSticky2(ctx, "test")
 	assert.NoError(t, err)
-	assert.Equal(t, expectedPost2, post)
-	assert.Equal(t, expectedComments, comments)
+	assert.Equal(t, expectedPostAndComments, postAndComments)
 }
 
 func TestSubredditService_Subscribe(t *testing.T) {

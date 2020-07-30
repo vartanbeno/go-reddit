@@ -10,84 +10,85 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var expectedPost2 = &Post{
-	ID:      "testpost",
-	FullID:  "t3_testpost",
-	Created: &Timestamp{time.Date(2020, 7, 18, 10, 26, 7, 0, time.UTC)},
-	Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
-
-	Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/"),
-	URL:       "https://www.reddit.com/r/test/comments/testpost/test/",
-
-	Title: "Test",
-	Body:  "Hello",
-
-	Score:            1,
-	UpvoteRatio:      1,
-	NumberOfComments: 2,
-
-	SubredditID:           "t5_2qh23",
-	SubredditName:         "test",
-	SubredditNamePrefixed: "r/test",
-
-	AuthorID:   "t2_testuser",
-	AuthorName: "testuser",
-
-	IsSelfPost: true,
-}
-
-var expectedComments = []*Comment{
-	{
-		ID:      "testc1",
-		FullID:  "t1_testc1",
-		Created: &Timestamp{time.Date(2020, 7, 18, 10, 31, 59, 0, time.UTC)},
+var expectedPostAndComments = &PostAndComments{
+	Post: &Post{
+		ID:      "testpost",
+		FullID:  "t3_testpost",
+		Created: &Timestamp{time.Date(2020, 7, 18, 10, 26, 7, 0, time.UTC)},
 		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-		ParentID:  "t3_testpost",
-		Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/testc1/"),
+		Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/"),
+		URL:       "https://www.reddit.com/r/test/comments/testpost/test/",
 
-		Body:     "Hi",
-		Author:   "testuser",
-		AuthorID: "t2_testuser",
-
-		Subreddit:             "test",
-		SubredditNamePrefixed: "r/test",
-		SubredditID:           "t5_2qh23",
+		Title: "Test",
+		Body:  "Hello",
 
 		Score:            1,
-		Controversiality: 0,
+		UpvoteRatio:      1,
+		NumberOfComments: 2,
 
-		PostID: "t3_testpost",
+		SubredditID:           "t5_2qh23",
+		SubredditName:         "test",
+		SubredditNamePrefixed: "r/test",
 
-		IsSubmitter: true,
-		CanGild:     true,
+		AuthorID:   "t2_testuser",
+		AuthorName: "testuser",
 
-		Replies: Replies{
-			Comments: []*Comment{
-				{
-					ID:      "testc2",
-					FullID:  "t1_testc2",
-					Created: &Timestamp{time.Date(2020, 7, 18, 10, 32, 28, 0, time.UTC)},
-					Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+		IsSelfPost: true,
+	},
+	Comments: []*Comment{
+		{
+			ID:      "testc1",
+			FullID:  "t1_testc1",
+			Created: &Timestamp{time.Date(2020, 7, 18, 10, 31, 59, 0, time.UTC)},
+			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-					ParentID:  "t1_testc1",
-					Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/testc2/"),
+			ParentID:  "t3_testpost",
+			Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/testc1/"),
 
-					Body:     "Hello",
-					Author:   "testuser",
-					AuthorID: "t2_testuser",
+			Body:     "Hi",
+			Author:   "testuser",
+			AuthorID: "t2_testuser",
 
-					Subreddit:             "test",
-					SubredditNamePrefixed: "r/test",
-					SubredditID:           "t5_2qh23",
+			Subreddit:             "test",
+			SubredditNamePrefixed: "r/test",
+			SubredditID:           "t5_2qh23",
 
-					Score:            1,
-					Controversiality: 0,
+			Score:            1,
+			Controversiality: 0,
 
-					PostID: "t3_testpost",
+			PostID: "t3_testpost",
 
-					IsSubmitter: true,
-					CanGild:     true,
+			IsSubmitter: true,
+			CanGild:     true,
+
+			Replies: Replies{
+				Comments: []*Comment{
+					{
+						ID:      "testc2",
+						FullID:  "t1_testc2",
+						Created: &Timestamp{time.Date(2020, 7, 18, 10, 32, 28, 0, time.UTC)},
+						Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+						ParentID:  "t1_testc1",
+						Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/testc2/"),
+
+						Body:     "Hello",
+						Author:   "testuser",
+						AuthorID: "t2_testuser",
+
+						Subreddit:             "test",
+						SubredditNamePrefixed: "r/test",
+						SubredditID:           "t5_2qh23",
+
+						Score:            1,
+						Controversiality: 0,
+
+						PostID: "t3_testpost",
+
+						IsSubmitter: true,
+						CanGild:     true,
+					},
 				},
 			},
 		},
@@ -141,10 +142,9 @@ func TestPostService_Get(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	post, comments, _, err := client.Post.Get(ctx, "test")
+	postAndComments, _, err := client.Post.Get(ctx, "test")
 	assert.NoError(t, err)
-	assert.Equal(t, expectedPost2, post)
-	assert.Equal(t, expectedComments, comments)
+	assert.Equal(t, expectedPostAndComments, postAndComments)
 }
 
 func TestPostService_SubmitText(t *testing.T) {
@@ -741,7 +741,7 @@ func TestPostService_More(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, err = client.Post.More(ctx, parentComment)
+	_, err = client.Comment.LoadMoreReplies(ctx, parentComment)
 	assert.NoError(t, err)
 	assert.Nil(t, parentComment.Replies.MoreComments)
 	assert.Len(t, parentComment.Replies.Comments, 1)
@@ -752,7 +752,7 @@ func TestPostService_MoreNil(t *testing.T) {
 	setup()
 	defer teardown()
 
-	_, err := client.Post.More(ctx, nil)
+	_, err := client.Comment.LoadMoreReplies(ctx, nil)
 	assert.EqualError(t, err, "comment: must not be nil")
 
 	parentComment := &Comment{
@@ -762,7 +762,7 @@ func TestPostService_MoreNil(t *testing.T) {
 	}
 
 	// should return nil, nil since comment does not have More struct
-	resp, err := client.Post.More(ctx, parentComment)
+	resp, err := client.Comment.LoadMoreReplies(ctx, parentComment)
 	assert.NoError(t, err)
 	assert.Nil(t, resp)
 
@@ -771,7 +771,7 @@ func TestPostService_MoreNil(t *testing.T) {
 	}
 
 	// should return nil, nil since comment's More struct has 0 children
-	resp, err = client.Post.More(ctx, parentComment)
+	resp, err = client.Comment.LoadMoreReplies(ctx, parentComment)
 	assert.NoError(t, err)
 	assert.Nil(t, resp)
 }
@@ -788,10 +788,9 @@ func TestPostService_RandomFromSubreddits(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	post, comments, _, err := client.Post.RandomFromSubreddits(ctx, "test")
+	postAndComments, _, err := client.Post.RandomFromSubreddits(ctx, "test")
 	assert.NoError(t, err)
-	assert.Equal(t, expectedPost2, post)
-	assert.Equal(t, expectedComments, comments)
+	assert.Equal(t, expectedPostAndComments, postAndComments)
 }
 
 func TestPostService_Random(t *testing.T) {
@@ -806,10 +805,9 @@ func TestPostService_Random(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	post, comments, _, err := client.Post.Random(ctx)
+	postAndComments, _, err := client.Post.Random(ctx)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedPost2, post)
-	assert.Equal(t, expectedComments, comments)
+	assert.Equal(t, expectedPostAndComments, postAndComments)
 }
 
 func TestPostService_RandomFromSubscriptions(t *testing.T) {
@@ -824,10 +822,9 @@ func TestPostService_RandomFromSubscriptions(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	post, comments, _, err := client.Post.RandomFromSubscriptions(ctx)
+	postAndComments, _, err := client.Post.RandomFromSubscriptions(ctx)
 	assert.NoError(t, err)
-	assert.Equal(t, expectedPost2, post)
-	assert.Equal(t, expectedComments, comments)
+	assert.Equal(t, expectedPostAndComments, postAndComments)
 }
 
 func TestPostService_Delete(t *testing.T) {

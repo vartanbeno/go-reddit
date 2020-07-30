@@ -164,12 +164,12 @@ func (s *SubredditService) GetModerated(ctx context.Context, opts *ListOptions) 
 }
 
 // GetSticky1 returns the first stickied post on a subreddit (if it exists).
-func (s *SubredditService) GetSticky1(ctx context.Context, name string) (*Post, []*Comment, *Response, error) {
+func (s *SubredditService) GetSticky1(ctx context.Context, name string) (*PostAndComments, *Response, error) {
 	return s.getSticky(ctx, name, 1)
 }
 
 // GetSticky2 returns the second stickied post on a subreddit (if it exists).
-func (s *SubredditService) GetSticky2(ctx context.Context, name string) (*Post, []*Comment, *Response, error) {
+func (s *SubredditService) GetSticky2(ctx context.Context, name string) (*PostAndComments, *Response, error) {
 	return s.getSticky(ctx, name, 2)
 }
 
@@ -278,7 +278,7 @@ func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts 
 
 // getSticky returns one of the 2 stickied posts of the subreddit (if they exist).
 // Num should be equal to 1 or 2, depending on which one you want.
-func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num int) (*Post, []*Comment, *Response, error) {
+func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num int) (*PostAndComments, *Response, error) {
 	type query struct {
 		Num int `url:"num"`
 	}
@@ -286,21 +286,21 @@ func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num 
 	path := fmt.Sprintf("r/%s/about/sticky", subreddit)
 	path, err := addOptions(path, query{num})
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	root := new(PostAndComments)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
-		return nil, nil, resp, err
+		return nil, resp, err
 	}
 
-	return root.Post, root.Comments, resp, nil
+	return root, resp, nil
 }
 
 // Moderators returns the moderators of a subreddit.

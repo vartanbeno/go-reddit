@@ -447,5 +447,3 @@ func (pc *PostAndComments) UnmarshalJSON(data []byte) error {
 func (pc *PostAndComments) hasMore() bool {
 	return pc.moreComments != nil && len(pc.moreComments.Children) > 0
 }
-
-func (pc *PostAndComments) M() *More { return pc.moreComments }
