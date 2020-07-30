@@ -32,7 +32,8 @@ func (p *Permalink) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	*p = Permalink("https://www.reddit.com" + v)
+	v = "https://www.reddit.com" + v
+	*p = Permalink(v)
 	return nil
 }
 
@@ -89,16 +90,20 @@ func (t *Things) init() {
 func (t *Things) UnmarshalJSON(b []byte) error {
 	t.init()
 
-	var children []map[string]interface{}
-	if err := json.Unmarshal(b, &children); err != nil {
+	type thing struct {
+		Kind string      `json:"kind"`
+		Data interface{} `json:"data"`
+	}
+
+	var things []thing
+	if err := json.Unmarshal(b, &things); err != nil {
 		return err
 	}
 
-	for _, child := range children {
-		data := child["data"]
-		byteValue, _ := json.Marshal(data)
+	for _, thing := range things {
+		byteValue, _ := json.Marshal(thing.Data)
 
-		switch child["kind"] {
+		switch thing.Kind {
 		case kindComment:
 			v := new(Comment)
 			if err := json.Unmarshal(byteValue, v); err == nil {

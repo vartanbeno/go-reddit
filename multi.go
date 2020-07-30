@@ -51,19 +51,18 @@ type SubredditNames []string
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (n *SubredditNames) UnmarshalJSON(data []byte) error {
-	var subreddits []map[string]string
+	type subreddit struct {
+		Name string `json:"name"`
+	}
+	var subreddits []subreddit
 
 	err := json.Unmarshal(data, &subreddits)
 	if err != nil {
 		return err
 	}
 
-	for _, subreddit := range subreddits {
-		name, ok := subreddit["name"]
-		if !ok {
-			continue
-		}
-		*n = append(*n, name)
+	for _, sr := range subreddits {
+		*n = append(*n, sr.Name)
 	}
 
 	return nil
@@ -71,12 +70,13 @@ func (n *SubredditNames) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON implements the json.Marshaler interface.
 func (n *SubredditNames) MarshalJSON() ([]byte, error) {
-	var subreddits []map[string]string
+	type subreddit struct {
+		Name string `json:"name"`
+	}
+	var subreddits []subreddit
 
-	for _, sr := range *n {
-		subreddits = append(subreddits, map[string]string{
-			"name": sr,
-		})
+	for _, name := range *n {
+		subreddits = append(subreddits, subreddit{name})
 	}
 
 	return json.Marshal(subreddits)
@@ -195,7 +195,7 @@ func (s *MultiService) Of(ctx context.Context, username string) ([]Multi, *Respo
 // Copy copies a multireddit.
 func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) (*Multi, *Response, error) {
 	if copyRequest == nil {
-		return nil, nil, errors.New("copyRequest cannot be nil")
+		return nil, nil, errors.New("copyRequest: cannot be nil")
 	}
 
 	path := "api/multi/copy"
@@ -217,7 +217,7 @@ func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) 
 // Create creates a multireddit.
 func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrUpdateRequest) (*Multi, *Response, error) {
 	if createRequest == nil {
-		return nil, nil, errors.New("createRequest cannot be nil")
+		return nil, nil, errors.New("createRequest: cannot be nil")
 	}
 
 	path := "api/multi"
@@ -240,7 +240,7 @@ func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrU
 // If the multireddit does not exist, it will be created.
 func (s *MultiService) Update(ctx context.Context, multiPath string, updateRequest *MultiCreateOrUpdateRequest) (*Multi, *Response, error) {
 	if updateRequest == nil {
-		return nil, nil, errors.New("updateRequest cannot be nil")
+		return nil, nil, errors.New("updateRequest: cannot be nil")
 	}
 
 	path := fmt.Sprintf("api/multi/%s", multiPath)

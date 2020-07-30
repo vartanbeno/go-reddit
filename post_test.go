@@ -17,7 +17,7 @@ var expectedPostAndComments = &PostAndComments{
 		Created: &Timestamp{time.Date(2020, 7, 18, 10, 26, 7, 0, time.UTC)},
 		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-		Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/"),
+		Permalink: "https://www.reddit.com/r/test/comments/testpost/test/",
 		URL:       "https://www.reddit.com/r/test/comments/testpost/test/",
 
 		Title: "Test",
@@ -44,7 +44,7 @@ var expectedPostAndComments = &PostAndComments{
 			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
 			ParentID:  "t3_testpost",
-			Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/testc1/"),
+			Permalink: "https://www.reddit.com/r/test/comments/testpost/test/testc1/",
 
 			Body:     "Hi",
 			Author:   "testuser",
@@ -71,7 +71,7 @@ var expectedPostAndComments = &PostAndComments{
 						Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
 						ParentID:  "t1_testc1",
-						Permalink: Permalink("https://www.reddit.com/r/test/comments/testpost/test/testc2/"),
+						Permalink: "https://www.reddit.com/r/test/comments/testpost/test/testc2/",
 
 						Body:     "Hello",
 						Author:   "testuser",
