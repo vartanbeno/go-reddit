@@ -91,8 +91,8 @@ func (t *Things) UnmarshalJSON(b []byte) error {
 	t.init()
 
 	type thing struct {
-		Kind string      `json:"kind"`
-		Data interface{} `json:"data"`
+		Kind string          `json:"kind"`
+		Data json.RawMessage `json:"data"`
 	}
 
 	var things []thing
@@ -101,39 +101,37 @@ func (t *Things) UnmarshalJSON(b []byte) error {
 	}
 
 	for _, thing := range things {
-		byteValue, _ := json.Marshal(thing.Data)
-
 		switch thing.Kind {
 		case kindComment:
 			v := new(Comment)
-			if err := json.Unmarshal(byteValue, v); err == nil {
+			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.Comments = append(t.Comments, v)
 			}
 		case kindMore:
 			v := new(More)
-			if err := json.Unmarshal(byteValue, v); err == nil {
+			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.MoreComments = v
 			}
 		case kindAccount:
 			v := new(User)
-			if err := json.Unmarshal(byteValue, v); err == nil {
+			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.Users = append(t.Users, v)
 			}
 		case kindLink:
 			v := new(Post)
-			if err := json.Unmarshal(byteValue, v); err == nil {
+			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.Posts = append(t.Posts, v)
 			}
 		case kindMessage:
 		case kindSubreddit:
 			v := new(Subreddit)
-			if err := json.Unmarshal(byteValue, v); err == nil {
+			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.Subreddits = append(t.Subreddits, v)
 			}
 		case kindAward:
 		case kindModAction:
 			v := new(ModAction)
-			if err := json.Unmarshal(byteValue, v); err == nil {
+			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.ModActions = append(t.ModActions, v)
 			}
 		}
