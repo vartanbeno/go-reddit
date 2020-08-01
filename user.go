@@ -515,3 +515,41 @@ func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]Trophy
 
 	return trophies, resp, nil
 }
+
+// Popular gets the user subreddits with the most activity.
+func (s *UserService) Popular(ctx context.Context, opts ...SearchOptionSetter) (*Subreddits, *Response, error) {
+	form := newSearchOptions(opts...)
+	path := addQuery("users/popular", form)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.getSubreddits(), resp, nil
+}
+
+// New gets the most recently created user subreddits.
+func (s *UserService) New(ctx context.Context, opts ...SearchOptionSetter) (*Subreddits, *Response, error) {
+	form := newSearchOptions(opts...)
+	path := addQuery("users/new", form)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.getSubreddits(), resp, nil
+}

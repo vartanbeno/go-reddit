@@ -129,6 +129,37 @@ var expectedTrophies = []Trophy{
 	},
 }
 
+var expectedUserSubreddits = &Subreddits{
+	Subreddits: []*Subreddit{
+		{
+			ID:      "3kefx",
+			FullID:  "t5_3kefx",
+			Created: &Timestamp{time.Date(2017, 5, 11, 16, 37, 16, 0, time.UTC)},
+
+			URL:          "/user/nickofnight/",
+			Name:         "u_nickofnight",
+			NamePrefixed: "u/nickofnight",
+			Title:        "nickofnight",
+			Description:  "Stories written for Writing Prompts, NoSleep, and originals. Current series: The Carnival of Night ",
+			Type:         "user",
+		},
+		{
+			ID:      "3knn1",
+			FullID:  "t5_3knn1",
+			Created: &Timestamp{time.Date(2017, 5, 18, 2, 15, 55, 0, time.UTC)},
+
+			URL:                  "/user/shittymorph/",
+			Name:                 "u_shittymorph",
+			NamePrefixed:         "u/shittymorph",
+			Title:                "shittymorph",
+			Description:          "In nineteen ninety eight the undertaker threw mankind off hеll in a cell, and plummeted sixteen feet through an announcer's table.",
+			Type:                 "user",
+			SuggestedCommentSort: "qa",
+		},
+	},
+	After: "t5_3knn1",
+}
+
 func TestUserService_Get(t *testing.T) {
 	setup()
 	defer teardown()
@@ -828,4 +859,38 @@ func TestUserService_TrophiesOf(t *testing.T) {
 	trophies, _, err := client.User.TrophiesOf(ctx, "test123")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedTrophies, trophies)
+}
+
+func TestUserService_Popular(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/user/user-subreddits.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/users/popular", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	userSubreddits, _, err := client.User.Popular(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedUserSubreddits, userSubreddits)
+}
+
+func TestUserService_New(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/user/user-subreddits.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/users/new", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	userSubreddits, _, err := client.User.New(ctx)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedUserSubreddits, userSubreddits)
 }
