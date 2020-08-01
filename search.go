@@ -86,8 +86,15 @@ func SortByTop(opts url.Values) {
 }
 
 // SortByRelevance sets the sort option to return the most relevant results first.
+// This can be used when searching for subreddits and users.
 func SortByRelevance(opts url.Values) {
 	opts.Set("sort", "relevance")
+}
+
+// SortByActivity sets the sort option to return results with the most activity first.
+// This can be used when searching for subreddits and users.
+func SortByActivity(opts url.Values) {
+	opts.Set("sort", "activity")
 }
 
 // SortByNumberOfComments sets the sort option to return the results with the highest

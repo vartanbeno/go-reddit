@@ -22,17 +22,6 @@ type rootSubreddit struct {
 	Data *Subreddit `json:"data,omitempty"`
 }
 
-type rootSubredditInfoList struct {
-	Subreddits []*SubredditInfo `json:"subreddits,omitempty"`
-}
-
-// SubredditInfo represents minimal information about a subreddit.
-type SubredditInfo struct {
-	Name        string `json:"name,omitempty"`
-	Subscribers int    `json:"subscriber_count"`
-	ActiveUsers int    `json:"active_user_count"`
-}
-
 type rootSubredditNames struct {
 	Names []string `json:"names,omitempty"`
 }
@@ -216,26 +205,24 @@ func (s *SubredditService) UnsubscribeByID(ctx context.Context, ids ...string) (
 	return s.handleSubscription(ctx, form)
 }
 
-// Search searches for subreddits with names beginning with the query provided.
-// They hold a very minimal amount of info.
-func (s *SubredditService) Search(ctx context.Context, query string) ([]*SubredditInfo, *Response, error) {
-	path := "api/search_subreddits"
+// Search searches for subreddits.
+func (s *SubredditService) Search(ctx context.Context, query string, opts ...SearchOptionSetter) (*Subreddits, *Response, error) {
+	opts = append(opts, setQuery(query))
+	form := newSearchOptions(opts...)
 
-	form := url.Values{}
-	form.Set("query", query)
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	path := addQuery("subreddits/search", form)
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	root := new(rootSubredditInfoList)
+	root := new(rootListing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Subreddits, resp, nil
+	return root.getSubreddits(), resp, nil
 }
 
 // SearchNames searches for subreddits with names beginning with the query provided.
@@ -375,4 +362,29 @@ func (s *SubredditService) Random(ctx context.Context) (*Subreddit, *Response, e
 // RandomNSFW returns a random NSFW subreddit.
 func (s *SubredditService) RandomNSFW(ctx context.Context) (*Subreddit, *Response, error) {
 	return s.random(ctx, true)
+}
+
+// SubmissionText gets the submission text for the subreddit.
+// This text is set by the subreddit moderators and intended to be displayed on the submission form.
+func (s *SubredditService) SubmissionText(ctx context.Context, name string) (string, *Response, error) {
+	if name == "" {
+		return "", nil, errors.New("name: must not be empty")
+	}
+
+	path := fmt.Sprintf("r/%s/api/submit_text", name)
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return "", nil, err
+	}
+
+	type response struct {
+		Text string `json:"submit_text"`
+	}
+	root := new(response)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return "", resp, err
+	}
+
+	return root.Text, resp, err
 }

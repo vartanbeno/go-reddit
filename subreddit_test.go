@@ -140,17 +140,7 @@ var expectedSubreddits = &Subreddits{
 	},
 }
 
-var expectSubredditInfos = []*SubredditInfo{
-	{Name: "golang", Subscribers: 119_722, ActiveUsers: 531},
-	{Name: "golang_infosec", Subscribers: 1_776, ActiveUsers: 0},
-	{Name: "GolangJobOfferings", Subscribers: 863, ActiveUsers: 1},
-	{Name: "golang2", Subscribers: 626, ActiveUsers: 0},
-	{Name: "GolangUnofficial", Subscribers: 239, ActiveUsers: 4},
-	{Name: "golanguage", Subscribers: 247, ActiveUsers: 4},
-	{Name: "golang_jobs", Subscribers: 16, ActiveUsers: 4},
-}
-
-var expectSubredditNames = []string{
+var expectedSubredditNames = []string{
 	"golang",
 	"golang_infosec",
 	"GolangJobOfferings",
@@ -531,25 +521,25 @@ func TestSubredditService_Search(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/search.json")
+	blob, err := readFileContents("testdata/subreddit/list.json")
 	assert.NoError(t, err)
 
-	mux.HandleFunc("/api/search_subreddits", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+	mux.HandleFunc("/subreddits/search", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
-		form.Set("query", "golang")
+		form.Set("q", "golang")
 
 		err := r.ParseForm()
 		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		assert.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	subreddits, _, err := client.Subreddit.Search(ctx, "golang")
 	assert.NoError(t, err)
-	assert.Equal(t, expectSubredditInfos, subreddits)
+	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
 func TestSubredditService_SearchNames(t *testing.T) {
@@ -574,7 +564,7 @@ func TestSubredditService_SearchNames(t *testing.T) {
 
 	names, _, err := client.Subreddit.SearchNames(ctx, "golang")
 	assert.NoError(t, err)
-	assert.Equal(t, expectSubredditNames, names)
+	assert.Equal(t, expectedSubredditNames, names)
 }
 
 func TestSubredditService_Moderators(t *testing.T) {
@@ -638,4 +628,21 @@ func TestSubredditService_RandomNSFW(t *testing.T) {
 	subreddit, _, err := client.Subreddit.RandomNSFW(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedRandomSubreddit, subreddit)
+}
+
+func TestSubredditService_SubmissionText(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/test/api/submit_text", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, `{
+			"submit_text": "this is a test",
+			"submit_text_html": ""
+		}`)
+	})
+
+	text, _, err := client.Subreddit.SubmissionText(ctx, "test")
+	assert.NoError(t, err)
+	assert.Equal(t, "this is a test", text)
 }
