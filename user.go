@@ -37,9 +37,9 @@ type User struct {
 	IsSuspended      bool `json:"is_suspended"`
 }
 
-// UserShort represents a Reddit user, but
+// UserSummary represents a Reddit user, but
 // contains fewer pieces of information.
-type UserShort struct {
+type UserSummary struct {
 	Name    string     `json:"name,omitempty"`
 	Created *Timestamp `json:"created_utc,omitempty"`
 
@@ -101,8 +101,8 @@ func (s *UserService) Get(ctx context.Context, username string) (*User, *Respons
 }
 
 // GetMultipleByID returns multiple users from their full IDs.
-// The response body is a map where the keys are the IDs (if they exist), and the value is the user
-func (s *UserService) GetMultipleByID(ctx context.Context, ids ...string) (map[string]*UserShort, *Response, error) {
+// The response body is a map where the keys are the IDs (if they exist), and the value is the user.
+func (s *UserService) GetMultipleByID(ctx context.Context, ids ...string) (map[string]*UserSummary, *Response, error) {
 	type query struct {
 		IDs []string `url:"ids,omitempty,comma"`
 	}
@@ -118,13 +118,13 @@ func (s *UserService) GetMultipleByID(ctx context.Context, ids ...string) (map[s
 		return nil, nil, err
 	}
 
-	root := new(map[string]*UserShort)
-	resp, err := s.client.Do(ctx, req, root)
+	root := make(map[string]*UserSummary)
+	resp, err := s.client.Do(ctx, req, &root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return *root, resp, nil
+	return root, resp, nil
 }
 
 // UsernameAvailable checks whether a username is available for registration.
@@ -552,4 +552,25 @@ func (s *UserService) New(ctx context.Context, opts ...SearchOptionSetter) (*Sub
 	}
 
 	return root.getSubreddits(), resp, nil
+}
+
+// Search searches for users.
+func (s *UserService) Search(ctx context.Context, query string, opts ...SearchOptionSetter) (*Users, *Response, error) {
+	opts = append(opts, setQuery(query))
+	form := newSearchOptions(opts...)
+
+	path := addQuery("users/search", form)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.getUsers(), resp, nil
 }

@@ -22,7 +22,7 @@ var expectedUser = &User{
 	HasVerifiedEmail: true,
 }
 
-var expectedUsers = map[string]*UserShort{
+var expectedUsers = map[string]*UserSummary{
 	"t2_1": {
 		Name:         "test_user_1",
 		Created:      &Timestamp{time.Date(2017, 3, 12, 2, 1, 47, 0, time.UTC)},
@@ -158,6 +158,32 @@ var expectedUserSubreddits = &Subreddits{
 		},
 	},
 	After: "t5_3knn1",
+}
+
+var expectedSearchUsers2 = &Users{
+	Users: []*User{
+		{
+			ID:      "179965",
+			Name:    "washingtonpost",
+			Created: &Timestamp{time.Date(2017, 4, 20, 21, 23, 58, 0, time.UTC)},
+
+			PostKarma:    1075227,
+			CommentKarma: 339569,
+
+			HasVerifiedEmail: true,
+		},
+		{
+			ID:      "11kowl2w",
+			Name:    "reuters",
+			Created: &Timestamp{time.Date(2018, 3, 15, 1, 50, 4, 0, time.UTC)},
+
+			PostKarma:    76744,
+			CommentKarma: 42717,
+
+			HasVerifiedEmail: true,
+		},
+	},
+	After: "t2_11kowl2w",
 }
 
 func TestUserService_Get(t *testing.T) {
@@ -893,4 +919,29 @@ func TestUserService_New(t *testing.T) {
 	userSubreddits, _, err := client.User.New(ctx)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedUserSubreddits, userSubreddits)
+}
+
+func TestUserService_Search(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/user/list.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/users/search", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("q", "test")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	users, _, err := client.User.Search(ctx, "test")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSearchUsers2, users)
 }
