@@ -146,9 +146,9 @@ func newClient(httpClient *http.Client) *Client {
 	c.Subreddit = &SubredditService{client: c}
 	c.User = &UserService{client: c}
 
-	postAndCommentService := &PostAndCommentService{client: c}
-	c.Comment = &CommentService{client: c, PostAndCommentService: postAndCommentService}
-	c.Post = &PostService{client: c, PostAndCommentService: postAndCommentService}
+	postAndCommentService := &postAndCommentService{client: c}
+	c.Comment = &CommentService{client: c, postAndCommentService: postAndCommentService}
+	c.Post = &PostService{client: c, postAndCommentService: postAndCommentService}
 
 	return c
 }

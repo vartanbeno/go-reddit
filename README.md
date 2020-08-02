@@ -1,6 +1,6 @@
 # go-reddit
 
-[![Actions Status](https://github.com/vartanbeno/go-reddit/workflows/CI/badge.svg)](https://github.com/vartanbeno/go-reddit/actions)
+[![Actions Status](https://github.com/vartanbeno/go-reddit/workflows/tests/badge.svg)](https://github.com/vartanbeno/go-reddit/actions)
 
 go-reddit is a Go client library for accessing the Reddit API.
 

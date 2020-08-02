@@ -7,14 +7,12 @@ import (
 	"net/url"
 )
 
-// PostAndCommentService handles communication with the post and comment
+// postAndCommentService handles communication with the post and comment
 // related methods of the Reddit API.
 // This service holds functionality common to both posts and comments.
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_links_and_comments
-//
-// todo: this is ugly, find a solution
-type PostAndCommentService struct {
+type postAndCommentService struct {
 	client *Client
 }
 
@@ -28,7 +26,7 @@ const (
 )
 
 // Delete deletes a post or comment via its full ID.
-func (s *PostAndCommentService) Delete(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) Delete(ctx context.Context, id string) (*Response, error) {
 	path := "api/del"
 
 	form := url.Values{}
@@ -43,7 +41,7 @@ func (s *PostAndCommentService) Delete(ctx context.Context, id string) (*Respons
 }
 
 // Save saves a post or comment.
-func (s *PostAndCommentService) Save(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) Save(ctx context.Context, id string) (*Response, error) {
 	path := "api/save"
 
 	form := url.Values{}
@@ -58,7 +56,7 @@ func (s *PostAndCommentService) Save(ctx context.Context, id string) (*Response,
 }
 
 // Unsave unsaves a post or comment.
-func (s *PostAndCommentService) Unsave(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) Unsave(ctx context.Context, id string) (*Response, error) {
 	path := "api/unsave"
 
 	form := url.Values{}
@@ -73,7 +71,7 @@ func (s *PostAndCommentService) Unsave(ctx context.Context, id string) (*Respons
 }
 
 // EnableReplies enables inbox replies for one of your posts or comments.
-func (s *PostAndCommentService) EnableReplies(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) EnableReplies(ctx context.Context, id string) (*Response, error) {
 	path := "api/sendreplies"
 
 	form := url.Values{}
@@ -89,7 +87,7 @@ func (s *PostAndCommentService) EnableReplies(ctx context.Context, id string) (*
 }
 
 // DisableReplies dsables inbox replies for one of your posts or comments.
-func (s *PostAndCommentService) DisableReplies(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) DisableReplies(ctx context.Context, id string) (*Response, error) {
 	path := "api/sendreplies"
 
 	form := url.Values{}
@@ -105,7 +103,7 @@ func (s *PostAndCommentService) DisableReplies(ctx context.Context, id string) (
 }
 
 // Lock locks a post or comment, preventing it from receiving new comments.
-func (s *PostAndCommentService) Lock(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) Lock(ctx context.Context, id string) (*Response, error) {
 	path := "api/lock"
 
 	form := url.Values{}
@@ -120,7 +118,7 @@ func (s *PostAndCommentService) Lock(ctx context.Context, id string) (*Response,
 }
 
 // Unlock unlocks a post or comment, allowing it to receive new comments.
-func (s *PostAndCommentService) Unlock(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) Unlock(ctx context.Context, id string) (*Response, error) {
 	path := "api/unlock"
 
 	form := url.Values{}
@@ -134,7 +132,7 @@ func (s *PostAndCommentService) Unlock(ctx context.Context, id string) (*Respons
 	return s.client.Do(ctx, req, nil)
 }
 
-func (s *PostAndCommentService) vote(ctx context.Context, id string, vote vote) (*Response, error) {
+func (s *postAndCommentService) vote(ctx context.Context, id string, vote vote) (*Response, error) {
 	path := "api/vote"
 
 	form := url.Values{}
@@ -151,16 +149,16 @@ func (s *PostAndCommentService) vote(ctx context.Context, id string, vote vote) 
 }
 
 // Upvote upvotes a post or a comment.
-func (s *PostAndCommentService) Upvote(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) Upvote(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, upvote)
 }
 
 // Downvote downvotes a post or a comment.
-func (s *PostAndCommentService) Downvote(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) Downvote(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, downvote)
 }
 
 // RemoveVote removes your vote on a post or a comment.
-func (s *PostAndCommentService) RemoveVote(ctx context.Context, id string) (*Response, error) {
+func (s *postAndCommentService) RemoveVote(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, novote)
 }

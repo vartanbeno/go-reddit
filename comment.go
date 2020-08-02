@@ -12,7 +12,7 @@ import (
 //
 // Reddit API docs: https://www.reddit.com/dev/api/#section_links_and_comments
 type CommentService struct {
-	*PostAndCommentService
+	*postAndCommentService
 	client *Client
 }
 
