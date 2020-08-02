@@ -243,6 +243,35 @@ func (s *SubredditService) SearchNames(ctx context.Context, query string) ([]str
 	return root.Names, resp, nil
 }
 
+// SearchPosts searches for posts.
+// If the list of subreddits provided is empty, the search is run against r/all.
+func (s *SubredditService) SearchPosts(ctx context.Context, query string, subreddits []string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+	if len(subreddits) > 0 {
+		opts = append(opts, setRestrict)
+	} else {
+		subreddits = append(subreddits, "all")
+	}
+
+	opts = append(opts, setQuery(query))
+	form := newSearchOptions(opts...)
+
+	path := fmt.Sprintf("r/%s/search", strings.Join(subreddits, "+"))
+	path = addQuery(path, form)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.getPosts(), resp, nil
+}
+
 func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts *ListOptions) (*Subreddits, *Response, error) {
 	path, err := addOptions(path, opts)
 	if err != nil {

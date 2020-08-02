@@ -160,7 +160,7 @@ var expectedUserSubreddits = &Subreddits{
 	After: "t5_3knn1",
 }
 
-var expectedSearchUsers2 = &Users{
+var expectedSearchUsers = &Users{
 	Users: []*User{
 		{
 			ID:      "179965",
@@ -943,5 +943,5 @@ func TestUserService_Search(t *testing.T) {
 
 	users, _, err := client.User.Search(ctx, "test")
 	assert.NoError(t, err)
-	assert.Equal(t, expectedSearchUsers2, users)
+	assert.Equal(t, expectedSearchUsers, users)
 }

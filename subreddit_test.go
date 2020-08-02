@@ -150,6 +150,56 @@ var expectedSubredditNames = []string{
 	"golang_jobs",
 }
 
+var expectedSearchPosts = &Posts{
+	Posts: []*Post{
+		{
+			ID:      "hybow9",
+			FullID:  "t3_hybow9",
+			Created: &Timestamp{time.Date(2020, 7, 26, 18, 14, 24, 0, time.UTC)},
+			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+			Permalink: "https://www.reddit.com/r/WatchPeopleDieInside/comments/hybow9/pregnancy_test/",
+			URL:       "https://v.redd.it/ra4qnt8bt8d51",
+
+			Title: "Pregnancy test",
+
+			Score:            103829,
+			UpvoteRatio:      0.88,
+			NumberOfComments: 3748,
+
+			SubredditID:           "t5_3h4zq",
+			SubredditName:         "WatchPeopleDieInside",
+			SubredditNamePrefixed: "r/WatchPeopleDieInside",
+
+			AuthorID:   "t2_3p32m02",
+			AuthorName: "chocolat_ice_cream",
+		},
+		{
+			ID:      "hmwhd7",
+			FullID:  "t3_hmwhd7",
+			Created: &Timestamp{time.Date(2020, 7, 7, 15, 19, 42, 0, time.UTC)},
+			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+			Permalink: "https://www.reddit.com/r/worldnews/comments/hmwhd7/brazilian_president_jair_bolsonaro_tests_positive/",
+			URL:       "https://www.theguardian.com/world/2020/jul/07/jair-bolsonaro-coronavirus-positive-test-brazil-president",
+
+			Title: "Brazilian president Jair Bolsonaro tests positive for coronavirus",
+
+			Score:            149238,
+			UpvoteRatio:      0.94,
+			NumberOfComments: 7415,
+
+			SubredditID:           "t5_2qh13",
+			SubredditName:         "worldnews",
+			SubredditNamePrefixed: "r/worldnews",
+
+			AuthorID:   "t2_wgrkg",
+			AuthorName: "Jeremy_Martin",
+		},
+	},
+	After: "t3_hmwhd7",
+}
+
 var expectedModerators = []Moderator{
 	{ID: "t2_test1", Name: "testuser1", Permissions: []string{"all"}},
 	{ID: "t2_test2", Name: "testuser2", Permissions: []string{"all"}},
@@ -565,6 +615,86 @@ func TestSubredditService_SearchNames(t *testing.T) {
 	names, _, err := client.Subreddit.SearchNames(ctx, "golang")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubredditNames, names)
+}
+
+func TestSubredditService_SearchPosts(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/search-posts.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/all/search", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("q", "test")
+		form.Set("after", "t3_testpost")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", nil, SetAfter("t3_testpost"))
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSearchPosts, posts)
+}
+
+func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/search-posts.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/search", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("q", "test")
+		form.Set("restrict_sr", "true")
+		form.Set("after", "t3_testpost")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", []string{"test"}, SetAfter("t3_testpost"))
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSearchPosts, posts)
+}
+
+func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/search-posts.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test+golang+nba/search", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("q", "test")
+		form.Set("restrict_sr", "true")
+		form.Set("after", "t3_testpost")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", []string{"test", "golang", "nba"}, SetAfter("t3_testpost"))
+	assert.NoError(t, err)
+	assert.Equal(t, expectedSearchPosts, posts)
 }
 
 func TestSubredditService_Moderators(t *testing.T) {
