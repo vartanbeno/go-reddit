@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-// Opt is a configuration option to initialize a client
+// Opt is a configuration option to initialize a client.
 type Opt func(*Client) error
 
 // FromEnv configures the client with values from environment variables.
@@ -35,7 +35,7 @@ func FromEnv(c *Client) error {
 	return nil
 }
 
-// WithBaseURL sets the base URL for the client to make requests to
+// WithBaseURL sets the base URL for the client to make requests to.
 func WithBaseURL(u string) Opt {
 	return func(c *Client) error {
 		url, err := url.Parse(u)
@@ -48,7 +48,7 @@ func WithBaseURL(u string) Opt {
 	}
 }
 
-// WithTokenURL sets the url used to get access tokens
+// WithTokenURL sets the url used to get access tokens.
 func WithTokenURL(u string) Opt {
 	return func(c *Client) error {
 		url, err := url.Parse(u)

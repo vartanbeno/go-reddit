@@ -39,7 +39,7 @@ func setup() {
 	})
 
 	client, _ = NewClient(nil,
-		WithOAuth2("id1", "secret1", "user1", "password1"),
+		WithCredentials("id1", "secret1", "user1", "password1"),
 		WithBaseURL(server.URL),
 		WithTokenURL(server.URL+"/api/v1/access_token"),
 	)

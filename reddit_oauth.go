@@ -55,7 +55,7 @@ type oauth2Config struct {
 	tokenURL string
 
 	// We need to set a custom user agent, because using the one set by default by the
-	// stdlib gives us 429 Too Many Request responses from the Reddit API
+	// stdlib gives us 429 Too Many Request responses from the Reddit API.
 	userAgentTransport *userAgentTransport
 }
 
@@ -74,8 +74,6 @@ func oauth2Transport(c oauth2Config) *oauth2.Transport {
 		EndpointParams: params,
 	}
 
-	// We need to set a custom user agent, because using the one set by default by the
-	// stdlib gives us 429 Too Many Request responses from the Reddit API
 	httpClient := &http.Client{Transport: c.userAgentTransport}
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, httpClient)
 
@@ -87,8 +85,8 @@ func oauth2Transport(c oauth2Config) *oauth2.Transport {
 	return tr
 }
 
-// WithOAuth2 sets the necessary values for the client to authenticate via OAuth2
-func WithOAuth2(id, secret, username, password string) Opt {
+// WithCredentials sets the necessary values for the client to authenticate via OAuth2.
+func WithCredentials(id, secret, username, password string) Opt {
 	return func(c *Client) error {
 		c.ID = id
 		c.Secret = secret
