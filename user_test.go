@@ -100,7 +100,7 @@ var expectedComment = &Comment{
 	PostTitle:       "I'm giving away an iPhone 11 Pro to a commenter at random to celebrate Apollo for Reddit's new iOS 13 update and as a thank you to the community! Just leave a comment on this post and the winner will be selected randomly and announced tomorrow at 8 PM GMT. Details inside, and good luck!",
 	PostPermalink:   "https://www.reddit.com/r/apple/comments/d7ejpn/im_giving_away_an_iphone_11_pro_to_a_commenter_at/",
 	PostAuthor:      "iamthatis",
-	PostNumComments: 89751,
+	PostNumComments: Int(89751),
 }
 
 var expectedRelationship = &Relationship{

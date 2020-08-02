@@ -153,7 +153,7 @@ func (s *UserService) UsernameAvailable(ctx context.Context, username string) (b
 	return *root, resp, nil
 }
 
-// Overview returns a list of the client's posts and comments.
+// Overview returns a list of your posts and comments.
 func (s *UserService) Overview(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
 	return s.OverviewOf(ctx, s.client.Username, opts...)
 }
@@ -179,7 +179,7 @@ func (s *UserService) OverviewOf(ctx context.Context, username string, opts ...S
 	return root.getPosts(), root.getComments(), resp, nil
 }
 
-// Posts returns a list of the client's posts.
+// Posts returns a list of your posts.
 func (s *UserService) Posts(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	return s.PostsOf(ctx, s.client.Username, opts...)
 }
@@ -205,7 +205,7 @@ func (s *UserService) PostsOf(ctx context.Context, username string, opts ...Sear
 	return root.getPosts(), resp, nil
 }
 
-// Comments returns a list of the client's comments.
+// Comments returns a list of your comments.
 func (s *UserService) Comments(ctx context.Context, opts ...SearchOptionSetter) (*Comments, *Response, error) {
 	return s.CommentsOf(ctx, s.client.Username, opts...)
 }

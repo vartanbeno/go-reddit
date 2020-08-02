@@ -142,17 +142,17 @@ func (s *SubredditService) GetDefault(ctx context.Context, opts *ListOptions) (*
 	return s.getSubreddits(ctx, "subreddits/default", opts)
 }
 
-// GetSubscribed returns the list of subreddits the client is subscribed to.
+// GetSubscribed returns the list of subreddits you are subscribed to.
 func (s *SubredditService) GetSubscribed(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/subscriber", opts)
 }
 
-// GetApproved returns the list of subreddits the client is an approved user in.
+// GetApproved returns the list of subreddits you are an approved user in.
 func (s *SubredditService) GetApproved(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
 }
 
-// GetModerated returns the list of subreddits the client is a moderator of.
+// GetModerated returns the list of subreddits you are a moderator of.
 func (s *SubredditService) GetModerated(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/moderator", opts)
 }

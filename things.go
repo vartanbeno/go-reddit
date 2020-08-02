@@ -160,15 +160,14 @@ type Comment struct {
 	SubredditNamePrefixed string `json:"subreddit_name_prefixed,omitempty"`
 	SubredditID           string `json:"subreddit_id,omitempty"`
 
-	// Indicates if the client has upvote/downvoted (true/false)
-	// If neither, it will be nil
+	// Indicates if you've upvote/downvoted (true/false).
+	// If neither, it will be nil.
 	Likes *bool `json:"likes"`
 
 	Score            int `json:"score"`
 	Controversiality int `json:"controversiality"`
 
 	PostID string `json:"link_id,omitempty"`
-
 	// This doesn't appear when submitting a comment.
 	PostTitle string `json:"link_title,omitempty"`
 	// This doesn't appear when submitting a comment.
@@ -177,7 +176,7 @@ type Comment struct {
 	PostAuthor string `json:"link_author,omitempty"`
 	// This doesn't appear when submitting a comment
 	// or when getting a post with its comments.
-	PostNumComments int `json:"num_comments"`
+	PostNumComments *int `json:"num_comments,omitempty"`
 
 	IsSubmitter bool `json:"is_submitter"`
 	ScoreHidden bool `json:"score_hidden"`
@@ -251,8 +250,8 @@ type Post struct {
 	Title string `json:"title,omitempty"`
 	Body  string `json:"selftext,omitempty"`
 
-	// Indicates if the client has upvote/downvoted (true/false)
-	// If neither, it will be nil
+	// Indicates if you've upvote/downvoted (true/false).
+	// If neither, it will be nil.
 	Likes *bool `json:"likes"`
 
 	Score            int     `json:"score"`

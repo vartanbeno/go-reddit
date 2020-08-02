@@ -92,6 +92,7 @@ func SortByActivity(opts url.Values) {
 
 // SortByNumberOfComments sets the sort option to return the results with the highest
 // number of comments first.
+// This can be used when searching for posts within a subreddit.
 func SortByNumberOfComments(opts url.Values) {
 	opts.Set("sort", "comments")
 }
