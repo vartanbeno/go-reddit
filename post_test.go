@@ -753,7 +753,7 @@ func TestPostService_MoreNil(t *testing.T) {
 	defer teardown()
 
 	_, err := client.Comment.LoadMoreReplies(ctx, nil)
-	assert.EqualError(t, err, "comment: must not be nil")
+	assert.EqualError(t, err, "comment: cannot be nil")
 
 	parentComment := &Comment{
 		Replies: Replies{

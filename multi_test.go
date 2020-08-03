@@ -117,6 +117,9 @@ func TestMultiService_Copy(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
+	_, _, err = client.Multi.Copy(ctx, nil)
+	assert.EqualError(t, err, "copyRequest: cannot be nil")
+
 	multi, _, err := client.Multi.Copy(ctx, &MultiCopyRequest{
 		FromPath:    "user/testuser/m/testmulti",
 		ToPath:      "user/testuser2/m/testmulti2",
@@ -157,6 +160,9 @@ func TestMultiService_Create(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
+	_, _, err = client.Multi.Create(ctx, nil)
+	assert.EqualError(t, err, "createRequest: cannot be nil")
+
 	multi, _, err := client.Multi.Create(ctx, createRequest)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedMulti, multi)
@@ -190,6 +196,9 @@ func TestMultiService_Update(t *testing.T) {
 
 		fmt.Fprint(w, blob)
 	})
+
+	_, _, err = client.Multi.Update(ctx, "user/testuser/m/testmulti", nil)
+	assert.EqualError(t, err, "updateRequest: cannot be nil")
 
 	multi, _, err := client.Multi.Update(ctx, "user/testuser/m/testmulti", updateRequest)
 	assert.NoError(t, err)

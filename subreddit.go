@@ -103,7 +103,7 @@ func (s *SubredditService) Top(ctx context.Context, subreddit string, opts ...Se
 // Get gets a subreddit by name.
 func (s *SubredditService) Get(ctx context.Context, name string) (*Subreddit, *Response, error) {
 	if name == "" {
-		return nil, nil, errors.New("name: must not be empty")
+		return nil, nil, errors.New("name: cannot be empty")
 	}
 
 	path := fmt.Sprintf("r/%s/about", name)
@@ -406,7 +406,7 @@ func (s *SubredditService) RandomNSFW(ctx context.Context) (*Subreddit, *Respons
 // This text is set by the subreddit moderators and intended to be displayed on the submission form.
 func (s *SubredditService) SubmissionText(ctx context.Context, name string) (string, *Response, error) {
 	if name == "" {
-		return "", nil, errors.New("name: must not be empty")
+		return "", nil, errors.New("name: cannot be empty")
 	}
 
 	path := fmt.Sprintf("r/%s/api/submit_text", name)

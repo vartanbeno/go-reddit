@@ -317,7 +317,7 @@ func TestSubredditService_Get(t *testing.T) {
 	})
 
 	_, _, err = client.Subreddit.Get(ctx, "")
-	assert.EqualError(t, err, "name: must not be empty")
+	assert.EqualError(t, err, "name: cannot be empty")
 
 	subreddit, _, err := client.Subreddit.Get(ctx, "golang")
 	assert.NoError(t, err)

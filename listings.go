@@ -2,7 +2,6 @@ package reddit
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -16,17 +15,9 @@ type ListingsService struct {
 	client *Client
 }
 
-// Get returns posts, comments, and subreddits from their IDs.
+// Get returns posts, comments, and subreddits from their full IDs.
 func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*Comment, []*Subreddit, *Response, error) {
-	type query struct {
-		IDs []string `url:"id,comma"`
-	}
-
-	path := "api/info"
-	path, err := addOptions(path, query{ids})
-	if err != nil {
-		return nil, nil, nil, nil, err
-	}
+	path := fmt.Sprintf("api/info?id=%s", strings.Join(ids, ","))
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -48,11 +39,8 @@ func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*C
 
 // GetPosts returns posts from their full IDs.
 func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]*Post, *Response, error) {
-	if len(ids) == 0 {
-		return nil, nil, errors.New("must provide at least 1 id")
-	}
-
 	path := fmt.Sprintf("by_id/%s", strings.Join(ids, ","))
+
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -64,5 +52,6 @@ func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]*Post,
 		return nil, resp, err
 	}
 
-	return root.getPosts().Posts, resp, nil
+	posts := root.getPosts().Posts
+	return posts, resp, nil
 }

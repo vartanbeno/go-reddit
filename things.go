@@ -167,6 +167,7 @@ type Comment struct {
 	Score            int `json:"score"`
 	Controversiality int `json:"controversiality"`
 
+	// todo: check the validity of these comments
 	PostID string `json:"link_id,omitempty"`
 	// This doesn't appear when submitting a comment.
 	PostTitle string `json:"link_title,omitempty"`
