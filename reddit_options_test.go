@@ -2,8 +2,9 @@ package reddit
 
 import (
 	"os"
-	"reflect"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFromEnv(t *testing.T) {
@@ -20,9 +21,7 @@ func TestFromEnv(t *testing.T) {
 	defer os.Unsetenv("GO_REDDIT_CLIENT_PASSWORD")
 
 	c, err := NewClient(nil, FromEnv)
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
+	assert.NoError(t, err)
 
 	type values struct {
 		id, secret, username, password string
@@ -30,32 +29,19 @@ func TestFromEnv(t *testing.T) {
 
 	expect := values{"id1", "secret1", "username1", "password1"}
 	actual := values{c.ID, c.Secret, c.Username, c.Password}
-
-	if !reflect.DeepEqual(expect, actual) {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.Equal(t, expect, actual)
 }
 
 func TestWithBaseURL(t *testing.T) {
 	baseURL := "http://localhost:8080"
 	c, err := NewClient(nil, WithBaseURL(baseURL))
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
-
-	if expect, actual := baseURL, c.BaseURL.String(); expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, baseURL, c.BaseURL.String())
 }
 
 func TestWithTokenURL(t *testing.T) {
 	tokenURL := "http://localhost:8080/api/v1/access_token"
 	c, err := NewClient(nil, WithTokenURL(tokenURL))
-	if err != nil {
-		t.Fatalf("got unexpected error: %v", err)
-	}
-
-	if expect, actual := tokenURL, c.TokenURL.String(); expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %s\nactual: %s", Stringify(expect), Stringify(actual))
-	}
+	assert.NoError(t, err)
+	assert.Equal(t, tokenURL, c.TokenURL.String())
 }

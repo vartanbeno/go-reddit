@@ -81,16 +81,13 @@ func testClientServices(t *testing.T, c *Client) {
 	cv := reflect.Indirect(cp)
 
 	for _, s := range services {
-		if cv.FieldByName(s).IsNil() {
-			t.Fatalf("c.%s shouldn't be nil", s)
-		}
+		assert.Falsef(t, cv.FieldByName(s).IsNil(), "c.%s should not be nil", s)
 	}
 }
 
 func testClientDefaultUserAgent(t *testing.T, c *Client) {
-	if expect, actual := fmt.Sprintf("golang:%s:v%s (by /u/)", libraryName, libraryVersion), c.userAgent; expect != actual {
-		t.Fatalf("got unexpected value\nexpect: %+v\nactual: %+v", Stringify(expect), Stringify(actual))
-	}
+	expectedUserAgent := fmt.Sprintf("golang:%s:v%s (by /u/)", libraryName, libraryVersion)
+	assert.Equal(t, expectedUserAgent, c.userAgent)
 }
 
 func testClientDefaults(t *testing.T, c *Client) {
