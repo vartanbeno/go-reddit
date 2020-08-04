@@ -63,40 +63,40 @@ func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit 
 	return root.getPosts(), resp, nil
 }
 
-// Hot returns the hottest posts from the specified subreddit.
+// HotPosts returns the hottest posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
 // Note: when looking for hot posts in a subreddit, it will include the stickied
 // posts (if any) PLUS posts from the limit parameter (25 by default).
-func (s *SubredditService) Hot(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *SubredditService) HotPosts(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "hot", subreddit, opts...)
 }
 
-// New returns the newest posts from the specified subreddit.
+// NewPosts returns the newest posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
-func (s *SubredditService) New(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *SubredditService) NewPosts(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "new", subreddit, opts...)
 }
 
-// Rising returns the rising posts from the specified subreddit.
+// RisingPosts returns the rising posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
-func (s *SubredditService) Rising(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *SubredditService) RisingPosts(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "rising", subreddit, opts...)
 }
 
-// Controversial returns the most controversial posts from the specified subreddit.
+// ControversialPosts returns the most controversial posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
-func (s *SubredditService) Controversial(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *SubredditService) ControversialPosts(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "controversial", subreddit, opts...)
 }
 
-// Top returns the top posts from the specified subreddit.
+// TopPosts returns the top posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
-func (s *SubredditService) Top(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
+func (s *SubredditService) TopPosts(ctx context.Context, subreddit string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "top", subreddit, opts...)
 }
 
@@ -121,39 +121,39 @@ func (s *SubredditService) Get(ctx context.Context, name string) (*Subreddit, *R
 	return root.Data, resp, nil
 }
 
-// GetPopular returns popular subreddits.
-// todo: use search opts for this
-func (s *SubredditService) GetPopular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+// Popular returns popular subreddits.
+func (s *SubredditService) Popular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/popular", opts)
 }
 
-// GetNew returns new subreddits.
-func (s *SubredditService) GetNew(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+// New returns new subreddits.
+func (s *SubredditService) New(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/new", opts)
 }
 
-// GetGold returns gold subreddits.
-func (s *SubredditService) GetGold(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+// Gold returns gold subreddits (i.e. only accessible to users with gold).
+// It seems like it returns an empty list if you don't have gold.
+func (s *SubredditService) Gold(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/gold", opts)
 }
 
-// GetDefault returns default subreddits.
-func (s *SubredditService) GetDefault(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+// Default returns default subreddits.
+func (s *SubredditService) Default(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/default", opts)
 }
 
-// GetSubscribed returns the list of subreddits you are subscribed to.
-func (s *SubredditService) GetSubscribed(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+// Subscribed returns the list of subreddits you are subscribed to.
+func (s *SubredditService) Subscribed(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/subscriber", opts)
 }
 
-// GetApproved returns the list of subreddits you are an approved user in.
-func (s *SubredditService) GetApproved(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+// Approved returns the list of subreddits you are an approved user in.
+func (s *SubredditService) Approved(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/contributor", opts)
 }
 
-// GetModerated returns the list of subreddits you are a moderator of.
-func (s *SubredditService) GetModerated(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+// Moderated returns the list of subreddits you are a moderator of.
+func (s *SubredditService) Moderated(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
 	return s.getSubreddits(ctx, "subreddits/mine/moderator", opts)
 }
 

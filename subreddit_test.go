@@ -231,7 +231,7 @@ func TestSubredditService_Hot(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.Hot(ctx, "test")
+	posts, _, err := client.Subreddit.HotPosts(ctx, "test")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
@@ -248,7 +248,7 @@ func TestSubredditService_New(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.New(ctx, "test")
+	posts, _, err := client.Subreddit.NewPosts(ctx, "test")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
@@ -265,7 +265,7 @@ func TestSubredditService_Rising(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.Rising(ctx, "test")
+	posts, _, err := client.Subreddit.RisingPosts(ctx, "test")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
@@ -282,7 +282,7 @@ func TestSubredditService_Controversial(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.Controversial(ctx, "test")
+	posts, _, err := client.Subreddit.ControversialPosts(ctx, "test")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
@@ -299,7 +299,7 @@ func TestSubredditService_Top(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.Top(ctx, "test")
+	posts, _, err := client.Subreddit.TopPosts(ctx, "test")
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
@@ -336,7 +336,7 @@ func TestSubredditService_GetPopular(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.GetPopular(ctx, nil)
+	subreddits, _, err := client.Subreddit.Popular(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
@@ -353,7 +353,7 @@ func TestSubredditService_GetNew(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.GetNew(ctx, nil)
+	subreddits, _, err := client.Subreddit.New(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
@@ -370,7 +370,7 @@ func TestSubredditService_GetGold(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.GetGold(ctx, nil)
+	subreddits, _, err := client.Subreddit.Gold(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
@@ -387,7 +387,7 @@ func TestSubredditService_GetDefault(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.GetDefault(ctx, nil)
+	subreddits, _, err := client.Subreddit.Default(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
@@ -404,7 +404,7 @@ func TestSubredditService_GetSubscribed(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.GetSubscribed(ctx, nil)
+	subreddits, _, err := client.Subreddit.Subscribed(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
@@ -421,7 +421,7 @@ func TestSubredditService_GetApproved(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.GetApproved(ctx, nil)
+	subreddits, _, err := client.Subreddit.Approved(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
@@ -438,7 +438,7 @@ func TestSubredditService_GetModerated(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.GetModerated(ctx, nil)
+	subreddits, _, err := client.Subreddit.Moderated(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddits, subreddits)
 }

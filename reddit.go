@@ -343,16 +343,21 @@ func CheckResponse(r *http.Response) error {
 	return errorResponse
 }
 
-// ListOptions are the optional parameters to the various endpoints that return lists.
+// ListOptions specifies the optional parameters to various API calls that return a listing.
 type ListOptions struct {
-	// For getting submissions
-	// all, year, month, week, day, hour
-	Timespan string `url:"t,omitempty"`
+	// Maximum number of items to be returned.
+	// Generally, the default is 25 and max is 100.
+	Limit int `url:"limit,omitempty"`
 
-	// Common for all listing endpoints
-	After  string `url:"after,omitempty"`
+	// The full ID of an item in the listing to use
+	// as the anchor point of the list. Only items
+	// appearing after it will be returned.
+	After string `url:"after,omitempty"`
+
+	// The full ID of an item in the listing to use
+	// as the anchor point of the list. Only items
+	// appearing before it will be returned.
 	Before string `url:"before,omitempty"`
-	Limit  int    `url:"limit,omitempty"` // default: 25, max: 100
 }
 
 func addOptions(s string, opt interface{}) (string, error) {

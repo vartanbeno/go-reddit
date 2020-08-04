@@ -27,7 +27,7 @@ func run() (err error) {
 	// Let's get the top 200 posts of r/golang.
 	// Reddit returns a maximum of 100 posts at a time,
 	// so we'll need to separate this into 2 requests.
-	result, _, err := client.Subreddit.Top(ctx, "golang", reddit.SetLimit(100), reddit.FromAllTime)
+	result, _, err := client.Subreddit.TopPosts(ctx, "golang", reddit.SetLimit(100), reddit.FromAllTime)
 	if err != nil {
 		return
 	}
@@ -38,7 +38,7 @@ func run() (err error) {
 
 	// The SetAfter option sets the id of an item that Reddit
 	// will use as an anchor point for the returned listing.
-	result, _, err = client.Subreddit.Top(ctx, "golang", reddit.SetLimit(100), reddit.FromAllTime, reddit.SetAfter(result.After))
+	result, _, err = client.Subreddit.TopPosts(ctx, "golang", reddit.SetLimit(100), reddit.FromAllTime, reddit.SetAfter(result.After))
 	if err != nil {
 		return
 	}
