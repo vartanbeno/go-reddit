@@ -154,16 +154,17 @@ func (s *UserService) UsernameAvailable(ctx context.Context, username string) (b
 }
 
 // Overview returns a list of your posts and comments.
-func (s *UserService) Overview(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
-	return s.OverviewOf(ctx, s.client.Username, opts...)
+func (s *UserService) Overview(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Comments, *Response, error) {
+	return s.OverviewOf(ctx, s.client.Username, opts)
 }
 
 // OverviewOf returns a list of the user's posts and comments.
-func (s *UserService) OverviewOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
-	form := newSearchOptions(opts...)
-
+func (s *UserService) OverviewOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Posts, *Comments, *Response, error) {
 	path := fmt.Sprintf("user/%s/overview", username)
-	path = addQuery(path, form)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -180,16 +181,17 @@ func (s *UserService) OverviewOf(ctx context.Context, username string, opts ...S
 }
 
 // Posts returns a list of your posts.
-func (s *UserService) Posts(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	return s.PostsOf(ctx, s.client.Username, opts...)
+func (s *UserService) Posts(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+	return s.PostsOf(ctx, s.client.Username, opts)
 }
 
 // PostsOf returns a list of the user's posts.
-func (s *UserService) PostsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	form := newSearchOptions(opts...)
-
+func (s *UserService) PostsOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted", username)
-	path = addQuery(path, form)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -206,16 +208,17 @@ func (s *UserService) PostsOf(ctx context.Context, username string, opts ...Sear
 }
 
 // Comments returns a list of your comments.
-func (s *UserService) Comments(ctx context.Context, opts ...SearchOptionSetter) (*Comments, *Response, error) {
-	return s.CommentsOf(ctx, s.client.Username, opts...)
+func (s *UserService) Comments(ctx context.Context, opts *ListUserOverviewOptions) (*Comments, *Response, error) {
+	return s.CommentsOf(ctx, s.client.Username, opts)
 }
 
 // CommentsOf returns a list of the user's comments.
-func (s *UserService) CommentsOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Comments, *Response, error) {
-	form := newSearchOptions(opts...)
-
+func (s *UserService) CommentsOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Comments, *Response, error) {
 	path := fmt.Sprintf("user/%s/comments", username)
-	path = addQuery(path, form)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -232,11 +235,12 @@ func (s *UserService) CommentsOf(ctx context.Context, username string, opts ...S
 }
 
 // Saved returns a list of the user's saved posts and comments.
-func (s *UserService) Saved(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Comments, *Response, error) {
-	form := newSearchOptions(opts...)
-
+func (s *UserService) Saved(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Comments, *Response, error) {
 	path := fmt.Sprintf("user/%s/saved", s.client.Username)
-	path = addQuery(path, form)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -253,17 +257,18 @@ func (s *UserService) Saved(ctx context.Context, opts ...SearchOptionSetter) (*P
 }
 
 // Upvoted returns a list of your upvoted posts.
-func (s *UserService) Upvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	return s.UpvotedOf(ctx, s.client.Username, opts...)
+func (s *UserService) Upvoted(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+	return s.UpvotedOf(ctx, s.client.Username, opts)
 }
 
 // UpvotedOf returns a list of the user's upvoted posts.
-// The user's votes must be public for this to work.
-func (s *UserService) UpvotedOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	form := newSearchOptions(opts...)
-
+// The user's votes must be public for this to work (unless the user is you).
+func (s *UserService) UpvotedOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
 	path := fmt.Sprintf("user/%s/upvoted", username)
-	path = addQuery(path, form)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -280,17 +285,18 @@ func (s *UserService) UpvotedOf(ctx context.Context, username string, opts ...Se
 }
 
 // Downvoted returns a list of your downvoted posts.
-func (s *UserService) Downvoted(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	return s.DownvotedOf(ctx, s.client.Username, opts...)
+func (s *UserService) Downvoted(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+	return s.DownvotedOf(ctx, s.client.Username, opts)
 }
 
 // DownvotedOf returns a list of the user's downvoted posts.
-// The user's votes must be public for this to work.
-func (s *UserService) DownvotedOf(ctx context.Context, username string, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	form := newSearchOptions(opts...)
-
+// The user's votes must be public for this to work (unless the user is you).
+func (s *UserService) DownvotedOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
 	path := fmt.Sprintf("user/%s/downvoted", username)
-	path = addQuery(path, form)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -307,11 +313,12 @@ func (s *UserService) DownvotedOf(ctx context.Context, username string, opts ...
 }
 
 // Hidden returns a list of the user's hidden posts.
-func (s *UserService) Hidden(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	form := newSearchOptions(opts...)
-
+func (s *UserService) Hidden(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
 	path := fmt.Sprintf("user/%s/hidden", s.client.Username)
-	path = addQuery(path, form)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -328,11 +335,12 @@ func (s *UserService) Hidden(ctx context.Context, opts ...SearchOptionSetter) (*
 }
 
 // Gilded returns a list of the user's gilded posts.
-func (s *UserService) Gilded(ctx context.Context, opts ...SearchOptionSetter) (*Posts, *Response, error) {
-	form := newSearchOptions(opts...)
-
+func (s *UserService) Gilded(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
 	path := fmt.Sprintf("user/%s/gilded", s.client.Username)
-	path = addQuery(path, form)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -517,9 +525,12 @@ func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]Trophy
 }
 
 // Popular gets the user subreddits with the most activity.
-func (s *UserService) Popular(ctx context.Context, opts ...SearchOptionSetter) (*Subreddits, *Response, error) {
-	form := newSearchOptions(opts...)
-	path := addQuery("users/popular", form)
+func (s *UserService) Popular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+	path := "users/popular"
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -536,9 +547,12 @@ func (s *UserService) Popular(ctx context.Context, opts ...SearchOptionSetter) (
 }
 
 // New gets the most recently created user subreddits.
-func (s *UserService) New(ctx context.Context, opts ...SearchOptionSetter) (*Subreddits, *Response, error) {
-	form := newSearchOptions(opts...)
-	path := addQuery("users/new", form)
+func (s *UserService) New(ctx context.Context, opts *ListUserOverviewOptions) (*Subreddits, *Response, error) {
+	path := "users/new"
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
@@ -555,11 +569,21 @@ func (s *UserService) New(ctx context.Context, opts ...SearchOptionSetter) (*Sub
 }
 
 // Search searches for users.
-func (s *UserService) Search(ctx context.Context, query string, opts ...SearchOptionSetter) (*Users, *Response, error) {
-	opts = append(opts, setQuery(query))
-	form := newSearchOptions(opts...)
+// todo: maybe include the sort option? (relevance, activity)
+func (s *UserService) Search(ctx context.Context, query string, opts *ListOptions) (*Users, *Response, error) {
+	path := "users/search"
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	path := addQuery("users/search", form)
+	type params struct {
+		Query string `url:"q"`
+	}
+	path, err = addOptions(path, params{query})
+	if err != nil {
+		return nil, nil, err
+	}
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {

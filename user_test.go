@@ -263,7 +263,7 @@ func TestUserService_Overview(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, comments, _, err := client.User.Overview(ctx)
+	posts, comments, _, err := client.User.Overview(ctx, nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -289,7 +289,7 @@ func TestUserService_OverviewOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, comments, _, err := client.User.OverviewOf(ctx, "user2")
+	posts, comments, _, err := client.User.OverviewOf(ctx, "user2", nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -325,7 +325,13 @@ func TestUserService_Overview_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, _, err = client.User.Overview(ctx, SetLimit(5), SetAfter("t3_after"), SortByTop)
+	_, _, _, err = client.User.Overview(ctx, &ListUserOverviewOptions{
+		ListOptions: ListOptions{
+			Limit: 5,
+			After: "t3_after",
+		},
+		Sort: "top",
+	})
 	assert.NoError(t, err)
 }
 
@@ -341,7 +347,7 @@ func TestUserService_Posts(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Posts(ctx)
+	posts, _, err := client.User.Posts(ctx, nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -362,7 +368,7 @@ func TestUserService_PostsOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.PostsOf(ctx, "user2")
+	posts, _, err := client.User.PostsOf(ctx, "user2", nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -392,7 +398,12 @@ func TestUserService_Posts_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, err = client.User.Posts(ctx, SetLimit(10), SortByNew)
+	_, _, err = client.User.Posts(ctx, &ListUserOverviewOptions{
+		ListOptions: ListOptions{
+			Limit: 10,
+		},
+		Sort: "new",
+	})
 	assert.NoError(t, err)
 }
 
@@ -408,7 +419,7 @@ func TestUserService_Comments(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	comments, _, err := client.User.Comments(ctx)
+	comments, _, err := client.User.Comments(ctx, nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, comments.Comments, 1)
@@ -429,7 +440,7 @@ func TestUserService_CommentsOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	comments, _, err := client.User.CommentsOf(ctx, "user2")
+	comments, _, err := client.User.CommentsOf(ctx, "user2", nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, comments.Comments, 1)
@@ -459,7 +470,12 @@ func TestUserService_Comments_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, err = client.User.Comments(ctx, SetLimit(100), SetBefore("t1_before"))
+	_, _, err = client.User.Comments(ctx, &ListUserOverviewOptions{
+		ListOptions: ListOptions{
+			Limit:  100,
+			Before: "t1_before",
+		},
+	})
 	assert.NoError(t, err)
 }
 
@@ -476,7 +492,7 @@ func TestUserService_Saved(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, comments, _, err := client.User.Saved(ctx)
+	posts, comments, _, err := client.User.Saved(ctx, nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -512,7 +528,12 @@ func TestUserService_Saved_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, _, err = client.User.Saved(ctx, SetLimit(50), SortByControversial)
+	_, _, _, err = client.User.Saved(ctx, &ListUserOverviewOptions{
+		ListOptions: ListOptions{
+			Limit: 50,
+		},
+		Sort: "controversial",
+	})
 	assert.NoError(t, err)
 }
 func TestUserService_Upvoted(t *testing.T) {
@@ -528,7 +549,7 @@ func TestUserService_Upvoted(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Upvoted(ctx)
+	posts, _, err := client.User.Upvoted(ctx, nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -559,7 +580,12 @@ func TestUserService_Upvoted_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, err = client.User.Upvoted(ctx, SetLimit(30), SetAfter("t3_after"))
+	_, _, err = client.User.Upvoted(ctx, &ListUserOverviewOptions{
+		ListOptions: ListOptions{
+			Limit: 30,
+			After: "t3_after",
+		},
+	})
 	assert.NoError(t, err)
 }
 
@@ -576,7 +602,7 @@ func TestUserService_UpvotedOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.UpvotedOf(ctx, "user2")
+	posts, _, err := client.User.UpvotedOf(ctx, "user2", nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -598,7 +624,7 @@ func TestUserService_Downvoted(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Downvoted(ctx)
+	posts, _, err := client.User.Downvoted(ctx, nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -629,7 +655,12 @@ func TestUserService_Downvoted_Options(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	_, _, err = client.User.Downvoted(ctx, SetLimit(20), SetBefore("t3_before"))
+	_, _, err = client.User.Downvoted(ctx, &ListUserOverviewOptions{
+		ListOptions: ListOptions{
+			Limit:  20,
+			Before: "t3_before",
+		},
+	})
 	assert.NoError(t, err)
 }
 
@@ -646,7 +677,7 @@ func TestUserService_DownvotedOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.DownvotedOf(ctx, "user2")
+	posts, _, err := client.User.DownvotedOf(ctx, "user2", nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -668,7 +699,7 @@ func TestUserService_Hidden(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Hidden(ctx)
+	posts, _, err := client.User.Hidden(ctx, nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -690,7 +721,7 @@ func TestUserService_Gilded(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Gilded(ctx)
+	posts, _, err := client.User.Gilded(ctx, nil)
 	assert.NoError(t, err)
 
 	assert.Len(t, posts.Posts, 1)
@@ -899,7 +930,7 @@ func TestUserService_Popular(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	userSubreddits, _, err := client.User.Popular(ctx)
+	userSubreddits, _, err := client.User.Popular(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedUserSubreddits, userSubreddits)
 }
@@ -916,7 +947,7 @@ func TestUserService_New(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	userSubreddits, _, err := client.User.New(ctx)
+	userSubreddits, _, err := client.User.New(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedUserSubreddits, userSubreddits)
 }
@@ -941,7 +972,7 @@ func TestUserService_Search(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	users, _, err := client.User.Search(ctx, "test")
+	users, _, err := client.User.Search(ctx, "test", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSearchUsers, users)
 }

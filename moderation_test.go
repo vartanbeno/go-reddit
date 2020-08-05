@@ -61,7 +61,7 @@ func TestModerationService_GetActions(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	result, _, err := client.Moderation.GetActions(ctx, "testsubreddit")
+	result, _, err := client.Moderation.GetActions(ctx, "testsubreddit", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedModActionsResult, result)
 }
@@ -86,7 +86,7 @@ func TestModerationService_GetActionsByType(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	result, _, err := client.Moderation.GetActionsByType(ctx, "testsubreddit", "testtype")
+	result, _, err := client.Moderation.GetActionsByType(ctx, "testsubreddit", "testtype", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedModActionsResult, result)
 }

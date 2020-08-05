@@ -27,10 +27,16 @@ func run() (err error) {
 
 	client.OnRequestCompleted(logResponse)
 
-	client.Subreddit.Search(ctx, "programming", reddit.SetLimit(10))
+	client.Subreddit.Search(ctx, "programming", nil)
 	client.Subreddit.SearchNames(ctx, "monitor")
-	client.Subreddit.SearchPosts(ctx, "react", "webdev", reddit.SortByNumberOfComments)
-	client.User.Posts(ctx, reddit.SetLimit(50))
+	client.Subreddit.SearchPosts(ctx, "react", "webdev", nil)
+	client.User.Posts(ctx, &reddit.ListUserOverviewOptions{
+		ListOptions: reddit.ListOptions{
+			Limit: 50,
+		},
+		Sort: "top",
+		Time: "month",
+	})
 
 	return
 }

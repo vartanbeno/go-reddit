@@ -60,6 +60,7 @@ type oauth2Config struct {
 }
 
 func oauth2Transport(c oauth2Config) *oauth2.Transport {
+	// todo: use oauth2.Config.PasswordCredentialsToken
 	params := url.Values{
 		"grant_type": {"password"},
 		"username":   {c.username},

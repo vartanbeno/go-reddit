@@ -219,7 +219,7 @@ var expectedRandomSubreddit = &Subreddit{
 	Subscribers: 52357,
 }
 
-func TestSubredditService_Hot(t *testing.T) {
+func TestSubredditService_HotPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -231,12 +231,12 @@ func TestSubredditService_Hot(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.HotPosts(ctx, "test")
+	posts, _, err := client.Subreddit.HotPosts(ctx, "test", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
 
-func TestSubredditService_New(t *testing.T) {
+func TestSubredditService_NewPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -248,12 +248,12 @@ func TestSubredditService_New(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.NewPosts(ctx, "test")
+	posts, _, err := client.Subreddit.NewPosts(ctx, "test", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
 
-func TestSubredditService_Rising(t *testing.T) {
+func TestSubredditService_RisingPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -265,12 +265,12 @@ func TestSubredditService_Rising(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.RisingPosts(ctx, "test")
+	posts, _, err := client.Subreddit.RisingPosts(ctx, "test", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
 
-func TestSubredditService_Controversial(t *testing.T) {
+func TestSubredditService_ControversialPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -282,12 +282,12 @@ func TestSubredditService_Controversial(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.ControversialPosts(ctx, "test")
+	posts, _, err := client.Subreddit.ControversialPosts(ctx, "test", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
 
-func TestSubredditService_Top(t *testing.T) {
+func TestSubredditService_TopPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -299,7 +299,7 @@ func TestSubredditService_Top(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.TopPosts(ctx, "test")
+	posts, _, err := client.Subreddit.TopPosts(ctx, "test", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedPosts, posts)
 }
@@ -324,7 +324,7 @@ func TestSubredditService_Get(t *testing.T) {
 	assert.Equal(t, expectedSubreddit, subreddit)
 }
 
-func TestSubredditService_GetPopular(t *testing.T) {
+func TestSubredditService_Popular(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -341,7 +341,7 @@ func TestSubredditService_GetPopular(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditService_GetNew(t *testing.T) {
+func TestSubredditService_New(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -358,7 +358,7 @@ func TestSubredditService_GetNew(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditService_GetGold(t *testing.T) {
+func TestSubredditService_Gold(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -375,7 +375,7 @@ func TestSubredditService_GetGold(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditService_GetDefault(t *testing.T) {
+func TestSubredditService_Default(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -392,7 +392,7 @@ func TestSubredditService_GetDefault(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditService_GetSubscribed(t *testing.T) {
+func TestSubredditService_Subscribed(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -409,7 +409,7 @@ func TestSubredditService_GetSubscribed(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditService_GetApproved(t *testing.T) {
+func TestSubredditService_Approved(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -426,7 +426,7 @@ func TestSubredditService_GetApproved(t *testing.T) {
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
 
-func TestSubredditService_GetModerated(t *testing.T) {
+func TestSubredditService_Moderated(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -579,6 +579,8 @@ func TestSubredditService_Search(t *testing.T) {
 
 		form := url.Values{}
 		form.Set("q", "golang")
+		form.Set("limit", "10")
+		form.Set("sort", "activity")
 
 		err := r.ParseForm()
 		assert.NoError(t, err)
@@ -587,7 +589,12 @@ func TestSubredditService_Search(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.Search(ctx, "golang")
+	subreddits, _, err := client.Subreddit.Search(ctx, "golang", &ListSubredditOptions{
+		ListOptions: ListOptions{
+			Limit: 10,
+		},
+		Sort: "activity",
+	})
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSubreddits, subreddits)
 }
@@ -629,7 +636,6 @@ func TestSubredditService_SearchPosts(t *testing.T) {
 
 		form := url.Values{}
 		form.Set("q", "test")
-		form.Set("after", "t3_testpost")
 
 		err := r.ParseForm()
 		assert.NoError(t, err)
@@ -638,7 +644,7 @@ func TestSubredditService_SearchPosts(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "", SetAfter("t3_testpost"))
+	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSearchPosts, posts)
 }
@@ -656,7 +662,6 @@ func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
 		form := url.Values{}
 		form.Set("q", "test")
 		form.Set("restrict_sr", "true")
-		form.Set("after", "t3_testpost")
 
 		err := r.ParseForm()
 		assert.NoError(t, err)
@@ -665,7 +670,7 @@ func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "test", SetAfter("t3_testpost"))
+	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "test", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSearchPosts, posts)
 }
@@ -683,7 +688,6 @@ func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
 		form := url.Values{}
 		form.Set("q", "test")
 		form.Set("restrict_sr", "true")
-		form.Set("after", "t3_testpost")
 
 		err := r.ParseForm()
 		assert.NoError(t, err)
@@ -692,7 +696,7 @@ func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "test+golang+nba", SetAfter("t3_testpost"))
+	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "test+golang+nba", nil)
 	assert.NoError(t, err)
 	assert.Equal(t, expectedSearchPosts, posts)
 }
