@@ -35,6 +35,17 @@ func FromEnv(c *Client) error {
 	return nil
 }
 
+// WithCredentials sets the necessary values for the client to authenticate via OAuth2.
+func WithCredentials(id, secret, username, password string) Opt {
+	return func(c *Client) error {
+		c.ID = id
+		c.Secret = secret
+		c.Username = username
+		c.Password = password
+		return nil
+	}
+}
+
 // WithBaseURL sets the base URL for the client to make requests to.
 func WithBaseURL(u string) Opt {
 	return func(c *Client) error {

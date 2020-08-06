@@ -36,63 +36,50 @@ package reddit
 import (
 	"context"
 	"net/http"
-	"net/url"
 
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/clientcredentials"
 )
 
-var endpoint = oauth2.Endpoint{
-	TokenURL:  "https://www.reddit.com/api/v1/access_token",
-	AuthStyle: oauth2.AuthStyleInHeader,
+type oauthTokenSource struct {
+	ctx                context.Context
+	config             *oauth2.Config
+	username, password string
 }
 
-type oauth2Config struct {
-	id       string
-	secret   string
-	username string
-	password string
-	tokenURL string
+func (s *oauthTokenSource) Token() (*oauth2.Token, error) {
+	return s.config.PasswordCredentialsToken(s.ctx, s.username, s.password)
+}
 
+func oauthTransport(client *Client) http.RoundTripper {
 	// We need to set a custom user agent, because using the one set by default by the
 	// stdlib gives us 429 Too Many Request responses from the Reddit API.
-	userAgentTransport *userAgentTransport
-}
-
-func oauth2Transport(c oauth2Config) *oauth2.Transport {
-	// todo: use oauth2.Config.PasswordCredentialsToken
-	params := url.Values{
-		"grant_type": {"password"},
-		"username":   {c.username},
-		"password":   {c.password},
+	userAgentTransport := &userAgentTransport{
+		userAgent: client.UserAgent(),
+		Base:      client.client.Transport,
 	}
 
-	cfg := clientcredentials.Config{
-		ClientID:       c.id,
-		ClientSecret:   c.secret,
-		TokenURL:       c.tokenURL,
-		AuthStyle:      oauth2.AuthStyleInHeader,
-		EndpointParams: params,
+	httpClient := &http.Client{Transport: userAgentTransport}
+	ctx := context.Background()
+	ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
+
+	config := &oauth2.Config{
+		ClientID:     client.ID,
+		ClientSecret: client.Secret,
+		Endpoint: oauth2.Endpoint{
+			TokenURL:  client.TokenURL.String(),
+			AuthStyle: oauth2.AuthStyleInHeader,
+		},
 	}
 
-	httpClient := &http.Client{Transport: c.userAgentTransport}
-	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, httpClient)
+	tokenSource := oauth2.ReuseTokenSource(nil, &oauthTokenSource{
+		ctx:      ctx,
+		config:   config,
+		username: client.Username,
+		password: client.Password,
+	})
 
-	src := cfg.TokenSource(ctx)
-	tr := &oauth2.Transport{
-		Source: src,
-		Base:   c.userAgentTransport,
-	}
-	return tr
-}
-
-// WithCredentials sets the necessary values for the client to authenticate via OAuth2.
-func WithCredentials(id, secret, username, password string) Opt {
-	return func(c *Client) error {
-		c.ID = id
-		c.Secret = secret
-		c.Username = username
-		c.Password = password
-		return nil
+	return &oauth2.Transport{
+		Source: tokenSource,
+		Base:   userAgentTransport,
 	}
 }

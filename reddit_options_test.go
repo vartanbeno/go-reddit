@@ -32,6 +32,16 @@ func TestFromEnv(t *testing.T) {
 	assert.Equal(t, expect, actual)
 }
 
+func TestWithCredentials(t *testing.T) {
+	withCredentials := WithCredentials("id1", "secret1", "username1", "password1")
+	c, err := NewClient(nil, withCredentials)
+	assert.NoError(t, err)
+	assert.Equal(t, "id1", c.ID)
+	assert.Equal(t, "secret1", c.Secret)
+	assert.Equal(t, "username1", c.Username)
+	assert.Equal(t, "password1", c.Password)
+}
+
 func TestWithBaseURL(t *testing.T) {
 	baseURL := "http://localhost:8080"
 	c, err := NewClient(nil, WithBaseURL(baseURL))

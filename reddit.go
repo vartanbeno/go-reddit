@@ -48,13 +48,13 @@ func cloneRequest(r *http.Request) *http.Request {
 
 // Sets the User-Agent header for requests.
 type userAgentTransport struct {
-	ua   string
-	Base http.RoundTripper
+	userAgent string
+	Base      http.RoundTripper
 }
 
 func (t *userAgentTransport) setUserAgent(req *http.Request) *http.Request {
 	req2 := cloneRequest(req)
-	req2.Header.Set(headerUserAgent, t.ua)
+	req2.Header.Set(headerUserAgent, t.userAgent)
 	return req2
 }
 
@@ -163,23 +163,18 @@ func NewClient(httpClient *http.Client, opts ...Opt) (c *Client, err error) {
 		}
 	}
 
-	c.userAgent = fmt.Sprintf("golang:%s:v%s (by /u/%s)", libraryName, libraryVersion, c.Username)
-	userAgentTransport := &userAgentTransport{
-		ua:   c.userAgent,
-		Base: c.client.Transport,
-	}
-
-	oauth2Config := oauth2Config{
-		id:                 c.ID,
-		secret:             c.Secret,
-		username:           c.Username,
-		password:           c.Password,
-		tokenURL:           c.TokenURL.String(),
-		userAgentTransport: userAgentTransport,
-	}
-	c.client.Transport = oauth2Transport(oauth2Config)
+	oauthTransport := oauthTransport(c)
+	c.client.Transport = oauthTransport
 
 	return
+}
+
+// UserAgent returns the client's user agent.
+func (c *Client) UserAgent() string {
+	if c.userAgent == "" {
+		c.userAgent = fmt.Sprintf("golang:%s:v%s (by /u/%s)", libraryName, libraryVersion, c.Username)
+	}
+	return c.userAgent
 }
 
 // NewRequest creates an API request.
