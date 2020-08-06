@@ -62,10 +62,15 @@ if err != nil {
 </details>
 
 <details>
-    <summary>Get a subreddit's top 5 posts of all time.</summary>
+    <summary>Get r/golang's top 5 posts of all time.</summary>
 
 ```go
-result, _, err := client.Subreddit.Top(context.Background(), "golang", reddit.SetLimit(5), reddit.FromAllTime)
+result, _, err := client.Subreddit.Top(context.Background(), "golang", &reddit.ListPostOptions{
+    ListOptions: reddit.ListOptions{
+        Limit: 5,
+    },
+    Time: "all",
+})
 if err != nil {
     fmt.Printf("Something bad happened: %v\n", err)
     return err

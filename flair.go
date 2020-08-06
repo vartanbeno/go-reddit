@@ -16,14 +16,6 @@ type FlairService struct {
 
 // Flair is a flair on Reddit
 type Flair struct {
-	ID   string `json:"id,omitempty"`
-	Text string `json:"text,omitempty"`
-	Type string `json:"type,omitempty"`
-	CSS  string `json:"css_class,omitempty"`
-}
-
-// FlairV2 is a flair on Reddit
-type FlairV2 struct {
 	ID      string `json:"id,omitempty"`
 	Text    string `json:"text,omitempty"`
 	Type    string `json:"type,omitempty"`
@@ -33,24 +25,6 @@ type FlairV2 struct {
 
 // GetFromSubreddit returns the flairs from the subreddit
 func (s *FlairService) GetFromSubreddit(ctx context.Context, name string) ([]Flair, *Response, error) {
-	path := fmt.Sprintf("r/%s/api/user_flair", name)
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	var flairs []Flair
-	resp, err := s.client.Do(ctx, req, &flairs)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return flairs, resp, nil
-}
-
-// GetFromSubredditV2 returns the flairs from the subreddit
-func (s *FlairService) GetFromSubredditV2(ctx context.Context, name string) ([]FlairV2, *Response, error) {
 	path := fmt.Sprintf("r/%s/api/user_flair_v2", name)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -58,7 +32,7 @@ func (s *FlairService) GetFromSubredditV2(ctx context.Context, name string) ([]F
 		return nil, nil, err
 	}
 
-	var flairs []FlairV2
+	var flairs []Flair
 	resp, err := s.client.Do(ctx, req, &flairs)
 	if err != nil {
 		return nil, resp, err
