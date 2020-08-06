@@ -360,38 +360,6 @@ type ListOptions struct {
 	Before string `url:"before,omitempty"`
 }
 
-// Value returns the value stored in the pointer.
-func (o *ListOptions) Value() ListOptions {
-	if o == nil {
-		return ListOptions{}
-	}
-	return *o
-}
-
-// GetLimit returns the limit option.
-func (o *ListOptions) GetLimit() int {
-	if o == nil {
-		return 0
-	}
-	return o.Limit
-}
-
-// GetAfter returns the after option.
-func (o *ListOptions) GetAfter() string {
-	if o == nil {
-		return ""
-	}
-	return o.After
-}
-
-// GetBefore returns the before option.
-func (o *ListOptions) GetBefore() string {
-	if o == nil {
-		return ""
-	}
-	return o.Before
-}
-
 // ListSubredditOptions defines possible options used when searching for subreddits.
 type ListSubredditOptions struct {
 	ListOptions
@@ -446,13 +414,6 @@ func addOptions(s string, opt interface{}) (string, error) {
 
 	origURL.RawQuery = origValues.Encode()
 	return origURL.String(), nil
-}
-
-func addQuery(url string, query url.Values) string {
-	if query == nil || len(query) == 0 {
-		return url
-	}
-	return url + "?" + query.Encode()
 }
 
 // String is a helper routine that allocates a new string value
