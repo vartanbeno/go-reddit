@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/google/go-querystring/query"
 )
 
 // MultiService handles communication with the multireddit
@@ -84,22 +86,12 @@ func (n *SubredditNames) MarshalJSON() ([]byte, error) {
 
 // MultiCopyRequest represents a request to copy a multireddit.
 type MultiCopyRequest struct {
-	FromPath string
-	ToPath   string
+	FromPath string `url:"from"`
+	ToPath   string `url:"to"`
 	// Raw markdown text.
-	Description string
+	Description string `url:"description_md,omitempty"`
 	// No longer than 50 characters.
-	DisplayName string
-}
-
-// Form parameterizes the fields and returns the form.
-func (r *MultiCopyRequest) Form() url.Values {
-	form := url.Values{}
-	form.Set("from", r.FromPath)
-	form.Set("to", r.ToPath)
-	form.Set("description_md", r.Description)
-	form.Set("display_name", r.DisplayName)
-	return form
+	DisplayName string `url:"display_name,omitempty"`
 }
 
 // MultiCreateOrUpdateRequest represents a request to create/update a multireddit.
@@ -199,8 +191,12 @@ func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) 
 	}
 
 	path := "api/multi/copy"
+	form, err := query.Values(copyRequest)
+	if err != nil {
+		return nil, nil, err
+	}
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, copyRequest.Form())
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
