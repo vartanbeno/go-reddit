@@ -233,3 +233,103 @@ func TestCollectionService_ReorderPosts(t *testing.T) {
 	_, err := client.Collection.ReorderPosts(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7", "t3_hs0cyh", "t3_hqrg8s", "t3_hs03f3")
 	assert.NoError(t, err)
 }
+
+func TestCollectionService_UpdateTitle(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/collections/update_collection_title", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("collection_id", "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
+		form.Set("title", "Test Title")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Collection.UpdateTitle(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7", "Test Title")
+	assert.NoError(t, err)
+}
+
+func TestCollectionService_UpdateDescription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/collections/update_collection_description", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("collection_id", "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
+		form.Set("description", "Test Description")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Collection.UpdateDescription(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7", "Test Description")
+	assert.NoError(t, err)
+}
+
+func TestCollectionService_UpdateLayout(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/collections/update_collection_display_layout", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("collection_id", "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
+		form.Set("display_layout", "TIMELINE")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Collection.UpdateLayout(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7", "TIMELINE")
+	assert.NoError(t, err)
+}
+
+func TestCollectionService_Follow(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/collections/follow_collection", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("collection_id", "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
+		form.Set("follow", "true")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Collection.Follow(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
+	assert.NoError(t, err)
+}
+
+func TestCollectionService_Unfollow(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/collections/follow_collection", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("collection_id", "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
+		form.Set("follow", "false")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Collection.Unfollow(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
+	assert.NoError(t, err)
+}
