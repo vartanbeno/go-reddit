@@ -67,6 +67,7 @@ func readFileContents(path string) (string, error) {
 func testClientServices(t *testing.T, c *Client) {
 	services := []string{
 		"Account",
+		"Collection",
 		"Comment",
 		"Flair",
 		"Listings",

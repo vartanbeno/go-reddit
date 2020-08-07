@@ -92,6 +92,7 @@ type Client struct {
 	redditID string
 
 	Account    *AccountService
+	Collection *CollectionService
 	Comment    *CommentService
 	Flair      *FlairService
 	Listings   *ListingsService
@@ -139,6 +140,7 @@ func newClient(httpClient *http.Client) *Client {
 	c := &Client{client: httpClient, BaseURL: baseURL, TokenURL: tokenURL}
 
 	c.Account = &AccountService{client: c}
+	c.Collection = &CollectionService{client: c}
 	c.Flair = &FlairService{client: c}
 	c.Listings = &ListingsService{client: c}
 	c.Moderation = &ModerationService{client: c}
