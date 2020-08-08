@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -70,6 +71,13 @@ func (s *EmojiService) Get(ctx context.Context, subreddit string) ([]*Emoji, []*
 		return nil, nil, resp, err
 	}
 
+	/*
+		The response to this request is something like:
+		{
+			"snoomojis": { ... },
+			"t5_subredditId": { ... }
+		}
+	*/
 	defaultEmojis := root["snoomojis"]
 	var subredditEmojis []*Emoji
 
@@ -81,4 +89,47 @@ func (s *EmojiService) Get(ctx context.Context, subreddit string) ([]*Emoji, []*
 	}
 
 	return defaultEmojis, subredditEmojis, resp, nil
+}
+
+// Delete deletes the emoji from the subreddit.
+func (s *EmojiService) Delete(ctx context.Context, subreddit string, emoji string) (*Response, error) {
+	path := fmt.Sprintf("api/v1/%s/emoji/%s", subreddit, emoji)
+
+	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+//todo: fav subreddits
+
+// SetSize sets the custom emoji size in the subreddit.
+// Both height and width must be between 1 and 40 (inclusive).
+func (s *EmojiService) SetSize(ctx context.Context, subreddit string, height, width int) (*Response, error) {
+	path := fmt.Sprintf("api/v1/%s/emoji_custom_size", subreddit)
+
+	form := url.Values{}
+	form.Set("height", fmt.Sprint(height))
+	form.Set("width", fmt.Sprint(width))
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// DisableCustomSize disables the custom emoji size in the subreddit.
+func (s *EmojiService) DisableCustomSize(ctx context.Context, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("api/v1/%s/emoji_custom_size", subreddit)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }

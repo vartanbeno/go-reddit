@@ -3,6 +3,7 @@ package reddit
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -54,4 +55,54 @@ func TestEmojiService_Get(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expectedDefaultEmojis, defaultEmojis)
 	assert.Equal(t, expectedSubredditEmojis, subredditEmojis)
+}
+
+func TestEmojiService_Delete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/testsubreddit/emoji/testemoji", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodDelete, r.Method)
+	})
+
+	_, err := client.Emoji.Delete(ctx, "testsubreddit", "testemoji")
+	assert.NoError(t, err)
+}
+
+func TestEmojiService_SetSize(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/testsubreddit/emoji_custom_size", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("height", "20")
+		form.Set("width", "20")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Emoji.SetSize(ctx, "testsubreddit", 20, 20)
+	assert.NoError(t, err)
+}
+
+func TestEmojiService_DisableCustomSize(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/testsubreddit/emoji_custom_size", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Emoji.DisableCustomSize(ctx, "testsubreddit")
+	assert.NoError(t, err)
 }
