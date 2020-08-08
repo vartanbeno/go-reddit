@@ -1,0 +1,27 @@
+{
+  "snoomojis": {
+    "cake": {
+      "url": "https://emoji.redditmedia.com/46kel8lf1guz_t5_3nqvj/cake",
+      "user_flair_allowed": true,
+      "post_flair_allowed": true,
+      "mod_flair_only": false,
+      "created_by": "t2_6zfp6ii"
+    },
+    "cat_blep": {
+      "url": "https://emoji.redditmedia.com/p9sxc1zh1guz_t5_3nqvj/cat_blep",
+      "user_flair_allowed": true,
+      "post_flair_allowed": true,
+      "mod_flair_only": false,
+      "created_by": "t2_6zfp6ii"
+    }
+  },
+  "t5_2uquw1": {
+    "TestEmoji": {
+      "url": "https://emoji.redditmedia.com/fxe5a674hpf51_t5_2uquw1/TestEmoji",
+      "user_flair_allowed": true,
+      "post_flair_allowed": true,
+      "mod_flair_only": false,
+      "created_by": "t2_164ab8"
+    }
+  }
+}
