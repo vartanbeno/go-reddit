@@ -1,0 +1,20 @@
+[
+  {
+    "type": "richtext",
+    "text_editable": false,
+    "allowable_content": "all",
+    "text": "test",
+    "max_emojis": 10,
+    "text_color": "light",
+    "mod_only": true,
+    "css_class": "test",
+    "richtext": [
+      {
+        "e": "text",
+        "t": "test"
+      }
+    ],
+    "background_color": "#373c3f",
+    "id": "305b503e-da60-11ea-9681-0e9f1d580d2d"
+  }
+]

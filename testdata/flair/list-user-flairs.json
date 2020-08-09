@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "flair_css_class": null,
+      "user": "TestUser1",
+      "flair_text": "TestFlair1"
+    },
+    {
+      "flair_css_class": null,
+      "user": "TestUser2",
+      "flair_text": "TestFlair2"
+    }
+  ]
+}
