@@ -1,11 +1,15 @@
 package reddit
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 )
 
@@ -27,12 +31,6 @@ type Emoji struct {
 	// ID of the user who created this emoji.
 	CreatedBy string `json:"created_by,omitempty"`
 }
-
-// UnmarshalJSON implements the json.Unmarshaler interface.
-// func (e *Emoji) UnmarshalJSON(data []byte) (err error) {
-// 	fmt.Println("===", string(data))
-// 	return nil
-// }
 
 type emojis []*Emoji
 
@@ -132,4 +130,124 @@ func (s *EmojiService) DisableCustomSize(ctx context.Context, subreddit string) 
 	}
 
 	return s.client.Do(ctx, req, nil)
+}
+
+type field struct {
+	Name  string `json:"name"`
+	Value string `json:"value"`
+}
+
+func (s *EmojiService) lease(ctx context.Context, subreddit, imagePath string) (string, []field, *Response, error) {
+	path := fmt.Sprintf("api/v1/%s/emoji_asset_upload_s3.json", subreddit)
+
+	form := url.Values{}
+	form.Set("filepath", imagePath)
+	form.Set("mimetype", "image/jpeg")
+	if strings.HasSuffix(strings.ToLower(path), ".png") {
+		form.Set("mimetype", "image/png")
+	}
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return "", nil, nil, err
+	}
+
+	var response struct {
+		S3UploadLease struct {
+			Action string  `json:"action"`
+			Fields []field `json:"fields"`
+		} `json:"s3UploadLease"`
+	}
+
+	resp, err := s.client.Do(ctx, req, &response)
+	if err != nil {
+		return "", nil, resp, err
+	}
+
+	uploadURL := fmt.Sprintf("http:%s", response.S3UploadLease.Action)
+	fields := response.S3UploadLease.Fields
+
+	return uploadURL, fields, resp, nil
+}
+
+func (s *EmojiService) upload(ctx context.Context, subreddit, emojiName, awsKey string) (*Response, error) {
+	path := fmt.Sprintf("api/v1/%s/emoji.json", subreddit)
+
+	form := url.Values{}
+	form.Set("name", emojiName)
+	form.Set("s3_key", awsKey)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Upload uploads an emoji.
+func (s *EmojiService) Upload(ctx context.Context, subreddit, emojiName, imagePath string) (*Response, error) {
+	uploadURL, fields, resp, err := s.lease(ctx, subreddit, imagePath)
+	if err != nil {
+		return resp, err
+	}
+
+	file, err := os.Open(imagePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	fileContents, err := ioutil.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+
+	// This will be used to trigger the upload on the AWS side.
+	var key string
+
+	// AWS ignores all fields in the request that come after the file field, so we need to set these before
+	// https://stackoverflow.com/questions/15234496/upload-directly-to-amazon-s3-using-ajax-returning-error-bucket-post-must-contai/15235866#15235866
+	for _, field := range fields {
+		if field.Name == "key" {
+			key = field.Value
+		}
+		writer.WriteField(field.Name, field.Value)
+	}
+
+	part, err := writer.CreateFormFile("file", file.Name())
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = part.Write(fileContents)
+	if err != nil {
+		return nil, err
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, uploadURL, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set(headerContentType, writer.FormDataContentType())
+
+	httpResponse, err := DoRequest(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = CheckResponse(httpResponse)
+	if err != nil {
+		return &Response{httpResponse}, err
+	}
+
+	return s.upload(ctx, subreddit, emojiName, key)
 }
