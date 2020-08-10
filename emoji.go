@@ -20,7 +20,7 @@ import (
 // EmojiService handles communication with the emoji
 // related methods of the Reddit API.
 //
-// Reddit API docs: https://www.reddit.com/dev/api/#section_collections
+// Reddit API docs: https://www.reddit.com/dev/api/#section_emoji
 type EmojiService struct {
 	client *Client
 }
@@ -36,15 +36,15 @@ type Emoji struct {
 	CreatedBy string `json:"created_by,omitempty"`
 }
 
-// EmojiCreateRequest represents a request to copy an emoji.
-type EmojiCreateRequest struct {
+// EmojiCreateOrUpdateRequest represents a request to create/update an emoji.
+type EmojiCreateOrUpdateRequest struct {
 	Name             string `url:"name"`
 	UserFlairAllowed *bool  `url:"user_flair_allowed,omitempty"`
 	PostFlairAllowed *bool  `url:"post_flair_allowed,omitempty"`
 	ModFlairOnly     *bool  `url:"mod_flair_only,omitempty"`
 }
 
-func (r *EmojiCreateRequest) validate() error {
+func (r *EmojiCreateOrUpdateRequest) validate() error {
 	if r.Name == "" {
 		return errors.New("name: cannot be empty")
 	}
@@ -184,7 +184,7 @@ func (s *EmojiService) lease(ctx context.Context, subreddit, imagePath string) (
 	return uploadURL, fields, resp, nil
 }
 
-func (s *EmojiService) upload(ctx context.Context, createRequest *EmojiCreateRequest, subreddit, awsKey string) (*Response, error) {
+func (s *EmojiService) upload(ctx context.Context, subreddit string, createRequest *EmojiCreateOrUpdateRequest, awsKey string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/%s/emoji.json", subreddit)
 
 	form, err := query.Values(createRequest)
@@ -201,8 +201,8 @@ func (s *EmojiService) upload(ctx context.Context, createRequest *EmojiCreateReq
 	return s.client.Do(ctx, req, nil)
 }
 
-// Upload uploads an emoji.
-func (s *EmojiService) Upload(ctx context.Context, createRequest *EmojiCreateRequest, subreddit, imagePath string) (*Response, error) {
+// Upload uploads an emoji to the subreddit.
+func (s *EmojiService) Upload(ctx context.Context, subreddit string, createRequest *EmojiCreateOrUpdateRequest, imagePath string) (*Response, error) {
 	if createRequest == nil {
 		return nil, errors.New("createRequest: cannot be nil")
 	}
@@ -257,5 +257,31 @@ func (s *EmojiService) Upload(ctx context.Context, createRequest *EmojiCreateReq
 		return &Response{httpResponse}, err
 	}
 
-	return s.upload(ctx, createRequest, subreddit, fields["key"])
+	return s.upload(ctx, subreddit, createRequest, fields["key"])
+}
+
+// Update updates an emoji on the subreddit.
+func (s *EmojiService) Update(ctx context.Context, subreddit string, updateRequest *EmojiCreateOrUpdateRequest) (*Response, error) {
+	if updateRequest == nil {
+		return nil, errors.New("updateRequest: cannot be nil")
+	}
+
+	err := updateRequest.validate()
+	if err != nil {
+		return nil, err
+	}
+
+	path := fmt.Sprintf("api/v1/%s/emoji_permissions", subreddit)
+
+	form, err := query.Values(updateRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }

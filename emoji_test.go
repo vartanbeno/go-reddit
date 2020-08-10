@@ -106,3 +106,34 @@ func TestEmojiService_DisableCustomSize(t *testing.T) {
 	_, err := client.Emoji.DisableCustomSize(ctx, "testsubreddit")
 	assert.NoError(t, err)
 }
+
+func TestEmojiService_Update(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/testsubreddit/emoji_permissions", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("name", "testemoji")
+		form.Set("post_flair_allowed", "false")
+		form.Set("mod_flair_only", "true")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Emoji.Update(ctx, "testsubreddit", nil)
+	assert.EqualError(t, err, "updateRequest: cannot be nil")
+
+	_, err = client.Emoji.Update(ctx, "testsubreddit", &EmojiCreateOrUpdateRequest{Name: ""})
+	assert.EqualError(t, err, "name: cannot be empty")
+
+	_, err = client.Emoji.Update(ctx, "testsubreddit", &EmojiCreateOrUpdateRequest{
+		Name:             "testemoji",
+		PostFlairAllowed: Bool(false),
+		ModFlairOnly:     Bool(true),
+	})
+	assert.NoError(t, err)
+}
