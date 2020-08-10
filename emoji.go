@@ -4,13 +4,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"mime/multipart"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/google/go-querystring/query"
+	"golang.org/x/net/context/ctxhttp"
 )
 
 // EmojiService handles communication with the emoji
@@ -30,6 +34,21 @@ type Emoji struct {
 	ModFlairOnly     bool   `json:"mod_flair_only,omitempty"`
 	// ID of the user who created this emoji.
 	CreatedBy string `json:"created_by,omitempty"`
+}
+
+// EmojiCreateRequest represents a request to copy an emoji.
+type EmojiCreateRequest struct {
+	Name             string `url:"name"`
+	UserFlairAllowed *bool  `url:"user_flair_allowed,omitempty"`
+	PostFlairAllowed *bool  `url:"post_flair_allowed,omitempty"`
+	ModFlairOnly     *bool  `url:"mod_flair_only,omitempty"`
+}
+
+func (r *EmojiCreateRequest) validate() error {
+	if r.Name == "" {
+		return errors.New("name: cannot be empty")
+	}
+	return nil
 }
 
 type emojis []*Emoji
@@ -69,13 +88,6 @@ func (s *EmojiService) Get(ctx context.Context, subreddit string) ([]*Emoji, []*
 		return nil, nil, resp, err
 	}
 
-	/*
-		The response to this request is something like:
-		{
-			"snoomojis": { ... },
-			"t5_subredditId": { ... }
-		}
-	*/
 	defaultEmojis := root["snoomojis"]
 	var subredditEmojis []*Emoji
 
@@ -132,12 +144,7 @@ func (s *EmojiService) DisableCustomSize(ctx context.Context, subreddit string) 
 	return s.client.Do(ctx, req, nil)
 }
 
-type field struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-}
-
-func (s *EmojiService) lease(ctx context.Context, subreddit, imagePath string) (string, []field, *Response, error) {
+func (s *EmojiService) lease(ctx context.Context, subreddit, imagePath string) (string, map[string]string, *Response, error) {
 	path := fmt.Sprintf("api/v1/%s/emoji_asset_upload_s3.json", subreddit)
 
 	form := url.Values{}
@@ -154,8 +161,11 @@ func (s *EmojiService) lease(ctx context.Context, subreddit, imagePath string) (
 
 	var response struct {
 		S3UploadLease struct {
-			Action string  `json:"action"`
-			Fields []field `json:"fields"`
+			Action string `json:"action"`
+			Fields []struct {
+				Name  string `json:"name"`
+				Value string `json:"value"`
+			} `json:"fields"`
 		} `json:"s3UploadLease"`
 	}
 
@@ -165,16 +175,22 @@ func (s *EmojiService) lease(ctx context.Context, subreddit, imagePath string) (
 	}
 
 	uploadURL := fmt.Sprintf("http:%s", response.S3UploadLease.Action)
-	fields := response.S3UploadLease.Fields
+
+	fields := make(map[string]string)
+	for _, field := range response.S3UploadLease.Fields {
+		fields[field.Name] = field.Value
+	}
 
 	return uploadURL, fields, resp, nil
 }
 
-func (s *EmojiService) upload(ctx context.Context, subreddit, emojiName, awsKey string) (*Response, error) {
+func (s *EmojiService) upload(ctx context.Context, createRequest *EmojiCreateRequest, subreddit, awsKey string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/%s/emoji.json", subreddit)
 
-	form := url.Values{}
-	form.Set("name", emojiName)
+	form, err := query.Values(createRequest)
+	if err != nil {
+		return nil, err
+	}
 	form.Set("s3_key", awsKey)
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
@@ -186,7 +202,16 @@ func (s *EmojiService) upload(ctx context.Context, subreddit, emojiName, awsKey 
 }
 
 // Upload uploads an emoji.
-func (s *EmojiService) Upload(ctx context.Context, subreddit, emojiName, imagePath string) (*Response, error) {
+func (s *EmojiService) Upload(ctx context.Context, createRequest *EmojiCreateRequest, subreddit, imagePath string) (*Response, error) {
+	if createRequest == nil {
+		return nil, errors.New("createRequest: cannot be nil")
+	}
+
+	err := createRequest.validate()
+	if err != nil {
+		return nil, err
+	}
+
 	uploadURL, fields, resp, err := s.lease(ctx, subreddit, imagePath)
 	if err != nil {
 		return resp, err
@@ -198,24 +223,13 @@ func (s *EmojiService) Upload(ctx context.Context, subreddit, emojiName, imagePa
 	}
 	defer file.Close()
 
-	fileContents, err := ioutil.ReadAll(file)
-	if err != nil {
-		return nil, err
-	}
-
 	body := new(bytes.Buffer)
 	writer := multipart.NewWriter(body)
 
-	// This will be used to trigger the upload on the AWS side.
-	var key string
-
 	// AWS ignores all fields in the request that come after the file field, so we need to set these before
 	// https://stackoverflow.com/questions/15234496/upload-directly-to-amazon-s3-using-ajax-returning-error-bucket-post-must-contai/15235866#15235866
-	for _, field := range fields {
-		if field.Name == "key" {
-			key = field.Value
-		}
-		writer.WriteField(field.Name, field.Value)
+	for k, v := range fields {
+		writer.WriteField(k, v)
 	}
 
 	part, err := writer.CreateFormFile("file", file.Name())
@@ -223,7 +237,7 @@ func (s *EmojiService) Upload(ctx context.Context, subreddit, emojiName, imagePa
 		return nil, err
 	}
 
-	_, err = part.Write(fileContents)
+	_, err = io.Copy(part, file)
 	if err != nil {
 		return nil, err
 	}
@@ -233,13 +247,7 @@ func (s *EmojiService) Upload(ctx context.Context, subreddit, emojiName, imagePa
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, uploadURL, body)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Set(headerContentType, writer.FormDataContentType())
-
-	httpResponse, err := DoRequest(ctx, req)
+	httpResponse, err := ctxhttp.Post(ctx, nil, uploadURL, writer.FormDataContentType(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -249,5 +257,5 @@ func (s *EmojiService) Upload(ctx context.Context, subreddit, emojiName, imagePa
 		return &Response{httpResponse}, err
 	}
 
-	return s.upload(ctx, subreddit, emojiName, key)
+	return s.upload(ctx, createRequest, subreddit, fields["key"])
 }
