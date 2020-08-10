@@ -91,9 +91,9 @@ func (s *EmojiService) Get(ctx context.Context, subreddit string) ([]*Emoji, []*
 	defaultEmojis := root["snoomojis"]
 	var subredditEmojis []*Emoji
 
-	for k := range root {
+	for k, v := range root {
 		if strings.HasPrefix(k, kindSubreddit) {
-			subredditEmojis = root[k]
+			subredditEmojis = v
 			break
 		}
 	}

@@ -53,7 +53,9 @@ func TestEmojiService_Get(t *testing.T) {
 
 	defaultEmojis, subredditEmojis, _, err := client.Emoji.Get(ctx, "test")
 	assert.NoError(t, err)
-	assert.Equal(t, expectedDefaultEmojis, defaultEmojis)
+	assert.Len(t, defaultEmojis, 2)
+	assert.Contains(t, expectedDefaultEmojis, defaultEmojis[0])
+	assert.Contains(t, expectedDefaultEmojis, defaultEmojis[1])
 	assert.Equal(t, expectedSubredditEmojis, subredditEmojis)
 }
 
