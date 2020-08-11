@@ -49,14 +49,6 @@ type UserSummary struct {
 	NSFW bool `json:"profile_over_18"`
 }
 
-// Relationship holds information about a relationship (friend/blocked).
-type Relationship struct {
-	ID      string     `json:"rel_id,omitempty"`
-	User    string     `json:"name,omitempty"`
-	UserID  string     `json:"id,omitempty"`
-	Created *Timestamp `json:"date,omitempty"`
-}
-
 // Blocked represents a blocked relationship.
 type Blocked struct {
 	Blocked   string     `json:"name,omitempty"`

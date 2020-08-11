@@ -26,28 +26,31 @@ type rootSubredditNames struct {
 	Names []string `json:"names,omitempty"`
 }
 
-type rootModeratorList struct {
-	Kind string `json:"kind,omitempty"`
-	Data struct {
-		Moderators []Moderator `json:"children"`
-	} `json:"data"`
+// Relationship holds information about a relationship (friend/blocked).
+// todo: there's also banned, wikibanned, etc.
+type Relationship struct {
+	ID      string     `json:"rel_id,omitempty"`
+	User    string     `json:"name,omitempty"`
+	UserID  string     `json:"id,omitempty"`
+	Created *Timestamp `json:"date,omitempty"`
+}
+
+// Relationships is a listing of relationships.
+type Relationships struct {
+	Relationships []*Relationship `json:"relationships"`
+	After         string          `json:"after"`
+	Before        string          `json:"before"`
 }
 
 // Moderator is a user who moderates a subreddit.
 type Moderator struct {
-	ID          string   `json:"id,omitempty"`
-	Name        string   `json:"name,omitempty"`
+	*Relationship
 	Permissions []string `json:"mod_permissions"`
 }
 
-// Ban represents a banned user and the ban information.
+// Ban represents a banned relationship.
 type Ban struct {
-	ID      string     `json:"rel_id,omitempty"`
-	Created *Timestamp `json:"date,omitempty"`
-
-	User   string `json:"name,omitempty"`
-	UserID string `json:"id,omitempty"`
-
+	*Relationship
 	// nil means the ban is permanent
 	DaysLeft *int   `json:"days_left"`
 	Note     string `json:"note,omitempty"`
@@ -58,22 +61,6 @@ type Bans struct {
 	Bans   []*Ban `json:"bans"`
 	After  string `json:"after"`
 	Before string `json:"before"`
-}
-
-// Mute represents a muted user and the mute information.
-type Mute struct {
-	ID      string     `json:"rel_id,omitempty"`
-	Created *Timestamp `json:"date,omitempty"`
-
-	User   string `json:"name,omitempty"`
-	UserID string `json:"id,omitempty"`
-}
-
-// Mutes is a listing of Mute.
-type Mutes struct {
-	Mutes  []*Mute `json:"mutes"`
-	After  string  `json:"after"`
-	Before string  `json:"before"`
 }
 
 func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
@@ -416,24 +403,6 @@ func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num 
 	return root, resp, nil
 }
 
-// Moderators returns the moderators of a subreddit.
-func (s *SubredditService) Moderators(ctx context.Context, subreddit string) (interface{}, *Response, error) {
-	path := fmt.Sprintf("r/%s/about/moderators", subreddit)
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(rootModeratorList)
-	resp, err := s.client.Do(ctx, req, root)
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return root.Data.Moderators, resp, nil
-}
-
 // todo: sr_detail's NSFW indicator is over_18 instead of over18
 func (s *SubredditService) random(ctx context.Context, nsfw bool) (*Subreddit, *Response, error) {
 	path := "r/random"
@@ -551,8 +520,43 @@ func (s *SubredditService) Banned(ctx context.Context, subreddit string, opts *L
 }
 
 // Muted gets muted users from the subreddit.
-func (s *SubredditService) Muted(ctx context.Context, subreddit string, opts *ListOptions) (*Mutes, *Response, error) {
+func (s *SubredditService) Muted(ctx context.Context, subreddit string, opts *ListOptions) (*Relationships, *Response, error) {
 	path := fmt.Sprintf("r/%s/about/muted", subreddit)
+
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(struct {
+		Data struct {
+			Relationships []*Relationship `json:"children"`
+			After         string          `json:"after"`
+			Before        string          `json:"before"`
+		} `json:"data"`
+	})
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	relationships := &Relationships{
+		Relationships: root.Data.Relationships,
+		After:         root.Data.After,
+		Before:        root.Data.Before,
+	}
+
+	return relationships, resp, nil
+}
+
+// WikiBanned gets banned users from the subreddit.
+func (s *SubredditService) WikiBanned(ctx context.Context, subreddit string, opts *ListOptions) (*Bans, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/wikibanned", subreddit)
 
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -566,9 +570,9 @@ func (s *SubredditService) Muted(ctx context.Context, subreddit string, opts *Li
 
 	var root struct {
 		Data struct {
-			Mutes  []*Mute `json:"children"`
-			After  string  `json:"after"`
-			Before string  `json:"before"`
+			Bans   []*Ban `json:"children"`
+			After  string `json:"after"`
+			Before string `json:"before"`
 		} `json:"data"`
 	}
 	resp, err := s.client.Do(ctx, req, &root)
@@ -576,11 +580,103 @@ func (s *SubredditService) Muted(ctx context.Context, subreddit string, opts *Li
 		return nil, resp, err
 	}
 
-	mutes := &Mutes{
-		Mutes:  root.Data.Mutes,
+	bans := &Bans{
+		Bans:   root.Data.Bans,
 		After:  root.Data.After,
 		Before: root.Data.Before,
 	}
 
-	return mutes, resp, nil
+	return bans, resp, nil
+}
+
+// Contributors gets contributors (also known as approved users) from the subreddit.
+func (s *SubredditService) Contributors(ctx context.Context, subreddit string, opts *ListOptions) (*Relationships, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/contributors", subreddit)
+
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(struct {
+		Data struct {
+			Relationships []*Relationship `json:"children"`
+			After         string          `json:"after"`
+			Before        string          `json:"before"`
+		} `json:"data"`
+	})
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	relationships := &Relationships{
+		Relationships: root.Data.Relationships,
+		After:         root.Data.After,
+		Before:        root.Data.Before,
+	}
+
+	return relationships, resp, nil
+}
+
+// WikiContributors gets contributors of the wiki from the subreddit.
+func (s *SubredditService) WikiContributors(ctx context.Context, subreddit string, opts *ListOptions) (*Relationships, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/wikicontributors", subreddit)
+
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(struct {
+		Data struct {
+			Relationships []*Relationship `json:"children"`
+			After         string          `json:"after"`
+			Before        string          `json:"before"`
+		} `json:"data"`
+	})
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	relationships := &Relationships{
+		Relationships: root.Data.Relationships,
+		After:         root.Data.After,
+		Before:        root.Data.Before,
+	}
+
+	return relationships, resp, nil
+}
+
+// Moderators gets the moderators of the subreddit.
+func (s *SubredditService) Moderators(ctx context.Context, subreddit string) ([]*Moderator, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/moderators", subreddit)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(struct {
+		Data struct {
+			Moderators []*Moderator `json:"children"`
+		} `json:"data"`
+	})
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Data.Moderators, resp, nil
 }

@@ -200,11 +200,6 @@ var expectedSearchPosts = &Posts{
 	After: "t3_hmwhd7",
 }
 
-var expectedModerators = []Moderator{
-	{ID: "t2_test1", Name: "testuser1", Permissions: []string{"all"}},
-	{ID: "t2_test2", Name: "testuser2", Permissions: []string{"all"}},
-}
-
 var expectedRandomSubreddit = &Subreddit{
 	FullID:  "t5_2wi4l",
 	Created: &Timestamp{time.Date(2013, 3, 1, 4, 4, 18, 0, time.UTC)},
@@ -219,24 +214,47 @@ var expectedRandomSubreddit = &Subreddit{
 	Subscribers: 52357,
 }
 
+var expectedRelationships3 = &Relationships{
+	Relationships: []*Relationship{
+		{
+			ID:      "rel_id1",
+			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
+			User:    "testuser1",
+			UserID:  "t2_user1",
+		},
+		{
+			ID:      "rel_id2",
+			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
+			User:    "testuser2",
+			UserID:  "t2_user2",
+		},
+	},
+	After:  "",
+	Before: "",
+}
+
 var expectedBans = &Bans{
 	Bans: []*Ban{
 		{
-			ID:      "rb_123",
-			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
+			Relationship: &Relationship{
+				ID:      "rb_123",
+				Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
 
-			User:   "testuser1",
-			UserID: "t2_user1",
+				User:   "testuser1",
+				UserID: "t2_user1",
+			},
 
 			DaysLeft: Int(43),
 			Note:     "Spam",
 		},
 		{
-			ID:      "rb_456",
-			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
+			Relationship: &Relationship{
+				ID:      "rb_456",
+				Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
 
-			User:   "testuser2",
-			UserID: "t2_user2",
+				User:   "testuser2",
+				UserID: "t2_user2",
+			},
 
 			DaysLeft: nil,
 			Note:     "Spam",
@@ -246,25 +264,25 @@ var expectedBans = &Bans{
 	Before: "",
 }
 
-var expectedMutes = &Mutes{
-	Mutes: []*Mute{
-		{
-			ID:      "Mute_123",
-			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
-
-			User:   "testuser1",
-			UserID: "t2_user1",
+var expectedModerators = []*Moderator{
+	{
+		Relationship: &Relationship{
+			ID:      "rb_tmatb9",
+			User:    "testuser1",
+			UserID:  "t2_test1",
+			Created: &Timestamp{time.Date(2013, 7, 29, 20, 44, 27, 0, time.UTC)},
 		},
-		{
-			ID:      "Mute_456",
-			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
-
-			User:   "testuser2",
-			UserID: "t2_user2",
-		},
+		Permissions: []string{"all"},
 	},
-	After:  "",
-	Before: "",
+	{
+		Relationship: &Relationship{
+			ID:      "rb_5c9s4d",
+			User:    "testuser2",
+			UserID:  "t2_test2",
+			Created: &Timestamp{time.Date(2014, 3, 1, 18, 13, 53, 0, time.UTC)},
+		},
+		Permissions: []string{"all"},
+	},
 }
 
 func TestSubredditService_HotPosts(t *testing.T) {
@@ -791,23 +809,6 @@ func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
 	assert.Equal(t, expectedSearchPosts, posts)
 }
 
-func TestSubredditService_Moderators(t *testing.T) {
-	setup()
-	defer teardown()
-
-	blob, err := readFileContents("testdata/subreddit/moderators.json")
-	assert.NoError(t, err)
-
-	mux.HandleFunc("/r/test/about/moderators", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, blob)
-	})
-
-	moderators, _, err := client.Subreddit.Moderators(ctx, "test")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedModerators, moderators)
-}
-
 func TestSubredditService_Random(t *testing.T) {
 	setup()
 	defer teardown()
@@ -901,7 +902,7 @@ func TestSubredditService_Muted(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/muted-users.json")
+	blob, err := readFileContents("testdata/subreddit/relationships.json")
 	assert.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/muted", func(w http.ResponseWriter, r *http.Request) {
@@ -920,5 +921,98 @@ func TestSubredditService_Muted(t *testing.T) {
 
 	mutes, _, err := client.Subreddit.Muted(ctx, "test", &ListOptions{Before: "testbefore", Limit: 50})
 	assert.NoError(t, err)
-	assert.Equal(t, expectedMutes, mutes)
+	assert.Equal(t, expectedRelationships3, mutes)
+}
+
+func TestSubredditService_WikiBanned(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/banned-users.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/about/wikibanned", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("after", "testafter")
+		form.Set("limit", "15")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	bans, _, err := client.Subreddit.WikiBanned(ctx, "test", &ListOptions{After: "testafter", Limit: 15})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedBans, bans)
+}
+
+func TestSubredditService_Contributors(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/relationships.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/about/contributors", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("limit", "5")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	contributors, _, err := client.Subreddit.Contributors(ctx, "test", &ListOptions{Limit: 5})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedRelationships3, contributors)
+}
+
+func TestSubredditService_WikiContributors(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/relationships.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/about/wikicontributors", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("limit", "99")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	contributors, _, err := client.Subreddit.WikiContributors(ctx, "test", &ListOptions{Limit: 99})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedRelationships3, contributors)
+}
+
+func TestSubredditService_Moderators(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/moderators.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/about/moderators", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	moderators, _, err := client.Subreddit.Moderators(ctx, "test")
+	assert.NoError(t, err)
+	assert.Equal(t, expectedModerators, moderators)
 }

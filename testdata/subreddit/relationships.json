@@ -6,13 +6,13 @@
     "children": [
       {
         "date": 1597113302.0,
-        "rel_id": "Mute_123",
+        "rel_id": "rel_id1",
         "name": "testuser1",
         "id": "t2_user1"
       },
       {
         "date": 1597113300.0,
-        "rel_id": "Mute_456",
+        "rel_id": "rel_id2",
         "name": "testuser2",
         "id": "t2_user2"
       }
