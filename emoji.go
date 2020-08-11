@@ -150,7 +150,7 @@ func (s *EmojiService) lease(ctx context.Context, subreddit, imagePath string) (
 	form := url.Values{}
 	form.Set("filepath", imagePath)
 	form.Set("mimetype", "image/jpeg")
-	if strings.HasSuffix(strings.ToLower(path), ".png") {
+	if strings.HasSuffix(strings.ToLower(imagePath), ".png") {
 		form.Set("mimetype", "image/png")
 	}
 

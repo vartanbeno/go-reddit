@@ -1,0 +1,15 @@
+{
+  "s3UploadLease": {
+    "action": "//%s",
+    "fields": [
+      {
+        "name": "key",
+        "value": "t5_2uquw1/t2_164ab8/a94a8f45ccb199a61c4c0873d391e98c982fabd3"
+      },
+      {
+        "name": "test name",
+        "value": "test value"
+      }
+    ]
+  }
+}
