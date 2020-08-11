@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var expectedUser = &User{
@@ -191,16 +191,16 @@ func TestUserService_Get(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/get.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/Test_User/about", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	user, _, err := client.User.Get(ctx, "Test_User")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedUser, user)
+	require.NoError(t, err)
+	require.Equal(t, expectedUser, user)
 }
 
 func TestUserService_GetMultipleByID(t *testing.T) {
@@ -208,21 +208,21 @@ func TestUserService_GetMultipleByID(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/get-multiple-by-id.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/user_data_by_account_ids", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, "t2_1,t2_2,t2_3", r.Form.Get("ids"))
+		require.NoError(t, err)
+		require.Equal(t, "t2_1,t2_2,t2_3", r.Form.Get("ids"))
 
 		fmt.Fprint(w, blob)
 	})
 
 	users, _, err := client.User.GetMultipleByID(ctx, "t2_1", "t2_2", "t2_3")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedUsers, users)
+	require.NoError(t, err)
+	require.Equal(t, expectedUsers, users)
 }
 
 func TestUserService_UsernameAvailable(t *testing.T) {
@@ -230,25 +230,25 @@ func TestUserService_UsernameAvailable(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/username_available", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		user := r.Form.Get("user")
-		assert.NotEmpty(t, user)
+		require.NotEmpty(t, user)
 
 		result := user == "test123"
 		fmt.Fprint(w, result)
 	})
 
 	ok, _, err := client.User.UsernameAvailable(ctx, "test123")
-	assert.NoError(t, err)
-	assert.True(t, ok)
+	require.NoError(t, err)
+	require.True(t, ok)
 
 	ok, _, err = client.User.UsernameAvailable(ctx, "123test")
-	assert.NoError(t, err)
-	assert.False(t, ok)
+	require.NoError(t, err)
+	require.False(t, ok)
 }
 
 func TestUserService_Overview(t *testing.T) {
@@ -256,25 +256,25 @@ func TestUserService_Overview(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/overview.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/overview", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, comments, _, err := client.User.Overview(ctx, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t1_f0zsa37", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t1_f0zsa37", posts.After)
+	require.Equal(t, "", posts.Before)
 
-	assert.Len(t, comments.Comments, 1)
-	assert.Equal(t, expectedComment, comments.Comments[0])
-	assert.Equal(t, "t1_f0zsa37", comments.After)
-	assert.Equal(t, "", comments.Before)
+	require.Len(t, comments.Comments, 1)
+	require.Equal(t, expectedComment, comments.Comments[0])
+	require.Equal(t, "t1_f0zsa37", comments.After)
+	require.Equal(t, "", comments.Before)
 }
 
 func TestUserService_OverviewOf(t *testing.T) {
@@ -282,25 +282,25 @@ func TestUserService_OverviewOf(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/overview.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/overview", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, comments, _, err := client.User.OverviewOf(ctx, "user2", nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t1_f0zsa37", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t1_f0zsa37", posts.After)
+	require.Equal(t, "", posts.Before)
 
-	assert.Len(t, comments.Comments, 1)
-	assert.Equal(t, expectedComment, comments.Comments[0])
-	assert.Equal(t, "t1_f0zsa37", comments.After)
-	assert.Equal(t, "", comments.Before)
+	require.Len(t, comments.Comments, 1)
+	require.Equal(t, expectedComment, comments.Comments[0])
+	require.Equal(t, "t1_f0zsa37", comments.After)
+	require.Equal(t, "", comments.Before)
 }
 
 func TestUserService_Overview_Options(t *testing.T) {
@@ -308,10 +308,10 @@ func TestUserService_Overview_Options(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/overview.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/overview", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("limit", "5")
@@ -319,8 +319,8 @@ func TestUserService_Overview_Options(t *testing.T) {
 		form.Set("sort", "top")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
@@ -332,7 +332,7 @@ func TestUserService_Overview_Options(t *testing.T) {
 		},
 		Sort: "top",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestUserService_Posts(t *testing.T) {
@@ -340,20 +340,20 @@ func TestUserService_Posts(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/submitted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.User.Posts(ctx, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t3_gczwql", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t3_gczwql", posts.After)
+	require.Equal(t, "", posts.Before)
 }
 
 func TestUserService_PostsOf(t *testing.T) {
@@ -361,20 +361,20 @@ func TestUserService_PostsOf(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/submitted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.User.PostsOf(ctx, "user2", nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t3_gczwql", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t3_gczwql", posts.After)
+	require.Equal(t, "", posts.Before)
 }
 
 func TestUserService_Posts_Options(t *testing.T) {
@@ -382,18 +382,18 @@ func TestUserService_Posts_Options(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/submitted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("limit", "10")
 		form.Set("sort", "new")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
@@ -404,7 +404,7 @@ func TestUserService_Posts_Options(t *testing.T) {
 		},
 		Sort: "new",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestUserService_Comments(t *testing.T) {
@@ -412,20 +412,20 @@ func TestUserService_Comments(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/comments.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/comments", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	comments, _, err := client.User.Comments(ctx, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, comments.Comments, 1)
-	assert.Equal(t, expectedComment, comments.Comments[0])
-	assert.Equal(t, "t1_f0zsa37", comments.After)
-	assert.Equal(t, "", comments.Before)
+	require.Len(t, comments.Comments, 1)
+	require.Equal(t, expectedComment, comments.Comments[0])
+	require.Equal(t, "t1_f0zsa37", comments.After)
+	require.Equal(t, "", comments.Before)
 }
 
 func TestUserService_CommentsOf(t *testing.T) {
@@ -433,20 +433,20 @@ func TestUserService_CommentsOf(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/comments.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/comments", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	comments, _, err := client.User.CommentsOf(ctx, "user2", nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, comments.Comments, 1)
-	assert.Equal(t, expectedComment, comments.Comments[0])
-	assert.Equal(t, "t1_f0zsa37", comments.After)
-	assert.Equal(t, "", comments.Before)
+	require.Len(t, comments.Comments, 1)
+	require.Equal(t, expectedComment, comments.Comments[0])
+	require.Equal(t, "t1_f0zsa37", comments.After)
+	require.Equal(t, "", comments.Before)
 }
 
 func TestUserService_Comments_Options(t *testing.T) {
@@ -454,18 +454,18 @@ func TestUserService_Comments_Options(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/comments.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/comments", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("limit", "100")
 		form.Set("before", "t1_before")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
@@ -476,7 +476,7 @@ func TestUserService_Comments_Options(t *testing.T) {
 			Before: "t1_before",
 		},
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestUserService_Saved(t *testing.T) {
@@ -485,25 +485,25 @@ func TestUserService_Saved(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/overview.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/saved", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, comments, _, err := client.User.Saved(ctx, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t1_f0zsa37", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t1_f0zsa37", posts.After)
+	require.Equal(t, "", posts.Before)
 
-	assert.Len(t, comments.Comments, 1)
-	assert.Equal(t, expectedComment, comments.Comments[0])
-	assert.Equal(t, "t1_f0zsa37", comments.After)
-	assert.Equal(t, "", comments.Before)
+	require.Len(t, comments.Comments, 1)
+	require.Equal(t, expectedComment, comments.Comments[0])
+	require.Equal(t, "t1_f0zsa37", comments.After)
+	require.Equal(t, "", comments.Before)
 }
 
 func TestUserService_Saved_Options(t *testing.T) {
@@ -512,18 +512,18 @@ func TestUserService_Saved_Options(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/overview.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/saved", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("limit", "50")
 		form.Set("sort", "controversial")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
@@ -534,7 +534,7 @@ func TestUserService_Saved_Options(t *testing.T) {
 		},
 		Sort: "controversial",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 func TestUserService_Upvoted(t *testing.T) {
 	setup()
@@ -542,20 +542,20 @@ func TestUserService_Upvoted(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/upvoted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.User.Upvoted(ctx, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t3_gczwql", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t3_gczwql", posts.After)
+	require.Equal(t, "", posts.Before)
 }
 
 func TestUserService_Upvoted_Options(t *testing.T) {
@@ -564,18 +564,18 @@ func TestUserService_Upvoted_Options(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/upvoted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("limit", "30")
 		form.Set("after", "t3_after")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
@@ -586,7 +586,7 @@ func TestUserService_Upvoted_Options(t *testing.T) {
 			After: "t3_after",
 		},
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestUserService_UpvotedOf(t *testing.T) {
@@ -595,20 +595,20 @@ func TestUserService_UpvotedOf(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/upvoted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.User.UpvotedOf(ctx, "user2", nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t3_gczwql", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t3_gczwql", posts.After)
+	require.Equal(t, "", posts.Before)
 }
 
 func TestUserService_Downvoted(t *testing.T) {
@@ -617,20 +617,20 @@ func TestUserService_Downvoted(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/downvoted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.User.Downvoted(ctx, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t3_gczwql", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t3_gczwql", posts.After)
+	require.Equal(t, "", posts.Before)
 }
 
 func TestUserService_Downvoted_Options(t *testing.T) {
@@ -639,18 +639,18 @@ func TestUserService_Downvoted_Options(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/downvoted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("limit", "20")
 		form.Set("before", "t3_before")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
@@ -661,7 +661,7 @@ func TestUserService_Downvoted_Options(t *testing.T) {
 			Before: "t3_before",
 		},
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestUserService_DownvotedOf(t *testing.T) {
@@ -670,20 +670,20 @@ func TestUserService_DownvotedOf(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/downvoted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.User.DownvotedOf(ctx, "user2", nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t3_gczwql", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t3_gczwql", posts.After)
+	require.Equal(t, "", posts.Before)
 }
 
 func TestUserService_Hidden(t *testing.T) {
@@ -692,20 +692,20 @@ func TestUserService_Hidden(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/hidden", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.User.Hidden(ctx, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t3_gczwql", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t3_gczwql", posts.After)
+	require.Equal(t, "", posts.Before)
 }
 
 func TestUserService_Gilded(t *testing.T) {
@@ -714,20 +714,20 @@ func TestUserService_Gilded(t *testing.T) {
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("testdata/user/submitted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/gilded", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.User.Gilded(ctx, nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	assert.Len(t, posts.Posts, 1)
-	assert.Equal(t, expectedPost, posts.Posts[0])
-	assert.Equal(t, "t3_gczwql", posts.After)
-	assert.Equal(t, "", posts.Before)
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t3_gczwql", posts.After)
+	require.Equal(t, "", posts.Before)
 }
 
 func TestUserService_GetFriendship(t *testing.T) {
@@ -735,16 +735,16 @@ func TestUserService_GetFriendship(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/friend.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	relationship, _, err := client.User.GetFriendship(ctx, "test123")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRelationship, relationship)
+	require.NoError(t, err)
+	require.Equal(t, expectedRelationship, relationship)
 }
 
 func TestUserService_Friend(t *testing.T) {
@@ -752,10 +752,10 @@ func TestUserService_Friend(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/friend.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPut, r.Method)
+		require.Equal(t, http.MethodPut, r.Method)
 
 		type request struct {
 			Username string `json:"name"`
@@ -763,15 +763,15 @@ func TestUserService_Friend(t *testing.T) {
 
 		var req request
 		err := json.NewDecoder(r.Body).Decode(&req)
-		assert.NoError(t, err)
-		assert.Equal(t, "test123", req.Username)
+		require.NoError(t, err)
+		require.Equal(t, "test123", req.Username)
 
 		fmt.Fprint(w, blob)
 	})
 
 	relationship, _, err := client.User.Friend(ctx, "test123")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRelationship, relationship)
+	require.NoError(t, err)
+	require.Equal(t, expectedRelationship, relationship)
 }
 
 func TestUserService_Unfriend(t *testing.T) {
@@ -779,13 +779,13 @@ func TestUserService_Unfriend(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodDelete, r.Method)
+		require.Equal(t, http.MethodDelete, r.Method)
 		w.WriteHeader(http.StatusNoContent)
 	})
 
 	res, err := client.User.Unfriend(ctx, "test123")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusNoContent, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusNoContent, res.StatusCode)
 }
 
 func TestUserService_Block(t *testing.T) {
@@ -793,24 +793,24 @@ func TestUserService_Block(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/block.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("name", "test123")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	blocked, _, err := client.User.Block(ctx, "test123")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedBlocked, blocked)
+	require.NoError(t, err)
+	require.Equal(t, expectedBlocked, blocked)
 }
 
 // func TestUserService_BlockByID(t *testing.T) {
@@ -818,24 +818,24 @@ func TestUserService_Block(t *testing.T) {
 // 	defer teardown()
 
 // 	blob, err := readFileContents("testdata/user/block.json")
-//  assert.NoError(t,err)
+//  require.NoError(t,err)
 
 // 	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
-// 		assert.Equal(t, http.MethodPost, r.Method)
+// 		require.Equal(t, http.MethodPost, r.Method)
 
 // 		form := url.Values{}
 // 		form.Set("account_id", "abc123")
 
 // 		err := r.ParseForm()
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, form, r.Form)
+// 		require.NoError(t, err)
+// 		require.Equal(t, form, r.Form)
 
 // 		fmt.Fprint(w, blob)
 // 	})
 
 // 	blocked, _, err := client.User.BlockByID(ctx, "abc123")
-// 	assert.NoError(t, err)
-// 	assert.Equal(t, expectedBlocked, blocked)
+// 	require.NoError(t, err)
+// 	require.Equal(t, expectedBlocked, blocked)
 // }
 
 func TestUserService_Unblock(t *testing.T) {
@@ -845,7 +845,7 @@ func TestUserService_Unblock(t *testing.T) {
 	client.redditID = "self123"
 
 	mux.HandleFunc("/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("name", "test123")
@@ -853,12 +853,12 @@ func TestUserService_Unblock(t *testing.T) {
 		form.Set("container", client.redditID)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.User.Unblock(ctx, "test123")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 // func TestUserService_UnblockByID(t *testing.T) {
@@ -868,7 +868,7 @@ func TestUserService_Unblock(t *testing.T) {
 // 	client.redditID = "self123"
 
 // 	mux.HandleFunc("/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
-// 		assert.Equal(t, http.MethodPost, r.Method)
+// 		require.Equal(t, http.MethodPost, r.Method)
 
 // 		form := url.Values{}
 // 		form.Set("id", "abc123")
@@ -876,12 +876,12 @@ func TestUserService_Unblock(t *testing.T) {
 // 		form.Set("container", client.redditID)
 
 // 		err := r.ParseForm()
-// 		assert.NoError(t, err)
-// 		assert.Equal(t, form, r.Form)
+// 		require.NoError(t, err)
+// 		require.Equal(t, form, r.Form)
 // 	})
 
 // 	_, err := client.User.UnblockByID(ctx, "abc123")
-// 	assert.NoError(t, err)
+// 	require.NoError(t, err)
 // }
 
 func TestUserService_Trophies(t *testing.T) {
@@ -889,16 +889,16 @@ func TestUserService_Trophies(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/trophies.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/user/user1/trophies", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	trophies, _, err := client.User.Trophies(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedTrophies, trophies)
+	require.NoError(t, err)
+	require.Equal(t, expectedTrophies, trophies)
 }
 
 func TestUserService_TrophiesOf(t *testing.T) {
@@ -906,16 +906,16 @@ func TestUserService_TrophiesOf(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/trophies.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/user/test123/trophies", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	trophies, _, err := client.User.TrophiesOf(ctx, "test123")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedTrophies, trophies)
+	require.NoError(t, err)
+	require.Equal(t, expectedTrophies, trophies)
 }
 
 func TestUserService_Popular(t *testing.T) {
@@ -923,16 +923,16 @@ func TestUserService_Popular(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/user-subreddits.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/users/popular", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	userSubreddits, _, err := client.User.Popular(ctx, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedUserSubreddits, userSubreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedUserSubreddits, userSubreddits)
 }
 
 func TestUserService_New(t *testing.T) {
@@ -940,16 +940,16 @@ func TestUserService_New(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/user-subreddits.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/users/new", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	userSubreddits, _, err := client.User.New(ctx, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedUserSubreddits, userSubreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedUserSubreddits, userSubreddits)
 }
 
 func TestUserService_Search(t *testing.T) {
@@ -957,22 +957,22 @@ func TestUserService_Search(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/user/list.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/users/search", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("q", "test")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	users, _, err := client.User.Search(ctx, "test", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSearchUsers, users)
+	require.NoError(t, err)
+	require.Equal(t, expectedSearchUsers, users)
 }

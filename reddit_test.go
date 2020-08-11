@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -83,13 +83,13 @@ func testClientServices(t *testing.T, c *Client) {
 	cv := reflect.Indirect(cp)
 
 	for _, s := range services {
-		assert.Falsef(t, cv.FieldByName(s).IsNil(), "c.%s should not be nil", s)
+		require.Falsef(t, cv.FieldByName(s).IsNil(), "c.%s should not be nil", s)
 	}
 }
 
 func testClientDefaultUserAgent(t *testing.T, c *Client) {
 	expectedUserAgent := fmt.Sprintf("golang:%s:v%s (by /u/)", libraryName, libraryVersion)
-	assert.Equal(t, expectedUserAgent, c.userAgent)
+	require.Equal(t, expectedUserAgent, c.userAgent)
 }
 
 func testClientDefaults(t *testing.T, c *Client) {
@@ -99,7 +99,7 @@ func testClientDefaults(t *testing.T, c *Client) {
 
 func TestNewClient(t *testing.T) {
 	c, err := NewClient(nil)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	testClientDefaults(t, c)
 }
 
@@ -109,5 +109,5 @@ func TestNewClient_Error(t *testing.T) {
 	}
 
 	_, err := NewClient(nil, errorOpt)
-	assert.EqualError(t, err, "foo")
+	require.EqualError(t, err, "foo")
 }

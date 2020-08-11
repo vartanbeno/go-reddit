@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var expectedMulti = &Multi{
@@ -48,16 +48,16 @@ func TestMultiService_Get(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/multi/multi.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	multi, _, err := client.Multi.Get(ctx, "user/testuser/m/testmulti")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedMulti, multi)
+	require.NoError(t, err)
+	require.Equal(t, expectedMulti, multi)
 }
 
 func TestMultiService_Mine(t *testing.T) {
@@ -65,16 +65,16 @@ func TestMultiService_Mine(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/multi/multis.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/mine", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	multis, _, err := client.Multi.Mine(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, []Multi{*expectedMulti, *expectedMulti2}, multis)
+	require.NoError(t, err)
+	require.Equal(t, []Multi{*expectedMulti, *expectedMulti2}, multis)
 }
 
 func TestMultiService_Of(t *testing.T) {
@@ -82,16 +82,16 @@ func TestMultiService_Of(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/multi/multis.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/test", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	multis, _, err := client.Multi.Of(ctx, "test")
-	assert.NoError(t, err)
-	assert.Equal(t, []Multi{*expectedMulti, *expectedMulti2}, multis)
+	require.NoError(t, err)
+	require.Equal(t, []Multi{*expectedMulti, *expectedMulti2}, multis)
 }
 
 func TestMultiService_Copy(t *testing.T) {
@@ -99,10 +99,10 @@ func TestMultiService_Copy(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/multi/multi.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/copy", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("from", "user/testuser/m/testmulti")
@@ -111,14 +111,14 @@ func TestMultiService_Copy(t *testing.T) {
 		form.Set("display_name", "hello")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	_, _, err = client.Multi.Copy(ctx, nil)
-	assert.EqualError(t, err, "copyRequest: cannot be nil")
+	require.EqualError(t, err, "copyRequest: cannot be nil")
 
 	multi, _, err := client.Multi.Copy(ctx, &MultiCopyRequest{
 		FromPath:    "user/testuser/m/testmulti",
@@ -126,8 +126,8 @@ func TestMultiService_Copy(t *testing.T) {
 		Description: "this is a multireddit",
 		DisplayName: "hello",
 	})
-	assert.NoError(t, err)
-	assert.Equal(t, expectedMulti, multi)
+	require.NoError(t, err)
+	require.Equal(t, expectedMulti, multi)
 }
 
 func TestMultiService_Create(t *testing.T) {
@@ -135,7 +135,7 @@ func TestMultiService_Create(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/multi/multi.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	createRequest := &MultiCreateOrUpdateRequest{
 		Name:        "testmulti",
@@ -145,27 +145,27 @@ func TestMultiService_Create(t *testing.T) {
 	}
 
 	mux.HandleFunc("/api/multi", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		model := r.Form.Get("model")
 
 		expectedCreateRequest := new(MultiCreateOrUpdateRequest)
 		err = json.Unmarshal([]byte(model), expectedCreateRequest)
-		assert.NoError(t, err)
-		assert.Equal(t, expectedCreateRequest, createRequest)
+		require.NoError(t, err)
+		require.Equal(t, expectedCreateRequest, createRequest)
 
 		fmt.Fprint(w, blob)
 	})
 
 	_, _, err = client.Multi.Create(ctx, nil)
-	assert.EqualError(t, err, "createRequest: cannot be nil")
+	require.EqualError(t, err, "createRequest: cannot be nil")
 
 	multi, _, err := client.Multi.Create(ctx, createRequest)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedMulti, multi)
+	require.NoError(t, err)
+	require.Equal(t, expectedMulti, multi)
 }
 
 func TestMultiService_Update(t *testing.T) {
@@ -173,7 +173,7 @@ func TestMultiService_Update(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/multi/multi.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	updateRequest := &MultiCreateOrUpdateRequest{
 		Name:        "testmulti",
@@ -182,27 +182,27 @@ func TestMultiService_Update(t *testing.T) {
 	}
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPut, r.Method)
+		require.Equal(t, http.MethodPut, r.Method)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		model := r.Form.Get("model")
 
 		expectedCreateRequest := new(MultiCreateOrUpdateRequest)
 		err = json.Unmarshal([]byte(model), expectedCreateRequest)
-		assert.NoError(t, err)
-		assert.Equal(t, expectedCreateRequest, updateRequest)
+		require.NoError(t, err)
+		require.Equal(t, expectedCreateRequest, updateRequest)
 
 		fmt.Fprint(w, blob)
 	})
 
 	_, _, err = client.Multi.Update(ctx, "user/testuser/m/testmulti", nil)
-	assert.EqualError(t, err, "updateRequest: cannot be nil")
+	require.EqualError(t, err, "updateRequest: cannot be nil")
 
 	multi, _, err := client.Multi.Update(ctx, "user/testuser/m/testmulti", updateRequest)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedMulti, multi)
+	require.NoError(t, err)
+	require.Equal(t, expectedMulti, multi)
 }
 
 func TestMultiService_Delete(t *testing.T) {
@@ -210,11 +210,11 @@ func TestMultiService_Delete(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodDelete, r.Method)
+		require.Equal(t, http.MethodDelete, r.Method)
 	})
 
 	_, err := client.Multi.Delete(ctx, "user/testuser/m/testmulti")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestMultiService_GetDescription(t *testing.T) {
@@ -222,16 +222,16 @@ func TestMultiService_GetDescription(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/multi/description.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/description", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	description, _, err := client.Multi.GetDescription(ctx, "user/testuser/m/testmulti")
-	assert.NoError(t, err)
-	assert.Equal(t, "hello world", description)
+	require.NoError(t, err)
+	require.Equal(t, "hello world", description)
 }
 
 func TestMultiService_UpdateDescription(t *testing.T) {
@@ -239,24 +239,24 @@ func TestMultiService_UpdateDescription(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/multi/description.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/description", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPut, r.Method)
+		require.Equal(t, http.MethodPut, r.Method)
 
 		form := url.Values{}
 		form.Set("model", `{"body_md":"hello world"}`)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	description, _, err := client.Multi.UpdateDescription(ctx, "user/testuser/m/testmulti", "hello world")
-	assert.NoError(t, err)
-	assert.Equal(t, "hello world", description)
+	require.NoError(t, err)
+	require.Equal(t, "hello world", description)
 }
 
 func TestMultiService_AddSubreddit(t *testing.T) {
@@ -264,18 +264,18 @@ func TestMultiService_AddSubreddit(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/r/golang", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPut, r.Method)
+		require.Equal(t, http.MethodPut, r.Method)
 
 		form := url.Values{}
 		form.Set("model", `{"name":"golang"}`)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.Multi.AddSubreddit(ctx, "user/testuser/m/testmulti", "golang")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestMultiService_DeleteSubreddit(t *testing.T) {
@@ -283,9 +283,9 @@ func TestMultiService_DeleteSubreddit(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/r/golang", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodDelete, r.Method)
+		require.Equal(t, http.MethodDelete, r.Method)
 	})
 
 	_, err := client.Multi.DeleteSubreddit(ctx, "user/testuser/m/testmulti", "golang")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }

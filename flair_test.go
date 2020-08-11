@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var expectedUserFlairs = []*Flair{
@@ -66,16 +66,16 @@ func TestFlairService_GetUserFlairs(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/flair/user-flairs.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/api/user_flair_v2", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	userFlairs, _, err := client.Flair.GetUserFlairs(ctx, "testsubreddit")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedUserFlairs, userFlairs)
+	require.NoError(t, err)
+	require.Equal(t, expectedUserFlairs, userFlairs)
 }
 
 func TestFlairService_GetPostFlairs(t *testing.T) {
@@ -83,16 +83,16 @@ func TestFlairService_GetPostFlairs(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/flair/post-flairs.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/api/link_flair_v2", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	postFlairs, _, err := client.Flair.GetPostFlairs(ctx, "testsubreddit")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedPostFlairs, postFlairs)
+	require.NoError(t, err)
+	require.Equal(t, expectedPostFlairs, postFlairs)
 }
 
 func TestFlairService_ListUserFlairs(t *testing.T) {
@@ -100,14 +100,14 @@ func TestFlairService_ListUserFlairs(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/flair/list-user-flairs.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/api/flairlist", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	userFlairs, _, err := client.Flair.ListUserFlairs(ctx, "testsubreddit")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedListUserFlairs, userFlairs)
+	require.NoError(t, err)
+	require.Equal(t, expectedListUserFlairs, userFlairs)
 }

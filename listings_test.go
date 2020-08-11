@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var expectedListingPosts = []*Post{
@@ -143,26 +143,26 @@ func TestListingsService_Get(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/listings/posts-comments-subreddits.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/info", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t5_2qh23,t3_i2gvg4,t1_g05v931")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	posts, comments, subreddits, _, err := client.Listings.Get(ctx, "t5_2qh23", "t3_i2gvg4", "t1_g05v931")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedListingPosts, posts)
-	assert.Equal(t, expectedListingComments, comments)
-	assert.Equal(t, expectedListingSubreddits, subreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedListingPosts, posts)
+	require.Equal(t, expectedListingComments, comments)
+	require.Equal(t, expectedListingSubreddits, subreddits)
 }
 
 func TestListingsService_GetPosts(t *testing.T) {
@@ -170,14 +170,14 @@ func TestListingsService_GetPosts(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/listings/posts.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/by_id/t3_i2gvg4,t3_i2gwgz", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.Listings.GetPosts(ctx, "t3_i2gvg4", "t3_i2gwgz")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedListingPosts2, posts)
+	require.NoError(t, err)
+	require.Equal(t, expectedListingPosts2, posts)
 }

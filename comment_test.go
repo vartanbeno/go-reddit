@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var expectedCommentSubmitOrEdit = &Comment{
@@ -43,10 +43,10 @@ func TestCommentService_Submit(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/comment/submit-or-edit.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/comment", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("api_type", "json")
@@ -55,15 +55,15 @@ func TestCommentService_Submit(t *testing.T) {
 		form.Set("text", "test comment")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
 
 	comment, _, err := client.Comment.Submit(ctx, "t1_test", "test comment")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedCommentSubmitOrEdit, comment)
+	require.NoError(t, err)
+	require.Equal(t, expectedCommentSubmitOrEdit, comment)
 }
 
 func TestCommentService_Edit(t *testing.T) {
@@ -71,10 +71,10 @@ func TestCommentService_Edit(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/comment/submit-or-edit.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/editusertext", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("api_type", "json")
@@ -83,15 +83,15 @@ func TestCommentService_Edit(t *testing.T) {
 		form.Set("text", "test comment")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
 
 	comment, _, err := client.Comment.Edit(ctx, "t1_test", "test comment")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedCommentSubmitOrEdit, comment)
+	require.NoError(t, err)
+	require.Equal(t, expectedCommentSubmitOrEdit, comment)
 }
 
 func TestCommentService_Delete(t *testing.T) {
@@ -99,19 +99,19 @@ func TestCommentService_Delete(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/del", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.Delete(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentService_Save(t *testing.T) {
@@ -119,19 +119,19 @@ func TestCommentService_Save(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/save", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.Save(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentService_Unsave(t *testing.T) {
@@ -139,19 +139,19 @@ func TestCommentService_Unsave(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/unsave", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.Unsave(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentService_EnableReplies(t *testing.T) {
@@ -159,20 +159,20 @@ func TestCommentService_EnableReplies(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 		form.Set("state", "true")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.EnableReplies(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentService_DisableReplies(t *testing.T) {
@@ -180,20 +180,20 @@ func TestCommentService_DisableReplies(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 		form.Set("state", "false")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.DisableReplies(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentService_Lock(t *testing.T) {
@@ -201,19 +201,19 @@ func TestCommentService_Lock(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/lock", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.Lock(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentService_Unlock(t *testing.T) {
@@ -221,19 +221,19 @@ func TestCommentService_Unlock(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/unlock", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.Unlock(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentService_Upvote(t *testing.T) {
@@ -241,7 +241,7 @@ func TestCommentService_Upvote(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
@@ -249,13 +249,13 @@ func TestCommentService_Upvote(t *testing.T) {
 		form.Set("rank", "10")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.Upvote(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentService_Downvote(t *testing.T) {
@@ -263,7 +263,7 @@ func TestCommentService_Downvote(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
@@ -271,13 +271,13 @@ func TestCommentService_Downvote(t *testing.T) {
 		form.Set("rank", "10")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.Downvote(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
 func TestCommentService_RemoveVote(t *testing.T) {
@@ -285,7 +285,7 @@ func TestCommentService_RemoveVote(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("id", "t1_test")
@@ -293,11 +293,11 @@ func TestCommentService_RemoveVote(t *testing.T) {
 		form.Set("rank", "10")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.PostForm)
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	res, err := client.Comment.RemoveVote(ctx, "t1_test")
-	assert.NoError(t, err)
-	assert.Equal(t, http.StatusOK, res.StatusCode)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, res.StatusCode)
 }

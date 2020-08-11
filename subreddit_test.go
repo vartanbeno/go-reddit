@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var expectedPosts = &Posts{
@@ -290,16 +290,16 @@ func TestSubredditService_HotPosts(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/posts.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/hot", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.Subreddit.HotPosts(ctx, "test", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedPosts, posts)
+	require.NoError(t, err)
+	require.Equal(t, expectedPosts, posts)
 }
 
 func TestSubredditService_NewPosts(t *testing.T) {
@@ -307,16 +307,16 @@ func TestSubredditService_NewPosts(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/posts.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/new", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.Subreddit.NewPosts(ctx, "test", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedPosts, posts)
+	require.NoError(t, err)
+	require.Equal(t, expectedPosts, posts)
 }
 
 func TestSubredditService_RisingPosts(t *testing.T) {
@@ -324,16 +324,16 @@ func TestSubredditService_RisingPosts(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/posts.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/rising", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.Subreddit.RisingPosts(ctx, "test", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedPosts, posts)
+	require.NoError(t, err)
+	require.Equal(t, expectedPosts, posts)
 }
 
 func TestSubredditService_ControversialPosts(t *testing.T) {
@@ -341,16 +341,16 @@ func TestSubredditService_ControversialPosts(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/posts.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/controversial", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.Subreddit.ControversialPosts(ctx, "test", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedPosts, posts)
+	require.NoError(t, err)
+	require.Equal(t, expectedPosts, posts)
 }
 
 func TestSubredditService_TopPosts(t *testing.T) {
@@ -358,16 +358,16 @@ func TestSubredditService_TopPosts(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/posts.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/top", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.Subreddit.TopPosts(ctx, "test", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedPosts, posts)
+	require.NoError(t, err)
+	require.Equal(t, expectedPosts, posts)
 }
 
 func TestSubredditService_Get(t *testing.T) {
@@ -375,19 +375,19 @@ func TestSubredditService_Get(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/about.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/golang/about", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	_, _, err = client.Subreddit.Get(ctx, "")
-	assert.EqualError(t, err, "name: cannot be empty")
+	require.EqualError(t, err, "name: cannot be empty")
 
 	subreddit, _, err := client.Subreddit.Get(ctx, "golang")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubreddit, subreddit)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubreddit, subreddit)
 }
 
 func TestSubredditService_Popular(t *testing.T) {
@@ -395,16 +395,16 @@ func TestSubredditService_Popular(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/list.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/popular", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	subreddits, _, err := client.Subreddit.Popular(ctx, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubreddits, subreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubreddits, subreddits)
 }
 
 func TestSubredditService_New(t *testing.T) {
@@ -412,16 +412,16 @@ func TestSubredditService_New(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/list.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/new", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	subreddits, _, err := client.Subreddit.New(ctx, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubreddits, subreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubreddits, subreddits)
 }
 
 func TestSubredditService_Gold(t *testing.T) {
@@ -429,16 +429,16 @@ func TestSubredditService_Gold(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/list.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/gold", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	subreddits, _, err := client.Subreddit.Gold(ctx, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubreddits, subreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubreddits, subreddits)
 }
 
 func TestSubredditService_Default(t *testing.T) {
@@ -446,16 +446,16 @@ func TestSubredditService_Default(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/list.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/default", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	subreddits, _, err := client.Subreddit.Default(ctx, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubreddits, subreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubreddits, subreddits)
 }
 
 func TestSubredditService_Subscribed(t *testing.T) {
@@ -463,16 +463,16 @@ func TestSubredditService_Subscribed(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/list.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/mine/subscriber", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	subreddits, _, err := client.Subreddit.Subscribed(ctx, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubreddits, subreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubreddits, subreddits)
 }
 
 func TestSubredditService_Approved(t *testing.T) {
@@ -480,16 +480,16 @@ func TestSubredditService_Approved(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/list.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/mine/contributor", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	subreddits, _, err := client.Subreddit.Approved(ctx, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubreddits, subreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubreddits, subreddits)
 }
 
 func TestSubredditService_Moderated(t *testing.T) {
@@ -497,16 +497,16 @@ func TestSubredditService_Moderated(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/list.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/mine/moderator", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	subreddits, _, err := client.Subreddit.Moderated(ctx, nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubreddits, subreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubreddits, subreddits)
 }
 
 func TestSubredditService_GetSticky1(t *testing.T) {
@@ -514,21 +514,21 @@ func TestSubredditService_GetSticky1(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/post/post.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/sticky", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, "1", r.Form.Get("num"))
+		require.NoError(t, err)
+		require.Equal(t, "1", r.Form.Get("num"))
 
 		fmt.Fprint(w, blob)
 	})
 
 	postAndComments, _, err := client.Subreddit.GetSticky1(ctx, "test")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedPostAndComments, postAndComments)
+	require.NoError(t, err)
+	require.Equal(t, expectedPostAndComments, postAndComments)
 }
 
 func TestSubredditService_GetSticky2(t *testing.T) {
@@ -536,21 +536,21 @@ func TestSubredditService_GetSticky2(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/post/post.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/sticky", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, "2", r.Form.Get("num"))
+		require.NoError(t, err)
+		require.Equal(t, "2", r.Form.Get("num"))
 
 		fmt.Fprint(w, blob)
 	})
 
 	postAndComments, _, err := client.Subreddit.GetSticky2(ctx, "test")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedPostAndComments, postAndComments)
+	require.NoError(t, err)
+	require.Equal(t, expectedPostAndComments, postAndComments)
 }
 
 func TestSubredditService_Subscribe(t *testing.T) {
@@ -558,19 +558,19 @@ func TestSubredditService_Subscribe(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("action", "sub")
 		form.Set("sr_name", "test,golang,nba")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.Subreddit.Subscribe(ctx, "test", "golang", "nba")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSubredditService_SubscribeByID(t *testing.T) {
@@ -578,19 +578,19 @@ func TestSubredditService_SubscribeByID(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("action", "sub")
 		form.Set("sr", "t5_test1,t5_test2,t5_test3")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.Subreddit.SubscribeByID(ctx, "t5_test1", "t5_test2", "t5_test3")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSubredditService_Unsubscribe(t *testing.T) {
@@ -598,19 +598,19 @@ func TestSubredditService_Unsubscribe(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("action", "unsub")
 		form.Set("sr_name", "test,golang,nba")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.Subreddit.Unsubscribe(ctx, "test", "golang", "nba")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSubredditService_UnsubscribeByID(t *testing.T) {
@@ -618,19 +618,19 @@ func TestSubredditService_UnsubscribeByID(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("action", "unsub")
 		form.Set("sr", "t5_test1,t5_test2,t5_test3")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.Subreddit.UnsubscribeByID(ctx, "t5_test1", "t5_test2", "t5_test3")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSubredditService_Favorite(t *testing.T) {
@@ -638,7 +638,7 @@ func TestSubredditService_Favorite(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/favorite", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("sr_name", "testsubreddit")
@@ -646,12 +646,12 @@ func TestSubredditService_Favorite(t *testing.T) {
 		form.Set("api_type", "json")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.Subreddit.Favorite(ctx, "testsubreddit")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSubredditService_Unfavorite(t *testing.T) {
@@ -659,7 +659,7 @@ func TestSubredditService_Unfavorite(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/favorite", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("sr_name", "testsubreddit")
@@ -667,12 +667,12 @@ func TestSubredditService_Unfavorite(t *testing.T) {
 		form.Set("api_type", "json")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.Subreddit.Unfavorite(ctx, "testsubreddit")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestSubredditService_Search(t *testing.T) {
@@ -680,10 +680,10 @@ func TestSubredditService_Search(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/list.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/search", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("q", "golang")
@@ -691,8 +691,8 @@ func TestSubredditService_Search(t *testing.T) {
 		form.Set("sort", "activity")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
@@ -703,8 +703,8 @@ func TestSubredditService_Search(t *testing.T) {
 		},
 		Sort: "activity",
 	})
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubreddits, subreddits)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubreddits, subreddits)
 }
 
 func TestSubredditService_SearchNames(t *testing.T) {
@@ -712,24 +712,24 @@ func TestSubredditService_SearchNames(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/search-names.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/search_reddit_names", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("query", "golang")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	names, _, err := client.Subreddit.SearchNames(ctx, "golang")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSubredditNames, names)
+	require.NoError(t, err)
+	require.Equal(t, expectedSubredditNames, names)
 }
 
 func TestSubredditService_SearchPosts(t *testing.T) {
@@ -737,24 +737,24 @@ func TestSubredditService_SearchPosts(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/search-posts.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/all/search", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("q", "test")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSearchPosts, posts)
+	require.NoError(t, err)
+	require.Equal(t, expectedSearchPosts, posts)
 }
 
 func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
@@ -762,25 +762,25 @@ func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/search-posts.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/search", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("q", "test")
 		form.Set("restrict_sr", "true")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "test", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSearchPosts, posts)
+	require.NoError(t, err)
+	require.Equal(t, expectedSearchPosts, posts)
 }
 
 func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
@@ -788,25 +788,25 @@ func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/search-posts.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test+golang+nba/search", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("q", "test")
 		form.Set("restrict_sr", "true")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "test+golang+nba", nil)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSearchPosts, posts)
+	require.NoError(t, err)
+	require.Equal(t, expectedSearchPosts, posts)
 }
 
 func TestSubredditService_Random(t *testing.T) {
@@ -814,22 +814,22 @@ func TestSubredditService_Random(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/random.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/random", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, "true", r.Form.Get("sr_detail"))
-		assert.Equal(t, "1", r.Form.Get("limit"))
+		require.NoError(t, err)
+		require.Equal(t, "true", r.Form.Get("sr_detail"))
+		require.Equal(t, "1", r.Form.Get("limit"))
 
 		fmt.Fprint(w, blob)
 	})
 
 	subreddit, _, err := client.Subreddit.Random(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRandomSubreddit, subreddit)
+	require.NoError(t, err)
+	require.Equal(t, expectedRandomSubreddit, subreddit)
 }
 
 func TestSubredditService_RandomNSFW(t *testing.T) {
@@ -837,22 +837,22 @@ func TestSubredditService_RandomNSFW(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/random.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/randnsfw", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, "true", r.Form.Get("sr_detail"))
-		assert.Equal(t, "1", r.Form.Get("limit"))
+		require.NoError(t, err)
+		require.Equal(t, "true", r.Form.Get("sr_detail"))
+		require.Equal(t, "1", r.Form.Get("limit"))
 
 		fmt.Fprint(w, blob)
 	})
 
 	subreddit, _, err := client.Subreddit.RandomNSFW(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRandomSubreddit, subreddit)
+	require.NoError(t, err)
+	require.Equal(t, expectedRandomSubreddit, subreddit)
 }
 
 func TestSubredditService_SubmissionText(t *testing.T) {
@@ -860,7 +860,7 @@ func TestSubredditService_SubmissionText(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/r/test/api/submit_text", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, `{
 			"submit_text": "this is a test",
 			"submit_text_html": ""
@@ -868,8 +868,8 @@ func TestSubredditService_SubmissionText(t *testing.T) {
 	})
 
 	text, _, err := client.Subreddit.SubmissionText(ctx, "test")
-	assert.NoError(t, err)
-	assert.Equal(t, "this is a test", text)
+	require.NoError(t, err)
+	require.Equal(t, "this is a test", text)
 }
 
 func TestSubredditService_Banned(t *testing.T) {
@@ -877,25 +877,25 @@ func TestSubredditService_Banned(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/banned-users.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/banned", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("after", "testafter")
 		form.Set("limit", "10")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	bans, _, err := client.Subreddit.Banned(ctx, "test", &ListOptions{After: "testafter", Limit: 10})
-	assert.NoError(t, err)
-	assert.Equal(t, expectedBans, bans)
+	require.NoError(t, err)
+	require.Equal(t, expectedBans, bans)
 }
 
 func TestSubredditService_Muted(t *testing.T) {
@@ -903,25 +903,25 @@ func TestSubredditService_Muted(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/relationships.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/muted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("before", "testbefore")
 		form.Set("limit", "50")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	mutes, _, err := client.Subreddit.Muted(ctx, "test", &ListOptions{Before: "testbefore", Limit: 50})
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRelationships3, mutes)
+	require.NoError(t, err)
+	require.Equal(t, expectedRelationships3, mutes)
 }
 
 func TestSubredditService_WikiBanned(t *testing.T) {
@@ -929,25 +929,25 @@ func TestSubredditService_WikiBanned(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/banned-users.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/wikibanned", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("after", "testafter")
 		form.Set("limit", "15")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	bans, _, err := client.Subreddit.WikiBanned(ctx, "test", &ListOptions{After: "testafter", Limit: 15})
-	assert.NoError(t, err)
-	assert.Equal(t, expectedBans, bans)
+	require.NoError(t, err)
+	require.Equal(t, expectedBans, bans)
 }
 
 func TestSubredditService_Contributors(t *testing.T) {
@@ -955,24 +955,24 @@ func TestSubredditService_Contributors(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/relationships.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/contributors", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("limit", "5")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	contributors, _, err := client.Subreddit.Contributors(ctx, "test", &ListOptions{Limit: 5})
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRelationships3, contributors)
+	require.NoError(t, err)
+	require.Equal(t, expectedRelationships3, contributors)
 }
 
 func TestSubredditService_WikiContributors(t *testing.T) {
@@ -980,24 +980,24 @@ func TestSubredditService_WikiContributors(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/relationships.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/wikicontributors", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("limit", "99")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
 		fmt.Fprint(w, blob)
 	})
 
 	contributors, _, err := client.Subreddit.WikiContributors(ctx, "test", &ListOptions{Limit: 99})
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRelationships3, contributors)
+	require.NoError(t, err)
+	require.Equal(t, expectedRelationships3, contributors)
 }
 
 func TestSubredditService_Moderators(t *testing.T) {
@@ -1005,14 +1005,14 @@ func TestSubredditService_Moderators(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/subreddit/moderators.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/moderators", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	moderators, _, err := client.Subreddit.Moderators(ctx, "test")
-	assert.NoError(t, err)
-	assert.Equal(t, expectedModerators, moderators)
+	require.NoError(t, err)
+	require.Equal(t, expectedModerators, moderators)
 }

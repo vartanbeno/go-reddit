@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var expectedInfo = &User{
@@ -127,16 +127,16 @@ func TestAccountService_Info(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/account/info.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	info, _, err := client.Account.Info(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedInfo, info)
+	require.NoError(t, err)
+	require.Equal(t, expectedInfo, info)
 }
 
 func TestAccountService_Karma(t *testing.T) {
@@ -144,16 +144,16 @@ func TestAccountService_Karma(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/account/karma.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/karma", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	karma, _, err := client.Account.Karma(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedKarma, karma)
+	require.NoError(t, err)
+	require.Equal(t, expectedKarma, karma)
 }
 
 func TestAccountService_Settings(t *testing.T) {
@@ -161,16 +161,16 @@ func TestAccountService_Settings(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/account/settings.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/prefs", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	settings, _, err := client.Account.Settings(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSettings, settings)
+	require.NoError(t, err)
+	require.Equal(t, expectedSettings, settings)
 }
 
 func TestAccountService_UpdateSettings(t *testing.T) {
@@ -178,24 +178,24 @@ func TestAccountService_UpdateSettings(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/account/settings.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	expectedSettingsBody := &Settings{NumberOfPosts: Int(10), MinimumCommentScore: Int(5), Compress: Bool(true)}
 
 	mux.HandleFunc("/api/v1/me/prefs", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPatch, r.Method)
+		require.Equal(t, http.MethodPatch, r.Method)
 
 		settingsBody := new(Settings)
 		err := json.NewDecoder(r.Body).Decode(settingsBody)
-		assert.NoError(t, err)
-		assert.Equal(t, expectedSettingsBody, settingsBody)
+		require.NoError(t, err)
+		require.Equal(t, expectedSettingsBody, settingsBody)
 
 		fmt.Fprint(w, blob)
 	})
 
 	settings, _, err := client.Account.UpdateSettings(ctx, expectedSettingsBody)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedSettings, settings)
+	require.NoError(t, err)
+	require.Equal(t, expectedSettings, settings)
 }
 
 func TestAccountService_Trophies(t *testing.T) {
@@ -203,16 +203,16 @@ func TestAccountService_Trophies(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/account/trophies.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/trophies", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	trophies, _, err := client.Account.Trophies(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedTrophies, trophies)
+	require.NoError(t, err)
+	require.Equal(t, expectedTrophies, trophies)
 }
 
 func TestAccountService_Friends(t *testing.T) {
@@ -220,16 +220,16 @@ func TestAccountService_Friends(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/account/friends.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/prefs/friends", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	relationships, _, err := client.Account.Friends(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRelationships, relationships)
+	require.NoError(t, err)
+	require.Equal(t, expectedRelationships, relationships)
 }
 
 func TestAccountService_Blocked(t *testing.T) {
@@ -237,16 +237,16 @@ func TestAccountService_Blocked(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/account/blocked.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/prefs/blocked", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	relationships, _, err := client.Account.Blocked(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRelationships, relationships)
+	require.NoError(t, err)
+	require.Equal(t, expectedRelationships, relationships)
 }
 
 func TestAccountService_Messaging(t *testing.T) {
@@ -254,17 +254,17 @@ func TestAccountService_Messaging(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/account/messaging.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/prefs/messaging", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	blocked, trusted, _, err := client.Account.Messaging(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRelationships, blocked)
-	assert.Equal(t, expectedRelationships2, trusted)
+	require.NoError(t, err)
+	require.Equal(t, expectedRelationships, blocked)
+	require.Equal(t, expectedRelationships2, trusted)
 }
 
 func TestAccountService_Trusted(t *testing.T) {
@@ -272,16 +272,16 @@ func TestAccountService_Trusted(t *testing.T) {
 	defer teardown()
 
 	blob, err := readFileContents("testdata/account/trusted.json")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	mux.HandleFunc("/prefs/trusted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
 	relationships, _, err := client.Account.Trusted(ctx)
-	assert.NoError(t, err)
-	assert.Equal(t, expectedRelationships, relationships)
+	require.NoError(t, err)
+	require.Equal(t, expectedRelationships, relationships)
 }
 
 func TestAccountService_AddTrusted(t *testing.T) {
@@ -289,19 +289,19 @@ func TestAccountService_AddTrusted(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/add_whitelisted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("api_type", "json")
 		form.Set("name", "test123")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.Account.AddTrusted(ctx, "test123")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
 
 func TestAccountService_RemoveTrusted(t *testing.T) {
@@ -309,16 +309,16 @@ func TestAccountService_RemoveTrusted(t *testing.T) {
 	defer teardown()
 
 	mux.HandleFunc("/api/remove_whitelisted", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("name", "test123")
 
 		err := r.ParseForm()
-		assert.NoError(t, err)
-		assert.Equal(t, form, r.Form)
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 	})
 
 	_, err := client.Account.RemoveTrusted(ctx, "test123")
-	assert.NoError(t, err)
+	require.NoError(t, err)
 }
