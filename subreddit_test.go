@@ -219,6 +219,54 @@ var expectedRandomSubreddit = &Subreddit{
 	Subscribers: 52357,
 }
 
+var expectedBans = &Bans{
+	Bans: []*Ban{
+		{
+			ID:      "rb_123",
+			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
+
+			User:   "testuser1",
+			UserID: "t2_user1",
+
+			DaysLeft: Int(43),
+			Note:     "Spam",
+		},
+		{
+			ID:      "rb_456",
+			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
+
+			User:   "testuser2",
+			UserID: "t2_user2",
+
+			DaysLeft: nil,
+			Note:     "Spam",
+		},
+	},
+	After:  "",
+	Before: "",
+}
+
+var expectedMutes = &Mutes{
+	Mutes: []*Mute{
+		{
+			ID:      "Mute_123",
+			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
+
+			User:   "testuser1",
+			UserID: "t2_user1",
+		},
+		{
+			ID:      "Mute_456",
+			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
+
+			User:   "testuser2",
+			UserID: "t2_user2",
+		},
+	},
+	After:  "",
+	Before: "",
+}
+
 func TestSubredditService_HotPosts(t *testing.T) {
 	setup()
 	defer teardown()
@@ -567,6 +615,48 @@ func TestSubredditService_UnsubscribeByID(t *testing.T) {
 	assert.NoError(t, err)
 }
 
+func TestSubredditService_Favorite(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/favorite", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("sr_name", "testsubreddit")
+		form.Set("make_favorite", "true")
+		form.Set("api_type", "json")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Subreddit.Favorite(ctx, "testsubreddit")
+	assert.NoError(t, err)
+}
+
+func TestSubredditService_Unfavorite(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/favorite", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("sr_name", "testsubreddit")
+		form.Set("make_favorite", "false")
+		form.Set("api_type", "json")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Subreddit.Unfavorite(ctx, "testsubreddit")
+	assert.NoError(t, err)
+}
+
 func TestSubredditService_Search(t *testing.T) {
 	setup()
 	defer teardown()
@@ -779,4 +869,56 @@ func TestSubredditService_SubmissionText(t *testing.T) {
 	text, _, err := client.Subreddit.SubmissionText(ctx, "test")
 	assert.NoError(t, err)
 	assert.Equal(t, "this is a test", text)
+}
+
+func TestSubredditService_Banned(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/banned-users.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/about/banned", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("after", "testafter")
+		form.Set("limit", "10")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	bans, _, err := client.Subreddit.Banned(ctx, "test", &ListOptions{After: "testafter", Limit: 10})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedBans, bans)
+}
+
+func TestSubredditService_Muted(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/subreddit/muted-users.json")
+	assert.NoError(t, err)
+
+	mux.HandleFunc("/r/test/about/muted", func(w http.ResponseWriter, r *http.Request) {
+		assert.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("before", "testbefore")
+		form.Set("limit", "50")
+
+		err := r.ParseForm()
+		assert.NoError(t, err)
+		assert.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	mutes, _, err := client.Subreddit.Muted(ctx, "test", &ListOptions{Before: "testbefore", Limit: 50})
+	assert.NoError(t, err)
+	assert.Equal(t, expectedMutes, mutes)
 }

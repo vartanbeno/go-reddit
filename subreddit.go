@@ -40,6 +40,42 @@ type Moderator struct {
 	Permissions []string `json:"mod_permissions"`
 }
 
+// Ban represents a banned user and the ban information.
+type Ban struct {
+	ID      string     `json:"rel_id,omitempty"`
+	Created *Timestamp `json:"date,omitempty"`
+
+	User   string `json:"name,omitempty"`
+	UserID string `json:"id,omitempty"`
+
+	// nil means the ban is permanent
+	DaysLeft *int   `json:"days_left"`
+	Note     string `json:"note,omitempty"`
+}
+
+// Bans is a listing of bans.
+type Bans struct {
+	Bans   []*Ban `json:"bans"`
+	After  string `json:"after"`
+	Before string `json:"before"`
+}
+
+// Mute represents a muted user and the mute information.
+type Mute struct {
+	ID      string     `json:"rel_id,omitempty"`
+	Created *Timestamp `json:"date,omitempty"`
+
+	User   string `json:"name,omitempty"`
+	UserID string `json:"id,omitempty"`
+}
+
+// Mutes is a listing of Mute.
+type Mutes struct {
+	Mutes  []*Mute `json:"mutes"`
+	After  string  `json:"after"`
+	Before string  `json:"before"`
+}
+
 func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
 	path := sort
 	if subreddit != "" {
@@ -210,6 +246,40 @@ func (s *SubredditService) UnsubscribeByID(ctx context.Context, ids ...string) (
 	form.Set("action", "unsub")
 	form.Set("sr", strings.Join(ids, ","))
 	return s.handleSubscription(ctx, form)
+}
+
+// Favorite favorites the subreddit.
+func (s *SubredditService) Favorite(ctx context.Context, subreddit string) (*Response, error) {
+	path := "api/favorite"
+
+	form := url.Values{}
+	form.Set("sr_name", subreddit)
+	form.Set("make_favorite", "true")
+	form.Set("api_type", "json")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Unfavorite unfavorites the subreddit.
+func (s *SubredditService) Unfavorite(ctx context.Context, subreddit string) (*Response, error) {
+	path := "api/favorite"
+
+	form := url.Values{}
+	form.Set("sr_name", subreddit)
+	form.Set("make_favorite", "false")
+	form.Set("api_type", "json")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }
 
 // Search searches for subreddits.
@@ -443,4 +513,74 @@ func (s *SubredditService) SubmissionText(ctx context.Context, name string) (str
 	}
 
 	return root.Text, resp, err
+}
+
+// Banned gets banned users from the subreddit.
+func (s *SubredditService) Banned(ctx context.Context, subreddit string, opts *ListOptions) (*Bans, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/banned", subreddit)
+
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var root struct {
+		Data struct {
+			Bans   []*Ban `json:"children"`
+			After  string `json:"after"`
+			Before string `json:"before"`
+		} `json:"data"`
+	}
+	resp, err := s.client.Do(ctx, req, &root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	bans := &Bans{
+		Bans:   root.Data.Bans,
+		After:  root.Data.After,
+		Before: root.Data.Before,
+	}
+
+	return bans, resp, nil
+}
+
+// Muted gets muted users from the subreddit.
+func (s *SubredditService) Muted(ctx context.Context, subreddit string, opts *ListOptions) (*Mutes, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/muted", subreddit)
+
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var root struct {
+		Data struct {
+			Mutes  []*Mute `json:"children"`
+			After  string  `json:"after"`
+			Before string  `json:"before"`
+		} `json:"data"`
+	}
+	resp, err := s.client.Do(ctx, req, &root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	mutes := &Mutes{
+		Mutes:  root.Data.Mutes,
+		After:  root.Data.After,
+		Before: root.Data.Before,
+	}
+
+	return mutes, resp, nil
 }

@@ -1,0 +1,23 @@
+{
+  "kind": "Listing",
+  "data": {
+    "modhash": null,
+    "dist": null,
+    "children": [
+      {
+        "date": 1597113302.0,
+        "rel_id": "Mute_123",
+        "name": "testuser1",
+        "id": "t2_user1"
+      },
+      {
+        "date": 1597113300.0,
+        "rel_id": "Mute_456",
+        "name": "testuser2",
+        "id": "t2_user2"
+      }
+    ],
+    "after": null,
+    "before": null
+  }
+}

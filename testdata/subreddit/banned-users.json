@@ -1,0 +1,27 @@
+{
+  "kind": "Listing",
+  "data": {
+    "modhash": null,
+    "dist": null,
+    "children": [
+      {
+        "name": "testuser1",
+        "days_left": 43,
+        "note": "Spam",
+        "date": 1597113302.0,
+        "rel_id": "rb_123",
+        "id": "t2_user1"
+      },
+      {
+        "name": "testuser2",
+        "days_left": null,
+        "note": "Spam",
+        "date": 1597113300.0,
+        "rel_id": "rb_456",
+        "id": "t2_user2"
+      }
+    ],
+    "after": null,
+    "before": null
+  }
+}
