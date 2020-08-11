@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-// APIError is an error coming from Reddit
+// APIError is an error coming from Reddit.
 type APIError struct {
 	Label  string
 	Reason string
@@ -19,15 +19,11 @@ func (e *APIError) Error() string {
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (e *APIError) UnmarshalJSON(data []byte) error {
-	var info []string
+	var info [3]string
 
 	err := json.Unmarshal(data, &info)
 	if err != nil {
 		return err
-	}
-
-	if len(info) != 3 {
-		return fmt.Errorf("got unexpected Reddit error: %v", info)
 	}
 
 	e.Label = info[0]
@@ -37,9 +33,9 @@ func (e *APIError) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// JSONErrorResponse is an error response that sometimes gets returned with a 200 code
+// JSONErrorResponse is an error response that sometimes gets returned with a 200 code.
 type JSONErrorResponse struct {
-	// HTTP response that caused this error
+	// HTTP response that caused this error.
 	Response *http.Response `json:"-"`
 
 	JSON *struct {
@@ -78,3 +74,5 @@ func (r *ErrorResponse) Error() string {
 		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, r.Message,
 	)
 }
+
+// todo: rate limit errors

@@ -425,15 +425,11 @@ type PostAndComments struct {
 // The 1st one contains the single post in its children array
 // The 2nd one contains the comments to the post
 func (pc *PostAndComments) UnmarshalJSON(data []byte) error {
-	var l []rootListing
+	var l [2]rootListing
 
 	err := json.Unmarshal(data, &l)
 	if err != nil {
 		return err
-	}
-
-	if len(l) < 2 {
-		return errors.New("unexpected json response when getting post")
 	}
 
 	post := l[0].getPosts().Posts[0]

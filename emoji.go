@@ -113,8 +113,6 @@ func (s *EmojiService) Delete(ctx context.Context, subreddit string, emoji strin
 	return s.client.Do(ctx, req, nil)
 }
 
-//todo: fav subreddits
-
 // SetSize sets the custom emoji size in the subreddit.
 // Both height and width must be between 1 and 40 (inclusive).
 func (s *EmojiService) SetSize(ctx context.Context, subreddit string, height, width int) (*Response, error) {
