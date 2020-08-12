@@ -83,7 +83,7 @@ func (s *ModerationService) GetActionsByType(ctx context.Context, subreddit stri
 		return nil, resp, err
 	}
 
-	return root.getModeratorActions(), resp, nil
+	return root.getModActions(), resp, nil
 }
 
 // AcceptInvite accepts a pending invite to moderate the specified subreddit.

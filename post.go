@@ -463,15 +463,13 @@ func (s *PostService) LoadMoreComments(ctx context.Context, pc *PostAndComments)
 		return nil, err
 	}
 
-	type rootResponse struct {
+	root := new(struct {
 		JSON struct {
 			Data struct {
-				Things Things `json:"things"`
+				Things things `json:"things"`
 			} `json:"data"`
 		} `json:"json"`
-	}
-
-	root := new(rootResponse)
+	})
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return resp, err

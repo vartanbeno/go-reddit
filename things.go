@@ -2,7 +2,6 @@ package reddit
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strings"
 )
@@ -10,7 +9,7 @@ import (
 const (
 	kindComment    = "t1"
 	kindAccount    = "t2"
-	kindLink       = "t3" // a link is a post
+	kindPost       = "t3"
 	kindMessage    = "t4"
 	kindSubreddit  = "t5"
 	kindAward      = "t6"
@@ -37,63 +36,49 @@ func (p *Permalink) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// todo: rename this to thing
-type root struct {
-	Kind string      `json:"kind,omitempty"`
-	Data interface{} `json:"data,omitempty"`
+// thing is an entity on Reddit.
+// Its kind reprsents what it is and what is stored in the Data field
+// e.g. t1 = comment, t2 = user, t3 = post, etc.
+type thing struct {
+	Kind string          `json:"kind"`
+	Data json.RawMessage `json:"data"`
 }
 
 type rootListing struct {
-	Kind string   `json:"kind,omitempty"`
-	Data *Listing `json:"data"`
+	Kind string  `json:"kind"`
+	Data listing `json:"data"`
 }
 
-// Listing holds things coming from the Reddit API
+// listing holds things coming from the Reddit API
 // It also contains the after/before anchors useful for subsequent requests
-type Listing struct {
-	Things Things `json:"children"`
+type listing struct {
+	Things things `json:"children"`
 	After  string `json:"after"`
 	Before string `json:"before"`
 }
 
-// Things are objects/entities coming from the Reddit API.
-type Things struct {
+type things struct {
 	Comments     []*Comment
 	MoreComments *More
-
-	Users      []*User
-	Posts      []*Post
-	Subreddits []*Subreddit
-	ModActions []*ModAction
+	Users        []*User
+	Posts        []*Post
+	Subreddits   []*Subreddit
+	ModActions   []*ModAction
 	// todo: add the other kinds of things
 }
 
-func (t *Things) init() {
-	if t.Comments == nil {
-		t.Comments = make([]*Comment, 0)
-	}
-	if t.Users == nil {
-		t.Users = make([]*User, 0)
-	}
-	if t.Posts == nil {
-		t.Posts = make([]*Post, 0)
-	}
-	if t.Subreddits == nil {
-		t.Subreddits = make([]*Subreddit, 0)
-	}
-	if t.ModActions == nil {
-		t.ModActions = make([]*ModAction, 0)
-	}
+// init initializes or clears the listing.
+func (t *things) init() {
+	t.Comments = make([]*Comment, 0)
+	t.Users = make([]*User, 0)
+	t.Posts = make([]*Post, 0)
+	t.Subreddits = make([]*Subreddit, 0)
+	t.ModActions = make([]*ModAction, 0)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
-func (t *Things) UnmarshalJSON(b []byte) error {
+func (t *things) UnmarshalJSON(b []byte) error {
 	t.init()
-
-	type thing struct {
-		Kind string          `json:"kind"`
-		Data json.RawMessage `json:"data"`
-	}
 
 	var things []thing
 	if err := json.Unmarshal(b, &things); err != nil {
@@ -117,7 +102,7 @@ func (t *Things) UnmarshalJSON(b []byte) error {
 			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.Users = append(t.Users, v)
 			}
-		case kindLink:
+		case kindPost:
 			v := new(Post)
 			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.Posts = append(t.Posts, v)
@@ -216,10 +201,8 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	if root.Data != nil {
-		r.Comments = root.Data.Things.Comments
-		r.MoreComments = root.Data.Things.MoreComments
-	}
+	r.Comments = root.Data.Things.Comments
+	r.MoreComments = root.Data.Things.MoreComments
 
 	return nil
 }
@@ -307,75 +290,48 @@ type Subreddit struct {
 	Favorite        bool `json:"user_has_favorited"`
 }
 
-func (rl *rootListing) getAfter() string {
-	if rl == nil || rl.Data == nil {
-		return ""
-	}
-	return rl.Data.After
-}
-
-func (rl *rootListing) getBefore() string {
-	if rl == nil || rl.Data == nil {
-		return ""
-	}
-	return rl.Data.Before
-}
-
 func (rl *rootListing) getComments() *Comments {
-	v := new(Comments)
-	if rl != nil && rl.Data != nil {
-		v.Comments = rl.Data.Things.Comments
-		v.After = rl.Data.After
-		v.Before = rl.Data.Before
+	return &Comments{
+		Comments: rl.Data.Things.Comments,
+		After:    rl.Data.After,
+		Before:   rl.Data.Before,
 	}
-	return v
 }
 
 func (rl *rootListing) getMoreComments() *More {
-	if rl == nil || rl.Data == nil {
-		return nil
-	}
 	return rl.Data.Things.MoreComments
 }
 
 func (rl *rootListing) getUsers() *Users {
-	v := new(Users)
-	if rl != nil && rl.Data != nil {
-		v.Users = rl.Data.Things.Users
-		v.After = rl.Data.After
-		v.Before = rl.Data.Before
+	return &Users{
+		Users:  rl.Data.Things.Users,
+		After:  rl.Data.After,
+		Before: rl.Data.Before,
 	}
-	return v
 }
 
 func (rl *rootListing) getPosts() *Posts {
-	v := new(Posts)
-	if rl != nil && rl.Data != nil {
-		v.Posts = rl.Data.Things.Posts
-		v.After = rl.Data.After
-		v.Before = rl.Data.Before
+	return &Posts{
+		Posts:  rl.Data.Things.Posts,
+		After:  rl.Data.After,
+		Before: rl.Data.Before,
 	}
-	return v
 }
 
 func (rl *rootListing) getSubreddits() *Subreddits {
-	v := new(Subreddits)
-	if rl != nil && rl.Data != nil {
-		v.Subreddits = rl.Data.Things.Subreddits
-		v.After = rl.Data.After
-		v.Before = rl.Data.Before
+	return &Subreddits{
+		Subreddits: rl.Data.Things.Subreddits,
+		After:      rl.Data.After,
+		Before:     rl.Data.Before,
 	}
-	return v
 }
 
-func (rl *rootListing) getModeratorActions() *ModActions {
-	v := new(ModActions)
-	if rl != nil && rl.Data != nil {
-		v.ModActions = rl.Data.Things.ModActions
-		v.After = rl.Data.After
-		v.Before = rl.Data.Before
+func (rl *rootListing) getModActions() *ModActions {
+	return &ModActions{
+		ModActions: rl.Data.Things.ModActions,
+		After:      rl.Data.After,
+		Before:     rl.Data.Before,
 	}
-	return v
 }
 
 // Comments is a list of comments
