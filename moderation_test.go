@@ -211,3 +211,30 @@ func TestModerationService_LeaveContributor(t *testing.T) {
 	_, err := client.Moderation.LeaveContributor(ctx, "t5_test")
 	require.NoError(t, err)
 }
+
+func TestModerationService_Edited(t *testing.T) {
+	setup()
+	defer teardown()
+
+	// contains posts and comments
+	blob, err := readFileContents("testdata/user/overview.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/about/edited", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, comments, _, err := client.Moderation.Edited(ctx, "testsubreddit", nil)
+	require.NoError(t, err)
+
+	require.Len(t, posts.Posts, 1)
+	require.Equal(t, expectedPost, posts.Posts[0])
+	require.Equal(t, "t1_f0zsa37", posts.After)
+	require.Equal(t, "", posts.Before)
+
+	require.Len(t, comments.Comments, 1)
+	require.Equal(t, expectedComment, comments.Comments[0])
+	require.Equal(t, "t1_f0zsa37", comments.After)
+	require.Equal(t, "", comments.Before)
+}

@@ -189,10 +189,12 @@ type Settings struct {
 	ShowCustomSubredditThemes        *bool `json:"show_stylesheets,omitempty"`
 
 	// Show trending subreddits on the home feed.
-	ShowTrendingSubreddits *bool   `json:"show_trending,omitempty"`
-	ShowTwitter            *bool   `json:"show_twitter,omitempty"`
-	StoreVisits            *bool   `json:"store_visits,omitempty"`
-	ThemeSelector          *string `json:"theme_selector,omitempty"`
+	ShowTrendingSubreddits *bool `json:"show_trending,omitempty"`
+	ShowTwitter            *bool `json:"show_twitter,omitempty"`
+
+	// Store whether or not you want to track posts you've visited.
+	StoreVisits   *bool   `json:"store_visits,omitempty"`
+	ThemeSelector *string `json:"theme_selector,omitempty"`
 
 	// Allow Reddit to use data provided by third-parties to show you more relevant advertisements on Reddit.i
 	AllowThirdPartyDataAdPersonalization *bool `json:"third_party_data_personalized_ads,omitempty"`

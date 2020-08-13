@@ -530,3 +530,23 @@ func (s *PostService) Random(ctx context.Context) (*PostAndComments, *Response, 
 func (s *PostService) RandomFromSubscriptions(ctx context.Context) (*PostAndComments, *Response, error) {
 	return s.random(ctx)
 }
+
+// MarkVisited marks the post(s) as visited.
+// This method requires a subscription to Reddit premium.
+func (s *PostService) MarkVisited(ctx context.Context, ids ...string) (*Response, error) {
+	if len(ids) == 0 {
+		return nil, errors.New("must provide at least 1 id")
+	}
+
+	path := "api/store_visits"
+
+	form := url.Values{}
+	form.Set("links", strings.Join(ids, ","))
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}

@@ -177,3 +177,26 @@ func (s *ModerationService) LeaveContributor(ctx context.Context, subredditID st
 
 	return s.client.Do(ctx, req, nil)
 }
+
+// Edited gets posts and comments that have been edited recently.
+func (s *ModerationService) Edited(ctx context.Context, subreddit string, opts *ListOptions) (*Posts, *Comments, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/edited", subreddit)
+
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	root := new(rootListing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	return root.getPosts(), root.getComments(), resp, nil
+}

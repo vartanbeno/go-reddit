@@ -1034,3 +1034,22 @@ func TestPostService_RemoveVote(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, res.StatusCode)
 }
+
+func TestPostService_MarkVisited(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/store_visits", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("links", "t3_test1,t3_test2,t3_test3")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Post.MarkVisited(ctx, "t3_test1", "t3_test2", "t3_test3")
+	require.NoError(t, err)
+}
