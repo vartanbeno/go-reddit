@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var expectedModActionsResult = &ModActions{
+var expectedModActions = &ModActions{
 	ModActions: []*ModAction{
 		{
 			ID:      "ModAction_b4e7979a-c4ad-11ea-8440-0ea1b7c2b8f9",
@@ -58,26 +58,10 @@ func TestModerationService_GetActions(t *testing.T) {
 
 	mux.HandleFunc("/r/testsubreddit/about/log", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, blob)
-	})
-
-	result, _, err := client.Moderation.GetActions(ctx, "testsubreddit", nil)
-	require.NoError(t, err)
-	require.Equal(t, expectedModActionsResult, result)
-}
-
-func TestModerationService_GetActionsByType(t *testing.T) {
-	setup()
-	defer teardown()
-
-	blob, err := readFileContents("testdata/moderation/actions.json")
-	require.NoError(t, err)
-
-	mux.HandleFunc("/r/testsubreddit/about/log", func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodGet, r.Method)
 
 		form := url.Values{}
 		form.Set("type", "testtype")
+		form.Set("mod", "testmod")
 
 		err := r.ParseForm()
 		require.NoError(t, err)
@@ -86,9 +70,9 @@ func TestModerationService_GetActionsByType(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	result, _, err := client.Moderation.GetActionsByType(ctx, "testsubreddit", "testtype", nil)
+	modActions, _, err := client.Moderation.GetActions(ctx, "testsubreddit", &ListModActionOptions{Type: "testtype", Moderator: "testmod"})
 	require.NoError(t, err)
-	require.Equal(t, expectedModActionsResult, result)
+	require.Equal(t, expectedModActions, modActions)
 }
 
 func TestModerationService_AcceptInvite(t *testing.T) {

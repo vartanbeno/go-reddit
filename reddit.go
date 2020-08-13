@@ -389,6 +389,26 @@ type ListUserOverviewOptions struct {
 	Time string `url:"t,omitempty"`
 }
 
+// ListModActionOptions defines possible options used when getting moderation actions in a subreddit.
+type ListModActionOptions struct {
+	// The max for the limit parameter here is 500.
+	ListOptions
+	// If empty, the search will return all action types.
+	// One of: banuser, unbanuser, spamlink, removelink, approvelink, spamcomment, removecomment,
+	// approvecomment, addmoderator, showcomment, invitemoderator, uninvitemoderator, acceptmoderatorinvite,
+	// removemoderator, addcontributor, removecontributor, editsettings, editflair, distinguish, marknsfw,
+	// wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor, wikirevise,
+	// wikipermlevel, ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky, unsticky,
+	// setcontestmode, unsetcontestmode, lock, unlock, muteuser, unmuteuser, createrule, editrule,
+	// reorderrules, deleterule, spoiler, unspoiler, modmail_enrollment, community_styling, community_widgets,
+	// markoriginalcontent, collections, events, hidden_award, add_community_topics, remove_community_topics,
+	// create_scheduled_post, edit_scheduled_post, delete_scheduled_post, submit_scheduled_post,
+	// edit_post_requirements, invitesubscriber, submit_content_rating_survey.
+	Type string `url:"type,omitempty"`
+	// If provided, only return the actions of this moderator.
+	Moderator string `url:"mod,omitempty"`
+}
+
 func addOptions(s string, opt interface{}) (string, error) {
 	v := reflect.ValueOf(opt)
 	if v.Kind() == reflect.Ptr && v.IsNil() {

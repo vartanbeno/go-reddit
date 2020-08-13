@@ -40,34 +40,14 @@ type ModAction struct {
 }
 
 // GetActions gets a list of moderator actions on a subreddit.
-// By default, the limit parameter is 25; max is 500.
-func (s *ModerationService) GetActions(ctx context.Context, subreddit string, opts *ListOptions) (*ModActions, *Response, error) {
-	return s.GetActionsByType(ctx, subreddit, "", opts)
-}
-
-// GetActionsByType gets a list of moderator actions of the specified type on a subreddit.
-// By default, the limit parameter is 25; max is 500.
-// The type should be one of: banuser, unbanuser, spamlink, removelink, approvelink, spamcomment,
-// removecomment, approvecomment, addmoderator, showcomment, invitemoderator, uninvitemoderator,
-// acceptmoderatorinvite, removemoderator, addcontributor, removecontributor, editsettings, editflair,
-// distinguish, marknsfw, wikibanned, wikicontributor, wikiunbanned, wikipagelisted, removewikicontributor,
-// wikirevise, wikipermlevel, ignorereports, unignorereports, setpermissions, setsuggestedsort, sticky,
-// unsticky, setcontestmode, unsetcontestmode, lock, unlock, muteuser, unmuteuser, createrule, editrule,
-// reorderrules, deleterule, spoiler, unspoiler, modmail_enrollment, community_styling, community_widgets,
-// markoriginalcontent, collections, events, hidden_award, add_community_topics, remove_community_topics,
-// create_scheduled_post, edit_scheduled_post, delete_scheduled_post, submit_scheduled_post, edit_post_requirements,
-// invitesubscriber, submit_content_rating_survey.
-func (s *ModerationService) GetActionsByType(ctx context.Context, subreddit string, actionType string, opts *ListOptions) (*ModActions, *Response, error) {
+func (s *ModerationService) GetActions(ctx context.Context, subreddit string, opts *ListModActionOptions) (*ModActions, *Response, error) {
 	path := fmt.Sprintf("r/%s/about/log", subreddit)
 	path, err := addOptions(path, opts)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	type params struct {
-		Type string `url:"type,omitempty"`
-	}
-	path, err = addOptions(path, params{actionType})
+	path, err = addOptions(path, opts)
 	if err != nil {
 		return nil, nil, err
 	}
