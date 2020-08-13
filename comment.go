@@ -76,7 +76,7 @@ func (s *CommentService) LoadMoreReplies(ctx context.Context, comment *Comment) 
 	}
 
 	postID := comment.PostID
-	commentIDs := comment.Replies.MoreComments.Children
+	commentIDs := comment.Replies.More.Children
 
 	type query struct {
 		PostID  string   `url:"link_id"`
@@ -112,7 +112,7 @@ func (s *CommentService) LoadMoreReplies(ctx context.Context, comment *Comment) 
 		addCommentToReplies(comment, c)
 	}
 
-	comment.Replies.MoreComments = nil
+	comment.Replies.More = nil
 	return resp, nil
 }
 

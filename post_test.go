@@ -717,7 +717,7 @@ func TestPostService_More(t *testing.T) {
 		ParentID: "t3_123",
 		PostID:   "t3_123",
 		Replies: Replies{
-			MoreComments: &More{
+			More: &More{
 				Children: []string{"def,ghi"},
 			},
 		},
@@ -743,7 +743,7 @@ func TestPostService_More(t *testing.T) {
 
 	_, err = client.Comment.LoadMoreReplies(ctx, parentComment)
 	require.NoError(t, err)
-	require.Nil(t, parentComment.Replies.MoreComments)
+	require.Nil(t, parentComment.Replies.More)
 	require.Len(t, parentComment.Replies.Comments, 1)
 	require.Len(t, parentComment.Replies.Comments[0].Replies.Comments, 1)
 }
@@ -757,7 +757,7 @@ func TestPostService_MoreNil(t *testing.T) {
 
 	parentComment := &Comment{
 		Replies: Replies{
-			MoreComments: nil,
+			More: nil,
 		},
 	}
 
@@ -766,7 +766,7 @@ func TestPostService_MoreNil(t *testing.T) {
 	require.NoError(t, err)
 	require.Nil(t, resp)
 
-	parentComment.Replies.MoreComments = &More{
+	parentComment.Replies.More = &More{
 		Children: []string{},
 	}
 

@@ -58,18 +58,19 @@ type listing struct {
 }
 
 type things struct {
-	Comments     []*Comment
-	MoreComments *More
-	Users        []*User
-	Posts        []*Post
-	Subreddits   []*Subreddit
-	ModActions   []*ModAction
+	Comments   []*Comment
+	More       []*More
+	Users      []*User
+	Posts      []*Post
+	Subreddits []*Subreddit
+	ModActions []*ModAction
 	// todo: add the other kinds of things
 }
 
 // init initializes or clears the listing.
 func (t *things) init() {
 	t.Comments = make([]*Comment, 0)
+	t.More = make([]*More, 0)
 	t.Users = make([]*User, 0)
 	t.Posts = make([]*Post, 0)
 	t.Subreddits = make([]*Subreddit, 0)
@@ -95,7 +96,7 @@ func (t *things) UnmarshalJSON(b []byte) error {
 		case kindMore:
 			v := new(More)
 			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.MoreComments = v
+				t.More = append(t.More, v)
 			}
 		case kindAccount:
 			v := new(User)
@@ -176,15 +177,15 @@ type Comment struct {
 }
 
 func (c *Comment) hasMore() bool {
-	return c.Replies.MoreComments != nil && len(c.Replies.MoreComments.Children) > 0
+	return c.Replies.More != nil && len(c.Replies.More.Children) > 0
 }
 
 // Replies holds replies to a comment.
 // It contains both comments and "more" comments, which are entrypoints to other
 // comments that were left out.
 type Replies struct {
-	Comments     []*Comment `json:"comments,omitempty"`
-	MoreComments *More      `json:"more,omitempty"`
+	Comments []*Comment `json:"comments,omitempty"`
+	More     *More      `json:"more,omitempty"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -202,7 +203,7 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 	}
 
 	r.Comments = root.Data.Things.Comments
-	r.MoreComments = root.Data.Things.MoreComments
+	r.More = root.getFirstMoreComments()
 
 	return nil
 }
@@ -298,8 +299,15 @@ func (rl *rootListing) getComments() *Comments {
 	}
 }
 
-func (rl *rootListing) getMoreComments() *More {
-	return rl.Data.Things.MoreComments
+func (rl *rootListing) getMoreComments() []*More {
+	return rl.Data.Things.More
+}
+
+func (rl *rootListing) getFirstMoreComments() *More {
+	if len(rl.Data.Things.More) == 0 {
+		return nil
+	}
+	return rl.Data.Things.More[0]
 }
 
 func (rl *rootListing) getUsers() *Users {
@@ -390,7 +398,7 @@ func (pc *PostAndComments) UnmarshalJSON(data []byte) error {
 
 	post := l[0].getPosts().Posts[0]
 	comments := l[1].getComments().Comments
-	moreComments := l[1].getMoreComments()
+	moreComments := l[1].getFirstMoreComments()
 
 	pc.Post = post
 	pc.Comments = comments
