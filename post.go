@@ -439,26 +439,23 @@ func (s *PostService) LoadMoreComments(ctx context.Context, pc *PostAndComments)
 		return nil, errors.New("pc: cannot be nil")
 	}
 
-	if !pc.hasMore() {
+	if !pc.HasMore() {
 		return nil, nil
 	}
 
 	postID := pc.Post.FullID
-	commentIDs := pc.moreComments.Children
+	commentIDs := pc.MoreComments.Children
 
-	type query struct {
-		PostID  string   `url:"link_id"`
-		IDs     []string `url:"children,comma"`
-		APIType string   `url:"api_type"`
-	}
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("link_id", postID)
+	form.Set("children", strings.Join(commentIDs, ","))
 
 	path := "api/morechildren"
-	path, err := addOptions(path, query{postID, commentIDs, "json"})
-	if err != nil {
-		return nil, err
-	}
 
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	// This was originally a GET, but with POST you can send a bigger payload
+	// since it's in the body and not the URI.
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -477,22 +474,24 @@ func (s *PostService) LoadMoreComments(ctx context.Context, pc *PostAndComments)
 
 	comments := root.JSON.Data.Things.Comments
 	for _, c := range comments {
-		addCommentToTree(pc, c)
+		pc.addCommentToTree(c)
 	}
 
-	pc.moreComments = nil
+	noMore := true
+
+	mores := root.JSON.Data.Things.More
+	for _, m := range mores {
+		if strings.HasPrefix(m.ParentID, kindPost+"_") {
+			noMore = false
+		}
+		pc.addMoreToTree(m)
+	}
+
+	if noMore {
+		pc.MoreComments = nil
+	}
+
 	return resp, nil
-}
-
-func addCommentToTree(pc *PostAndComments, comment *Comment) {
-	if pc.Post.FullID == comment.ParentID {
-		pc.Comments = append(pc.Comments, comment)
-		return
-	}
-
-	for _, reply := range pc.Comments {
-		addCommentToReplies(reply, comment)
-	}
 }
 
 func (s *PostService) random(ctx context.Context, subreddits ...string) (*PostAndComments, *Response, error) {

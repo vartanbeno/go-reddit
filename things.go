@@ -176,8 +176,33 @@ type Comment struct {
 	Replies Replies `json:"replies"`
 }
 
-func (c *Comment) hasMore() bool {
+// HasMore determines whether the comment has more replies to load in its reply tree.
+func (c *Comment) HasMore() bool {
 	return c.Replies.More != nil && len(c.Replies.More.Children) > 0
+}
+
+// addCommentToReplies traverses the comment tree to find the one
+// that the 2nd comment is replying to. It then adds it to its replies.
+func (c *Comment) addCommentToReplies(comment *Comment) {
+	if c.FullID == comment.ParentID {
+		c.Replies.Comments = append(c.Replies.Comments, comment)
+		return
+	}
+
+	for _, reply := range c.Replies.Comments {
+		reply.addCommentToReplies(comment)
+	}
+}
+
+func (c *Comment) addMoreToReplies(more *More) {
+	if c.FullID == more.ParentID {
+		c.Replies.More = more
+		return
+	}
+
+	for _, reply := range c.Replies.Comments {
+		reply.addMoreToReplies(more)
+	}
 }
 
 // Replies holds replies to a comment.
@@ -185,7 +210,7 @@ func (c *Comment) hasMore() bool {
 // comments that were left out.
 type Replies struct {
 	Comments []*Comment `json:"comments,omitempty"`
-	More     *More      `json:"more,omitempty"`
+	More     *More      `json:"-"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -206,6 +231,14 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 	r.More = root.getFirstMoreComments()
 
 	return nil
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (r *Replies) MarshalJSON() ([]byte, error) {
+	if r == nil || len(r.Comments) == 0 {
+		return []byte(`null`), nil
+	}
+	return json.Marshal(r.Comments)
 }
 
 // todo: should we implement json.Marshaler?
@@ -381,7 +414,7 @@ type ModActions struct {
 type PostAndComments struct {
 	Post         *Post      `json:"post"`
 	Comments     []*Comment `json:"comments"`
-	moreComments *More
+	MoreComments *More      `json:"-"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -402,11 +435,33 @@ func (pc *PostAndComments) UnmarshalJSON(data []byte) error {
 
 	pc.Post = post
 	pc.Comments = comments
-	pc.moreComments = moreComments
+	pc.MoreComments = moreComments
 
 	return nil
 }
 
-func (pc *PostAndComments) hasMore() bool {
-	return pc.moreComments != nil && len(pc.moreComments.Children) > 0
+// HasMore determines whether the post has more replies to load in its reply tree.
+func (pc *PostAndComments) HasMore() bool {
+	return pc.MoreComments != nil && len(pc.MoreComments.Children) > 0
+}
+
+func (pc *PostAndComments) addCommentToTree(comment *Comment) {
+	if pc.Post.FullID == comment.ParentID {
+		pc.Comments = append(pc.Comments, comment)
+		return
+	}
+
+	for _, reply := range pc.Comments {
+		reply.addCommentToReplies(comment)
+	}
+}
+
+func (pc *PostAndComments) addMoreToTree(more *More) {
+	if pc.Post.FullID == more.ParentID {
+		pc.MoreComments = more
+	}
+
+	for _, reply := range pc.Comments {
+		reply.addMoreToReplies(more)
+	}
 }

@@ -71,7 +71,7 @@ func (s *CommentService) LoadMoreReplies(ctx context.Context, comment *Comment) 
 		return nil, errors.New("comment: cannot be nil")
 	}
 
-	if !comment.hasMore() {
+	if !comment.HasMore() {
 		return nil, nil
 	}
 
@@ -108,23 +108,17 @@ func (s *CommentService) LoadMoreReplies(ctx context.Context, comment *Comment) 
 	}
 
 	comments := root.JSON.Data.Things.Comments
+	mores := root.JSON.Data.Things.More
+
 	for _, c := range comments {
-		addCommentToReplies(comment, c)
+		comment.addCommentToReplies(c)
 	}
 
-	comment.Replies.More = nil
+	if len(mores) > 0 {
+		comment.Replies.More = mores[0]
+	} else {
+		comment.Replies.More = nil
+	}
+
 	return resp, nil
-}
-
-// addCommentToReplies traverses the comment tree to find the one
-// that the 2nd comment is replying to. It then adds it to its replies.
-func addCommentToReplies(parent *Comment, comment *Comment) {
-	if parent.FullID == comment.ParentID {
-		parent.Replies.Comments = append(parent.Replies.Comments, comment)
-		return
-	}
-
-	for _, reply := range parent.Replies.Comments {
-		addCommentToReplies(reply, comment)
-	}
 }
