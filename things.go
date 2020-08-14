@@ -57,7 +57,7 @@ type listing struct {
 
 type things struct {
 	Comments   []*Comment
-	More       []*More
+	Mores      []*More
 	Users      []*User
 	Posts      []*Post
 	Subreddits []*Subreddit
@@ -68,7 +68,7 @@ type things struct {
 // init initializes or clears the listing.
 func (t *things) init() {
 	t.Comments = make([]*Comment, 0)
-	t.More = make([]*More, 0)
+	t.Mores = make([]*More, 0)
 	t.Users = make([]*User, 0)
 	t.Posts = make([]*Post, 0)
 	t.Subreddits = make([]*Subreddit, 0)
@@ -94,7 +94,7 @@ func (t *things) UnmarshalJSON(b []byte) error {
 		case kindMore:
 			v := new(More)
 			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.More = append(t.More, v)
+				t.Mores = append(t.Mores, v)
 			}
 		case kindAccount:
 			v := new(User)
@@ -310,54 +310,54 @@ type Subreddit struct {
 	Favorite        bool `json:"user_has_favorited"`
 }
 
-func (rl *rootListing) getComments() *Comments {
+func (l *rootListing) getComments() *Comments {
 	return &Comments{
-		Comments: rl.Data.Things.Comments,
-		After:    rl.Data.After,
-		Before:   rl.Data.Before,
+		Comments: l.Data.Things.Comments,
+		After:    l.Data.After,
+		Before:   l.Data.Before,
 	}
 }
 
-func (rl *rootListing) getMoreComments() []*More {
-	return rl.Data.Things.More
+func (l *rootListing) getMoreComments() []*More {
+	return l.Data.Things.Mores
 }
 
-func (rl *rootListing) getFirstMoreComments() *More {
-	if len(rl.Data.Things.More) == 0 {
+func (l *rootListing) getFirstMoreComments() *More {
+	if len(l.Data.Things.Mores) == 0 {
 		return nil
 	}
-	return rl.Data.Things.More[0]
+	return l.Data.Things.Mores[0]
 }
 
-func (rl *rootListing) getUsers() *Users {
+func (l *rootListing) getUsers() *Users {
 	return &Users{
-		Users:  rl.Data.Things.Users,
-		After:  rl.Data.After,
-		Before: rl.Data.Before,
+		Users:  l.Data.Things.Users,
+		After:  l.Data.After,
+		Before: l.Data.Before,
 	}
 }
 
-func (rl *rootListing) getPosts() *Posts {
+func (l *rootListing) getPosts() *Posts {
 	return &Posts{
-		Posts:  rl.Data.Things.Posts,
-		After:  rl.Data.After,
-		Before: rl.Data.Before,
+		Posts:  l.Data.Things.Posts,
+		After:  l.Data.After,
+		Before: l.Data.Before,
 	}
 }
 
-func (rl *rootListing) getSubreddits() *Subreddits {
+func (l *rootListing) getSubreddits() *Subreddits {
 	return &Subreddits{
-		Subreddits: rl.Data.Things.Subreddits,
-		After:      rl.Data.After,
-		Before:     rl.Data.Before,
+		Subreddits: l.Data.Things.Subreddits,
+		After:      l.Data.After,
+		Before:     l.Data.Before,
 	}
 }
 
-func (rl *rootListing) getModActions() *ModActions {
+func (l *rootListing) getModActions() *ModActions {
 	return &ModActions{
-		ModActions: rl.Data.Things.ModActions,
-		After:      rl.Data.After,
-		Before:     rl.Data.Before,
+		ModActions: l.Data.Things.ModActions,
+		After:      l.Data.After,
+		Before:     l.Data.Before,
 	}
 }
 

@@ -506,7 +506,7 @@ func (s *PostService) LoadMoreComments(ctx context.Context, pc *PostAndComments)
 
 	noMore := true
 
-	mores := root.JSON.Data.Things.More
+	mores := root.JSON.Data.Things.Mores
 	for _, m := range mores {
 		if strings.HasPrefix(m.ParentID, kindPost+"_") {
 			noMore = false

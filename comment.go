@@ -108,7 +108,7 @@ func (s *CommentService) LoadMoreReplies(ctx context.Context, comment *Comment) 
 	}
 
 	comments := root.JSON.Data.Things.Comments
-	mores := root.JSON.Data.Things.More
+	mores := root.JSON.Data.Things.Mores
 
 	for _, c := range comments {
 		comment.addCommentToReplies(c)
