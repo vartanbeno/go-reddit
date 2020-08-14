@@ -78,14 +78,14 @@ func (s *CommentService) LoadMoreReplies(ctx context.Context, comment *Comment) 
 	postID := comment.PostID
 	commentIDs := comment.Replies.More.Children
 
-	type query struct {
+	type params struct {
 		PostID  string   `url:"link_id"`
 		IDs     []string `url:"children,comma"`
 		APIType string   `url:"api_type"`
 	}
 
 	path := "api/morechildren"
-	path, err := addOptions(path, query{postID, commentIDs, "json"})
+	path, err := addOptions(path, params{postID, commentIDs, "json"})
 	if err != nil {
 		return nil, err
 	}

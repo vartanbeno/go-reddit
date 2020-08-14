@@ -389,6 +389,19 @@ type ListUserOverviewOptions struct {
 	Time string `url:"t,omitempty"`
 }
 
+// ListDuplicatePostOptions defines possible options used when getting duplicates of a post, i.e.
+// other submissions of the same URL.
+type ListDuplicatePostOptions struct {
+	ListOptions
+	// If empty, it'll search for duplicates in all subreddits.
+	Subreddit string `url:"sr,omitempty"`
+	// One of: num_comments, new.
+	Sort string `url:"sort,omitempty"`
+	// If true, the search will only return duplicates that are
+	// crossposts of the original post.
+	CrosspostsOnly bool `url:"crossposts_only,omitempty"`
+}
+
 // ListModActionOptions defines possible options used when getting moderation actions in a subreddit.
 type ListModActionOptions struct {
 	// The max for the limit parameter here is 500.

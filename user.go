@@ -95,12 +95,12 @@ func (s *UserService) Get(ctx context.Context, username string) (*User, *Respons
 // GetMultipleByID returns multiple users from their full IDs.
 // The response body is a map where the keys are the IDs (if they exist), and the value is the user.
 func (s *UserService) GetMultipleByID(ctx context.Context, ids ...string) (map[string]*UserSummary, *Response, error) {
-	type query struct {
+	type params struct {
 		IDs []string `url:"ids,omitempty,comma"`
 	}
 
 	path := "api/user_data_by_account_ids"
-	path, err := addOptions(path, query{ids})
+	path, err := addOptions(path, params{ids})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -121,12 +121,12 @@ func (s *UserService) GetMultipleByID(ctx context.Context, ids ...string) (map[s
 
 // UsernameAvailable checks whether a username is available for registration.
 func (s *UserService) UsernameAvailable(ctx context.Context, username string) (bool, *Response, error) {
-	type query struct {
-		User string `url:"user,omitempty"`
+	type params struct {
+		User string `url:"user"`
 	}
 
 	path := "api/username_available"
-	path, err := addOptions(path, query{username})
+	path, err := addOptions(path, params{username})
 	if err != nil {
 		return false, nil, err
 	}

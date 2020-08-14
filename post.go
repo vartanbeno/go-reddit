@@ -81,6 +81,33 @@ func (s *PostService) Get(ctx context.Context, id string) (*PostAndComments, *Re
 	return root, resp, nil
 }
 
+// Duplicates returns the post with the id, and a list of its duplicates.
+// id is the ID36 of the post, not its full id.
+// Example: instead of t3_abc123, use abc123.
+func (s *PostService) Duplicates(ctx context.Context, id string, opts *ListDuplicatePostOptions) (*Post, *Posts, *Response, error) {
+	path := fmt.Sprintf("duplicates/%s", id)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	var root [2]rootListing
+	resp, err := s.client.Do(ctx, req, &root)
+	if err != nil {
+		return nil, nil, resp, err
+	}
+
+	post := root[0].Data.Things.Posts[0]
+	duplicates := root[1].getPosts()
+
+	return post, duplicates, resp, nil
+}
+
 func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *Response, error) {
 	path := "api/submit"
 

@@ -130,6 +130,86 @@ var expectedEditedPost = &Post{
 	IsSelfPost: true,
 }
 
+var expectedPost2 = &Post{
+	ID:      "i2gvs1",
+	FullID:  "t3_i2gvs1",
+	Created: &Timestamp{time.Date(2020, 8, 2, 18, 23, 37, 0, time.UTC)},
+	Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+	Permalink: "https://www.reddit.com/r/test/comments/i2gvs1/this_is_a_title/",
+	URL:       "http://example.com",
+
+	Title: "This is a title",
+
+	Likes: Bool(true),
+
+	Score:            1,
+	UpvoteRatio:      1,
+	NumberOfComments: 0,
+
+	SubredditID:           "t5_2qh23",
+	SubredditName:         "test",
+	SubredditNamePrefixed: "r/test",
+
+	AuthorID:   "t2_164ab8",
+	AuthorName: "v_95",
+}
+
+var expectedPostDuplicates = &Posts{
+	Posts: []*Post{
+		{
+			ID:      "8kbs85",
+			FullID:  "t3_8kbs85",
+			Created: &Timestamp{time.Date(2018, 5, 18, 9, 10, 18, 0, time.UTC)},
+			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+			Permalink: "https://www.reddit.com/r/test/comments/8kbs85/test/",
+			URL:       "http://example.com",
+
+			Title: "test",
+
+			Likes: nil,
+
+			Score:            1,
+			UpvoteRatio:      0.66,
+			NumberOfComments: 1,
+
+			SubredditID:           "t5_2qh23",
+			SubredditName:         "test",
+			SubredditNamePrefixed: "r/test",
+
+			AuthorID:   "t2_d2v1r90",
+			AuthorName: "GarlicoinAccount",
+		},
+		{
+			ID:      "le1tc",
+			FullID:  "t3_le1tc",
+			Created: &Timestamp{time.Date(2011, 10, 16, 13, 26, 40, 0, time.UTC)},
+			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+			Permalink: "https://www.reddit.com/r/test/comments/le1tc/test_to_see_if_this_fixes_the_problem_of_my_likes/",
+			URL:       "http://www.example.com",
+
+			Title: "Test to see if this fixes the problem of my \"likes\" from the last 7 months vanishing.",
+
+			Likes: nil,
+
+			Score:            2,
+			UpvoteRatio:      1,
+			NumberOfComments: 1,
+
+			SubredditID:           "t5_2qh23",
+			SubredditName:         "test",
+			SubredditNamePrefixed: "r/test",
+
+			AuthorID:   "t2_8dyo",
+			AuthorName: "prog101",
+		},
+	},
+	After:  "t3_le1tc",
+	Before: "",
+}
+
 func TestPostService_Get(t *testing.T) {
 	setup()
 	defer teardown()
@@ -137,14 +217,46 @@ func TestPostService_Get(t *testing.T) {
 	blob, err := readFileContents("testdata/post/post.json")
 	require.NoError(t, err)
 
-	mux.HandleFunc("/comments/test", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/comments/abc123", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
-	postAndComments, _, err := client.Post.Get(ctx, "test")
+	postAndComments, _, err := client.Post.Get(ctx, "abc123")
 	require.NoError(t, err)
 	require.Equal(t, expectedPostAndComments, postAndComments)
+}
+
+func TestPostService_Duplicates(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/post/duplicates.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/duplicates/abc123", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("limit", "2")
+		form.Set("sr", "test")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	post, postDuplicates, _, err := client.Post.Duplicates(ctx, "abc123", &ListDuplicatePostOptions{
+		ListOptions: ListOptions{
+			Limit: 2,
+		},
+		Subreddit: "test",
+	})
+	require.NoError(t, err)
+	require.Equal(t, expectedPost2, post)
+	require.Equal(t, expectedPostDuplicates, postDuplicates)
 }
 
 func TestPostService_SubmitText(t *testing.T) {

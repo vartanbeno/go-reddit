@@ -183,13 +183,13 @@ func (s *SubredditService) Moderated(ctx context.Context, opts *ListSubredditOpt
 }
 
 // GetSticky1 returns the first stickied post on a subreddit (if it exists).
-func (s *SubredditService) GetSticky1(ctx context.Context, name string) (*PostAndComments, *Response, error) {
-	return s.getSticky(ctx, name, 1)
+func (s *SubredditService) GetSticky1(ctx context.Context, subreddit string) (*PostAndComments, *Response, error) {
+	return s.getSticky(ctx, subreddit, 1)
 }
 
 // GetSticky2 returns the second stickied post on a subreddit (if it exists).
-func (s *SubredditService) GetSticky2(ctx context.Context, name string) (*PostAndComments, *Response, error) {
-	return s.getSticky(ctx, name, 2)
+func (s *SubredditService) GetSticky2(ctx context.Context, subreddit string) (*PostAndComments, *Response, error) {
+	return s.getSticky(ctx, subreddit, 2)
 }
 
 func (s *SubredditService) handleSubscription(ctx context.Context, form url.Values) (*Response, error) {
@@ -379,12 +379,12 @@ func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts 
 // getSticky returns one of the 2 stickied posts of the subreddit (if they exist).
 // Num should be equal to 1 or 2, depending on which one you want.
 func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num int) (*PostAndComments, *Response, error) {
-	type query struct {
+	type params struct {
 		Num int `url:"num"`
 	}
 
 	path := fmt.Sprintf("r/%s/about/sticky", subreddit)
-	path, err := addOptions(path, query{num})
+	path, err := addOptions(path, params{num})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -410,12 +410,12 @@ func (s *SubredditService) random(ctx context.Context, nsfw bool) (*Subreddit, *
 		path = "r/randnsfw"
 	}
 
-	type query struct {
+	type params struct {
 		ExpandSubreddit bool `url:"sr_detail"`
 		Limit           int  `url:"limit,omitempty"`
 	}
 
-	path, err := addOptions(path, query{true, 1})
+	path, err := addOptions(path, params{true, 1})
 	if err != nil {
 		return nil, nil, err
 	}
@@ -425,7 +425,7 @@ func (s *SubredditService) random(ctx context.Context, nsfw bool) (*Subreddit, *
 		return nil, nil, err
 	}
 
-	type rootResponse struct {
+	root := new(struct {
 		Data struct {
 			Children []struct {
 				Data struct {
@@ -433,9 +433,7 @@ func (s *SubredditService) random(ctx context.Context, nsfw bool) (*Subreddit, *
 				} `json:"data"`
 			} `json:"children"`
 		} `json:"data"`
-	}
-
-	root := new(rootResponse)
+	})
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
@@ -472,10 +470,9 @@ func (s *SubredditService) SubmissionText(ctx context.Context, name string) (str
 		return "", nil, err
 	}
 
-	type response struct {
+	root := new(struct {
 		Text string `json:"submit_text"`
-	}
-	root := new(response)
+	})
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return "", resp, err
@@ -498,14 +495,14 @@ func (s *SubredditService) Banned(ctx context.Context, subreddit string, opts *L
 		return nil, nil, err
 	}
 
-	var root struct {
+	root := new(struct {
 		Data struct {
 			Bans   []*Ban `json:"children"`
 			After  string `json:"after"`
 			Before string `json:"before"`
 		} `json:"data"`
-	}
-	resp, err := s.client.Do(ctx, req, &root)
+	})
+	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}

@@ -2,8 +2,6 @@ package reddit
 
 import (
 	"encoding/json"
-	"fmt"
-	"strings"
 )
 
 const (
@@ -289,18 +287,6 @@ type Post struct {
 	IsSelfPost bool `json:"is_self"`
 	Saved      bool `json:"saved"`
 	Stickied   bool `json:"stickied"`
-}
-
-func (p Post) String() string {
-	chunks := []string{
-		fmt.Sprintf("[%d]", p.Score),
-		p.SubredditNamePrefixed,
-		"-",
-		p.Title,
-		"-",
-		string(p.Permalink),
-	}
-	return strings.Join(chunks, " ")
 }
 
 // Subreddit holds information about a subreddit
