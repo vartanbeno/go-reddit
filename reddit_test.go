@@ -72,10 +72,10 @@ func testClientServices(t *testing.T, c *Client) {
 		"Emoji",
 		"Flair",
 		"Listings",
+		"Message",
 		"Moderation",
 		"Multi",
 		"Post",
-		"PrivateMessage",
 		"Subreddit",
 		"User",
 	}

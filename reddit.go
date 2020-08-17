@@ -91,18 +91,18 @@ type Client struct {
 	// This is the client's user ID in Reddit's database.
 	redditID string
 
-	Account        *AccountService
-	Collection     *CollectionService
-	Comment        *CommentService
-	Emoji          *EmojiService
-	Flair          *FlairService
-	Listings       *ListingsService
-	Moderation     *ModerationService
-	Multi          *MultiService
-	Post           *PostService
-	PrivateMessage *PrivateMessageService
-	Subreddit      *SubredditService
-	User           *UserService
+	Account    *AccountService
+	Collection *CollectionService
+	Comment    *CommentService
+	Emoji      *EmojiService
+	Flair      *FlairService
+	Listings   *ListingsService
+	Message    *MessageService
+	Moderation *ModerationService
+	Multi      *MultiService
+	Post       *PostService
+	Subreddit  *SubredditService
+	User       *UserService
 
 	oauth2Transport *oauth2.Transport
 
@@ -146,9 +146,9 @@ func newClient(httpClient *http.Client) *Client {
 	c.Emoji = &EmojiService{client: c}
 	c.Flair = &FlairService{client: c}
 	c.Listings = &ListingsService{client: c}
+	c.Message = &MessageService{client: c}
 	c.Moderation = &ModerationService{client: c}
 	c.Multi = &MultiService{client: c}
-	c.PrivateMessage = &PrivateMessageService{client: c}
 	c.Subreddit = &SubredditService{client: c}
 	c.User = &UserService{client: c}
 

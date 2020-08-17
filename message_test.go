@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPrivateMessageService_ReadAll(t *testing.T) {
+func TestMessageService_ReadAll(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -17,12 +17,12 @@ func TestPrivateMessageService_ReadAll(t *testing.T) {
 		w.WriteHeader(http.StatusAccepted)
 	})
 
-	res, err := client.PrivateMessage.ReadAll(ctx)
+	res, err := client.Message.ReadAll(ctx)
 	require.NoError(t, err)
 	require.Equal(t, http.StatusAccepted, res.StatusCode)
 }
 
-func TestPrivateMessageService_Read(t *testing.T) {
+func TestMessageService_Read(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -37,14 +37,14 @@ func TestPrivateMessageService_Read(t *testing.T) {
 		require.Equal(t, form, r.Form)
 	})
 
-	_, err := client.PrivateMessage.Read(ctx)
+	_, err := client.Message.Read(ctx)
 	require.EqualError(t, err, "must provide at least 1 id")
 
-	_, err = client.PrivateMessage.Read(ctx, "test1", "test2", "test3")
+	_, err = client.Message.Read(ctx, "test1", "test2", "test3")
 	require.NoError(t, err)
 }
 
-func TestPrivateMessageService_Unread(t *testing.T) {
+func TestMessageService_Unread(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -59,14 +59,14 @@ func TestPrivateMessageService_Unread(t *testing.T) {
 		require.Equal(t, form, r.Form)
 	})
 
-	_, err := client.PrivateMessage.Unread(ctx)
+	_, err := client.Message.Unread(ctx)
 	require.EqualError(t, err, "must provide at least 1 id")
 
-	_, err = client.PrivateMessage.Unread(ctx, "test1", "test2", "test3")
+	_, err = client.Message.Unread(ctx, "test1", "test2", "test3")
 	require.NoError(t, err)
 }
 
-func TestPrivateMessageService_Block(t *testing.T) {
+func TestMessageService_Block(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -81,11 +81,11 @@ func TestPrivateMessageService_Block(t *testing.T) {
 		require.Equal(t, form, r.Form)
 	})
 
-	_, err := client.PrivateMessage.Block(ctx, "test")
+	_, err := client.Message.Block(ctx, "test")
 	require.NoError(t, err)
 }
 
-func TestPrivateMessageService_Collapse(t *testing.T) {
+func TestMessageService_Collapse(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -100,14 +100,14 @@ func TestPrivateMessageService_Collapse(t *testing.T) {
 		require.Equal(t, form, r.Form)
 	})
 
-	_, err := client.PrivateMessage.Collapse(ctx)
+	_, err := client.Message.Collapse(ctx)
 	require.EqualError(t, err, "must provide at least 1 id")
 
-	_, err = client.PrivateMessage.Collapse(ctx, "test1", "test2", "test3")
+	_, err = client.Message.Collapse(ctx, "test1", "test2", "test3")
 	require.NoError(t, err)
 }
 
-func TestPrivateMessageService_Uncollapse(t *testing.T) {
+func TestMessageService_Uncollapse(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -122,9 +122,28 @@ func TestPrivateMessageService_Uncollapse(t *testing.T) {
 		require.Equal(t, form, r.Form)
 	})
 
-	_, err := client.PrivateMessage.Uncollapse(ctx)
+	_, err := client.Message.Uncollapse(ctx)
 	require.EqualError(t, err, "must provide at least 1 id")
 
-	_, err = client.PrivateMessage.Uncollapse(ctx, "test1", "test2", "test3")
+	_, err = client.Message.Uncollapse(ctx, "test1", "test2", "test3")
+	require.NoError(t, err)
+}
+
+func TestMessageService_Delete(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/del_msg", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("id", "test")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Message.Delete(ctx, "test")
 	require.NoError(t, err)
 }

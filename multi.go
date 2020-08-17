@@ -101,7 +101,7 @@ type MultiCreateOrUpdateRequest struct {
 	Name        string         `json:"display_name,omitempty"`
 	Description string         `json:"description_md,omitempty"`
 	Subreddits  SubredditNames `json:"subreddits,omitempty"`
-	// One of: private, public, hidden
+	// One of: private, public, hidden.
 	Visibility string `json:"visibility,omitempty"`
 }
 
