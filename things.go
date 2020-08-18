@@ -106,7 +106,6 @@ func (t *things) UnmarshalJSON(b []byte) error {
 			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.Posts = append(t.Posts, v)
 			}
-		case kindMessage:
 		case kindSubreddit:
 			v := new(Subreddit)
 			if err := json.Unmarshal(thing.Data, v); err == nil {
@@ -389,7 +388,7 @@ type Posts struct {
 	Before string  `json:"before"`
 }
 
-// ModActions is a list of moderator action.
+// ModActions is a list of moderator actions.
 type ModActions struct {
 	ModActions []*ModAction `json:"moderator_actions"`
 	After      string       `json:"after"`
