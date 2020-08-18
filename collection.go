@@ -223,15 +223,29 @@ func (s *CollectionService) UpdateDescription(ctx context.Context, id string, de
 	return s.client.Do(ctx, req, nil)
 }
 
-// UpdateLayout updates a collection's layout.
-// layout is one of: TIMELINE, GALLERY.
-func (s *CollectionService) UpdateLayout(ctx context.Context, id string, layout string) (*Response, error) {
-	// todo: should we validate layout?
+// UpdateLayoutTimeline updates a collection's layout to the timeline format.
+func (s *CollectionService) UpdateLayoutTimeline(ctx context.Context, id string) (*Response, error) {
 	path := "api/v1/collections/update_collection_display_layout"
 
 	form := url.Values{}
 	form.Set("collection_id", id)
-	form.Set("display_layout", layout)
+	form.Set("display_layout", "TIMELINE")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// UpdateLayoutGallery updates a collection's layout to the gallery format.
+func (s *CollectionService) UpdateLayoutGallery(ctx context.Context, id string) (*Response, error) {
+	path := "api/v1/collections/update_collection_display_layout"
+
+	form := url.Values{}
+	form.Set("collection_id", id)
+	form.Set("display_layout", "GALLERY")
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {

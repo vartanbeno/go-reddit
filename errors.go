@@ -38,23 +38,19 @@ type JSONErrorResponse struct {
 	// HTTP response that caused this error.
 	Response *http.Response `json:"-"`
 
-	JSON *struct {
+	JSON struct {
 		Errors []APIError `json:"errors,omitempty"`
-	} `json:"json,omitempty"`
+	} `json:"json"`
 }
 
 func (r *JSONErrorResponse) Error() string {
 	var message string
-	if r.JSON != nil && len(r.JSON.Errors) > 0 {
-		for i, err := range r.JSON.Errors {
-			message += err.Error()
-			if i < len(r.JSON.Errors)-1 {
-				message += ";"
-			}
-		}
+	if len(r.JSON.Errors) > 0 {
+		message = r.JSON.Errors[0].Error()
 	}
+
 	return fmt.Sprintf(
-		"%v %v: %d %v",
+		"%s %s: %d %s",
 		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, message,
 	)
 }
@@ -70,7 +66,7 @@ type ErrorResponse struct {
 
 func (r *ErrorResponse) Error() string {
 	return fmt.Sprintf(
-		"%v %v: %d %v",
+		"%s %s: %d %s",
 		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, r.Message,
 	)
 }

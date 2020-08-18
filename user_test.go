@@ -64,12 +64,12 @@ var expectedPost = &Post{
 	UpvoteRatio:      0.86,
 	NumberOfComments: 2,
 
-	SubredditID:           "t5_2qizd",
 	SubredditName:         "redditdev",
 	SubredditNamePrefixed: "r/redditdev",
+	SubredditID:           "t5_2qizd",
 
-	AuthorID:   "t2_164ab8",
-	AuthorName: "v_95",
+	Author:   "v_95",
+	AuthorID: "t2_164ab8",
 
 	IsSelfPost: true,
 }
@@ -87,7 +87,7 @@ var expectedComment = &Comment{
 	Author:   "v_95",
 	AuthorID: "t2_164ab8",
 
-	Subreddit:             "apple",
+	SubredditName:         "apple",
 	SubredditNamePrefixed: "r/apple",
 	SubredditID:           "t5_2qh1f",
 

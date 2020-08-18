@@ -274,7 +274,7 @@ func TestCollectionService_UpdateDescription(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestCollectionService_UpdateLayout(t *testing.T) {
+func TestCollectionService_UpdateLayoutTimeline(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -290,7 +290,27 @@ func TestCollectionService_UpdateLayout(t *testing.T) {
 		require.Equal(t, form, r.Form)
 	})
 
-	_, err := client.Collection.UpdateLayout(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7", "TIMELINE")
+	_, err := client.Collection.UpdateLayoutTimeline(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
+	require.NoError(t, err)
+}
+
+func TestCollectionService_UpdateLayoutGallery(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/collections/update_collection_display_layout", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("collection_id", "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
+		form.Set("display_layout", "GALLERY")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
+	})
+
+	_, err := client.Collection.UpdateLayoutGallery(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
 	require.NoError(t, err)
 }
 

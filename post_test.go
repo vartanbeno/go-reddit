@@ -27,12 +27,12 @@ var expectedPostAndComments = &PostAndComments{
 		UpvoteRatio:      1,
 		NumberOfComments: 2,
 
-		SubredditID:           "t5_2qh23",
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
+		SubredditID:           "t5_2qh23",
 
-		AuthorID:   "t2_testuser",
-		AuthorName: "testuser",
+		Author:   "testuser",
+		AuthorID: "t2_testuser",
 
 		IsSelfPost: true,
 	},
@@ -50,7 +50,7 @@ var expectedPostAndComments = &PostAndComments{
 			Author:   "testuser",
 			AuthorID: "t2_testuser",
 
-			Subreddit:             "test",
+			SubredditName:         "test",
 			SubredditNamePrefixed: "r/test",
 			SubredditID:           "t5_2qh23",
 
@@ -77,7 +77,7 @@ var expectedPostAndComments = &PostAndComments{
 						Author:   "testuser",
 						AuthorID: "t2_testuser",
 
-						Subreddit:             "test",
+						SubredditName:         "test",
 						SubredditNamePrefixed: "r/test",
 						SubredditID:           "t5_2qh23",
 
@@ -119,12 +119,12 @@ var expectedEditedPost = &Post{
 	UpvoteRatio:      1,
 	NumberOfComments: 0,
 
-	SubredditID:           "t5_2qh23",
 	SubredditName:         "test",
 	SubredditNamePrefixed: "r/test",
+	SubredditID:           "t5_2qh23",
 
-	AuthorID:   "t2_164ab8",
-	AuthorName: "v_95",
+	Author:   "v_95",
+	AuthorID: "t2_164ab8",
 
 	Spoiler:    true,
 	IsSelfPost: true,
@@ -147,12 +147,12 @@ var expectedPost2 = &Post{
 	UpvoteRatio:      1,
 	NumberOfComments: 0,
 
-	SubredditID:           "t5_2qh23",
 	SubredditName:         "test",
 	SubredditNamePrefixed: "r/test",
+	SubredditID:           "t5_2qh23",
 
-	AuthorID:   "t2_164ab8",
-	AuthorName: "v_95",
+	Author:   "v_95",
+	AuthorID: "t2_164ab8",
 }
 
 var expectedPostDuplicates = &Posts{
@@ -174,12 +174,12 @@ var expectedPostDuplicates = &Posts{
 			UpvoteRatio:      0.66,
 			NumberOfComments: 1,
 
-			SubredditID:           "t5_2qh23",
 			SubredditName:         "test",
 			SubredditNamePrefixed: "r/test",
+			SubredditID:           "t5_2qh23",
 
-			AuthorID:   "t2_d2v1r90",
-			AuthorName: "GarlicoinAccount",
+			Author:   "GarlicoinAccount",
+			AuthorID: "t2_d2v1r90",
 		},
 		{
 			ID:      "le1tc",
@@ -198,12 +198,12 @@ var expectedPostDuplicates = &Posts{
 			UpvoteRatio:      1,
 			NumberOfComments: 1,
 
-			SubredditID:           "t5_2qh23",
 			SubredditName:         "test",
 			SubredditNamePrefixed: "r/test",
+			SubredditID:           "t5_2qh23",
 
-			AuthorID:   "t2_8dyo",
-			AuthorName: "prog101",
+			Author:   "prog101",
+			AuthorID: "t2_8dyo",
 		},
 	},
 	After:  "t3_le1tc",

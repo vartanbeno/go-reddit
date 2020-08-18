@@ -28,12 +28,12 @@ var expectedListingPosts = []*Post{
 		UpvoteRatio:      1,
 		NumberOfComments: 1,
 
-		SubredditID:           "t5_2qh23",
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
+		SubredditID:           "t5_2qh23",
 
-		AuthorID:   "t2_164ab8",
-		AuthorName: "v_95",
+		Author:   "v_95",
+		AuthorID: "t2_164ab8",
 
 		IsSelfPost: true,
 	},
@@ -49,13 +49,11 @@ var expectedListingComments = []*Comment{
 		ParentID:  "t3_i2gvg4",
 		Permalink: "https://www.reddit.com/r/test/comments/i2gvg4/this_is_a_title/g05v931/",
 
-		// todo fix naming
 		Body:     "Test comment",
 		Author:   "v_95",
 		AuthorID: "t2_164ab8",
 
-		// todo fix naming
-		Subreddit:             "test",
+		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
 		SubredditID:           "t5_2qh23",
 
@@ -104,12 +102,12 @@ var expectedListingPosts2 = []*Post{
 		UpvoteRatio:      1,
 		NumberOfComments: 1,
 
-		SubredditID:           "t5_2qh23",
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
+		SubredditID:           "t5_2qh23",
 
-		AuthorID:   "t2_164ab8",
-		AuthorName: "v_95",
+		Author:   "v_95",
+		AuthorID: "t2_164ab8",
 
 		IsSelfPost: true,
 	},
@@ -129,12 +127,12 @@ var expectedListingPosts2 = []*Post{
 		UpvoteRatio:      1,
 		NumberOfComments: 0,
 
-		SubredditID:           "t5_2qh23",
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
+		SubredditID:           "t5_2qh23",
 
-		AuthorID:   "t2_164ab8",
-		AuthorName: "v_95",
+		Author:   "v_95",
+		AuthorID: "t2_164ab8",
 	},
 }
 

@@ -62,7 +62,6 @@ type things struct {
 	Posts      []*Post
 	Subreddits []*Subreddit
 	ModActions []*ModAction
-	// todo: add the other kinds of things
 }
 
 // init initializes or clears the listing.
@@ -111,7 +110,6 @@ func (t *things) UnmarshalJSON(b []byte) error {
 			if err := json.Unmarshal(thing.Data, v); err == nil {
 				t.Subreddits = append(t.Subreddits, v)
 			}
-		case kindAward:
 		case kindModAction:
 			v := new(ModAction)
 			if err := json.Unmarshal(thing.Data, v); err == nil {
@@ -123,7 +121,7 @@ func (t *things) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// Comment is a comment posted by a user
+// Comment is a comment posted by a user.
 type Comment struct {
 	ID      string     `json:"id,omitempty"`
 	FullID  string     `json:"name,omitempty"`
@@ -139,7 +137,7 @@ type Comment struct {
 	AuthorFlairText string `json:"author_flair_text,omitempty"`
 	AuthorFlairID   string `json:"author_flair_template_id,omitempty"`
 
-	Subreddit             string `json:"subreddit,omitempty"`
+	SubredditName         string `json:"subreddit,omitempty"`
 	SubredditNamePrefixed string `json:"subreddit_name_prefixed,omitempty"`
 	SubredditID           string `json:"subreddit_id,omitempty"`
 
@@ -150,16 +148,14 @@ type Comment struct {
 	Score            int `json:"score"`
 	Controversiality int `json:"controversiality"`
 
-	// todo: check the validity of these comments
 	PostID string `json:"link_id,omitempty"`
-	// This doesn't appear when submitting a comment.
+	// This doesn't appear consistently.
 	PostTitle string `json:"link_title,omitempty"`
-	// This doesn't appear when submitting a comment.
+	// This doesn't appear consistently.
 	PostPermalink string `json:"link_permalink,omitempty"`
-	// This doesn't appear when submitting a comment.
+	// This doesn't appear consistently.
 	PostAuthor string `json:"link_author,omitempty"`
-	// This doesn't appear when submitting a comment
-	// or when getting a post with its comments.
+	// This doesn't appear consistently.
 	PostNumComments *int `json:"num_comments,omitempty"`
 
 	IsSubmitter bool `json:"is_submitter"`
@@ -238,9 +234,7 @@ func (r *Replies) MarshalJSON() ([]byte, error) {
 	return json.Marshal(r.Comments)
 }
 
-// todo: should we implement json.Marshaler?
-
-// More holds information
+// More holds information used to retrieve additional comments omitted from a base comment tree.
 type More struct {
 	ID       string `json:"id"`
 	FullID   string `json:"name"`
@@ -273,12 +267,12 @@ type Post struct {
 	UpvoteRatio      float32 `json:"upvote_ratio"`
 	NumberOfComments int     `json:"num_comments"`
 
-	SubredditID           string `json:"subreddit_id,omitempty"`
 	SubredditName         string `json:"subreddit,omitempty"`
 	SubredditNamePrefixed string `json:"subreddit_name_prefixed,omitempty"`
+	SubredditID           string `json:"subreddit_id,omitempty"`
 
-	AuthorID   string `json:"author_fullname,omitempty"`
-	AuthorName string `json:"author,omitempty"`
+	Author   string `json:"author,omitempty"`
+	AuthorID string `json:"author_fullname,omitempty"`
 
 	Spoiler    bool `json:"spoiler"`
 	Locked     bool `json:"locked"`

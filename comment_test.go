@@ -22,7 +22,7 @@ var expectedCommentSubmitOrEdit = &Comment{
 	AuthorFlairText: "Flair",
 	AuthorFlairID:   "024b2b66-05ca-11e1-96f4-12313d096aae",
 
-	Subreddit:             "subreddit",
+	SubredditName:         "subreddit",
 	SubredditNamePrefixed: "r/subreddit",
 	SubredditID:           "t5_test",
 

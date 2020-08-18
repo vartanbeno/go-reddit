@@ -28,12 +28,12 @@ var expectedPosts = &Posts{
 			UpvoteRatio:      0.99,
 			NumberOfComments: 1634,
 
-			SubredditID:           "t5_2qh23",
 			SubredditName:         "test",
 			SubredditNamePrefixed: "r/test",
+			SubredditID:           "t5_2qh23",
 
-			AuthorID:   "t2_30a5ktgt",
-			AuthorName: "kmiller0112",
+			Author:   "kmiller0112",
+			AuthorID: "t2_30a5ktgt",
 
 			IsSelfPost: true,
 			Stickied:   true,
@@ -53,12 +53,12 @@ var expectedPosts = &Posts{
 			UpvoteRatio:      1,
 			NumberOfComments: 0,
 
-			SubredditID:           "t5_2qh23",
 			SubredditName:         "test",
 			SubredditNamePrefixed: "r/test",
+			SubredditID:           "t5_2qh23",
 
-			AuthorID:   "t2_6fqntbwq",
-			AuthorName: "MuckleMcDuckle",
+			Author:   "MuckleMcDuckle",
+			AuthorID: "t2_6fqntbwq",
 		},
 	},
 	After:  "t3_hyhquk",
@@ -167,12 +167,12 @@ var expectedSearchPosts = &Posts{
 			UpvoteRatio:      0.88,
 			NumberOfComments: 3748,
 
-			SubredditID:           "t5_3h4zq",
 			SubredditName:         "WatchPeopleDieInside",
 			SubredditNamePrefixed: "r/WatchPeopleDieInside",
+			SubredditID:           "t5_3h4zq",
 
-			AuthorID:   "t2_3p32m02",
-			AuthorName: "chocolat_ice_cream",
+			Author:   "chocolat_ice_cream",
+			AuthorID: "t2_3p32m02",
 		},
 		{
 			ID:      "hmwhd7",
@@ -189,12 +189,12 @@ var expectedSearchPosts = &Posts{
 			UpvoteRatio:      0.94,
 			NumberOfComments: 7415,
 
-			SubredditID:           "t5_2qh13",
 			SubredditName:         "worldnews",
 			SubredditNamePrefixed: "r/worldnews",
+			SubredditID:           "t5_2qh13",
 
-			AuthorID:   "t2_wgrkg",
-			AuthorName: "Jeremy_Martin",
+			Author:   "Jeremy_Martin",
+			AuthorID: "t2_wgrkg",
 		},
 	},
 	After: "t3_hmwhd7",
