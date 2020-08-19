@@ -99,7 +99,7 @@
             "author": "testuser2",
             "can_mod_post": false,
             "send_replies": true,
-            "parent_id": "t1_def",
+            "parent_id": "t1_abc",
             "score": 1,
             "author_fullname": "t2_user2",
             "approved_by": null,
@@ -170,7 +170,7 @@
             "author": "testuser2",
             "can_mod_post": false,
             "send_replies": true,
-            "parent_id": "t3_123",
+            "parent_id": "t1_def",
             "score": 1,
             "author_fullname": "t2_user2",
             "approved_by": null,
@@ -214,17 +214,6 @@
             "mod_reports": [],
             "subreddit_type": "public",
             "ups": 1
-          }
-        },
-        {
-          "kind": "more",
-          "data": {
-            "count": 1,
-            "name": "t1_fye3844",
-            "id": "fye3844",
-            "parent_id": "t1_jkl",
-            "depth": 6,
-            "children": ["fye3844"]
           }
         }
       ]

@@ -301,3 +301,49 @@ func TestCommentService_RemoveVote(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, http.StatusOK, res.StatusCode)
 }
+
+func TestCommentService_LoadMoreReplies(t *testing.T) {
+	setup()
+	defer teardown()
+
+	blob, err := readFileContents("testdata/comment/more.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/api/morechildren", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("link_id", "t3_123")
+		form.Set("children", "def,ghi,jkl")
+		form.Set("api_type", "json")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, blob)
+	})
+
+	_, err = client.Comment.LoadMoreReplies(ctx, nil)
+	require.EqualError(t, err, "comment: cannot be nil")
+
+	resp, err := client.Comment.LoadMoreReplies(ctx, &Comment{})
+	require.Nil(t, resp)
+	require.Nil(t, err)
+
+	comment := &Comment{
+		FullID: "t1_abc",
+		PostID: "t3_123",
+		Replies: Replies{
+			More: &More{
+				Children: []string{"def", "ghi", "jkl"},
+			},
+		},
+	}
+
+	_, err = client.Comment.LoadMoreReplies(ctx, comment)
+	require.Nil(t, err)
+	require.False(t, comment.HasMore())
+	require.Len(t, comment.Replies.Comments, 2)
+	require.Len(t, comment.Replies.Comments[0].Replies.Comments, 1)
+}

@@ -471,7 +471,7 @@ func (s *PostService) LoadMoreComments(ctx context.Context, pc *PostAndComments)
 	}
 
 	postID := pc.Post.FullID
-	commentIDs := pc.MoreComments.Children
+	commentIDs := pc.More.Children
 
 	form := url.Values{}
 	form.Set("api_type", "json")
@@ -515,7 +515,7 @@ func (s *PostService) LoadMoreComments(ctx context.Context, pc *PostAndComments)
 	}
 
 	if noMore {
-		pc.MoreComments = nil
+		pc.More = nil
 	}
 
 	return resp, nil

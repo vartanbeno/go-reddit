@@ -221,7 +221,7 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 	}
 
 	r.Comments = root.Data.Things.Comments
-	r.More = root.getFirstMoreComments()
+	r.More = root.getFirstMore()
 
 	return nil
 }
@@ -311,11 +311,7 @@ func (l *rootListing) getComments() *Comments {
 	}
 }
 
-func (l *rootListing) getMoreComments() []*More {
-	return l.Data.Things.Mores
-}
-
-func (l *rootListing) getFirstMoreComments() *More {
+func (l *rootListing) getFirstMore() *More {
 	if len(l.Data.Things.Mores) == 0 {
 		return nil
 	}
@@ -391,9 +387,9 @@ type ModActions struct {
 
 // PostAndComments is a post and its comments.
 type PostAndComments struct {
-	Post         *Post      `json:"post"`
-	Comments     []*Comment `json:"comments"`
-	MoreComments *More      `json:"-"`
+	Post     *Post      `json:"post"`
+	Comments []*Comment `json:"comments"`
+	More     *More      `json:"-"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -410,18 +406,18 @@ func (pc *PostAndComments) UnmarshalJSON(data []byte) error {
 
 	post := l[0].getPosts().Posts[0]
 	comments := l[1].getComments().Comments
-	moreComments := l[1].getFirstMoreComments()
+	moreComments := l[1].getFirstMore()
 
 	pc.Post = post
 	pc.Comments = comments
-	pc.MoreComments = moreComments
+	pc.More = moreComments
 
 	return nil
 }
 
 // HasMore determines whether the post has more replies to load in its reply tree.
 func (pc *PostAndComments) HasMore() bool {
-	return pc.MoreComments != nil && len(pc.MoreComments.Children) > 0
+	return pc.More != nil && len(pc.More.Children) > 0
 }
 
 func (pc *PostAndComments) addCommentToTree(comment *Comment) {
@@ -437,7 +433,7 @@ func (pc *PostAndComments) addCommentToTree(comment *Comment) {
 
 func (pc *PostAndComments) addMoreToTree(more *More) {
 	if pc.Post.FullID == more.ParentID {
-		pc.MoreComments = more
+		pc.More = more
 	}
 
 	for _, reply := range pc.Comments {

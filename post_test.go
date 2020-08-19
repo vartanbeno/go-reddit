@@ -820,72 +820,56 @@ func TestPostService_DisableContestMode(t *testing.T) {
 	require.Equal(t, http.StatusOK, res.StatusCode)
 }
 
-func TestPostService_More(t *testing.T) {
+func TestPostService_LoadMoreReplies(t *testing.T) {
 	setup()
 	defer teardown()
-
-	parentComment := &Comment{
-		FullID:   "t1_abc",
-		ParentID: "t3_123",
-		PostID:   "t3_123",
-		Replies: Replies{
-			More: &More{
-				Children: []string{"def,ghi"},
-			},
-		},
-	}
 
 	blob, err := readFileContents("testdata/post/more.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/morechildren", func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodGet, r.Method)
+		require.Equal(t, http.MethodPost, r.Method)
 
 		form := url.Values{}
 		form.Set("link_id", "t3_123")
-		form.Set("children", "def,ghi")
+		form.Set("children", "def,ghi,jkl")
 		form.Set("api_type", "json")
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
 
-	_, err = client.Comment.LoadMoreReplies(ctx, parentComment)
-	require.NoError(t, err)
-	require.Nil(t, parentComment.Replies.More)
-	require.Len(t, parentComment.Replies.Comments, 1)
-	require.Len(t, parentComment.Replies.Comments[0].Replies.Comments, 1)
-}
+	_, err = client.Post.LoadMoreComments(ctx, nil)
+	require.EqualError(t, err, "pc: cannot be nil")
 
-func TestPostService_MoreNil(t *testing.T) {
-	setup()
-	defer teardown()
+	resp, err := client.Post.LoadMoreComments(ctx, &PostAndComments{})
+	require.Nil(t, resp)
+	require.Nil(t, err)
 
-	_, err := client.Comment.LoadMoreReplies(ctx, nil)
-	require.EqualError(t, err, "comment: cannot be nil")
-
-	parentComment := &Comment{
-		Replies: Replies{
-			More: nil,
+	pc := &PostAndComments{
+		Post: &Post{
+			FullID: "t3_123",
+		},
+		Comments: []*Comment{
+			{
+				FullID: "t1_abc",
+			},
+		},
+		More: &More{
+			Children: []string{"def", "ghi", "jkl"},
 		},
 	}
 
-	// should return nil, nil since comment does not have More struct
-	resp, err := client.Comment.LoadMoreReplies(ctx, parentComment)
+	_, err = client.Post.LoadMoreComments(ctx, pc)
 	require.NoError(t, err)
-	require.Nil(t, resp)
-
-	parentComment.Replies.More = &More{
-		Children: []string{},
-	}
-
-	// should return nil, nil since comment's More struct has 0 children
-	resp, err = client.Comment.LoadMoreReplies(ctx, parentComment)
-	require.NoError(t, err)
-	require.Nil(t, resp)
+	require.False(t, pc.HasMore())
+	require.Len(t, pc.Comments, 2)
+	require.True(t, pc.Comments[1].HasMore())
+	require.Len(t, pc.Comments[0].Replies.Comments, 1)
+	require.Len(t, pc.Comments[0].Replies.Comments[0].Replies.Comments, 1)
 }
 
 func TestPostService_RandomFromSubreddits(t *testing.T) {
@@ -1162,6 +1146,9 @@ func TestPostService_MarkVisited(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	_, err := client.Post.MarkVisited(ctx, "t3_test1", "t3_test2", "t3_test3")
+	_, err := client.Post.MarkVisited(ctx)
+	require.EqualError(t, err, "must provide at least 1 id")
+
+	_, err = client.Post.MarkVisited(ctx, "t3_test1", "t3_test2", "t3_test3")
 	require.NoError(t, err)
 }

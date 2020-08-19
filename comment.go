@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 // CommentService handles communication with the comment
@@ -78,19 +79,16 @@ func (s *CommentService) LoadMoreReplies(ctx context.Context, comment *Comment) 
 	postID := comment.PostID
 	commentIDs := comment.Replies.More.Children
 
-	type params struct {
-		PostID  string   `url:"link_id"`
-		IDs     []string `url:"children,comma"`
-		APIType string   `url:"api_type"`
-	}
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("link_id", postID)
+	form.Set("children", strings.Join(commentIDs, ","))
 
 	path := "api/morechildren"
-	path, err := addOptions(path, params{postID, commentIDs, "json"})
-	if err != nil {
-		return nil, err
-	}
 
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	// This was originally a GET, but with POST you can send a bigger payload
+	// since it's in the body and not the URI.
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
