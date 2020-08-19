@@ -14,7 +14,7 @@ var expectedCommentSubmitOrEdit = &Comment{
 	ID:        "test2",
 	FullID:    "t1_test2",
 	ParentID:  "t1_test",
-	Permalink: "https://www.reddit.com/r/subreddit/comments/test1/some_thread/test2/",
+	Permalink: "/r/subreddit/comments/test1/some_thread/test2/",
 
 	Body:            "test comment",
 	Author:          "reddit_username",

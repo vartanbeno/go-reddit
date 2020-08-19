@@ -17,7 +17,7 @@ var expectedListingPosts = []*Post{
 		Created: &Timestamp{time.Date(2020, 8, 2, 18, 23, 8, 0, time.UTC)},
 		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-		Permalink: "https://www.reddit.com/r/test/comments/i2gvg4/this_is_a_title/",
+		Permalink: "/r/test/comments/i2gvg4/this_is_a_title/",
 		URL:       "https://www.reddit.com/r/test/comments/i2gvg4/this_is_a_title/",
 
 		Title: "This is a title",
@@ -47,7 +47,7 @@ var expectedListingComments = []*Comment{
 		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
 		ParentID:  "t3_i2gvg4",
-		Permalink: "https://www.reddit.com/r/test/comments/i2gvg4/this_is_a_title/g05v931/",
+		Permalink: "/r/test/comments/i2gvg4/this_is_a_title/g05v931/",
 
 		Body:     "Test comment",
 		Author:   "v_95",
@@ -91,7 +91,7 @@ var expectedListingPosts2 = []*Post{
 		Created: &Timestamp{time.Date(2020, 8, 2, 18, 23, 8, 0, time.UTC)},
 		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-		Permalink: "https://www.reddit.com/r/test/comments/i2gvg4/this_is_a_title/",
+		Permalink: "/r/test/comments/i2gvg4/this_is_a_title/",
 		URL:       "https://www.reddit.com/r/test/comments/i2gvg4/this_is_a_title/",
 
 		Title: "This is a title",
@@ -117,7 +117,7 @@ var expectedListingPosts2 = []*Post{
 		Created: &Timestamp{time.Date(2020, 8, 2, 18, 23, 37, 0, time.UTC)},
 		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-		Permalink: "https://www.reddit.com/r/test/comments/i2gvs1/this_is_a_title/",
+		Permalink: "/r/test/comments/i2gvs1/this_is_a_title/",
 		URL:       "http://example.com",
 
 		Title: "This is a title",

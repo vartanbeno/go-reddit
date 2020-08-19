@@ -52,7 +52,7 @@ var expectedPost = &Post{
 	Created: &Timestamp{time.Date(2020, 5, 3, 22, 46, 25, 0, time.UTC)},
 	Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-	Permalink: "https://www.reddit.com/r/redditdev/comments/gczwql/get_userusernamegilded_does_it_return_other_users/",
+	Permalink: "/r/redditdev/comments/gczwql/get_userusernamegilded_does_it_return_other_users/",
 	URL:       "https://www.reddit.com/r/redditdev/comments/gczwql/get_userusernamegilded_does_it_return_other_users/",
 
 	Title: "GET /user/{username}/gilded: does it return other user's things you've gilded, or your things that have been gilded? Does it return both comments and posts?",
@@ -81,7 +81,7 @@ var expectedComment = &Comment{
 	Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
 	ParentID:  "t3_d7ejpn",
-	Permalink: "https://www.reddit.com/r/apple/comments/d7ejpn/im_giving_away_an_iphone_11_pro_to_a_commenter_at/f0zsa37/",
+	Permalink: "/r/apple/comments/d7ejpn/im_giving_away_an_iphone_11_pro_to_a_commenter_at/f0zsa37/",
 
 	Body:     "Thank you!",
 	Author:   "v_95",

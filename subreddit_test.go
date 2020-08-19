@@ -18,7 +18,7 @@ var expectedPosts = &Posts{
 			Created: &Timestamp{time.Date(2019, 1, 16, 5, 57, 51, 0, time.UTC)},
 			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-			Permalink: "https://www.reddit.com/r/test/comments/agi5zf/test/",
+			Permalink: "/r/test/comments/agi5zf/test/",
 			URL:       "https://www.reddit.com/r/test/comments/agi5zf/test/",
 
 			Title: "test",
@@ -44,7 +44,7 @@ var expectedPosts = &Posts{
 			Created: &Timestamp{time.Date(2020, 7, 27, 0, 5, 10, 0, time.UTC)},
 			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-			Permalink: "https://www.reddit.com/r/test/comments/hyhquk/veggies/",
+			Permalink: "/r/test/comments/hyhquk/veggies/",
 			URL:       "https://i.imgur.com/LrN2mPw.jpg",
 
 			Title: "Veggies",
@@ -158,7 +158,7 @@ var expectedSearchPosts = &Posts{
 			Created: &Timestamp{time.Date(2020, 7, 26, 18, 14, 24, 0, time.UTC)},
 			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-			Permalink: "https://www.reddit.com/r/WatchPeopleDieInside/comments/hybow9/pregnancy_test/",
+			Permalink: "/r/WatchPeopleDieInside/comments/hybow9/pregnancy_test/",
 			URL:       "https://v.redd.it/ra4qnt8bt8d51",
 
 			Title: "Pregnancy test",
@@ -180,7 +180,7 @@ var expectedSearchPosts = &Posts{
 			Created: &Timestamp{time.Date(2020, 7, 7, 15, 19, 42, 0, time.UTC)},
 			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-			Permalink: "https://www.reddit.com/r/worldnews/comments/hmwhd7/brazilian_president_jair_bolsonaro_tests_positive/",
+			Permalink: "/r/worldnews/comments/hmwhd7/brazilian_president_jair_bolsonaro_tests_positive/",
 			URL:       "https://www.theguardian.com/world/2020/jul/07/jair-bolsonaro-coronavirus-positive-test-brazil-president",
 
 			Title: "Brazilian president Jair Bolsonaro tests positive for coronavirus",

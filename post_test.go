@@ -17,7 +17,7 @@ var expectedPostAndComments = &PostAndComments{
 		Created: &Timestamp{time.Date(2020, 7, 18, 10, 26, 7, 0, time.UTC)},
 		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-		Permalink: "https://www.reddit.com/r/test/comments/testpost/test/",
+		Permalink: "/r/test/comments/testpost/test/",
 		URL:       "https://www.reddit.com/r/test/comments/testpost/test/",
 
 		Title: "Test",
@@ -44,7 +44,7 @@ var expectedPostAndComments = &PostAndComments{
 			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
 			ParentID:  "t3_testpost",
-			Permalink: "https://www.reddit.com/r/test/comments/testpost/test/testc1/",
+			Permalink: "/r/test/comments/testpost/test/testc1/",
 
 			Body:     "Hi",
 			Author:   "testuser",
@@ -71,7 +71,7 @@ var expectedPostAndComments = &PostAndComments{
 						Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
 						ParentID:  "t1_testc1",
-						Permalink: "https://www.reddit.com/r/test/comments/testpost/test/testc2/",
+						Permalink: "/r/test/comments/testpost/test/testc2/",
 
 						Body:     "Hello",
 						Author:   "testuser",
@@ -107,7 +107,7 @@ var expectedEditedPost = &Post{
 	Created: &Timestamp{time.Date(2020, 7, 23, 1, 24, 55, 0, time.UTC)},
 	Edited:  &Timestamp{time.Date(2020, 7, 23, 1, 42, 44, 0, time.UTC)},
 
-	Permalink: "https://www.reddit.com/r/test/comments/hw6l6a/test_title/",
+	Permalink: "/r/test/comments/hw6l6a/test_title/",
 	URL:       "https://www.reddit.com/r/test/comments/hw6l6a/test_title/",
 
 	Title: "Test Title",
@@ -136,7 +136,7 @@ var expectedPost2 = &Post{
 	Created: &Timestamp{time.Date(2020, 8, 2, 18, 23, 37, 0, time.UTC)},
 	Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-	Permalink: "https://www.reddit.com/r/test/comments/i2gvs1/this_is_a_title/",
+	Permalink: "/r/test/comments/i2gvs1/this_is_a_title/",
 	URL:       "http://example.com",
 
 	Title: "This is a title",
@@ -163,7 +163,7 @@ var expectedPostDuplicates = &Posts{
 			Created: &Timestamp{time.Date(2018, 5, 18, 9, 10, 18, 0, time.UTC)},
 			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-			Permalink: "https://www.reddit.com/r/test/comments/8kbs85/test/",
+			Permalink: "/r/test/comments/8kbs85/test/",
 			URL:       "http://example.com",
 
 			Title: "test",
@@ -187,7 +187,7 @@ var expectedPostDuplicates = &Posts{
 			Created: &Timestamp{time.Date(2011, 10, 16, 13, 26, 40, 0, time.UTC)},
 			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-			Permalink: "https://www.reddit.com/r/test/comments/le1tc/test_to_see_if_this_fixes_the_problem_of_my_likes/",
+			Permalink: "/r/test/comments/le1tc/test_to_see_if_this_fixes_the_problem_of_my_likes/",
 			URL:       "http://www.example.com",
 
 			Title: "Test to see if this fixes the problem of my \"likes\" from the last 7 months vanishing.",

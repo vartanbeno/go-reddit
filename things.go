@@ -19,21 +19,6 @@ const (
 	kindModAction  = "modaction"
 )
 
-// Permalink is the link to a post or comment.
-type Permalink string
-
-// UnmarshalJSON implements the json.Unmarshaler interface.
-func (p *Permalink) UnmarshalJSON(data []byte) error {
-	var v string
-	err := json.Unmarshal(data, &v)
-	if err != nil {
-		return err
-	}
-	v = "https://www.reddit.com" + v
-	*p = Permalink(v)
-	return nil
-}
-
 // thing is an entity on Reddit.
 // Its kind reprsents what it is and what is stored in the Data field
 // e.g. t1 = comment, t2 = user, t3 = post, etc.
@@ -128,8 +113,8 @@ type Comment struct {
 	Created *Timestamp `json:"created_utc,omitempty"`
 	Edited  *Timestamp `json:"edited,omitempty"`
 
-	ParentID  string    `json:"parent_id,omitempty"`
-	Permalink Permalink `json:"permalink,omitempty"`
+	ParentID  string `json:"parent_id,omitempty"`
+	Permalink string `json:"permalink,omitempty"`
 
 	Body            string `json:"body,omitempty"`
 	Author          string `json:"author,omitempty"`
@@ -253,8 +238,8 @@ type Post struct {
 	Created *Timestamp `json:"created_utc,omitempty"`
 	Edited  *Timestamp `json:"edited,omitempty"`
 
-	Permalink Permalink `json:"permalink,omitempty"`
-	URL       string    `json:"url,omitempty"`
+	Permalink string `json:"permalink,omitempty"`
+	URL       string `json:"url,omitempty"`
 
 	Title string `json:"title,omitempty"`
 	Body  string `json:"selftext,omitempty"`
