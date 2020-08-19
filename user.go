@@ -421,32 +421,32 @@ func (s *UserService) Block(ctx context.Context, username string) (*Blocked, *Re
 	return root, resp, nil
 }
 
-// // BlockByID blocks a user via their full id.
-// func (s *UserService) BlockByID(ctx context.Context, id string) (*Blocked, *Response, error) {
-// 	path := "api/block_user"
+// BlockByID blocks a user via their full id.
+func (s *UserService) BlockByID(ctx context.Context, id string) (*Blocked, *Response, error) {
+	path := "api/block_user"
 
-// 	form := url.Values{}
-// 	form.Set("account_id", id)
+	form := url.Values{}
+	form.Set("account_id", id)
 
-// 	req, err := s.client.NewPostForm(path, form)
-// 	if err != nil {
-// 		return nil, nil, err
-// 	}
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, nil, err
+	}
 
-// 	root := new(Blocked)
-// 	resp, err := s.client.Do(ctx, req, root)
-// 	if err != nil {
-// 		return nil, resp, err
-// 	}
+	root := new(Blocked)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
 
-// 	return root, resp, nil
-// }
+	return root, resp, nil
+}
 
 // Unblock unblocks a user.
 func (s *UserService) Unblock(ctx context.Context, username string) (*Response, error) {
-	selfID, err := s.client.id(ctx)
+	selfID, resp, err := s.client.id(ctx)
 	if err != nil {
-		return nil, err
+		return resp, err
 	}
 
 	path := "api/unfriend"
@@ -464,27 +464,27 @@ func (s *UserService) Unblock(ctx context.Context, username string) (*Response, 
 	return s.client.Do(ctx, req, nil)
 }
 
-// // UnblockByID unblocks a user via their full id.
-// func (s *UserService) UnblockByID(ctx context.Context, id string) (*Response, error) {
-// 	selfID, err := s.client.GetRedditID(ctx)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+// UnblockByID unblocks a user via their full id.
+func (s *UserService) UnblockByID(ctx context.Context, id string) (*Response, error) {
+	selfID, resp, err := s.client.id(ctx)
+	if err != nil {
+		return resp, err
+	}
 
-// 	path := "api/unfriend"
+	path := "api/unfriend"
 
-// 	form := url.Values{}
-// 	form.Set("id", id)
-// 	form.Set("type", "enemy")
-// 	form.Set("container", selfID)
+	form := url.Values{}
+	form.Set("id", id)
+	form.Set("type", "enemy")
+	form.Set("container", selfID)
 
-// 	req, err := s.client.NewPostForm(path, form)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
 
-// 	return s.client.Do(ctx, req, nil)
-// }
+	return s.client.Do(ctx, req, nil)
+}
 
 // Trophies returns a list of your trophies.
 func (s *UserService) Trophies(ctx context.Context) ([]Trophy, *Response, error) {

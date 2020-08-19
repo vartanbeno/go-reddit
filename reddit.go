@@ -286,18 +286,18 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 }
 
 // id returns the client's Reddit ID.
-func (c *Client) id(ctx context.Context) (string, error) {
+func (c *Client) id(ctx context.Context) (string, *Response, error) {
 	if c.redditID != "" {
-		return c.redditID, nil
+		return c.redditID, nil, nil
 	}
 
-	self, _, err := c.User.Get(ctx, c.Username)
+	self, resp, err := c.User.Get(ctx, c.Username)
 	if err != nil {
-		return "", err
+		return "", resp, err
 	}
 
 	c.redditID = fmt.Sprintf("%s_%s", kindAccount, self.ID)
-	return c.redditID, nil
+	return c.redditID, resp, nil
 }
 
 // DoRequest submits an HTTP request.

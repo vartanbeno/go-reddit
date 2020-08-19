@@ -813,30 +813,30 @@ func TestUserService_Block(t *testing.T) {
 	require.Equal(t, expectedBlocked, blocked)
 }
 
-// func TestUserService_BlockByID(t *testing.T) {
-// 	setup()
-// 	defer teardown()
+func TestUserService_BlockByID(t *testing.T) {
+	setup()
+	defer teardown()
 
-// 	blob, err := readFileContents("testdata/user/block.json")
-//  require.NoError(t,err)
+	blob, err := readFileContents("testdata/user/block.json")
+	require.NoError(t, err)
 
-// 	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
-// 		require.Equal(t, http.MethodPost, r.Method)
+	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
 
-// 		form := url.Values{}
-// 		form.Set("account_id", "abc123")
+		form := url.Values{}
+		form.Set("account_id", "abc123")
 
-// 		err := r.ParseForm()
-// 		require.NoError(t, err)
-// 		require.Equal(t, form, r.Form)
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
 
-// 		fmt.Fprint(w, blob)
-// 	})
+		fmt.Fprint(w, blob)
+	})
 
-// 	blocked, _, err := client.User.BlockByID(ctx, "abc123")
-// 	require.NoError(t, err)
-// 	require.Equal(t, expectedBlocked, blocked)
-// }
+	blocked, _, err := client.User.BlockByID(ctx, "abc123")
+	require.NoError(t, err)
+	require.Equal(t, expectedBlocked, blocked)
+}
 
 func TestUserService_Unblock(t *testing.T) {
 	setup()
@@ -861,28 +861,28 @@ func TestUserService_Unblock(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// func TestUserService_UnblockByID(t *testing.T) {
-// 	setup()
-// 	defer teardown()
+func TestUserService_UnblockByID(t *testing.T) {
+	setup()
+	defer teardown()
 
-// 	client.redditID = "self123"
+	client.redditID = "self123"
 
-// 	mux.HandleFunc("/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
-// 		require.Equal(t, http.MethodPost, r.Method)
+	mux.HandleFunc("/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
 
-// 		form := url.Values{}
-// 		form.Set("id", "abc123")
-// 		form.Set("type", "enemy")
-// 		form.Set("container", client.redditID)
+		form := url.Values{}
+		form.Set("id", "abc123")
+		form.Set("type", "enemy")
+		form.Set("container", client.redditID)
 
-// 		err := r.ParseForm()
-// 		require.NoError(t, err)
-// 		require.Equal(t, form, r.Form)
-// 	})
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
+	})
 
-// 	_, err := client.User.UnblockByID(ctx, "abc123")
-// 	require.NoError(t, err)
-// }
+	_, err := client.User.UnblockByID(ctx, "abc123")
+	require.NoError(t, err)
+}
 
 func TestUserService_Trophies(t *testing.T) {
 	setup()
