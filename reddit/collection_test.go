@@ -74,7 +74,7 @@ func TestCollectionService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("./testdata/collection/collection.json")
+	blob, err := readFileContents("../testdata/collection/collection.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/collections/collection", func(w http.ResponseWriter, r *http.Request) {
@@ -100,7 +100,7 @@ func TestCollectionService_FromSubreddit(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("./testdata/collection/collections.json")
+	blob, err := readFileContents("../testdata/collection/collections.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/collections/subreddit_collections", func(w http.ResponseWriter, r *http.Request) {
@@ -125,7 +125,7 @@ func TestCollectionService_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("./testdata/collection/collection.json")
+	blob, err := readFileContents("../testdata/collection/collection.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/collections/create_collection", func(w http.ResponseWriter, r *http.Request) {

@@ -190,7 +190,7 @@ func TestUserService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/get.json")
+	blob, err := readFileContents("../testdata/user/get.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/Test_User/about", func(w http.ResponseWriter, r *http.Request) {
@@ -207,7 +207,7 @@ func TestUserService_GetMultipleByID(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/get-multiple-by-id.json")
+	blob, err := readFileContents("../testdata/user/get-multiple-by-id.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/user_data_by_account_ids", func(w http.ResponseWriter, r *http.Request) {
@@ -255,7 +255,7 @@ func TestUserService_Overview(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/overview.json")
+	blob, err := readFileContents("../testdata/user/overview.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/overview", func(w http.ResponseWriter, r *http.Request) {
@@ -281,7 +281,7 @@ func TestUserService_OverviewOf(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/overview.json")
+	blob, err := readFileContents("../testdata/user/overview.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/overview", func(w http.ResponseWriter, r *http.Request) {
@@ -307,7 +307,7 @@ func TestUserService_Overview_Options(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/overview.json")
+	blob, err := readFileContents("../testdata/user/overview.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/overview", func(w http.ResponseWriter, r *http.Request) {
@@ -339,7 +339,7 @@ func TestUserService_Posts(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/submitted", func(w http.ResponseWriter, r *http.Request) {
@@ -360,7 +360,7 @@ func TestUserService_PostsOf(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/submitted", func(w http.ResponseWriter, r *http.Request) {
@@ -381,7 +381,7 @@ func TestUserService_Posts_Options(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/submitted", func(w http.ResponseWriter, r *http.Request) {
@@ -411,7 +411,7 @@ func TestUserService_Comments(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/comments.json")
+	blob, err := readFileContents("../testdata/user/comments.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/comments", func(w http.ResponseWriter, r *http.Request) {
@@ -432,7 +432,7 @@ func TestUserService_CommentsOf(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/comments.json")
+	blob, err := readFileContents("../testdata/user/comments.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/comments", func(w http.ResponseWriter, r *http.Request) {
@@ -453,7 +453,7 @@ func TestUserService_Comments_Options(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/comments.json")
+	blob, err := readFileContents("../testdata/user/comments.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/comments", func(w http.ResponseWriter, r *http.Request) {
@@ -484,7 +484,7 @@ func TestUserService_Saved(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/overview.json")
+	blob, err := readFileContents("../testdata/user/overview.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/saved", func(w http.ResponseWriter, r *http.Request) {
@@ -511,7 +511,7 @@ func TestUserService_Saved_Options(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/overview.json")
+	blob, err := readFileContents("../testdata/user/overview.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/saved", func(w http.ResponseWriter, r *http.Request) {
@@ -541,7 +541,7 @@ func TestUserService_Upvoted(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/upvoted", func(w http.ResponseWriter, r *http.Request) {
@@ -563,7 +563,7 @@ func TestUserService_Upvoted_Options(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/upvoted", func(w http.ResponseWriter, r *http.Request) {
@@ -594,7 +594,7 @@ func TestUserService_UpvotedOf(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/upvoted", func(w http.ResponseWriter, r *http.Request) {
@@ -616,7 +616,7 @@ func TestUserService_Downvoted(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/downvoted", func(w http.ResponseWriter, r *http.Request) {
@@ -638,7 +638,7 @@ func TestUserService_Downvoted_Options(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/downvoted", func(w http.ResponseWriter, r *http.Request) {
@@ -669,7 +669,7 @@ func TestUserService_DownvotedOf(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user2/downvoted", func(w http.ResponseWriter, r *http.Request) {
@@ -691,7 +691,7 @@ func TestUserService_Hidden(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/hidden", func(w http.ResponseWriter, r *http.Request) {
@@ -713,7 +713,7 @@ func TestUserService_Gilded(t *testing.T) {
 	defer teardown()
 
 	// we'll use this, similar payloads
-	blob, err := readFileContents("testdata/user/submitted.json")
+	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/user/user1/gilded", func(w http.ResponseWriter, r *http.Request) {
@@ -734,7 +734,7 @@ func TestUserService_GetFriendship(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/friend.json")
+	blob, err := readFileContents("../testdata/user/friend.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
@@ -751,7 +751,7 @@ func TestUserService_Friend(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/friend.json")
+	blob, err := readFileContents("../testdata/user/friend.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
@@ -792,7 +792,7 @@ func TestUserService_Block(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/block.json")
+	blob, err := readFileContents("../testdata/user/block.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
@@ -817,7 +817,7 @@ func TestUserService_BlockByID(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/block.json")
+	blob, err := readFileContents("../testdata/user/block.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/block_user", func(w http.ResponseWriter, r *http.Request) {
@@ -888,7 +888,7 @@ func TestUserService_Trophies(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/trophies.json")
+	blob, err := readFileContents("../testdata/user/trophies.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/user/user1/trophies", func(w http.ResponseWriter, r *http.Request) {
@@ -905,7 +905,7 @@ func TestUserService_TrophiesOf(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/trophies.json")
+	blob, err := readFileContents("../testdata/user/trophies.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/user/test123/trophies", func(w http.ResponseWriter, r *http.Request) {
@@ -922,7 +922,7 @@ func TestUserService_Popular(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/user-subreddits.json")
+	blob, err := readFileContents("../testdata/user/user-subreddits.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/users/popular", func(w http.ResponseWriter, r *http.Request) {
@@ -939,7 +939,7 @@ func TestUserService_New(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/user-subreddits.json")
+	blob, err := readFileContents("../testdata/user/user-subreddits.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/users/new", func(w http.ResponseWriter, r *http.Request) {
@@ -956,7 +956,7 @@ func TestUserService_Search(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/user/list.json")
+	blob, err := readFileContents("../testdata/user/list.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/users/search", func(w http.ResponseWriter, r *http.Request) {

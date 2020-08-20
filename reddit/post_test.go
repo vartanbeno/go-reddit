@@ -214,7 +214,7 @@ func TestPostService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/post.json")
+	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/comments/abc123", func(w http.ResponseWriter, r *http.Request) {
@@ -231,7 +231,7 @@ func TestPostService_Duplicates(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/duplicates.json")
+	blob, err := readFileContents("../testdata/post/duplicates.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/duplicates/abc123", func(w http.ResponseWriter, r *http.Request) {
@@ -263,7 +263,7 @@ func TestPostService_SubmitText(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/submit.json")
+	blob, err := readFileContents("../testdata/post/submit.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/submit", func(w http.ResponseWriter, r *http.Request) {
@@ -298,7 +298,7 @@ func TestPostService_SubmitLink(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/submit.json")
+	blob, err := readFileContents("../testdata/post/submit.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/submit", func(w http.ResponseWriter, r *http.Request) {
@@ -337,7 +337,7 @@ func TestPostService_Edit(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/edit.json")
+	blob, err := readFileContents("../testdata/post/edit.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/editusertext", func(w http.ResponseWriter, r *http.Request) {
@@ -824,7 +824,7 @@ func TestPostService_LoadMoreReplies(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/more.json")
+	blob, err := readFileContents("../testdata/post/more.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/morechildren", func(w http.ResponseWriter, r *http.Request) {
@@ -876,7 +876,7 @@ func TestPostService_RandomFromSubreddits(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/post.json")
+	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/random", func(w http.ResponseWriter, r *http.Request) {
@@ -893,7 +893,7 @@ func TestPostService_Random(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/post.json")
+	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/all/random", func(w http.ResponseWriter, r *http.Request) {
@@ -910,7 +910,7 @@ func TestPostService_RandomFromSubscriptions(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/post.json")
+	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/random", func(w http.ResponseWriter, r *http.Request) {

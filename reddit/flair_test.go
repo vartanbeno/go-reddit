@@ -65,7 +65,7 @@ func TestFlairService_GetUserFlairs(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/flair/user-flairs.json")
+	blob, err := readFileContents("../testdata/flair/user-flairs.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/api/user_flair_v2", func(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +82,7 @@ func TestFlairService_GetPostFlairs(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/flair/post-flairs.json")
+	blob, err := readFileContents("../testdata/flair/post-flairs.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/api/link_flair_v2", func(w http.ResponseWriter, r *http.Request) {
@@ -99,7 +99,7 @@ func TestFlairService_ListUserFlairs(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/flair/list-user-flairs.json")
+	blob, err := readFileContents("../testdata/flair/list-user-flairs.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/api/flairlist", func(w http.ResponseWriter, r *http.Request) {

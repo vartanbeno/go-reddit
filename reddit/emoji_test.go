@@ -47,7 +47,7 @@ func TestEmojiService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/emoji/emojis.json")
+	blob, err := readFileContents("../testdata/emoji/emojis.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/test/emojis/all", func(w http.ResponseWriter, r *http.Request) {
@@ -122,7 +122,7 @@ func TestEmojiService_Upload(t *testing.T) {
 
 	uploadURL := u.Host + "/api/emoji_upload"
 
-	blob, err := readFileContents("testdata/emoji/lease.json")
+	blob, err := readFileContents("../testdata/emoji/lease.json")
 	require.NoError(t, err)
 	blob = fmt.Sprintf(blob, uploadURL)
 

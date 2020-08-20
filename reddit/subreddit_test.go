@@ -293,7 +293,7 @@ func TestSubredditService_HotPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/posts.json")
+	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/hot", func(w http.ResponseWriter, r *http.Request) {
@@ -310,7 +310,7 @@ func TestSubredditService_NewPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/posts.json")
+	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/new", func(w http.ResponseWriter, r *http.Request) {
@@ -327,7 +327,7 @@ func TestSubredditService_RisingPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/posts.json")
+	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/rising", func(w http.ResponseWriter, r *http.Request) {
@@ -344,7 +344,7 @@ func TestSubredditService_ControversialPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/posts.json")
+	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/controversial", func(w http.ResponseWriter, r *http.Request) {
@@ -361,7 +361,7 @@ func TestSubredditService_TopPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/posts.json")
+	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/top", func(w http.ResponseWriter, r *http.Request) {
@@ -378,7 +378,7 @@ func TestSubredditService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/about.json")
+	blob, err := readFileContents("../testdata/subreddit/about.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/golang/about", func(w http.ResponseWriter, r *http.Request) {
@@ -398,7 +398,7 @@ func TestSubredditService_Popular(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/list.json")
+	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/popular", func(w http.ResponseWriter, r *http.Request) {
@@ -415,7 +415,7 @@ func TestSubredditService_New(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/list.json")
+	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/new", func(w http.ResponseWriter, r *http.Request) {
@@ -432,7 +432,7 @@ func TestSubredditService_Gold(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/list.json")
+	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/gold", func(w http.ResponseWriter, r *http.Request) {
@@ -449,7 +449,7 @@ func TestSubredditService_Default(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/list.json")
+	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/default", func(w http.ResponseWriter, r *http.Request) {
@@ -466,7 +466,7 @@ func TestSubredditService_Subscribed(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/list.json")
+	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/mine/subscriber", func(w http.ResponseWriter, r *http.Request) {
@@ -483,7 +483,7 @@ func TestSubredditService_Approved(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/list.json")
+	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/mine/contributor", func(w http.ResponseWriter, r *http.Request) {
@@ -500,7 +500,7 @@ func TestSubredditService_Moderated(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/list.json")
+	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/mine/moderator", func(w http.ResponseWriter, r *http.Request) {
@@ -517,7 +517,7 @@ func TestSubredditService_GetSticky1(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/post.json")
+	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/sticky", func(w http.ResponseWriter, r *http.Request) {
@@ -539,7 +539,7 @@ func TestSubredditService_GetSticky2(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/post/post.json")
+	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/sticky", func(w http.ResponseWriter, r *http.Request) {
@@ -683,7 +683,7 @@ func TestSubredditService_Search(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/list.json")
+	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/subreddits/search", func(w http.ResponseWriter, r *http.Request) {
@@ -715,7 +715,7 @@ func TestSubredditService_SearchNames(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/search-names.json")
+	blob, err := readFileContents("../testdata/subreddit/search-names.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/search_reddit_names", func(w http.ResponseWriter, r *http.Request) {
@@ -740,7 +740,7 @@ func TestSubredditService_SearchPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/search-posts.json")
+	blob, err := readFileContents("../testdata/subreddit/search-posts.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/all/search", func(w http.ResponseWriter, r *http.Request) {
@@ -765,7 +765,7 @@ func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/search-posts.json")
+	blob, err := readFileContents("../testdata/subreddit/search-posts.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/search", func(w http.ResponseWriter, r *http.Request) {
@@ -791,7 +791,7 @@ func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/search-posts.json")
+	blob, err := readFileContents("../testdata/subreddit/search-posts.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test+golang+nba/search", func(w http.ResponseWriter, r *http.Request) {
@@ -817,7 +817,7 @@ func TestSubredditService_Random(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/random.json")
+	blob, err := readFileContents("../testdata/subreddit/random.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/random", func(w http.ResponseWriter, r *http.Request) {
@@ -840,7 +840,7 @@ func TestSubredditService_RandomNSFW(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/random.json")
+	blob, err := readFileContents("../testdata/subreddit/random.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/randnsfw", func(w http.ResponseWriter, r *http.Request) {
@@ -880,7 +880,7 @@ func TestSubredditService_Banned(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/banned-users.json")
+	blob, err := readFileContents("../testdata/subreddit/banned-users.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/banned", func(w http.ResponseWriter, r *http.Request) {
@@ -906,7 +906,7 @@ func TestSubredditService_Muted(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/relationships.json")
+	blob, err := readFileContents("../testdata/subreddit/relationships.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/muted", func(w http.ResponseWriter, r *http.Request) {
@@ -932,7 +932,7 @@ func TestSubredditService_WikiBanned(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/banned-users.json")
+	blob, err := readFileContents("../testdata/subreddit/banned-users.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/wikibanned", func(w http.ResponseWriter, r *http.Request) {
@@ -958,7 +958,7 @@ func TestSubredditService_Contributors(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/relationships.json")
+	blob, err := readFileContents("../testdata/subreddit/relationships.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/contributors", func(w http.ResponseWriter, r *http.Request) {
@@ -983,7 +983,7 @@ func TestSubredditService_WikiContributors(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/relationships.json")
+	blob, err := readFileContents("../testdata/subreddit/relationships.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/wikicontributors", func(w http.ResponseWriter, r *http.Request) {
@@ -1008,7 +1008,7 @@ func TestSubredditService_Moderators(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/subreddit/moderators.json")
+	blob, err := readFileContents("../testdata/subreddit/moderators.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/test/about/moderators", func(w http.ResponseWriter, r *http.Request) {

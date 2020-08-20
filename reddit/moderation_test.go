@@ -53,7 +53,7 @@ func TestModerationService_GetActions(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/moderation/actions.json")
+	blob, err := readFileContents("../testdata/moderation/actions.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/about/log", func(w http.ResponseWriter, r *http.Request) {
@@ -79,7 +79,7 @@ func TestModerationService_AcceptInvite(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/moderation/actions.json")
+	blob, err := readFileContents("../testdata/moderation/actions.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/api/accept_moderator_invite", func(w http.ResponseWriter, r *http.Request) {
@@ -201,7 +201,7 @@ func TestModerationService_Edited(t *testing.T) {
 	defer teardown()
 
 	// contains posts and comments
-	blob, err := readFileContents("testdata/user/overview.json")
+	blob, err := readFileContents("../testdata/user/overview.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/r/testsubreddit/about/edited", func(w http.ResponseWriter, r *http.Request) {

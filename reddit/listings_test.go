@@ -141,7 +141,7 @@ func TestListingsService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/listings/posts-comments-subreddits.json")
+	blob, err := readFileContents("../testdata/listings/posts-comments-subreddits.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/info", func(w http.ResponseWriter, r *http.Request) {
@@ -168,7 +168,7 @@ func TestListingsService_GetPosts(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/listings/posts.json")
+	blob, err := readFileContents("../testdata/listings/posts.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/by_id/t3_i2gvg4,t3_i2gwgz", func(w http.ResponseWriter, r *http.Request) {

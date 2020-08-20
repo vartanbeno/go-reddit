@@ -47,7 +47,7 @@ func TestMultiService_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/multi/multi.json")
+	blob, err := readFileContents("../testdata/multi/multi.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti", func(w http.ResponseWriter, r *http.Request) {
@@ -64,7 +64,7 @@ func TestMultiService_Mine(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/multi/multis.json")
+	blob, err := readFileContents("../testdata/multi/multis.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/mine", func(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +81,7 @@ func TestMultiService_Of(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/multi/multis.json")
+	blob, err := readFileContents("../testdata/multi/multis.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/test", func(w http.ResponseWriter, r *http.Request) {
@@ -98,7 +98,7 @@ func TestMultiService_Copy(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/multi/multi.json")
+	blob, err := readFileContents("../testdata/multi/multi.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/copy", func(w http.ResponseWriter, r *http.Request) {
@@ -134,7 +134,7 @@ func TestMultiService_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/multi/multi.json")
+	blob, err := readFileContents("../testdata/multi/multi.json")
 	require.NoError(t, err)
 
 	createRequest := &MultiCreateOrUpdateRequest{
@@ -172,7 +172,7 @@ func TestMultiService_Update(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/multi/multi.json")
+	blob, err := readFileContents("../testdata/multi/multi.json")
 	require.NoError(t, err)
 
 	updateRequest := &MultiCreateOrUpdateRequest{
@@ -221,7 +221,7 @@ func TestMultiService_GetDescription(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/multi/description.json")
+	blob, err := readFileContents("../testdata/multi/description.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/description", func(w http.ResponseWriter, r *http.Request) {
@@ -238,7 +238,7 @@ func TestMultiService_UpdateDescription(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/multi/description.json")
+	blob, err := readFileContents("../testdata/multi/description.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/description", func(w http.ResponseWriter, r *http.Request) {

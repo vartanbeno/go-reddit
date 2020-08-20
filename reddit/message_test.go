@@ -227,7 +227,7 @@ func TestMessageService_Inbox(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/message/inbox.json")
+	blob, err := readFileContents("../testdata/message/inbox.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/message/inbox", func(w http.ResponseWriter, r *http.Request) {
@@ -245,7 +245,7 @@ func TestMessageService_InboxUnread(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/message/inbox.json")
+	blob, err := readFileContents("../testdata/message/inbox.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/message/unread", func(w http.ResponseWriter, r *http.Request) {
@@ -263,7 +263,7 @@ func TestMessageService_Sent(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/message/inbox.json")
+	blob, err := readFileContents("../testdata/message/inbox.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/message/sent", func(w http.ResponseWriter, r *http.Request) {

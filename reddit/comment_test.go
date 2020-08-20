@@ -42,7 +42,7 @@ func TestCommentService_Submit(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/comment/submit-or-edit.json")
+	blob, err := readFileContents("../testdata/comment/submit-or-edit.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/comment", func(w http.ResponseWriter, r *http.Request) {
@@ -70,7 +70,7 @@ func TestCommentService_Edit(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/comment/submit-or-edit.json")
+	blob, err := readFileContents("../testdata/comment/submit-or-edit.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/editusertext", func(w http.ResponseWriter, r *http.Request) {
@@ -306,7 +306,7 @@ func TestCommentService_LoadMoreReplies(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/comment/more.json")
+	blob, err := readFileContents("../testdata/comment/more.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/morechildren", func(w http.ResponseWriter, r *http.Request) {

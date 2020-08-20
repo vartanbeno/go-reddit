@@ -126,7 +126,7 @@ func TestAccountService_Info(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/account/info.json")
+	blob, err := readFileContents("../testdata/account/info.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me", func(w http.ResponseWriter, r *http.Request) {
@@ -143,7 +143,7 @@ func TestAccountService_Karma(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/account/karma.json")
+	blob, err := readFileContents("../testdata/account/karma.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/karma", func(w http.ResponseWriter, r *http.Request) {
@@ -160,7 +160,7 @@ func TestAccountService_Settings(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/account/settings.json")
+	blob, err := readFileContents("../testdata/account/settings.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/prefs", func(w http.ResponseWriter, r *http.Request) {
@@ -177,7 +177,7 @@ func TestAccountService_UpdateSettings(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/account/settings.json")
+	blob, err := readFileContents("../testdata/account/settings.json")
 	require.NoError(t, err)
 
 	expectedSettingsBody := &Settings{NumberOfPosts: Int(10), MinimumCommentScore: Int(5), Compress: Bool(true)}
@@ -202,7 +202,7 @@ func TestAccountService_Trophies(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/account/trophies.json")
+	blob, err := readFileContents("../testdata/account/trophies.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/api/v1/me/trophies", func(w http.ResponseWriter, r *http.Request) {
@@ -219,7 +219,7 @@ func TestAccountService_Friends(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/account/friends.json")
+	blob, err := readFileContents("../testdata/account/friends.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/prefs/friends", func(w http.ResponseWriter, r *http.Request) {
@@ -236,7 +236,7 @@ func TestAccountService_Blocked(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/account/blocked.json")
+	blob, err := readFileContents("../testdata/account/blocked.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/prefs/blocked", func(w http.ResponseWriter, r *http.Request) {
@@ -253,7 +253,7 @@ func TestAccountService_Messaging(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/account/messaging.json")
+	blob, err := readFileContents("../testdata/account/messaging.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/prefs/messaging", func(w http.ResponseWriter, r *http.Request) {
@@ -271,7 +271,7 @@ func TestAccountService_Trusted(t *testing.T) {
 	setup()
 	defer teardown()
 
-	blob, err := readFileContents("testdata/account/trusted.json")
+	blob, err := readFileContents("../testdata/account/trusted.json")
 	require.NoError(t, err)
 
 	mux.HandleFunc("/prefs/trusted", func(w http.ResponseWriter, r *http.Request) {
