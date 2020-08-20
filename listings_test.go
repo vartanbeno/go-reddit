@@ -81,6 +81,7 @@ var expectedListingSubreddits = []*Subreddit{
 		Type:         "public",
 
 		Subscribers: 8202,
+		Subscribed:  true,
 	},
 }
 

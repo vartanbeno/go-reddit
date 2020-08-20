@@ -285,6 +285,7 @@ type Subreddit struct {
 	ActiveUserCount *int `json:"active_user_count,omitempty"`
 	NSFW            bool `json:"over18"`
 	UserIsMod       bool `json:"user_is_moderator"`
+	Subscribed      bool `json:"user_is_subscriber"`
 	Favorite        bool `json:"user_has_favorited"`
 }
 

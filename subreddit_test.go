@@ -81,6 +81,7 @@ var expectedSubreddit = &Subreddit{
 	ActiveUserCount: Int(386),
 	NSFW:            false,
 	UserIsMod:       false,
+	Subscribed:      true,
 }
 
 var expectedSubreddits = &Subreddits{
@@ -101,6 +102,7 @@ var expectedSubreddits = &Subreddits{
 			Subscribers: 15336,
 			NSFW:        false,
 			UserIsMod:   false,
+			Subscribed:  true,
 			Favorite:    false,
 		},
 		{
@@ -118,6 +120,7 @@ var expectedSubreddits = &Subreddits{
 			Subscribers: 28449174,
 			NSFW:        false,
 			UserIsMod:   false,
+			Subscribed:  true,
 			Favorite:    true,
 		},
 		{
@@ -135,6 +138,7 @@ var expectedSubreddits = &Subreddits{
 			Subscribers: 24987753,
 			NSFW:        false,
 			UserIsMod:   false,
+			Subscribed:  false,
 			Favorite:    false,
 		},
 	},
