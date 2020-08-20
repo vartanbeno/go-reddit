@@ -96,6 +96,7 @@ type Client struct {
 	Comment    *CommentService
 	Emoji      *EmojiService
 	Flair      *FlairService
+	Gold       *GoldService
 	Listings   *ListingsService
 	Message    *MessageService
 	Moderation *ModerationService
@@ -145,6 +146,7 @@ func newClient(httpClient *http.Client) *Client {
 	c.Collection = &CollectionService{client: c}
 	c.Emoji = &EmojiService{client: c}
 	c.Flair = &FlairService{client: c}
+	c.Gold = &GoldService{client: c}
 	c.Listings = &ListingsService{client: c}
 	c.Message = &MessageService{client: c}
 	c.Moderation = &ModerationService{client: c}
