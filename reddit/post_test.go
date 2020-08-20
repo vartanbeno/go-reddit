@@ -1152,3 +1152,24 @@ func TestPostService_MarkVisited(t *testing.T) {
 	_, err = client.Post.MarkVisited(ctx, "t3_test1", "t3_test2", "t3_test3")
 	require.NoError(t, err)
 }
+
+func TestPostService_Report(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/report", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("thing_id", "t3_test")
+		form.Set("reason", "test reason")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Post.Report(ctx, "t3_test", "test reason")
+	require.NoError(t, err)
+}

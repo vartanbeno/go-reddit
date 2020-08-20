@@ -162,3 +162,21 @@ func (s *postAndCommentService) Downvote(ctx context.Context, id string) (*Respo
 func (s *postAndCommentService) RemoveVote(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, novote)
 }
+
+// Report reports a post or comment.
+// The reason must not be longer than 100 characters.
+func (s *postAndCommentService) Report(ctx context.Context, id string, reason string) (*Response, error) {
+	path := "api/report"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("thing_id", id)
+	form.Set("reason", reason)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}

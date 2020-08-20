@@ -222,3 +222,41 @@ func TestModerationService_Edited(t *testing.T) {
 	require.Equal(t, "t1_f0zsa37", comments.After)
 	require.Equal(t, "", comments.Before)
 }
+
+func TestModerationService_IgnoreReports(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/ignore_reports", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("id", "t3_test")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.IgnoreReports(ctx, "t3_test")
+	require.NoError(t, err)
+}
+
+func TestModerationService_UnignoreReports(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/unignore_reports", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("id", "t3_test")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.UnignoreReports(ctx, "t3_test")
+	require.NoError(t, err)
+}

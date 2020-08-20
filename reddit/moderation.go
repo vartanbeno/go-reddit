@@ -180,3 +180,33 @@ func (s *ModerationService) Edited(ctx context.Context, subreddit string, opts *
 
 	return root.getPosts(), root.getComments(), resp, nil
 }
+
+// IgnoreReports prevents reports on a post or comment from causing notifications.
+func (s *ModerationService) IgnoreReports(ctx context.Context, id string) (*Response, error) {
+	path := "api/ignore_reports"
+
+	form := url.Values{}
+	form.Set("id", id)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// UnignoreReports allows reports on a post or comment to cause notifications.
+func (s *ModerationService) UnignoreReports(ctx context.Context, id string) (*Response, error) {
+	path := "api/unignore_reports"
+
+	form := url.Values{}
+	form.Set("id", id)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}

@@ -347,3 +347,24 @@ func TestCommentService_LoadMoreReplies(t *testing.T) {
 	require.Len(t, comment.Replies.Comments, 2)
 	require.Len(t, comment.Replies.Comments[0].Replies.Comments, 1)
 }
+
+func TestCommentService_Report(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/report", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("thing_id", "t1_test")
+		form.Set("reason", "test reason")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Comment.Report(ctx, "t1_test", "test reason")
+	require.NoError(t, err)
+}
