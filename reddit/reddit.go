@@ -253,17 +253,13 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	if c.onRequestCompleted != nil {
 		c.onRequestCompleted(req, resp)
 	}
 
 	response := newResponse(resp)
-	defer func() {
-		if rerr := response.Body.Close(); err == nil {
-			err = rerr
-		}
-	}()
 
 	err = CheckResponse(resp)
 	if err != nil {
@@ -284,7 +280,7 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 		}
 	}
 
-	return response, err
+	return response, nil
 }
 
 // id returns the client's Reddit ID.

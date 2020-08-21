@@ -91,6 +91,8 @@ func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit 
 // HotPosts returns the hottest posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
+// To search through all, just specify "all".
+// To search through all and filter out subreddits, provide "all-name1-name2".
 // Note: when looking for hot posts in a subreddit, it will include the stickied
 // posts (if any) PLUS posts from the limit parameter (25 by default).
 func (s *SubredditService) HotPosts(ctx context.Context, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
@@ -100,6 +102,8 @@ func (s *SubredditService) HotPosts(ctx context.Context, subreddit string, opts 
 // NewPosts returns the newest posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
+// To search through all, just specify "all".
+// To search through all and filter out subreddits, provide "all-name1-name2".
 func (s *SubredditService) NewPosts(ctx context.Context, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "new", subreddit, opts)
 }
@@ -107,6 +111,8 @@ func (s *SubredditService) NewPosts(ctx context.Context, subreddit string, opts 
 // RisingPosts returns the rising posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
+// To search through all, just specify "all".
+// To search through all and filter out subreddits, provide "all-name1-name2".
 func (s *SubredditService) RisingPosts(ctx context.Context, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "rising", subreddit, opts)
 }
@@ -114,6 +120,8 @@ func (s *SubredditService) RisingPosts(ctx context.Context, subreddit string, op
 // ControversialPosts returns the most controversial posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
+// To search through all, just specify "all".
+// To search through all and filter out subreddits, provide "all-name1-name2".
 func (s *SubredditService) ControversialPosts(ctx context.Context, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "controversial", subreddit, opts)
 }
@@ -121,6 +129,8 @@ func (s *SubredditService) ControversialPosts(ctx context.Context, subreddit str
 // TopPosts returns the top posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
+// To search through all, just specify "all".
+// To search through all and filter out subreddits, provide "all-name1-name2".
 func (s *SubredditService) TopPosts(ctx context.Context, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "top", subreddit, opts)
 }

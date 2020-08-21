@@ -16,19 +16,19 @@ type Opt func(*Client) error
 // GO_REDDIT_CLIENT_USERNAME to set the client's username.
 // GO_REDDIT_CLIENT_PASSWORD to set the client's password.
 func FromEnv(c *Client) error {
-	if v, ok := os.LookupEnv("GO_REDDIT_CLIENT_ID"); ok {
+	if v := os.Getenv("GO_REDDIT_CLIENT_ID"); v != "" {
 		c.ID = v
 	}
 
-	if v, ok := os.LookupEnv("GO_REDDIT_CLIENT_SECRET"); ok {
+	if v := os.Getenv("GO_REDDIT_CLIENT_SECRET"); v != "" {
 		c.Secret = v
 	}
 
-	if v, ok := os.LookupEnv("GO_REDDIT_CLIENT_USERNAME"); ok {
+	if v := os.Getenv("GO_REDDIT_CLIENT_USERNAME"); v != "" {
 		c.Username = v
 	}
 
-	if v, ok := os.LookupEnv("GO_REDDIT_CLIENT_PASSWORD"); ok {
+	if v := os.Getenv("GO_REDDIT_CLIENT_PASSWORD"); v != "" {
 		c.Password = v
 	}
 

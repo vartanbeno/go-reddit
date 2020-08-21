@@ -11,7 +11,7 @@ import (
 // GoldService handles communication with the gold
 // related methods of the Reddit API.
 //
-// Reddit API docs: https://www.reddit.com/dev/api/#section_collections
+// Reddit API docs: https://www.reddit.com/dev/api/#section_gold
 type GoldService struct {
 	client *Client
 }
