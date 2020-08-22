@@ -63,7 +63,8 @@ type Bans struct {
 	Before string `json:"before"`
 }
 
-func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
+// todo: interface{}, seriously?
+func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit string, opts interface{}) (*Posts, *Response, error) {
 	path := sort
 	if subreddit != "" {
 		path = fmt.Sprintf("r/%s/%s", subreddit, sort)
@@ -95,7 +96,7 @@ func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit 
 // To search through all and filter out subreddits, provide "all-name1-name2".
 // Note: when looking for hot posts in a subreddit, it will include the stickied
 // posts (if any) PLUS posts from the limit parameter (25 by default).
-func (s *SubredditService) HotPosts(ctx context.Context, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
+func (s *SubredditService) HotPosts(ctx context.Context, subreddit string, opts *ListOptions) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "hot", subreddit, opts)
 }
 
@@ -104,7 +105,7 @@ func (s *SubredditService) HotPosts(ctx context.Context, subreddit string, opts 
 // If none are defined, it returns the ones from your subscribed subreddits.
 // To search through all, just specify "all".
 // To search through all and filter out subreddits, provide "all-name1-name2".
-func (s *SubredditService) NewPosts(ctx context.Context, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
+func (s *SubredditService) NewPosts(ctx context.Context, subreddit string, opts *ListOptions) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "new", subreddit, opts)
 }
 
@@ -113,7 +114,7 @@ func (s *SubredditService) NewPosts(ctx context.Context, subreddit string, opts 
 // If none are defined, it returns the ones from your subscribed subreddits.
 // To search through all, just specify "all".
 // To search through all and filter out subreddits, provide "all-name1-name2".
-func (s *SubredditService) RisingPosts(ctx context.Context, subreddit string, opts *ListPostOptions) (*Posts, *Response, error) {
+func (s *SubredditService) RisingPosts(ctx context.Context, subreddit string, opts *ListOptions) (*Posts, *Response, error) {
 	return s.getPosts(ctx, "rising", subreddit, opts)
 }
 

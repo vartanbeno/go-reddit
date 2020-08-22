@@ -102,6 +102,7 @@ type Client struct {
 	Moderation *ModerationService
 	Multi      *MultiService
 	Post       *PostService
+	Stream     *StreamService
 	Subreddit  *SubredditService
 	User       *UserService
 
@@ -151,6 +152,7 @@ func newClient(httpClient *http.Client) *Client {
 	c.Message = &MessageService{client: c}
 	c.Moderation = &ModerationService{client: c}
 	c.Multi = &MultiService{client: c}
+	c.Stream = &StreamService{client: c}
 	c.Subreddit = &SubredditService{client: c}
 	c.User = &UserService{client: c}
 
