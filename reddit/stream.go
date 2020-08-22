@@ -18,20 +18,48 @@ type StreamService struct {
 //   - a function that the client can call once to stop the streaming and close the channels
 // Because of the 100 post limit imposed by Reddit when fetching posts, some high-traffic
 // streams might drop submissions between API requests, such as when streaming r/all.
-func (s *StreamService) Posts(subreddit string) (<-chan *Post, <-chan error, func()) {
+func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post, <-chan error, func()) {
+	streamConfig := &streamConfig{
+		Interval:       defaultStreamInterval,
+		DiscardInitial: false,
+		MaxRequests:    0,
+	}
+	for _, opt := range opts {
+		opt(streamConfig)
+	}
+
+	ticker := time.NewTicker(streamConfig.Interval)
 	posts := make(chan *Post)
 	errs := make(chan error)
-	ticker := time.NewTicker(time.Second * 5)
+
+	var once sync.Once
+	stop := func() {
+		once.Do(func() {
+			ticker.Stop()
+			close(posts)
+			close(errs)
+		})
+	}
 
 	// originally used the "before" parameter, but if that post gets deleted, subsequent requests
 	// would just return empty listings; easier to just keep track of all post ids encountered
 	ids := set{}
 
 	go func() {
+		defer stop()
+
+		var n int
+		infinite := streamConfig.MaxRequests == 0
+
 		for ; ; <-ticker.C {
+			n++
+
 			result, err := s.getPosts(subreddit)
 			if err != nil {
 				errs <- err
+				if !infinite && n >= streamConfig.MaxRequests {
+					break
+				}
 				continue
 			}
 
@@ -43,34 +71,28 @@ func (s *StreamService) Posts(subreddit string) (<-chan *Post, <-chan error, fun
 				if ids.Exists(id) {
 					break
 				}
-
 				ids.Add(id)
+
+				if streamConfig.DiscardInitial {
+					streamConfig.DiscardInitial = false
+					break
+				}
+
 				posts <- post
+			}
+
+			if !infinite && n >= streamConfig.MaxRequests {
+				break
 			}
 		}
 	}()
 
-	var once sync.Once
-	return posts, errs, func() {
-		once.Do(func() {
-			ticker.Stop()
-			close(posts)
-			close(errs)
-		})
-	}
+	return posts, errs, stop
 }
 
 func (s *StreamService) getPosts(subreddit string) (*Posts, error) {
-	opts := &ListOptions{
-		Limit: 100,
-	}
-
-	result, _, err := s.client.Subreddit.NewPosts(context.Background(), subreddit, opts)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	result, _, err := s.client.Subreddit.NewPosts(context.Background(), subreddit, &ListOptions{Limit: 100})
+	return result, err
 }
 
 type set map[string]struct{}
