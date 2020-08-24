@@ -39,7 +39,7 @@ var expectedCommentSubmitOrEdit = &Comment{
 }
 
 func TestCommentService_Submit(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/comment/submit-or-edit.json")
@@ -67,7 +67,7 @@ func TestCommentService_Submit(t *testing.T) {
 }
 
 func TestCommentService_Edit(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/comment/submit-or-edit.json")
@@ -95,7 +95,7 @@ func TestCommentService_Edit(t *testing.T) {
 }
 
 func TestCommentService_Delete(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/del", func(w http.ResponseWriter, r *http.Request) {
@@ -115,7 +115,7 @@ func TestCommentService_Delete(t *testing.T) {
 }
 
 func TestCommentService_Save(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/save", func(w http.ResponseWriter, r *http.Request) {
@@ -135,7 +135,7 @@ func TestCommentService_Save(t *testing.T) {
 }
 
 func TestCommentService_Unsave(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/unsave", func(w http.ResponseWriter, r *http.Request) {
@@ -155,7 +155,7 @@ func TestCommentService_Unsave(t *testing.T) {
 }
 
 func TestCommentService_EnableReplies(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
@@ -176,7 +176,7 @@ func TestCommentService_EnableReplies(t *testing.T) {
 }
 
 func TestCommentService_DisableReplies(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
@@ -197,7 +197,7 @@ func TestCommentService_DisableReplies(t *testing.T) {
 }
 
 func TestCommentService_Lock(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/lock", func(w http.ResponseWriter, r *http.Request) {
@@ -217,7 +217,7 @@ func TestCommentService_Lock(t *testing.T) {
 }
 
 func TestCommentService_Unlock(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/unlock", func(w http.ResponseWriter, r *http.Request) {
@@ -237,7 +237,7 @@ func TestCommentService_Unlock(t *testing.T) {
 }
 
 func TestCommentService_Upvote(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
@@ -259,7 +259,7 @@ func TestCommentService_Upvote(t *testing.T) {
 }
 
 func TestCommentService_Downvote(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
@@ -281,7 +281,7 @@ func TestCommentService_Downvote(t *testing.T) {
 }
 
 func TestCommentService_RemoveVote(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
@@ -303,7 +303,7 @@ func TestCommentService_RemoveVote(t *testing.T) {
 }
 
 func TestCommentService_LoadMoreReplies(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/comment/more.json")
@@ -349,7 +349,7 @@ func TestCommentService_LoadMoreReplies(t *testing.T) {
 }
 
 func TestCommentService_Report(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/report", func(w http.ResponseWriter, r *http.Request) {

@@ -10,7 +10,7 @@ import (
 )
 
 func TestStreamService_Posts(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	var counter int
@@ -162,7 +162,7 @@ loop:
 }
 
 func TestStreamService_Posts_DiscardInitial(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	var counter int

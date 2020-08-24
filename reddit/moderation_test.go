@@ -50,7 +50,7 @@ var expectedModActions = &ModActions{
 }
 
 func TestModerationService_GetActions(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/moderation/actions.json")
@@ -76,7 +76,7 @@ func TestModerationService_GetActions(t *testing.T) {
 }
 
 func TestModerationService_AcceptInvite(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/moderation/actions.json")
@@ -100,7 +100,7 @@ func TestModerationService_AcceptInvite(t *testing.T) {
 }
 
 func TestModerationService_Approve(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/approve", func(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +119,7 @@ func TestModerationService_Approve(t *testing.T) {
 }
 
 func TestModerationService_Remove(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/remove", func(w http.ResponseWriter, r *http.Request) {
@@ -139,7 +139,7 @@ func TestModerationService_Remove(t *testing.T) {
 }
 
 func TestModerationService_RemoveSpam(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/remove", func(w http.ResponseWriter, r *http.Request) {
@@ -159,7 +159,7 @@ func TestModerationService_RemoveSpam(t *testing.T) {
 }
 
 func TestModerationService_Leave(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/leavemoderator", func(w http.ResponseWriter, r *http.Request) {
@@ -178,7 +178,7 @@ func TestModerationService_Leave(t *testing.T) {
 }
 
 func TestModerationService_LeaveContributor(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/leavecontributor", func(w http.ResponseWriter, r *http.Request) {
@@ -197,7 +197,7 @@ func TestModerationService_LeaveContributor(t *testing.T) {
 }
 
 func TestModerationService_Edited(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	// contains posts and comments
@@ -224,7 +224,7 @@ func TestModerationService_Edited(t *testing.T) {
 }
 
 func TestModerationService_IgnoreReports(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/ignore_reports", func(w http.ResponseWriter, r *http.Request) {
@@ -243,7 +243,7 @@ func TestModerationService_IgnoreReports(t *testing.T) {
 }
 
 func TestModerationService_UnignoreReports(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/unignore_reports", func(w http.ResponseWriter, r *http.Request) {

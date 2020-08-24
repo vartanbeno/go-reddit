@@ -53,7 +53,7 @@ var expectedMessages = &Messages{
 }
 
 func TestMessageService_ReadAll(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/read_all_messages", func(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +67,7 @@ func TestMessageService_ReadAll(t *testing.T) {
 }
 
 func TestMessageService_Read(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/read_message", func(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +89,7 @@ func TestMessageService_Read(t *testing.T) {
 }
 
 func TestMessageService_Unread(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/unread_message", func(w http.ResponseWriter, r *http.Request) {
@@ -111,7 +111,7 @@ func TestMessageService_Unread(t *testing.T) {
 }
 
 func TestMessageService_Block(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/block", func(w http.ResponseWriter, r *http.Request) {
@@ -130,7 +130,7 @@ func TestMessageService_Block(t *testing.T) {
 }
 
 func TestMessageService_Collapse(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/collapse_message", func(w http.ResponseWriter, r *http.Request) {
@@ -152,7 +152,7 @@ func TestMessageService_Collapse(t *testing.T) {
 }
 
 func TestMessageService_Uncollapse(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/uncollapse_message", func(w http.ResponseWriter, r *http.Request) {
@@ -174,7 +174,7 @@ func TestMessageService_Uncollapse(t *testing.T) {
 }
 
 func TestMessageService_Delete(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/del_msg", func(w http.ResponseWriter, r *http.Request) {
@@ -193,7 +193,7 @@ func TestMessageService_Delete(t *testing.T) {
 }
 
 func TestMessageService_Send(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/compose", func(w http.ResponseWriter, r *http.Request) {
@@ -224,7 +224,7 @@ func TestMessageService_Send(t *testing.T) {
 }
 
 func TestMessageService_Inbox(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/message/inbox.json")
@@ -242,7 +242,7 @@ func TestMessageService_Inbox(t *testing.T) {
 }
 
 func TestMessageService_InboxUnread(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/message/inbox.json")
@@ -260,7 +260,7 @@ func TestMessageService_InboxUnread(t *testing.T) {
 }
 
 func TestMessageService_Sent(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/message/inbox.json")

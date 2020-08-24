@@ -290,7 +290,7 @@ var expectedModerators = []*Moderator{
 }
 
 func TestSubredditService_HotPosts(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
@@ -307,7 +307,7 @@ func TestSubredditService_HotPosts(t *testing.T) {
 }
 
 func TestSubredditService_NewPosts(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
@@ -324,7 +324,7 @@ func TestSubredditService_NewPosts(t *testing.T) {
 }
 
 func TestSubredditService_RisingPosts(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
@@ -341,7 +341,7 @@ func TestSubredditService_RisingPosts(t *testing.T) {
 }
 
 func TestSubredditService_ControversialPosts(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
@@ -358,7 +358,7 @@ func TestSubredditService_ControversialPosts(t *testing.T) {
 }
 
 func TestSubredditService_TopPosts(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
@@ -375,7 +375,7 @@ func TestSubredditService_TopPosts(t *testing.T) {
 }
 
 func TestSubredditService_Get(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/about.json")
@@ -395,7 +395,7 @@ func TestSubredditService_Get(t *testing.T) {
 }
 
 func TestSubredditService_Popular(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
@@ -412,7 +412,7 @@ func TestSubredditService_Popular(t *testing.T) {
 }
 
 func TestSubredditService_New(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
@@ -429,7 +429,7 @@ func TestSubredditService_New(t *testing.T) {
 }
 
 func TestSubredditService_Gold(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
@@ -446,7 +446,7 @@ func TestSubredditService_Gold(t *testing.T) {
 }
 
 func TestSubredditService_Default(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
@@ -463,7 +463,7 @@ func TestSubredditService_Default(t *testing.T) {
 }
 
 func TestSubredditService_Subscribed(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
@@ -480,7 +480,7 @@ func TestSubredditService_Subscribed(t *testing.T) {
 }
 
 func TestSubredditService_Approved(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
@@ -497,7 +497,7 @@ func TestSubredditService_Approved(t *testing.T) {
 }
 
 func TestSubredditService_Moderated(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
@@ -514,7 +514,7 @@ func TestSubredditService_Moderated(t *testing.T) {
 }
 
 func TestSubredditService_GetSticky1(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/post.json")
@@ -536,7 +536,7 @@ func TestSubredditService_GetSticky1(t *testing.T) {
 }
 
 func TestSubredditService_GetSticky2(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/post.json")
@@ -558,7 +558,7 @@ func TestSubredditService_GetSticky2(t *testing.T) {
 }
 
 func TestSubredditService_Subscribe(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
@@ -578,7 +578,7 @@ func TestSubredditService_Subscribe(t *testing.T) {
 }
 
 func TestSubredditService_SubscribeByID(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
@@ -598,7 +598,7 @@ func TestSubredditService_SubscribeByID(t *testing.T) {
 }
 
 func TestSubredditService_Unsubscribe(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
@@ -618,7 +618,7 @@ func TestSubredditService_Unsubscribe(t *testing.T) {
 }
 
 func TestSubredditService_UnsubscribeByID(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
@@ -638,7 +638,7 @@ func TestSubredditService_UnsubscribeByID(t *testing.T) {
 }
 
 func TestSubredditService_Favorite(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/favorite", func(w http.ResponseWriter, r *http.Request) {
@@ -659,7 +659,7 @@ func TestSubredditService_Favorite(t *testing.T) {
 }
 
 func TestSubredditService_Unfavorite(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/favorite", func(w http.ResponseWriter, r *http.Request) {
@@ -680,7 +680,7 @@ func TestSubredditService_Unfavorite(t *testing.T) {
 }
 
 func TestSubredditService_Search(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
@@ -712,7 +712,7 @@ func TestSubredditService_Search(t *testing.T) {
 }
 
 func TestSubredditService_SearchNames(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/search-names.json")
@@ -737,7 +737,7 @@ func TestSubredditService_SearchNames(t *testing.T) {
 }
 
 func TestSubredditService_SearchPosts(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/search-posts.json")
@@ -762,7 +762,7 @@ func TestSubredditService_SearchPosts(t *testing.T) {
 }
 
 func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/search-posts.json")
@@ -788,7 +788,7 @@ func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
 }
 
 func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/search-posts.json")
@@ -814,7 +814,7 @@ func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
 }
 
 func TestSubredditService_Random(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/random.json")
@@ -837,7 +837,7 @@ func TestSubredditService_Random(t *testing.T) {
 }
 
 func TestSubredditService_RandomNSFW(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/random.json")
@@ -860,7 +860,7 @@ func TestSubredditService_RandomNSFW(t *testing.T) {
 }
 
 func TestSubredditService_SubmissionText(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/r/test/api/submit_text", func(w http.ResponseWriter, r *http.Request) {
@@ -877,7 +877,7 @@ func TestSubredditService_SubmissionText(t *testing.T) {
 }
 
 func TestSubredditService_Banned(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/banned-users.json")
@@ -903,7 +903,7 @@ func TestSubredditService_Banned(t *testing.T) {
 }
 
 func TestSubredditService_Muted(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/relationships.json")
@@ -929,7 +929,7 @@ func TestSubredditService_Muted(t *testing.T) {
 }
 
 func TestSubredditService_WikiBanned(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/banned-users.json")
@@ -955,7 +955,7 @@ func TestSubredditService_WikiBanned(t *testing.T) {
 }
 
 func TestSubredditService_Contributors(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/relationships.json")
@@ -980,7 +980,7 @@ func TestSubredditService_Contributors(t *testing.T) {
 }
 
 func TestSubredditService_WikiContributors(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/relationships.json")
@@ -1005,7 +1005,7 @@ func TestSubredditService_WikiContributors(t *testing.T) {
 }
 
 func TestSubredditService_Moderators(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/subreddit/moderators.json")

@@ -123,7 +123,7 @@ var expectedRelationships2 = []Relationship{
 }
 
 func TestAccountService_Info(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/account/info.json")
@@ -140,7 +140,7 @@ func TestAccountService_Info(t *testing.T) {
 }
 
 func TestAccountService_Karma(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/account/karma.json")
@@ -157,7 +157,7 @@ func TestAccountService_Karma(t *testing.T) {
 }
 
 func TestAccountService_Settings(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/account/settings.json")
@@ -174,7 +174,7 @@ func TestAccountService_Settings(t *testing.T) {
 }
 
 func TestAccountService_UpdateSettings(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/account/settings.json")
@@ -199,7 +199,7 @@ func TestAccountService_UpdateSettings(t *testing.T) {
 }
 
 func TestAccountService_Trophies(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/account/trophies.json")
@@ -216,7 +216,7 @@ func TestAccountService_Trophies(t *testing.T) {
 }
 
 func TestAccountService_Friends(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/account/friends.json")
@@ -233,7 +233,7 @@ func TestAccountService_Friends(t *testing.T) {
 }
 
 func TestAccountService_Blocked(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/account/blocked.json")
@@ -250,7 +250,7 @@ func TestAccountService_Blocked(t *testing.T) {
 }
 
 func TestAccountService_Messaging(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/account/messaging.json")
@@ -268,7 +268,7 @@ func TestAccountService_Messaging(t *testing.T) {
 }
 
 func TestAccountService_Trusted(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/account/trusted.json")
@@ -285,7 +285,7 @@ func TestAccountService_Trusted(t *testing.T) {
 }
 
 func TestAccountService_AddTrusted(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/add_whitelisted", func(w http.ResponseWriter, r *http.Request) {
@@ -305,7 +305,7 @@ func TestAccountService_AddTrusted(t *testing.T) {
 }
 
 func TestAccountService_RemoveTrusted(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/remove_whitelisted", func(w http.ResponseWriter, r *http.Request) {

@@ -62,7 +62,7 @@ var expectedListUserFlairs = []*FlairSummary{
 }
 
 func TestFlairService_GetUserFlairs(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/flair/user-flairs.json")
@@ -79,7 +79,7 @@ func TestFlairService_GetUserFlairs(t *testing.T) {
 }
 
 func TestFlairService_GetPostFlairs(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/flair/post-flairs.json")
@@ -96,7 +96,7 @@ func TestFlairService_GetPostFlairs(t *testing.T) {
 }
 
 func TestFlairService_ListUserFlairs(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/flair/list-user-flairs.json")

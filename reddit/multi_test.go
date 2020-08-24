@@ -44,7 +44,7 @@ var expectedMulti2 = &Multi{
 }
 
 func TestMultiService_Get(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/multi/multi.json")
@@ -61,7 +61,7 @@ func TestMultiService_Get(t *testing.T) {
 }
 
 func TestMultiService_Mine(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/multi/multis.json")
@@ -78,7 +78,7 @@ func TestMultiService_Mine(t *testing.T) {
 }
 
 func TestMultiService_Of(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/multi/multis.json")
@@ -95,7 +95,7 @@ func TestMultiService_Of(t *testing.T) {
 }
 
 func TestMultiService_Copy(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/multi/multi.json")
@@ -131,7 +131,7 @@ func TestMultiService_Copy(t *testing.T) {
 }
 
 func TestMultiService_Create(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/multi/multi.json")
@@ -169,7 +169,7 @@ func TestMultiService_Create(t *testing.T) {
 }
 
 func TestMultiService_Update(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/multi/multi.json")
@@ -206,7 +206,7 @@ func TestMultiService_Update(t *testing.T) {
 }
 
 func TestMultiService_Delete(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti", func(w http.ResponseWriter, r *http.Request) {
@@ -218,7 +218,7 @@ func TestMultiService_Delete(t *testing.T) {
 }
 
 func TestMultiService_GetDescription(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/multi/description.json")
@@ -235,7 +235,7 @@ func TestMultiService_GetDescription(t *testing.T) {
 }
 
 func TestMultiService_UpdateDescription(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/multi/description.json")
@@ -260,7 +260,7 @@ func TestMultiService_UpdateDescription(t *testing.T) {
 }
 
 func TestMultiService_AddSubreddit(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/r/golang", func(w http.ResponseWriter, r *http.Request) {
@@ -279,7 +279,7 @@ func TestMultiService_AddSubreddit(t *testing.T) {
 }
 
 func TestMultiService_DeleteSubreddit(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/multi/user/testuser/m/testmulti/r/golang", func(w http.ResponseWriter, r *http.Request) {

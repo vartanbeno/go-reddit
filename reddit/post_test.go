@@ -211,7 +211,7 @@ var expectedPostDuplicates = &Posts{
 }
 
 func TestPostService_Get(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/post.json")
@@ -228,7 +228,7 @@ func TestPostService_Get(t *testing.T) {
 }
 
 func TestPostService_Duplicates(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/duplicates.json")
@@ -260,7 +260,7 @@ func TestPostService_Duplicates(t *testing.T) {
 }
 
 func TestPostService_SubmitText(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/submit.json")
@@ -295,7 +295,7 @@ func TestPostService_SubmitText(t *testing.T) {
 }
 
 func TestPostService_SubmitLink(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/submit.json")
@@ -334,7 +334,7 @@ func TestPostService_SubmitLink(t *testing.T) {
 }
 
 func TestPostService_Edit(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/edit.json")
@@ -362,7 +362,7 @@ func TestPostService_Edit(t *testing.T) {
 }
 
 func TestPostService_Hide(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/hide", func(w http.ResponseWriter, r *http.Request) {
@@ -385,7 +385,7 @@ func TestPostService_Hide(t *testing.T) {
 }
 
 func TestPostService_Unhide(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/unhide", func(w http.ResponseWriter, r *http.Request) {
@@ -408,7 +408,7 @@ func TestPostService_Unhide(t *testing.T) {
 }
 
 func TestPostService_MarkNSFW(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/marknsfw", func(w http.ResponseWriter, r *http.Request) {
@@ -428,7 +428,7 @@ func TestPostService_MarkNSFW(t *testing.T) {
 }
 
 func TestPostService_UnmarkNSFW(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/unmarknsfw", func(w http.ResponseWriter, r *http.Request) {
@@ -448,7 +448,7 @@ func TestPostService_UnmarkNSFW(t *testing.T) {
 }
 
 func TestPostService_Spoiler(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/spoiler", func(w http.ResponseWriter, r *http.Request) {
@@ -468,7 +468,7 @@ func TestPostService_Spoiler(t *testing.T) {
 }
 
 func TestPostService_Unspoiler(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/unspoiler", func(w http.ResponseWriter, r *http.Request) {
@@ -488,7 +488,7 @@ func TestPostService_Unspoiler(t *testing.T) {
 }
 
 func TestPostService_Sticky(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_subreddit_sticky", func(w http.ResponseWriter, r *http.Request) {
@@ -511,7 +511,7 @@ func TestPostService_Sticky(t *testing.T) {
 }
 
 func TestPostService_Unsticky(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_subreddit_sticky", func(w http.ResponseWriter, r *http.Request) {
@@ -533,7 +533,7 @@ func TestPostService_Unsticky(t *testing.T) {
 }
 
 func TestPostService_PinToProfile(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_subreddit_sticky", func(w http.ResponseWriter, r *http.Request) {
@@ -556,7 +556,7 @@ func TestPostService_PinToProfile(t *testing.T) {
 }
 
 func TestPostService_UnpinFromProfile(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_subreddit_sticky", func(w http.ResponseWriter, r *http.Request) {
@@ -579,7 +579,7 @@ func TestPostService_UnpinFromProfile(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortBest(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
@@ -601,7 +601,7 @@ func TestPostService_SetSuggestedSortBest(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortTop(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
@@ -623,7 +623,7 @@ func TestPostService_SetSuggestedSortTop(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortNew(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
@@ -645,7 +645,7 @@ func TestPostService_SetSuggestedSortNew(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortControversial(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
@@ -667,7 +667,7 @@ func TestPostService_SetSuggestedSortControversial(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortOld(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
@@ -689,7 +689,7 @@ func TestPostService_SetSuggestedSortOld(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortRandom(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
@@ -711,7 +711,7 @@ func TestPostService_SetSuggestedSortRandom(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortAMA(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
@@ -733,7 +733,7 @@ func TestPostService_SetSuggestedSortAMA(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortLive(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
@@ -755,7 +755,7 @@ func TestPostService_SetSuggestedSortLive(t *testing.T) {
 }
 
 func TestPostService_ClearSuggestedSort(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
@@ -777,7 +777,7 @@ func TestPostService_ClearSuggestedSort(t *testing.T) {
 }
 
 func TestPostService_EnableContestMode(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_contest_mode", func(w http.ResponseWriter, r *http.Request) {
@@ -799,7 +799,7 @@ func TestPostService_EnableContestMode(t *testing.T) {
 }
 
 func TestPostService_DisableContestMode(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/set_contest_mode", func(w http.ResponseWriter, r *http.Request) {
@@ -821,7 +821,7 @@ func TestPostService_DisableContestMode(t *testing.T) {
 }
 
 func TestPostService_LoadMoreReplies(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/more.json")
@@ -873,7 +873,7 @@ func TestPostService_LoadMoreReplies(t *testing.T) {
 }
 
 func TestPostService_RandomFromSubreddits(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/post.json")
@@ -890,7 +890,7 @@ func TestPostService_RandomFromSubreddits(t *testing.T) {
 }
 
 func TestPostService_Random(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/post.json")
@@ -907,7 +907,7 @@ func TestPostService_Random(t *testing.T) {
 }
 
 func TestPostService_RandomFromSubscriptions(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	blob, err := readFileContents("../testdata/post/post.json")
@@ -924,7 +924,7 @@ func TestPostService_RandomFromSubscriptions(t *testing.T) {
 }
 
 func TestPostService_Delete(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/del", func(w http.ResponseWriter, r *http.Request) {
@@ -944,7 +944,7 @@ func TestPostService_Delete(t *testing.T) {
 }
 
 func TestPostService_Save(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/save", func(w http.ResponseWriter, r *http.Request) {
@@ -964,7 +964,7 @@ func TestPostService_Save(t *testing.T) {
 }
 
 func TestPostService_Unsave(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/unsave", func(w http.ResponseWriter, r *http.Request) {
@@ -984,7 +984,7 @@ func TestPostService_Unsave(t *testing.T) {
 }
 
 func TestPostService_EnableReplies(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
@@ -1005,7 +1005,7 @@ func TestPostService_EnableReplies(t *testing.T) {
 }
 
 func TestPostService_DisableReplies(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
@@ -1026,7 +1026,7 @@ func TestPostService_DisableReplies(t *testing.T) {
 }
 
 func TestPostService_Lock(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/lock", func(w http.ResponseWriter, r *http.Request) {
@@ -1046,7 +1046,7 @@ func TestPostService_Lock(t *testing.T) {
 }
 
 func TestPostService_Unlock(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/unlock", func(w http.ResponseWriter, r *http.Request) {
@@ -1066,7 +1066,7 @@ func TestPostService_Unlock(t *testing.T) {
 }
 
 func TestPostService_Upvote(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
@@ -1088,7 +1088,7 @@ func TestPostService_Upvote(t *testing.T) {
 }
 
 func TestPostService_Downvote(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
@@ -1110,7 +1110,7 @@ func TestPostService_Downvote(t *testing.T) {
 }
 
 func TestPostService_RemoveVote(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
@@ -1132,7 +1132,7 @@ func TestPostService_RemoveVote(t *testing.T) {
 }
 
 func TestPostService_MarkVisited(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/store_visits", func(w http.ResponseWriter, r *http.Request) {
@@ -1154,7 +1154,7 @@ func TestPostService_MarkVisited(t *testing.T) {
 }
 
 func TestPostService_Report(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/report", func(w http.ResponseWriter, r *http.Request) {

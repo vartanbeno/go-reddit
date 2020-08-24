@@ -9,7 +9,7 @@ import (
 )
 
 func TestGoldService_Gild(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/v1/gold/gild/t1_test", func(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +21,7 @@ func TestGoldService_Gild(t *testing.T) {
 }
 
 func TestGoldService_Give(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/v1/gold/give/testuser", func(w http.ResponseWriter, r *http.Request) {

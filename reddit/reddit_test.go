@@ -14,39 +14,30 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var (
-	mux    *http.ServeMux
-	ctx    = context.Background()
-	client *Client
-	server *httptest.Server
-)
+var ctx = context.Background()
 
-func setup() {
-	mux = http.NewServeMux()
-	server = httptest.NewServer(mux)
+func setup() (*Client, *http.ServeMux, func()) {
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
 
 	mux.HandleFunc("/api/v1/access_token", func(w http.ResponseWriter, r *http.Request) {
-		response := `
-		{
+		response := `{
 			"access_token": "token1",
 			"token_type": "bearer",
 			"expires_in": 3600,
 			"scope": "*"
-		}
-		`
+		}`
 		w.Header().Add(headerContentType, mediaTypeJSON)
 		fmt.Fprint(w, response)
 	})
 
-	client, _ = NewClient(nil,
+	client, _ := NewClient(nil,
 		&Credentials{"id1", "secret1", "user1", "password1"},
 		WithBaseURL(server.URL),
 		WithTokenURL(server.URL+"/api/v1/access_token"),
 	)
-}
 
-func teardown() {
-	server.Close()
+	return client, mux, server.Close
 }
 
 func readFileContents(path string) (string, error) {
@@ -116,7 +107,7 @@ func TestNewClient_Error(t *testing.T) {
 }
 
 func TestClient_OnRequestComplemented(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	var i int
@@ -146,7 +137,7 @@ func TestClient_OnRequestComplemented(t *testing.T) {
 }
 
 func TestClient_JSONErrorResponse(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/v1/test", func(w http.ResponseWriter, r *http.Request) {
@@ -169,12 +160,12 @@ func TestClient_JSONErrorResponse(t *testing.T) {
 
 	resp, err := client.Do(ctx, req, nil)
 	require.IsType(t, &JSONErrorResponse{}, err)
-	require.EqualError(t, err, fmt.Sprintf(`GET %s/api/v1/test: 200 field "test field" caused TEST_ERROR: this is a test error`, server.URL))
+	require.EqualError(t, err, fmt.Sprintf(`GET %s/api/v1/test: 200 field "test field" caused TEST_ERROR: this is a test error`, client.BaseURL))
 	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestClient_ErrorResponse(t *testing.T) {
-	setup()
+	client, mux, teardown := setup()
 	defer teardown()
 
 	mux.HandleFunc("/api/v1/test", func(w http.ResponseWriter, r *http.Request) {
@@ -190,6 +181,6 @@ func TestClient_ErrorResponse(t *testing.T) {
 
 	resp, err := client.Do(ctx, req, nil)
 	require.IsType(t, &ErrorResponse{}, err)
-	require.EqualError(t, err, fmt.Sprintf(`GET %s/api/v1/test: 403 error message`, server.URL))
+	require.EqualError(t, err, fmt.Sprintf(`GET %s/api/v1/test: 403 error message`, client.BaseURL))
 	require.Equal(t, http.StatusForbidden, resp.StatusCode)
 }
