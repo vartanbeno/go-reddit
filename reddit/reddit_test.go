@@ -39,7 +39,7 @@ func setup() {
 	})
 
 	client, _ = NewClient(nil,
-		WithCredentials("id1", "secret1", "user1", "password1"),
+		&Credentials{"id1", "secret1", "user1", "password1"},
 		WithBaseURL(server.URL),
 		WithTokenURL(server.URL+"/api/v1/access_token"),
 	)
@@ -92,7 +92,7 @@ func testClientServices(t *testing.T, c *Client) {
 
 func testClientDefaultUserAgent(t *testing.T, c *Client) {
 	expectedUserAgent := fmt.Sprintf("golang:%s:v%s (by /u/)", libraryName, libraryVersion)
-	require.Equal(t, expectedUserAgent, c.userAgent)
+	require.Equal(t, expectedUserAgent, c.UserAgent())
 }
 
 func testClientDefaults(t *testing.T, c *Client) {
@@ -101,7 +101,7 @@ func testClientDefaults(t *testing.T, c *Client) {
 }
 
 func TestNewClient(t *testing.T) {
-	c, err := NewClient(nil)
+	c, err := NewClient(nil, nil)
 	require.NoError(t, err)
 	testClientDefaults(t, c)
 }
@@ -111,7 +111,7 @@ func TestNewClient_Error(t *testing.T) {
 		return errors.New("foo")
 	}
 
-	_, err := NewClient(nil, errorOpt)
+	_, err := NewClient(nil, nil, errorOpt)
 	require.EqualError(t, err, "foo")
 }
 

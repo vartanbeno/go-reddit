@@ -73,6 +73,14 @@ func (t *userAgentTransport) base() http.RoundTripper {
 // RequestCompletionCallback defines the type of the request callback function.
 type RequestCompletionCallback func(*http.Request, *http.Response)
 
+// Credentials used to authenticate to make requests to the Reddit API.
+type Credentials struct {
+	ID       string
+	Secret   string
+	Username string
+	Password string
+}
+
 // Client manages communication with the Reddit API.
 type Client struct {
 	// HTTP client used to communicate with the Reddit API.
@@ -141,42 +149,50 @@ func newClient(httpClient *http.Client) *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 	tokenURL, _ := url.Parse(defaultTokenURL)
 
-	c := &Client{client: httpClient, BaseURL: baseURL, TokenURL: tokenURL}
+	client := &Client{client: httpClient, BaseURL: baseURL, TokenURL: tokenURL}
 
-	c.Account = &AccountService{client: c}
-	c.Collection = &CollectionService{client: c}
-	c.Emoji = &EmojiService{client: c}
-	c.Flair = &FlairService{client: c}
-	c.Gold = &GoldService{client: c}
-	c.Listings = &ListingsService{client: c}
-	c.Message = &MessageService{client: c}
-	c.Moderation = &ModerationService{client: c}
-	c.Multi = &MultiService{client: c}
-	c.Stream = &StreamService{client: c}
-	c.Subreddit = &SubredditService{client: c}
-	c.User = &UserService{client: c}
+	client.Account = &AccountService{client: client}
+	client.Collection = &CollectionService{client: client}
+	client.Emoji = &EmojiService{client: client}
+	client.Flair = &FlairService{client: client}
+	client.Gold = &GoldService{client: client}
+	client.Listings = &ListingsService{client: client}
+	client.Message = &MessageService{client: client}
+	client.Moderation = &ModerationService{client: client}
+	client.Multi = &MultiService{client: client}
+	client.Stream = &StreamService{client: client}
+	client.Subreddit = &SubredditService{client: client}
+	client.User = &UserService{client: client}
 
-	postAndCommentService := &postAndCommentService{client: c}
-	c.Comment = &CommentService{client: c, postAndCommentService: postAndCommentService}
-	c.Post = &PostService{client: c, postAndCommentService: postAndCommentService}
+	postAndCommentService := &postAndCommentService{client: client}
+	client.Comment = &CommentService{client: client, postAndCommentService: postAndCommentService}
+	client.Post = &PostService{client: client, postAndCommentService: postAndCommentService}
 
-	return c
+	return client
 }
 
-// NewClient returns a client that can make requests to the Reddit API.
-func NewClient(httpClient *http.Client, opts ...Opt) (c *Client, err error) {
-	c = newClient(httpClient)
+// NewClient returns a new Reddit API client. If a nil httpClient is provided,
+// a new http.Client will be used.
+func NewClient(httpClient *http.Client, creds *Credentials, opts ...Opt) (*Client, error) {
+	client := newClient(httpClient)
 
 	for _, opt := range opts {
-		if err = opt(c); err != nil {
-			return
+		if err := opt(client); err != nil {
+			return nil, err
 		}
 	}
 
-	oauthTransport := oauthTransport(c)
-	c.client.Transport = oauthTransport
+	if creds != nil {
+		client.ID = creds.ID
+		client.Secret = creds.Secret
+		client.Username = creds.Username
+		client.Password = creds.Password
 
-	return
+		oauthTransport := oauthTransport(client)
+		client.client.Transport = oauthTransport
+	}
+
+	return client, nil
 }
 
 // UserAgent returns the client's user agent.
