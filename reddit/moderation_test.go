@@ -260,3 +260,119 @@ func TestModerationService_UnignoreReports(t *testing.T) {
 	_, err := client.Moderation.UnignoreReports(ctx, "t3_test")
 	require.NoError(t, err)
 }
+
+func TestModerationService_Invite(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "moderator_invite")
+		form.Set("permissions", "+all")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.Invite(ctx, "testsubreddit", "testuser", nil)
+	require.NoError(t, err)
+}
+
+func TestModerationService_Invite_Permissions(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "moderator_invite")
+		form.Set("permissions", "-all,-access,-chat_config,+chat_operator,+config,-flair,-mail,-posts,+wiki")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.Invite(ctx, "testsubreddit", "testuser", &ModPermissions{ChatOperator: true, Config: true, Wiki: true})
+	require.NoError(t, err)
+}
+
+func TestModerationService_Uninvite(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "moderator_invite")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.Uninvite(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}
+
+func TestModerationService_Ban(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "banned")
+		form.Set("reason", "test reason")
+		form.Set("note", "test mod note")
+		form.Set("duration", "5")
+		form.Set("ban_message", "test message")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.Ban(ctx, "testsubreddit", "testuser", &BanConfig{
+		Reason:  "test reason",
+		ModNote: "test mod note",
+		Days:    Int(5),
+		Message: "test message",
+	})
+	require.NoError(t, err)
+}
+
+func TestModerationService_Unban(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "banned")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.Unban(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}

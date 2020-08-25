@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/google/go-querystring/query"
 )
 
 // ModerationService handles communication with the moderation
@@ -202,6 +204,176 @@ func (s *ModerationService) UnignoreReports(ctx context.Context, id string) (*Re
 
 	form := url.Values{}
 	form.Set("id", id)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// ModPermissions are the different permissions moderators have or don't have on a subreddit.
+// Read about them here: https://mods.reddithelp.com/hc/en-us/articles/360009381491-User-Management-moderators-and-permissions
+type ModPermissions struct {
+	All          bool
+	Access       bool
+	ChatConfig   bool
+	ChatOperator bool
+	Config       bool
+	Flair        bool
+	Mail         bool
+	Posts        bool
+	Wiki         bool
+}
+
+func (p *ModPermissions) String() (s string) {
+	if p == nil {
+		return "+all"
+	}
+
+	if p.All {
+		s += "+"
+	} else {
+		s += "-"
+	}
+	s += "all,"
+
+	if p.Access {
+		s += "+"
+	} else {
+		s += "-"
+	}
+	s += "access,"
+
+	if p.ChatConfig {
+		s += "+"
+	} else {
+		s += "-"
+	}
+	s += "chat_config,"
+
+	if p.ChatOperator {
+		s += "+"
+	} else {
+		s += "-"
+	}
+	s += "chat_operator,"
+
+	if p.Config {
+		s += "+"
+	} else {
+		s += "-"
+	}
+	s += "config,"
+
+	if p.Flair {
+		s += "+"
+	} else {
+		s += "-"
+	}
+	s += "flair,"
+
+	if p.Mail {
+		s += "+"
+	} else {
+		s += "-"
+	}
+	s += "mail,"
+
+	if p.Posts {
+		s += "+"
+	} else {
+		s += "-"
+	}
+	s += "posts,"
+
+	if p.Wiki {
+		s += "+"
+	} else {
+		s += "-"
+	}
+	s += "wiki"
+
+	return
+}
+
+// Invite a user to become a moderator of the subreddit.
+// If permissions is nil, all permissions will be granted.
+func (s *ModerationService) Invite(ctx context.Context, subreddit string, username string, permissions *ModPermissions) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/friend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "moderator_invite")
+	form.Set("permissions", permissions.String())
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Uninvite a user from becoming a moderator of the subreddit.
+func (s *ModerationService) Uninvite(ctx context.Context, subreddit string, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "moderator_invite")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// BanConfig configures the ban of the user being banned.
+type BanConfig struct {
+	Reason string `url:"reason,omitempty"`
+	// Not visible to the user being banned.
+	ModNote string `url:"note,omitempty"`
+	// How long the ban will last. 0-999. Leave nil for permanent.
+	Days *int `url:"duration,omitempty"`
+	// Note to include in the ban message to the user.
+	Message string `url:"ban_message,omitempty"`
+}
+
+// Ban a user from the subreddit.
+func (s *ModerationService) Ban(ctx context.Context, subreddit string, username string, config *BanConfig) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/friend", subreddit)
+
+	form, err := query.Values(config)
+	if err != nil {
+		return nil, err
+	}
+
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "banned")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Unban a user from the subreddit.
+func (s *ModerationService) Unban(ctx context.Context, subreddit string, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "banned")
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
