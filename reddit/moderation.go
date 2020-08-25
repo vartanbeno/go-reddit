@@ -382,3 +382,143 @@ func (s *ModerationService) Unban(ctx context.Context, subreddit string, usernam
 
 	return s.client.Do(ctx, req, nil)
 }
+
+// BanWiki a user from contributing to the subreddit wiki.
+func (s *ModerationService) BanWiki(ctx context.Context, subreddit string, username string, config *BanConfig) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/friend", subreddit)
+
+	form, err := query.Values(config)
+	if err != nil {
+		return nil, err
+	}
+
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "wikibanned")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// UnbanWiki a user from contributing to the subreddit wiki.
+func (s *ModerationService) UnbanWiki(ctx context.Context, subreddit string, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "wikibanned")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Mute a user in the subreddit.
+func (s *ModerationService) Mute(ctx context.Context, subreddit string, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/friend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "muted")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Unmute a user in the subreddit.
+func (s *ModerationService) Unmute(ctx context.Context, subreddit string, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "muted")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// ApproveUser adds a user as an approved user to the subreddit.
+func (s *ModerationService) ApproveUser(ctx context.Context, subreddit string, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/friend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "contributor")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// UnapproveUser removes a user as an approved user to the subreddit.
+func (s *ModerationService) UnapproveUser(ctx context.Context, subreddit string, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "contributor")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// ApproveUserWiki adds a user as an approved wiki contributor in the subreddit.
+func (s *ModerationService) ApproveUserWiki(ctx context.Context, subreddit string, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/friend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "wikicontributor")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// UnapproveUserWiki removes a user as an approved wiki contributor in the subreddit.
+func (s *ModerationService) UnapproveUserWiki(ctx context.Context, subreddit string, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "wikicontributor")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}

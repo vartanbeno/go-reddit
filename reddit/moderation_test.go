@@ -376,3 +376,180 @@ func TestModerationService_Unban(t *testing.T) {
 	_, err := client.Moderation.Unban(ctx, "testsubreddit", "testuser")
 	require.NoError(t, err)
 }
+
+func TestModerationService_BanWiki(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "wikibanned")
+		form.Set("reason", "test reason")
+		form.Set("note", "test mod note")
+		form.Set("duration", "5")
+		form.Set("ban_message", "test message")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.BanWiki(ctx, "testsubreddit", "testuser", &BanConfig{
+		Reason:  "test reason",
+		ModNote: "test mod note",
+		Days:    Int(5),
+		Message: "test message",
+	})
+	require.NoError(t, err)
+}
+
+func TestModerationService_UnbanWiki(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "wikibanned")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.UnbanWiki(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}
+
+func TestModerationService_Mute(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "muted")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.Mute(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}
+
+func TestModerationService_Unmuted(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "muted")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.Unmute(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}
+
+func TestModerationService_ApproveUser(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "contributor")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.ApproveUser(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}
+
+func TestModerationService_UnapproveUser(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "contributor")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.UnapproveUser(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}
+
+func TestModerationService_ApproveUserWiki(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "wikicontributor")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.ApproveUserWiki(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}
+
+func TestModerationService_UnapproveUserWiki(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "wikicontributor")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.UnapproveUserWiki(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}
