@@ -326,6 +326,28 @@ func TestModerationService_Uninvite(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestModerationService_SetPermissions(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/setpermissions", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("type", "moderator_invite")
+		form.Set("permissions", "-all,+access,-chat_config,-chat_operator,-config,+flair,-mail,+posts,-wiki")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.SetPermissions(ctx, "testsubreddit", "testuser", &ModPermissions{Access: true, Flair: true, Posts: true})
+	require.NoError(t, err)
+}
+
 func TestModerationService_Ban(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()

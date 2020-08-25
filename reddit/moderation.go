@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"reflect"
 
 	"github.com/google/go-querystring/query"
 )
@@ -216,15 +217,15 @@ func (s *ModerationService) UnignoreReports(ctx context.Context, id string) (*Re
 // ModPermissions are the different permissions moderators have or don't have on a subreddit.
 // Read about them here: https://mods.reddithelp.com/hc/en-us/articles/360009381491-User-Management-moderators-and-permissions
 type ModPermissions struct {
-	All          bool
-	Access       bool
-	ChatConfig   bool
-	ChatOperator bool
-	Config       bool
-	Flair        bool
-	Mail         bool
-	Posts        bool
-	Wiki         bool
+	All          bool `permission:"all"`
+	Access       bool `permission:"access"`
+	ChatConfig   bool `permission:"chat_config"`
+	ChatOperator bool `permission:"chat_operator"`
+	Config       bool `permission:"config"`
+	Flair        bool `permission:"flair"`
+	Mail         bool `permission:"mail"`
+	Posts        bool `permission:"posts"`
+	Wiki         bool `permission:"wiki"`
 }
 
 func (p *ModPermissions) String() (s string) {
@@ -232,68 +233,29 @@ func (p *ModPermissions) String() (s string) {
 		return "+all"
 	}
 
-	if p.All {
-		s += "+"
-	} else {
-		s += "-"
-	}
-	s += "all,"
+	t := reflect.TypeOf(*p)
+	v := reflect.ValueOf(*p)
 
-	if p.Access {
-		s += "+"
-	} else {
-		s += "-"
-	}
-	s += "access,"
+	for i := 0; i < t.NumField(); i++ {
+		if v.Field(i).Kind() != reflect.Bool {
+			continue
+		}
 
-	if p.ChatConfig {
-		s += "+"
-	} else {
-		s += "-"
-	}
-	s += "chat_config,"
+		permission := t.Field(i).Tag.Get("permission")
+		permitted := v.Field(i).Bool()
 
-	if p.ChatOperator {
-		s += "+"
-	} else {
-		s += "-"
-	}
-	s += "chat_operator,"
+		if permitted {
+			s += "+"
+		} else {
+			s += "-"
+		}
 
-	if p.Config {
-		s += "+"
-	} else {
-		s += "-"
-	}
-	s += "config,"
+		s += permission
 
-	if p.Flair {
-		s += "+"
-	} else {
-		s += "-"
+		if i != t.NumField()-1 {
+			s += ","
+		}
 	}
-	s += "flair,"
-
-	if p.Mail {
-		s += "+"
-	} else {
-		s += "-"
-	}
-	s += "mail,"
-
-	if p.Posts {
-		s += "+"
-	} else {
-		s += "-"
-	}
-	s += "posts,"
-
-	if p.Wiki {
-		s += "+"
-	} else {
-		s += "-"
-	}
-	s += "wiki"
 
 	return
 }
@@ -319,12 +281,19 @@ func (s *ModerationService) Invite(ctx context.Context, subreddit string, userna
 
 // Uninvite a user from becoming a moderator of the subreddit.
 func (s *ModerationService) Uninvite(ctx context.Context, subreddit string, username string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
+	return s.deleteRelationship(ctx, subreddit, username, "moderator_invite")
+}
+
+// SetPermissions sets the mod permissions for the user in the subreddit.
+// If permissions is nil, all permissions will be granted.
+func (s *ModerationService) SetPermissions(ctx context.Context, subreddit string, username string, permissions *ModPermissions) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/setpermissions", subreddit)
 
 	form := url.Values{}
 	form.Set("api_type", "json")
 	form.Set("name", username)
 	form.Set("type", "moderator_invite")
+	form.Set("permissions", permissions.String())
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
@@ -368,19 +337,7 @@ func (s *ModerationService) Ban(ctx context.Context, subreddit string, username 
 
 // Unban a user from the subreddit.
 func (s *ModerationService) Unban(ctx context.Context, subreddit string, username string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
-
-	form := url.Values{}
-	form.Set("api_type", "json")
-	form.Set("name", username)
-	form.Set("type", "banned")
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
+	return s.deleteRelationship(ctx, subreddit, username, "banned")
 }
 
 // BanWiki a user from contributing to the subreddit wiki.
@@ -406,97 +363,46 @@ func (s *ModerationService) BanWiki(ctx context.Context, subreddit string, usern
 
 // UnbanWiki a user from contributing to the subreddit wiki.
 func (s *ModerationService) UnbanWiki(ctx context.Context, subreddit string, username string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
-
-	form := url.Values{}
-	form.Set("api_type", "json")
-	form.Set("name", username)
-	form.Set("type", "wikibanned")
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
+	return s.deleteRelationship(ctx, subreddit, username, "wikibanned")
 }
 
 // Mute a user in the subreddit.
 func (s *ModerationService) Mute(ctx context.Context, subreddit string, username string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/friend", subreddit)
-
-	form := url.Values{}
-	form.Set("api_type", "json")
-	form.Set("name", username)
-	form.Set("type", "muted")
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
+	return s.createRelationship(ctx, subreddit, username, "muted")
 }
 
 // Unmute a user in the subreddit.
 func (s *ModerationService) Unmute(ctx context.Context, subreddit string, username string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
-
-	form := url.Values{}
-	form.Set("api_type", "json")
-	form.Set("name", username)
-	form.Set("type", "muted")
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
+	return s.deleteRelationship(ctx, subreddit, username, "muted")
 }
 
 // ApproveUser adds a user as an approved user to the subreddit.
 func (s *ModerationService) ApproveUser(ctx context.Context, subreddit string, username string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/friend", subreddit)
-
-	form := url.Values{}
-	form.Set("api_type", "json")
-	form.Set("name", username)
-	form.Set("type", "contributor")
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
+	return s.createRelationship(ctx, subreddit, username, "contributor")
 }
 
 // UnapproveUser removes a user as an approved user to the subreddit.
 func (s *ModerationService) UnapproveUser(ctx context.Context, subreddit string, username string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
-
-	form := url.Values{}
-	form.Set("api_type", "json")
-	form.Set("name", username)
-	form.Set("type", "contributor")
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
+	return s.deleteRelationship(ctx, subreddit, username, "contributor")
 }
 
 // ApproveUserWiki adds a user as an approved wiki contributor in the subreddit.
 func (s *ModerationService) ApproveUserWiki(ctx context.Context, subreddit string, username string) (*Response, error) {
+	return s.createRelationship(ctx, subreddit, username, "wikicontributor")
+}
+
+// UnapproveUserWiki removes a user as an approved wiki contributor in the subreddit.
+func (s *ModerationService) UnapproveUserWiki(ctx context.Context, subreddit string, username string) (*Response, error) {
+	return s.deleteRelationship(ctx, subreddit, username, "wikicontributor")
+}
+
+func (s *ModerationService) createRelationship(ctx context.Context, subreddit, username, relationship string) (*Response, error) {
 	path := fmt.Sprintf("r/%s/api/friend", subreddit)
 
 	form := url.Values{}
 	form.Set("api_type", "json")
 	form.Set("name", username)
-	form.Set("type", "wikicontributor")
+	form.Set("type", relationship)
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
@@ -506,14 +412,13 @@ func (s *ModerationService) ApproveUserWiki(ctx context.Context, subreddit strin
 	return s.client.Do(ctx, req, nil)
 }
 
-// UnapproveUserWiki removes a user as an approved wiki contributor in the subreddit.
-func (s *ModerationService) UnapproveUserWiki(ctx context.Context, subreddit string, username string) (*Response, error) {
+func (s *ModerationService) deleteRelationship(ctx context.Context, subreddit, username, relationship string) (*Response, error) {
 	path := fmt.Sprintf("r/%s/api/unfriend", subreddit)
 
 	form := url.Values{}
 	form.Set("api_type", "json")
 	form.Set("name", username)
-	form.Set("type", "wikicontributor")
+	form.Set("type", relationship)
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
