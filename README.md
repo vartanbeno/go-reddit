@@ -31,14 +31,17 @@ package main
 import "github.com/vartanbeno/go-reddit/reddit"
 
 func main() {
-    withCredentials := reddit.WithCredentials("id", "secret", "username", "password")
-    client, _ := reddit.NewClient(nil, withCredentials)
+    credentials := &reddit.Credentials{
+        ID:       "id",
+        Secret:   "secret",
+        Username: "username",
+        Password: "password",
+    }
+    client, _ := reddit.NewClient(nil, credentials)
 }
 ```
 
 The first argument (the one set to `nil`) is of type `*http.Client`. It will be used to make the requests. If nil, it will be set to `&http.Client{}`.
-
-The `WithCredentials` option sets the credentials used to make requests to the Reddit API.
 
 ## Examples
 
@@ -66,7 +69,7 @@ if err != nil {
     <summary>Get r/golang's top 5 posts of all time.</summary>
 
 ```go
-result, _, err := client.Subreddit.Top(context.Background(), "golang", &reddit.ListPostOptions{
+result, _, err := client.Subreddit.TopPosts(context.Background(), "golang", &reddit.ListPostOptions{
     ListOptions: reddit.ListOptions{
         Limit: 5,
     },
