@@ -18,7 +18,7 @@ import (
 
 const (
 	libraryName    = "github.com/vartanbeno/go-reddit"
-	libraryVersion = "0.0.1"
+	libraryVersion = "1.0.0"
 
 	defaultBaseURL  = "https://oauth.reddit.com"
 	defaultTokenURL = "https://www.reddit.com/api/v1/access_token"
