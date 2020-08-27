@@ -27,7 +27,6 @@ type rootSubredditNames struct {
 }
 
 // Relationship holds information about a relationship (friend/blocked).
-// todo: there's also banned, wikibanned, etc.
 type Relationship struct {
 	ID      string     `json:"rel_id,omitempty"`
 	User    string     `json:"name,omitempty"`

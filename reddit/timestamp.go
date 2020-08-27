@@ -45,8 +45,3 @@ func (t *Timestamp) UnmarshalJSON(data []byte) (err error) {
 func (t Timestamp) Equal(u Timestamp) bool {
 	return t.Time.Equal(u.Time)
 }
-
-// Before reports whether u is before t based on time.Before
-func (t Timestamp) Before(u Timestamp) bool {
-	return t.Time.Before(u.Time)
-}

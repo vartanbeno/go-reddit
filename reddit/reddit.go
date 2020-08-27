@@ -119,6 +119,11 @@ func NewClient(creds *Credentials, opts ...Opt) (*Client, error) {
 	}
 
 	client := newClient()
+	client.ID = creds.ID
+	client.Secret = creds.Secret
+	client.Username = creds.Username
+	client.Password = creds.Password
+
 	for _, opt := range opts {
 		if err := opt(client); err != nil {
 			return nil, err
@@ -155,11 +160,6 @@ func NewClient(creds *Credentials, opts ...Opt) (*Client, error) {
 			return nil
 		}
 	}
-
-	client.ID = creds.ID
-	client.Secret = creds.Secret
-	client.Username = creds.Username
-	client.Password = creds.Password
 
 	oauthTransport := oauthTransport(client)
 	client.client.Transport = oauthTransport

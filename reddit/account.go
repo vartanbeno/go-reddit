@@ -326,7 +326,7 @@ func (s *AccountService) Friends(ctx context.Context) ([]Relationship, *Response
 		return nil, nil, err
 	}
 
-	root := make([]rootRelationshipList, 2)
+	var root [2]rootRelationshipList
 	resp, err := s.client.Do(ctx, req, &root)
 	if err != nil {
 		return nil, resp, err
@@ -362,7 +362,7 @@ func (s *AccountService) Messaging(ctx context.Context) ([]Relationship, []Relat
 		return nil, nil, nil, err
 	}
 
-	root := make([]rootRelationshipList, 2)
+	var root [2]rootRelationshipList
 	resp, err := s.client.Do(ctx, req, &root)
 	if err != nil {
 		return nil, nil, resp, err
@@ -400,7 +400,6 @@ func (s *AccountService) AddTrusted(ctx context.Context, username string) (*Resp
 	form := url.Values{}
 	form.Set("api_type", "json")
 	form.Set("name", username)
-	// todo: you can also do this with the user id. form.Set("id", id). should we? or is this enough?
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
@@ -417,7 +416,6 @@ func (s *AccountService) RemoveTrusted(ctx context.Context, username string) (*R
 
 	form := url.Values{}
 	form.Set("name", username)
-	// todo: you can also do this with the user id. form.Set("id", id). should we? or is this enough?
 
 	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
 	if err != nil {
