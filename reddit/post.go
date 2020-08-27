@@ -62,7 +62,7 @@ type SubmitLinkOptions struct {
 	Spoiler     bool  `url:"spoiler,omitempty"`
 }
 
-// Get returns a post with its comments.
+// Get a post with its comments.
 // id is the ID36 of the post, not its full id.
 // Example: instead of t3_abc123, use abc123.
 func (s *PostService) Get(ctx context.Context, id string) (*PostAndComments, *Response, error) {
@@ -149,7 +149,7 @@ func (s *PostService) SubmitLink(ctx context.Context, opts SubmitLinkOptions) (*
 	return s.submit(ctx, &submit{opts, "link"})
 }
 
-// Edit edits a post.
+// Edit a post.
 func (s *PostService) Edit(ctx context.Context, id string, text string) (*Post, *Response, error) {
 	path := "api/editusertext"
 
@@ -173,7 +173,7 @@ func (s *PostService) Edit(ctx context.Context, id string, text string) (*Post, 
 	return root, resp, nil
 }
 
-// Hide hides posts.
+// Hide posts.
 func (s *PostService) Hide(ctx context.Context, ids ...string) (*Response, error) {
 	if len(ids) == 0 {
 		return nil, errors.New("must provide at least 1 id")
@@ -192,7 +192,7 @@ func (s *PostService) Hide(ctx context.Context, ids ...string) (*Response, error
 	return s.client.Do(ctx, req, nil)
 }
 
-// Unhide unhides posts.
+// Unhide posts.
 func (s *PostService) Unhide(ctx context.Context, ids ...string) (*Response, error) {
 	if len(ids) == 0 {
 		return nil, errors.New("must provide at least 1 id")
@@ -271,7 +271,7 @@ func (s *PostService) Unspoiler(ctx context.Context, id string) (*Response, erro
 	return s.client.Do(ctx, req, nil)
 }
 
-// Sticky stickies a post in its subreddit.
+// Sticky a post in its subreddit.
 // When bottom is true, the post will be set as the bottom sticky (the 2nd one).
 // If no top sticky exists, the post will become the top sticky regardless.
 // When attempting to sticky a post that's already stickied, it will return a 409 Conflict error.

@@ -17,7 +17,7 @@ type CommentService struct {
 	client *Client
 }
 
-// Submit submits a comment as a reply to a post, comment, or message.
+// Submit a comment as a reply to a post, comment, or message.
 // parentID is the full ID of the thing being replied to.
 func (s *CommentService) Submit(ctx context.Context, parentID string, text string) (*Comment, *Response, error) {
 	path := "api/comment"
@@ -42,7 +42,7 @@ func (s *CommentService) Submit(ctx context.Context, parentID string, text strin
 	return root, resp, nil
 }
 
-// Edit edits a comment.
+// Edit a comment.
 func (s *CommentService) Edit(ctx context.Context, id string, text string) (*Comment, *Response, error) {
 	path := "api/editusertext"
 

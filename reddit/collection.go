@@ -101,7 +101,7 @@ func (s *CollectionService) FromSubreddit(ctx context.Context, id string) ([]*Co
 	return collections, resp, nil
 }
 
-// Create creates a collection.
+// Create a collection.
 func (s *CollectionService) Create(ctx context.Context, createRequest *CollectionCreateRequest) (*Collection, *Response, error) {
 	if createRequest == nil {
 		return nil, nil, errors.New("createRequest: cannot be nil")
@@ -128,7 +128,7 @@ func (s *CollectionService) Create(ctx context.Context, createRequest *Collectio
 	return collection, resp, nil
 }
 
-// Delete deletes a collection via its id.
+// Delete a collection via its id.
 func (s *CollectionService) Delete(ctx context.Context, id string) (*Response, error) {
 	path := "api/v1/collections/delete_collection"
 
@@ -255,7 +255,7 @@ func (s *CollectionService) UpdateLayoutGallery(ctx context.Context, id string) 
 	return s.client.Do(ctx, req, nil)
 }
 
-// Follow follows a collection.
+// Follow a collection.
 func (s *CollectionService) Follow(ctx context.Context, id string) (*Response, error) {
 	path := "api/v1/collections/follow_collection"
 
@@ -271,7 +271,7 @@ func (s *CollectionService) Follow(ctx context.Context, id string) (*Response, e
 	return s.client.Do(ctx, req, nil)
 }
 
-// Unfollow unfollows a collection.
+// Unfollow a collection.
 func (s *CollectionService) Unfollow(ctx context.Context, id string) (*Response, error) {
 	path := "api/v1/collections/follow_collection"
 

@@ -15,7 +15,7 @@ type ListingsService struct {
 	client *Client
 }
 
-// Get returns posts, comments, and subreddits from their full IDs.
+// Get posts, comments, and subreddits from their full IDs.
 func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*Comment, []*Subreddit, *Response, error) {
 	path := fmt.Sprintf("api/info?id=%s", strings.Join(ids, ","))
 

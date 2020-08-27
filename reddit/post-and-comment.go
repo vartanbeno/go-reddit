@@ -25,7 +25,7 @@ const (
 	upvote
 )
 
-// Delete deletes a post or comment via its full ID.
+// Delete a post or comment via its full ID.
 func (s *postAndCommentService) Delete(ctx context.Context, id string) (*Response, error) {
 	path := "api/del"
 
@@ -40,7 +40,7 @@ func (s *postAndCommentService) Delete(ctx context.Context, id string) (*Respons
 	return s.client.Do(ctx, req, nil)
 }
 
-// Save saves a post or comment.
+// Save a post or comment.
 func (s *postAndCommentService) Save(ctx context.Context, id string) (*Response, error) {
 	path := "api/save"
 
@@ -55,7 +55,7 @@ func (s *postAndCommentService) Save(ctx context.Context, id string) (*Response,
 	return s.client.Do(ctx, req, nil)
 }
 
-// Unsave unsaves a post or comment.
+// Unsave a post or comment.
 func (s *postAndCommentService) Unsave(ctx context.Context, id string) (*Response, error) {
 	path := "api/unsave"
 
@@ -102,7 +102,7 @@ func (s *postAndCommentService) DisableReplies(ctx context.Context, id string) (
 	return s.client.Do(ctx, req, nil)
 }
 
-// Lock locks a post or comment, preventing it from receiving new comments.
+// Lock a post or comment, preventing it from receiving new comments.
 func (s *postAndCommentService) Lock(ctx context.Context, id string) (*Response, error) {
 	path := "api/lock"
 
@@ -117,7 +117,7 @@ func (s *postAndCommentService) Lock(ctx context.Context, id string) (*Response,
 	return s.client.Do(ctx, req, nil)
 }
 
-// Unlock unlocks a post or comment, allowing it to receive new comments.
+// Unlock a post or comment, allowing it to receive new comments.
 func (s *postAndCommentService) Unlock(ctx context.Context, id string) (*Response, error) {
 	path := "api/unlock"
 
@@ -148,12 +148,12 @@ func (s *postAndCommentService) vote(ctx context.Context, id string, vote vote) 
 	return s.client.Do(ctx, req, nil)
 }
 
-// Upvote upvotes a post or a comment.
+// Upvote a post or a comment.
 func (s *postAndCommentService) Upvote(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, upvote)
 }
 
-// Downvote downvotes a post or a comment.
+// Downvote a post or a comment.
 func (s *postAndCommentService) Downvote(ctx context.Context, id string) (*Response, error) {
 	return s.vote(ctx, id, downvote)
 }

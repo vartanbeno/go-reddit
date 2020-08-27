@@ -84,7 +84,7 @@ func (s *ModerationService) AcceptInvite(ctx context.Context, subreddit string) 
 	return s.client.Do(ctx, req, nil)
 }
 
-// Approve approves a post or comment via its full ID.
+// Approve a post or comment via its full ID.
 func (s *ModerationService) Approve(ctx context.Context, id string) (*Response, error) {
 	path := "api/approve"
 
@@ -99,7 +99,7 @@ func (s *ModerationService) Approve(ctx context.Context, id string) (*Response, 
 	return s.client.Do(ctx, req, nil)
 }
 
-// Remove removes a post, comment or modmail message via its full ID.
+// Remove a post, comment or modmail message via its full ID.
 func (s *ModerationService) Remove(ctx context.Context, id string) (*Response, error) {
 	path := "api/remove"
 
@@ -340,7 +340,7 @@ func (s *ModerationService) Unban(ctx context.Context, subreddit string, usernam
 	return s.deleteRelationship(ctx, subreddit, username, "banned")
 }
 
-// BanWiki a user from contributing to the subreddit wiki.
+// BanWiki bans a user from contributing to the subreddit wiki.
 func (s *ModerationService) BanWiki(ctx context.Context, subreddit string, username string, config *BanConfig) (*Response, error) {
 	path := fmt.Sprintf("r/%s/api/friend", subreddit)
 
@@ -361,7 +361,7 @@ func (s *ModerationService) BanWiki(ctx context.Context, subreddit string, usern
 	return s.client.Do(ctx, req, nil)
 }
 
-// UnbanWiki a user from contributing to the subreddit wiki.
+// UnbanWiki unbans a user from contributing to the subreddit wiki.
 func (s *ModerationService) UnbanWiki(ctx context.Context, subreddit string, username string) (*Response, error) {
 	return s.deleteRelationship(ctx, subreddit, username, "wikibanned")
 }

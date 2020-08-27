@@ -135,7 +135,7 @@ func (s *SubredditService) TopPosts(ctx context.Context, subreddit string, opts 
 	return s.getPosts(ctx, "top", subreddit, opts)
 }
 
-// Get gets a subreddit by name.
+// Get a subreddit by name.
 func (s *SubredditService) Get(ctx context.Context, name string) (*Subreddit, *Response, error) {
 	if name == "" {
 		return nil, nil, errors.New("name: cannot be empty")
@@ -245,7 +245,7 @@ func (s *SubredditService) UnsubscribeByID(ctx context.Context, ids ...string) (
 	return s.handleSubscription(ctx, form)
 }
 
-// Favorite favorites the subreddit.
+// Favorite the subreddit.
 func (s *SubredditService) Favorite(ctx context.Context, subreddit string) (*Response, error) {
 	path := "api/favorite"
 
@@ -262,7 +262,7 @@ func (s *SubredditService) Favorite(ctx context.Context, subreddit string) (*Res
 	return s.client.Do(ctx, req, nil)
 }
 
-// Unfavorite unfavorites the subreddit.
+// Unfavorite the subreddit.
 func (s *SubredditService) Unfavorite(ctx context.Context, subreddit string) (*Response, error) {
 	path := "api/favorite"
 
@@ -279,7 +279,7 @@ func (s *SubredditService) Unfavorite(ctx context.Context, subreddit string) (*R
 	return s.client.Do(ctx, req, nil)
 }
 
-// Search searches for subreddits.
+// Search for subreddits.
 func (s *SubredditService) Search(ctx context.Context, query string, opts *ListSubredditOptions) (*Subreddits, *Response, error) {
 	path := "subreddits/search"
 	path, err := addOptions(path, opts)

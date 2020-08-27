@@ -119,7 +119,7 @@ type rootMultiDescription struct {
 	} `json:"data"`
 }
 
-// Get gets information about the multireddit from its url path.
+// Get the multireddit from its url path.
 func (s *MultiService) Get(ctx context.Context, multiPath string) (*Multi, *Response, error) {
 	path := fmt.Sprintf("api/multi/%s", multiPath)
 
@@ -184,7 +184,7 @@ func (s *MultiService) Of(ctx context.Context, username string) ([]Multi, *Respo
 	return multis, resp, nil
 }
 
-// Copy copies a multireddit.
+// Copy a multireddit.
 func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) (*Multi, *Response, error) {
 	if copyRequest == nil {
 		return nil, nil, errors.New("copyRequest: cannot be nil")
@@ -210,7 +210,7 @@ func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) 
 	return root.Data, resp, nil
 }
 
-// Create creates a multireddit.
+// Create a multireddit.
 func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrUpdateRequest) (*Multi, *Response, error) {
 	if createRequest == nil {
 		return nil, nil, errors.New("createRequest: cannot be nil")
@@ -232,7 +232,7 @@ func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrU
 	return root.Data, resp, nil
 }
 
-// Update updates a multireddit.
+// Update a multireddit.
 // If the multireddit does not exist, it will be created.
 func (s *MultiService) Update(ctx context.Context, multiPath string, updateRequest *MultiCreateOrUpdateRequest) (*Multi, *Response, error) {
 	if updateRequest == nil {
@@ -255,7 +255,7 @@ func (s *MultiService) Update(ctx context.Context, multiPath string, updateReque
 	return root.Data, resp, nil
 }
 
-// Delete deletes a multireddit.
+// Delete a multireddit.
 func (s *MultiService) Delete(ctx context.Context, multiPath string) (*Response, error) {
 	path := fmt.Sprintf("api/multi/%s", multiPath)
 

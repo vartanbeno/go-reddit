@@ -171,8 +171,7 @@ func (s *MessageService) Unread(ctx context.Context, ids ...string) (*Response, 
 	return s.client.Do(ctx, req, nil)
 }
 
-// Block blocks the author of a thing via the thing's full ID.
-// The thing can be a post, comment or message.
+// Block the author of a post, comment or message via its full ID.
 func (s *MessageService) Block(ctx context.Context, id string) (*Response, error) {
 	path := "api/block"
 
@@ -187,7 +186,7 @@ func (s *MessageService) Block(ctx context.Context, id string) (*Response, error
 	return s.client.Do(ctx, req, nil)
 }
 
-// Collapse collapses messages.
+// Collapse messages.
 func (s *MessageService) Collapse(ctx context.Context, ids ...string) (*Response, error) {
 	if len(ids) == 0 {
 		return nil, errors.New("must provide at least 1 id")
@@ -206,7 +205,7 @@ func (s *MessageService) Collapse(ctx context.Context, ids ...string) (*Response
 	return s.client.Do(ctx, req, nil)
 }
 
-// Uncollapse uncollapses messages.
+// Uncollapse messages.
 func (s *MessageService) Uncollapse(ctx context.Context, ids ...string) (*Response, error) {
 	if len(ids) == 0 {
 		return nil, errors.New("must provide at least 1 id")
@@ -225,7 +224,7 @@ func (s *MessageService) Uncollapse(ctx context.Context, ids ...string) (*Respon
 	return s.client.Do(ctx, req, nil)
 }
 
-// Delete deletes a message.
+// Delete a message.
 func (s *MessageService) Delete(ctx context.Context, id string) (*Response, error) {
 	path := "api/del_msg"
 
@@ -240,7 +239,7 @@ func (s *MessageService) Delete(ctx context.Context, id string) (*Response, erro
 	return s.client.Do(ctx, req, nil)
 }
 
-// Send sends a message.
+// Send a message.
 func (s *MessageService) Send(ctx context.Context, sendRequest *SendMessageRequest) (*Response, error) {
 	if sendRequest == nil {
 		return nil, errors.New("sendRequest: cannot be nil")

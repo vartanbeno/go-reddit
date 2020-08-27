@@ -367,7 +367,7 @@ func (s *UserService) GetFriendship(ctx context.Context, username string) (*Rela
 	return root, resp, nil
 }
 
-// Friend friends a user.
+// Friend a user.
 func (s *UserService) Friend(ctx context.Context, username string) (*Relationship, *Response, error) {
 	type request struct {
 		Username string `json:"name"`
@@ -390,7 +390,7 @@ func (s *UserService) Friend(ctx context.Context, username string) (*Relationshi
 	return root, resp, nil
 }
 
-// Unfriend unfriends a user.
+// Unfriend a user.
 func (s *UserService) Unfriend(ctx context.Context, username string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/me/friends/%s", username)
 	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
@@ -400,7 +400,7 @@ func (s *UserService) Unfriend(ctx context.Context, username string) (*Response,
 	return s.client.Do(ctx, req, nil)
 }
 
-// Block blocks a user.
+// Block a user.
 func (s *UserService) Block(ctx context.Context, username string) (*Blocked, *Response, error) {
 	path := "api/block_user"
 
@@ -442,7 +442,7 @@ func (s *UserService) BlockByID(ctx context.Context, id string) (*Blocked, *Resp
 	return root, resp, nil
 }
 
-// Unblock unblocks a user.
+// Unblock a user.
 func (s *UserService) Unblock(ctx context.Context, username string) (*Response, error) {
 	selfID, resp, err := s.client.id(ctx)
 	if err != nil {
@@ -560,7 +560,7 @@ func (s *UserService) New(ctx context.Context, opts *ListUserOverviewOptions) (*
 	return root.getSubreddits(), resp, nil
 }
 
-// Search searches for users.
+// Search for users.
 // todo: maybe include the sort option? (relevance, activity)
 func (s *UserService) Search(ctx context.Context, query string, opts *ListOptions) (*Users, *Response, error) {
 	path := "users/search"

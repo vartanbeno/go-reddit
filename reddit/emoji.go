@@ -73,7 +73,7 @@ func (e *emojis) UnmarshalJSON(data []byte) (err error) {
 	return
 }
 
-// Get returns the default set of Reddit emojis, and those of the subreddit, respectively.
+// Get the default set of Reddit emojis and those of the subreddit, respectively.
 func (s *EmojiService) Get(ctx context.Context, subreddit string) ([]*Emoji, []*Emoji, *Response, error) {
 	path := fmt.Sprintf("api/v1/%s/emojis/all", subreddit)
 
@@ -101,7 +101,7 @@ func (s *EmojiService) Get(ctx context.Context, subreddit string) ([]*Emoji, []*
 	return defaultEmojis, subredditEmojis, resp, nil
 }
 
-// Delete deletes the emoji from the subreddit.
+// Delete the emoji from the subreddit.
 func (s *EmojiService) Delete(ctx context.Context, subreddit string, emoji string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/%s/emoji/%s", subreddit, emoji)
 
@@ -199,7 +199,7 @@ func (s *EmojiService) upload(ctx context.Context, subreddit string, createReque
 	return s.client.Do(ctx, req, nil)
 }
 
-// Upload uploads an emoji to the subreddit.
+// Upload an emoji to the subreddit.
 func (s *EmojiService) Upload(ctx context.Context, subreddit string, createRequest *EmojiCreateOrUpdateRequest, imagePath string) (*Response, error) {
 	if createRequest == nil {
 		return nil, errors.New("createRequest: cannot be nil")
