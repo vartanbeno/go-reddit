@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
-	"os"
 )
 
 // Opt is a configuration option to initialize a client.
@@ -27,21 +26,21 @@ func WithHTTPClient(httpClient *http.Client) Opt {
 // GO_REDDIT_CLIENT_SECRET to set the client's secret.
 // GO_REDDIT_CLIENT_USERNAME to set the client's username.
 // GO_REDDIT_CLIENT_PASSWORD to set the client's password.
-func FromEnv(c *Client) error {
-	if v := os.Getenv("GO_REDDIT_CLIENT_ID"); v != "" {
-		c.ID = v
-	}
-	if v := os.Getenv("GO_REDDIT_CLIENT_SECRET"); v != "" {
-		c.Secret = v
-	}
-	if v := os.Getenv("GO_REDDIT_CLIENT_USERNAME"); v != "" {
-		c.Username = v
-	}
-	if v := os.Getenv("GO_REDDIT_CLIENT_PASSWORD"); v != "" {
-		c.Password = v
-	}
-	return nil
-}
+// func FromEnv(c *Client) error {
+// 	if v := os.Getenv("GO_REDDIT_CLIENT_ID"); v != "" {
+// 		c.ID = v
+// 	}
+// 	if v := os.Getenv("GO_REDDIT_CLIENT_SECRET"); v != "" {
+// 		c.Secret = v
+// 	}
+// 	if v := os.Getenv("GO_REDDIT_CLIENT_USERNAME"); v != "" {
+// 		c.Username = v
+// 	}
+// 	if v := os.Getenv("GO_REDDIT_CLIENT_PASSWORD"); v != "" {
+// 		c.Password = v
+// 	}
+// 	return nil
+// }
 
 // WithBaseURL sets the base URL for the client to make requests to.
 func WithBaseURL(u string) Opt {

@@ -92,17 +92,20 @@ func testClientDefaults(t *testing.T, c *Client) {
 }
 
 func TestNewClient(t *testing.T) {
-	c, err := NewClient(nil)
+	c, err := NewClient(&Credentials{})
 	require.NoError(t, err)
 	testClientDefaults(t, c)
 }
 
 func TestNewClient_Error(t *testing.T) {
+	_, err := NewClient(nil)
+	require.EqualError(t, err, "must provide credentials to initialize *reddit.Client")
+
 	errorOpt := func(c *Client) error {
 		return errors.New("foo")
 	}
 
-	_, err := NewClient(nil, errorOpt)
+	_, err = NewClient(&Credentials{}, errorOpt)
 	require.EqualError(t, err, "foo")
 }
 

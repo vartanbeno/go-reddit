@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -30,45 +31,6 @@ const (
 	headerAccept      = "Accept"
 	headerUserAgent   = "User-Agent"
 )
-
-// cloneRequest returns a clone of the provided *http.Request.
-// The clone is a shallow copy of the struct and its Header map,
-// since we'll only be modify the headers.
-// Per the specification of http.RoundTripper, we should not directly modify a request.
-func cloneRequest(r *http.Request) *http.Request {
-	r2 := new(http.Request)
-	*r2 = *r
-	// deep copy of the Header
-	r2.Header = make(http.Header, len(r.Header))
-	for k, s := range r.Header {
-		r2.Header[k] = append([]string(nil), s...)
-	}
-	return r2
-}
-
-// Sets the User-Agent header for requests.
-type userAgentTransport struct {
-	userAgent string
-	Base      http.RoundTripper
-}
-
-func (t *userAgentTransport) setUserAgent(req *http.Request) *http.Request {
-	req2 := cloneRequest(req)
-	req2.Header.Set(headerUserAgent, t.userAgent)
-	return req2
-}
-
-func (t *userAgentTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req2 := t.setUserAgent(req)
-	return t.base().RoundTrip(req2)
-}
-
-func (t *userAgentTransport) base() http.RoundTripper {
-	if t.Base != nil {
-		return t.Base
-	}
-	return http.DefaultTransport
-}
 
 // RequestCompletionCallback defines the type of the request callback function.
 type RequestCompletionCallback func(*http.Request, *http.Response)
@@ -152,8 +114,11 @@ func newClient() *Client {
 
 // NewClient returns a new Reddit API client.
 func NewClient(creds *Credentials, opts ...Opt) (*Client, error) {
-	client := newClient()
+	if creds == nil {
+		return nil, errors.New("must provide credentials to initialize *reddit.Client")
+	}
 
+	client := newClient()
 	for _, opt := range opts {
 		if err := opt(client); err != nil {
 			return nil, err
@@ -163,6 +128,14 @@ func NewClient(creds *Credentials, opts ...Opt) (*Client, error) {
 	if client.client == nil {
 		client.client = &http.Client{}
 	}
+
+	// We need to set a custom user agent, because using the one set by the
+	// stdlib gives us 429 Too Many Requests responses from the Reddit API.
+	userAgentTransport := &userAgentTransport{
+		userAgent: client.UserAgent(),
+		Base:      client.client.Transport,
+	}
+	client.client.Transport = userAgentTransport
 
 	// todo...
 	// Some endpoints (notably the ones to get random subreddits/posts) redirect to a
@@ -183,15 +156,13 @@ func NewClient(creds *Credentials, opts ...Opt) (*Client, error) {
 		}
 	}
 
-	if creds != nil {
-		client.ID = creds.ID
-		client.Secret = creds.Secret
-		client.Username = creds.Username
-		client.Password = creds.Password
+	client.ID = creds.ID
+	client.Secret = creds.Secret
+	client.Username = creds.Username
+	client.Password = creds.Password
 
-		oauthTransport := oauthTransport(client)
-		client.client.Transport = oauthTransport
-	}
+	oauthTransport := oauthTransport(client)
+	client.client.Transport = oauthTransport
 
 	return client, nil
 }
@@ -204,7 +175,7 @@ func (c *Client) UserAgent() string {
 	return c.userAgent
 }
 
-// NewRequest creates an API request.
+// NewRequest creates an API request with a JSON body.
 // The path is the relative URL which will be resolves to the BaseURL of the Client.
 // It should always be specified without a preceding slash.
 func (c *Client) NewRequest(method string, path string, body interface{}) (*http.Request, error) {
@@ -253,7 +224,7 @@ func (c *Client) NewRequestWithForm(method string, path string, form url.Values)
 	return req, nil
 }
 
-// Response is a PlayNetwork response. This wraps the standard http.Response returned from PlayNetwork.
+// Response is a Reddit response. This wraps the standard http.Response returned from Reddit.
 type Response struct {
 	*http.Response
 }
