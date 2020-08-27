@@ -25,7 +25,7 @@ func run() (err error) {
 		Password: "password",
 	}
 
-	client, err := reddit.NewClient(nil, credentials)
+	client, err := reddit.NewClient(credentials)
 	if err != nil {
 		return
 	}

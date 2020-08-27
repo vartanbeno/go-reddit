@@ -31,7 +31,7 @@ func setup() (*Client, *http.ServeMux, func()) {
 		fmt.Fprint(w, response)
 	})
 
-	client, _ := NewClient(nil,
+	client, _ := NewClient(
 		&Credentials{"id1", "secret1", "user1", "password1"},
 		WithBaseURL(server.URL),
 		WithTokenURL(server.URL+"/api/v1/access_token"),
@@ -92,7 +92,7 @@ func testClientDefaults(t *testing.T, c *Client) {
 }
 
 func TestNewClient(t *testing.T) {
-	c, err := NewClient(nil, nil)
+	c, err := NewClient(nil)
 	require.NoError(t, err)
 	testClientDefaults(t, c)
 }
@@ -102,7 +102,7 @@ func TestNewClient_Error(t *testing.T) {
 		return errors.New("foo")
 	}
 
-	_, err := NewClient(nil, nil, errorOpt)
+	_, err := NewClient(nil, errorOpt)
 	require.EqualError(t, err, "foo")
 }
 

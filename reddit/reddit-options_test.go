@@ -1,11 +1,21 @@
 package reddit
 
 import (
+	"net/http"
+	"net/url"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+func TestWithHTTPClient(t *testing.T) {
+	_, err := NewClient(nil, WithHTTPClient(nil))
+	require.EqualError(t, err, "httpClient: cannot be nil")
+
+	_, err = NewClient(nil, WithHTTPClient(&http.Client{}))
+	require.NoError(t, err)
+}
 
 func TestFromEnv(t *testing.T) {
 	os.Setenv("GO_REDDIT_CLIENT_ID", "id1")
@@ -20,7 +30,7 @@ func TestFromEnv(t *testing.T) {
 	os.Setenv("GO_REDDIT_CLIENT_PASSWORD", "password1")
 	defer os.Unsetenv("GO_REDDIT_CLIENT_PASSWORD")
 
-	c, err := NewClient(nil, nil, FromEnv)
+	c, err := NewClient(nil, FromEnv)
 	require.NoError(t, err)
 
 	type values struct {
@@ -33,15 +43,25 @@ func TestFromEnv(t *testing.T) {
 }
 
 func TestWithBaseURL(t *testing.T) {
+	c, err := NewClient(nil, WithBaseURL(":"))
+	urlErr, ok := err.(*url.Error)
+	require.True(t, ok)
+	require.Equal(t, "parse", urlErr.Op)
+
 	baseURL := "http://localhost:8080"
-	c, err := NewClient(nil, nil, WithBaseURL(baseURL))
+	c, err = NewClient(nil, WithBaseURL(baseURL))
 	require.NoError(t, err)
 	require.Equal(t, baseURL, c.BaseURL.String())
 }
 
 func TestWithTokenURL(t *testing.T) {
+	c, err := NewClient(nil, WithTokenURL(":"))
+	urlErr, ok := err.(*url.Error)
+	require.True(t, ok)
+	require.Equal(t, "parse", urlErr.Op)
+
 	tokenURL := "http://localhost:8080/api/v1/access_token"
-	c, err := NewClient(nil, nil, WithTokenURL(tokenURL))
+	c, err = NewClient(nil, WithTokenURL(tokenURL))
 	require.NoError(t, err)
 	require.Equal(t, tokenURL, c.TokenURL.String())
 }

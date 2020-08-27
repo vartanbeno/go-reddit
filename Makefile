@@ -12,7 +12,7 @@ define log
 endef
 
 .PHONY: all
-all: lint fmt vet test test-coverage build
+all: lint fmt vet test test-coverage
 
 .PHONY: usage
 usage:

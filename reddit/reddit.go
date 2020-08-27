@@ -124,32 +124,11 @@ func (c *Client) OnRequestCompleted(rc RequestCompletionCallback) {
 	c.onRequestCompleted = rc
 }
 
-func newClient(httpClient *http.Client) *Client {
-	if httpClient == nil {
-		httpClient = &http.Client{}
-	}
-
-	// todo...
-	// Some endpoints (notably the ones to get random subreddits/posts) redirect to a
-	// reddit.com url, which returns a 403 Forbidden for some reason, unless the url's
-	// host is changed to oauth.reddit.com
-	httpClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		redirectURL := req.URL.String()
-		redirectURL = strings.Replace(redirectURL, "https://www.reddit.com", defaultBaseURL, 1)
-
-		reqURL, err := url.Parse(redirectURL)
-		if err != nil {
-			return err
-		}
-		req.URL = reqURL
-
-		return nil
-	}
-
+func newClient() *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 	tokenURL, _ := url.Parse(defaultTokenURL)
 
-	client := &Client{client: httpClient, BaseURL: baseURL, TokenURL: tokenURL}
+	client := &Client{BaseURL: baseURL, TokenURL: tokenURL}
 
 	client.Account = &AccountService{client: client}
 	client.Collection = &CollectionService{client: client}
@@ -171,14 +150,36 @@ func newClient(httpClient *http.Client) *Client {
 	return client
 }
 
-// NewClient returns a new Reddit API client. If a nil httpClient is provided,
-// a new http.Client will be used.
-func NewClient(httpClient *http.Client, creds *Credentials, opts ...Opt) (*Client, error) {
-	client := newClient(httpClient)
+// NewClient returns a new Reddit API client.
+func NewClient(creds *Credentials, opts ...Opt) (*Client, error) {
+	client := newClient()
 
 	for _, opt := range opts {
 		if err := opt(client); err != nil {
 			return nil, err
+		}
+	}
+
+	if client.client == nil {
+		client.client = &http.Client{}
+	}
+
+	// todo...
+	// Some endpoints (notably the ones to get random subreddits/posts) redirect to a
+	// reddit.com url, which returns a 403 Forbidden for some reason, unless the url's
+	// host is changed to oauth.reddit.com
+	if client.client.CheckRedirect == nil {
+		client.client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			redirectURL := req.URL.String()
+			redirectURL = strings.Replace(redirectURL, "https://www.reddit.com", defaultBaseURL, 1)
+
+			reqURL, err := url.Parse(redirectURL)
+			if err != nil {
+				return err
+			}
+			req.URL = reqURL
+
+			return nil
 		}
 	}
 

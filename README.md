@@ -37,19 +37,30 @@ func main() {
         Username: "username",
         Password: "password",
     }
-    client, _ := reddit.NewClient(nil, credentials)
+    client, _ := reddit.NewClient(credentials)
 }
 ```
 
-The first argument (the one set to `nil`) is of type `*http.Client`. It will be used to make the requests. If nil, it will be set to `&http.Client{}`.
+You can pass in a number of options to `NewClient` that further configure the client. For example, to use a custom HTTP client:
+
+```go
+httpClient := &http.Client{Timeout: time.Second * 30}
+client, _ := reddit.NewClient(credentials, reddit.WithHTTPClient(httpClient))
+```
+
+If this option is not used, it will be set to `&http.Client{}` by default. More options are available in the [reddit/reddit-options.go](reddit/reddit-options.go) file.
 
 ## Examples
 
 <details>
-    <summary>Configure the client from environment variables.</summary>
+    <summary>Submit a comment.</summary>
 
 ```go
-client, _ := reddit.NewClient(nil, reddit.FromEnv)
+comment, _, err := client.Comment.Submit(context.Background(), "t3_postid", "comment body")
+if err != nil {
+    return err
+}
+fmt.Printf("Comment permalink: %s\n", comment.Permalink)
 ```
 </details>
 
@@ -59,7 +70,6 @@ client, _ := reddit.NewClient(nil, reddit.FromEnv)
 ```go
 _, err := client.Post.Upvote(context.Background(), "t3_postid")
 if err != nil {
-    fmt.Printf("Something bad happened: %v\n", err)
     return err
 }
 ```
@@ -76,7 +86,6 @@ result, _, err := client.Subreddit.TopPosts(context.Background(), "golang", &red
     Time: "all",
 })
 if err != nil {
-    fmt.Printf("Something bad happened: %v\n", err)
     return err
 }
 fmt.Printf("Received %d posts.\n", len(result.Posts))
@@ -87,7 +96,7 @@ More examples are available in the [examples](examples) folder.
 
 ## Design
 
-The package design and structure are heavily inspired from [Google's GitHub API client](https://github.com/google/go-github) and [DigitalOcean's API client](https://github.com/digitalocean/godo).
+The package design is heavily inspired from [Google's GitHub API client](https://github.com/google/go-github) and [DigitalOcean's API client](https://github.com/digitalocean/godo).
 
 ## License
 
