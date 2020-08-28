@@ -3,6 +3,8 @@
 [![Actions Status](https://github.com/vartanbeno/go-reddit/workflows/tests/badge.svg)](https://github.com/vartanbeno/go-reddit/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit)
 
+Featured in [issue 327 of Golang Weekly](https://golangweekly.com/issues/327) 🎉
+
 go-reddit is a Go client library for accessing the Reddit API.
 
 You can view Reddit's official API documentation [here](https://www.reddit.com/dev/api/).
