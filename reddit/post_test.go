@@ -376,9 +376,9 @@ func TestPostService_Hide(t *testing.T) {
 	_, err := client.Post.Hide(ctx)
 	require.EqualError(t, err, "must provide at least 1 id")
 
-	res, err := client.Post.Hide(ctx, "1", "2", "3")
+	resp, err := client.Post.Hide(ctx, "1", "2", "3")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Unhide(t *testing.T) {
@@ -399,9 +399,9 @@ func TestPostService_Unhide(t *testing.T) {
 	_, err := client.Post.Unhide(ctx)
 	require.EqualError(t, err, "must provide at least 1 id")
 
-	res, err := client.Post.Unhide(ctx, "1", "2", "3")
+	resp, err := client.Post.Unhide(ctx, "1", "2", "3")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_MarkNSFW(t *testing.T) {
@@ -419,9 +419,9 @@ func TestPostService_MarkNSFW(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.MarkNSFW(ctx, "t3_test")
+	resp, err := client.Post.MarkNSFW(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_UnmarkNSFW(t *testing.T) {
@@ -439,9 +439,9 @@ func TestPostService_UnmarkNSFW(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.UnmarkNSFW(ctx, "t3_test")
+	resp, err := client.Post.UnmarkNSFW(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Spoiler(t *testing.T) {
@@ -459,9 +459,9 @@ func TestPostService_Spoiler(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Spoiler(ctx, "t3_test")
+	resp, err := client.Post.Spoiler(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Unspoiler(t *testing.T) {
@@ -479,9 +479,9 @@ func TestPostService_Unspoiler(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Unspoiler(ctx, "t3_test")
+	resp, err := client.Post.Unspoiler(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Sticky(t *testing.T) {
@@ -502,9 +502,9 @@ func TestPostService_Sticky(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Sticky(ctx, "t3_test", false)
+	resp, err := client.Post.Sticky(ctx, "t3_test", false)
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Unsticky(t *testing.T) {
@@ -524,9 +524,9 @@ func TestPostService_Unsticky(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Unsticky(ctx, "t3_test")
+	resp, err := client.Post.Unsticky(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_PinToProfile(t *testing.T) {
@@ -547,9 +547,9 @@ func TestPostService_PinToProfile(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.PinToProfile(ctx, "t3_test")
+	resp, err := client.Post.PinToProfile(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_UnpinFromProfile(t *testing.T) {
@@ -570,9 +570,9 @@ func TestPostService_UnpinFromProfile(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.UnpinFromProfile(ctx, "t3_test")
+	resp, err := client.Post.UnpinFromProfile(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_SetSuggestedSortBest(t *testing.T) {
@@ -592,9 +592,9 @@ func TestPostService_SetSuggestedSortBest(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.SetSuggestedSortBest(ctx, "t3_test")
+	resp, err := client.Post.SetSuggestedSortBest(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_SetSuggestedSortTop(t *testing.T) {
@@ -614,9 +614,9 @@ func TestPostService_SetSuggestedSortTop(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.SetSuggestedSortTop(ctx, "t3_test")
+	resp, err := client.Post.SetSuggestedSortTop(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_SetSuggestedSortNew(t *testing.T) {
@@ -636,9 +636,9 @@ func TestPostService_SetSuggestedSortNew(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.SetSuggestedSortNew(ctx, "t3_test")
+	resp, err := client.Post.SetSuggestedSortNew(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_SetSuggestedSortControversial(t *testing.T) {
@@ -658,9 +658,9 @@ func TestPostService_SetSuggestedSortControversial(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.SetSuggestedSortControversial(ctx, "t3_test")
+	resp, err := client.Post.SetSuggestedSortControversial(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_SetSuggestedSortOld(t *testing.T) {
@@ -680,9 +680,9 @@ func TestPostService_SetSuggestedSortOld(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.SetSuggestedSortOld(ctx, "t3_test")
+	resp, err := client.Post.SetSuggestedSortOld(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_SetSuggestedSortRandom(t *testing.T) {
@@ -702,9 +702,9 @@ func TestPostService_SetSuggestedSortRandom(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.SetSuggestedSortRandom(ctx, "t3_test")
+	resp, err := client.Post.SetSuggestedSortRandom(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_SetSuggestedSortAMA(t *testing.T) {
@@ -724,9 +724,9 @@ func TestPostService_SetSuggestedSortAMA(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.SetSuggestedSortAMA(ctx, "t3_test")
+	resp, err := client.Post.SetSuggestedSortAMA(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_SetSuggestedSortLive(t *testing.T) {
@@ -746,9 +746,9 @@ func TestPostService_SetSuggestedSortLive(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.SetSuggestedSortLive(ctx, "t3_test")
+	resp, err := client.Post.SetSuggestedSortLive(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_ClearSuggestedSort(t *testing.T) {
@@ -768,9 +768,9 @@ func TestPostService_ClearSuggestedSort(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.ClearSuggestedSort(ctx, "t3_test")
+	resp, err := client.Post.ClearSuggestedSort(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_EnableContestMode(t *testing.T) {
@@ -790,9 +790,9 @@ func TestPostService_EnableContestMode(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.EnableContestMode(ctx, "t3_test")
+	resp, err := client.Post.EnableContestMode(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_DisableContestMode(t *testing.T) {
@@ -812,9 +812,9 @@ func TestPostService_DisableContestMode(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.DisableContestMode(ctx, "t3_test")
+	resp, err := client.Post.DisableContestMode(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_LoadMoreReplies(t *testing.T) {
@@ -935,9 +935,9 @@ func TestPostService_Delete(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Delete(ctx, "t3_test")
+	resp, err := client.Post.Delete(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Save(t *testing.T) {
@@ -955,9 +955,9 @@ func TestPostService_Save(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Save(ctx, "t3_test")
+	resp, err := client.Post.Save(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Unsave(t *testing.T) {
@@ -975,9 +975,9 @@ func TestPostService_Unsave(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Unsave(ctx, "t3_test")
+	resp, err := client.Post.Unsave(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_EnableReplies(t *testing.T) {
@@ -996,9 +996,9 @@ func TestPostService_EnableReplies(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.EnableReplies(ctx, "t3_test")
+	resp, err := client.Post.EnableReplies(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_DisableReplies(t *testing.T) {
@@ -1017,9 +1017,9 @@ func TestPostService_DisableReplies(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.DisableReplies(ctx, "t3_test")
+	resp, err := client.Post.DisableReplies(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Lock(t *testing.T) {
@@ -1037,9 +1037,9 @@ func TestPostService_Lock(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Lock(ctx, "t3_test")
+	resp, err := client.Post.Lock(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Unlock(t *testing.T) {
@@ -1057,9 +1057,9 @@ func TestPostService_Unlock(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Unlock(ctx, "t3_test")
+	resp, err := client.Post.Unlock(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Upvote(t *testing.T) {
@@ -1079,9 +1079,9 @@ func TestPostService_Upvote(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Upvote(ctx, "t3_test")
+	resp, err := client.Post.Upvote(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_Downvote(t *testing.T) {
@@ -1101,9 +1101,9 @@ func TestPostService_Downvote(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.Downvote(ctx, "t3_test")
+	resp, err := client.Post.Downvote(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_RemoveVote(t *testing.T) {
@@ -1123,9 +1123,9 @@ func TestPostService_RemoveVote(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Post.RemoveVote(ctx, "t3_test")
+	resp, err := client.Post.RemoveVote(ctx, "t3_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestPostService_MarkVisited(t *testing.T) {

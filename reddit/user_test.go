@@ -761,9 +761,9 @@ func TestUserService_Unfriend(t *testing.T) {
 		w.WriteHeader(http.StatusNoContent)
 	})
 
-	res, err := client.User.Unfriend(ctx, "test123")
+	resp, err := client.User.Unfriend(ctx, "test123")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusNoContent, res.StatusCode)
+	require.Equal(t, http.StatusNoContent, resp.StatusCode)
 }
 
 func TestUserService_Block(t *testing.T) {

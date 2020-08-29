@@ -61,9 +61,9 @@ func TestMessageService_ReadAll(t *testing.T) {
 		w.WriteHeader(http.StatusAccepted)
 	})
 
-	res, err := client.Message.ReadAll(ctx)
+	resp, err := client.Message.ReadAll(ctx)
 	require.NoError(t, err)
-	require.Equal(t, http.StatusAccepted, res.StatusCode)
+	require.Equal(t, http.StatusAccepted, resp.StatusCode)
 }
 
 func TestMessageService_Read(t *testing.T) {

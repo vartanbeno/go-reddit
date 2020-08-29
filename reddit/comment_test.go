@@ -108,9 +108,9 @@ func TestCommentService_Delete(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.Delete(ctx, "t1_test")
+	resp, err := client.Comment.Delete(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_Save(t *testing.T) {
@@ -128,9 +128,9 @@ func TestCommentService_Save(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.Save(ctx, "t1_test")
+	resp, err := client.Comment.Save(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_Unsave(t *testing.T) {
@@ -148,9 +148,9 @@ func TestCommentService_Unsave(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.Unsave(ctx, "t1_test")
+	resp, err := client.Comment.Unsave(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_EnableReplies(t *testing.T) {
@@ -169,9 +169,9 @@ func TestCommentService_EnableReplies(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.EnableReplies(ctx, "t1_test")
+	resp, err := client.Comment.EnableReplies(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_DisableReplies(t *testing.T) {
@@ -190,9 +190,9 @@ func TestCommentService_DisableReplies(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.DisableReplies(ctx, "t1_test")
+	resp, err := client.Comment.DisableReplies(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_Lock(t *testing.T) {
@@ -210,9 +210,9 @@ func TestCommentService_Lock(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.Lock(ctx, "t1_test")
+	resp, err := client.Comment.Lock(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_Unlock(t *testing.T) {
@@ -230,9 +230,9 @@ func TestCommentService_Unlock(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.Unlock(ctx, "t1_test")
+	resp, err := client.Comment.Unlock(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_Upvote(t *testing.T) {
@@ -252,9 +252,9 @@ func TestCommentService_Upvote(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.Upvote(ctx, "t1_test")
+	resp, err := client.Comment.Upvote(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_Downvote(t *testing.T) {
@@ -274,9 +274,9 @@ func TestCommentService_Downvote(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.Downvote(ctx, "t1_test")
+	resp, err := client.Comment.Downvote(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_RemoveVote(t *testing.T) {
@@ -296,9 +296,9 @@ func TestCommentService_RemoveVote(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	res, err := client.Comment.RemoveVote(ctx, "t1_test")
+	resp, err := client.Comment.RemoveVote(ctx, "t1_test")
 	require.NoError(t, err)
-	require.Equal(t, http.StatusOK, res.StatusCode)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
 }
 
 func TestCommentService_LoadMoreReplies(t *testing.T) {
