@@ -40,7 +40,8 @@ func main() {
 			if !ok {
 				return
 			}
-			fmt.Printf("Stopping due to %s signal\n", rcvSig)
+			fmt.Printf("Stopping due to %s signal.\n", rcvSig)
+			return
 		case <-timer.C:
 			return
 		}
