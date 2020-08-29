@@ -207,54 +207,46 @@ var expectedRandomSubreddit = &Subreddit{
 	Subscribers: 52357,
 }
 
-var expectedRelationships3 = &Relationships{
-	Relationships: []*Relationship{
-		{
-			ID:      "rel_id1",
-			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
-			User:    "testuser1",
-			UserID:  "t2_user1",
-		},
-		{
-			ID:      "rel_id2",
-			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
-			User:    "testuser2",
-			UserID:  "t2_user2",
-		},
+var expectedRelationships3 = []*Relationship{
+	{
+		ID:      "rel_id1",
+		Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
+		User:    "testuser1",
+		UserID:  "t2_user1",
 	},
-	After:  "",
-	Before: "",
+	{
+		ID:      "rel_id2",
+		Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
+		User:    "testuser2",
+		UserID:  "t2_user2",
+	},
 }
 
-var expectedBans = &Bans{
-	Bans: []*Ban{
-		{
-			Relationship: &Relationship{
-				ID:      "rb_123",
-				Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
+var expectedBans = []*Ban{
+	{
+		Relationship: &Relationship{
+			ID:      "rb_123",
+			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 2, 0, time.UTC)},
 
-				User:   "testuser1",
-				UserID: "t2_user1",
-			},
-
-			DaysLeft: Int(43),
-			Note:     "Spam",
+			User:   "testuser1",
+			UserID: "t2_user1",
 		},
-		{
-			Relationship: &Relationship{
-				ID:      "rb_456",
-				Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
 
-				User:   "testuser2",
-				UserID: "t2_user2",
-			},
-
-			DaysLeft: nil,
-			Note:     "Spam",
-		},
+		DaysLeft: Int(43),
+		Note:     "Spam",
 	},
-	After:  "",
-	Before: "",
+	{
+		Relationship: &Relationship{
+			ID:      "rb_456",
+			Created: &Timestamp{time.Date(2020, 8, 11, 2, 35, 0, 0, time.UTC)},
+
+			User:   "testuser2",
+			UserID: "t2_user2",
+		},
+
+		DaysLeft: nil,
+		Note:     "Spam",
+	},
 }
 
 var expectedModerators = []*Moderator{

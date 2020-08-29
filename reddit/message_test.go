@@ -10,46 +10,38 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var expectedCommentMessages = &Messages{
-	Messages: []*Message{
-		{
-			ID:      "g1xi2m9",
-			FullID:  "t1_g1xi2m9",
-			Created: &Timestamp{time.Date(2020, 8, 18, 0, 24, 13, 0, time.UTC)},
+var expectedCommentMessages = []*Message{
+	{
+		ID:      "g1xi2m9",
+		FullID:  "t1_g1xi2m9",
+		Created: &Timestamp{time.Date(2020, 8, 18, 0, 24, 13, 0, time.UTC)},
 
-			Subject:  "post reply",
-			Text:     "u/testuser2 hello",
-			ParentID: "t3_hs03f3",
+		Subject:  "post reply",
+		Text:     "u/testuser2 hello",
+		ParentID: "t3_hs03f3",
 
-			Author: "testuser1",
-			To:     "testuser2",
+		Author: "testuser1",
+		To:     "testuser2",
 
-			IsComment: true,
-		},
+		IsComment: true,
 	},
-	After:  "",
-	Before: "",
 }
 
-var expectedMessages = &Messages{
-	Messages: []*Message{
-		{
-			ID:      "qwki97",
-			FullID:  "t4_qwki97",
-			Created: &Timestamp{time.Date(2020, 8, 18, 0, 16, 53, 0, time.UTC)},
+var expectedMessages = []*Message{
+	{
+		ID:      "qwki97",
+		FullID:  "t4_qwki97",
+		Created: &Timestamp{time.Date(2020, 8, 18, 0, 16, 53, 0, time.UTC)},
 
-			Subject:  "re: test",
-			Text:     "test",
-			ParentID: "t4_qwki4m",
+		Subject:  "re: test",
+		Text:     "test",
+		ParentID: "t4_qwki4m",
 
-			Author: "testuser1",
-			To:     "testuser2",
+		Author: "testuser1",
+		To:     "testuser2",
 
-			IsComment: false,
-		},
+		IsComment: false,
 	},
-	After:  "",
-	Before: "",
 }
 
 func TestMessageService_ReadAll(t *testing.T) {

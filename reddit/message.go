@@ -35,22 +35,42 @@ type Message struct {
 	IsComment bool `json:"was_comment"`
 }
 
-// Messages is a list of messages.
-type Messages struct {
-	Messages []*Message `json:"messages"`
-	After    string     `json:"after"`
-	Before   string     `json:"before"`
-}
-
-type rootInboxListing struct {
-	Kind string       `json:"kind"`
-	Data inboxListing `json:"data"`
-}
-
 type inboxListing struct {
-	Things inboxThings `json:"children"`
-	After  string      `json:"after"`
-	Before string      `json:"before"`
+	inboxThings
+	after  string
+	before string
+}
+
+var _ anchor = &inboxListing{}
+
+func (l *inboxListing) After() string {
+	return l.after
+}
+
+func (l *inboxListing) Before() string {
+	return l.before
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (l *inboxListing) UnmarshalJSON(b []byte) error {
+	root := new(struct {
+		Data struct {
+			Things inboxThings `json:"children"`
+			After  string      `json:"after"`
+			Before string      `json:"before"`
+		} `json:"data"`
+	})
+
+	err := json.Unmarshal(b, root)
+	if err != nil {
+		return err
+	}
+
+	l.inboxThings = root.Data.Things
+	l.after = root.Data.After
+	l.before = root.Data.Before
+
+	return nil
 }
 
 // The returned JSON for comments is a bit different.
@@ -91,22 +111,6 @@ func (t *inboxThings) UnmarshalJSON(b []byte) error {
 	}
 
 	return nil
-}
-
-func (l *rootInboxListing) getComments() *Messages {
-	return &Messages{
-		Messages: l.Data.Things.Comments,
-		After:    l.Data.After,
-		Before:   l.Data.Before,
-	}
-}
-
-func (l *rootInboxListing) getMessages() *Messages {
-	return &Messages{
-		Messages: l.Data.Things.Messages,
-		After:    l.Data.After,
-		Before:   l.Data.Before,
-	}
 }
 
 // SendMessageRequest represents a request to send a message.
@@ -262,33 +266,33 @@ func (s *MessageService) Send(ctx context.Context, sendRequest *SendMessageReque
 }
 
 // Inbox returns comments and messages that appear in your inbox, respectively.
-func (s *MessageService) Inbox(ctx context.Context, opts *ListOptions) (*Messages, *Messages, *Response, error) {
+func (s *MessageService) Inbox(ctx context.Context, opts *ListOptions) ([]*Message, []*Message, *Response, error) {
 	root, resp, err := s.inbox(ctx, "message/inbox", opts)
 	if err != nil {
 		return nil, nil, resp, err
 	}
-	return root.getComments(), root.getMessages(), resp, nil
+	return root.Comments, root.Messages, resp, nil
 }
 
 // InboxUnread returns unread comments and messages that appear in your inbox, respectively.
-func (s *MessageService) InboxUnread(ctx context.Context, opts *ListOptions) (*Messages, *Messages, *Response, error) {
+func (s *MessageService) InboxUnread(ctx context.Context, opts *ListOptions) ([]*Message, []*Message, *Response, error) {
 	root, resp, err := s.inbox(ctx, "message/unread", opts)
 	if err != nil {
 		return nil, nil, resp, err
 	}
-	return root.getComments(), root.getMessages(), resp, nil
+	return root.Comments, root.Messages, resp, nil
 }
 
 // Sent returns messages that you've sent.
-func (s *MessageService) Sent(ctx context.Context, opts *ListOptions) (*Messages, *Response, error) {
+func (s *MessageService) Sent(ctx context.Context, opts *ListOptions) ([]*Message, *Response, error) {
 	root, resp, err := s.inbox(ctx, "message/sent", opts)
 	if err != nil {
 		return nil, resp, err
 	}
-	return root.getMessages(), resp, nil
+	return root.Messages, resp, nil
 }
 
-func (s *MessageService) inbox(ctx context.Context, path string, opts *ListOptions) (*rootInboxListing, *Response, error) {
+func (s *MessageService) inbox(ctx context.Context, path string, opts *ListOptions) (*inboxListing, *Response, error) {
 	path, err := addOptions(path, opts)
 	if err != nil {
 		return nil, nil, err
@@ -299,7 +303,7 @@ func (s *MessageService) inbox(ctx context.Context, path string, opts *ListOptio
 		return nil, nil, err
 	}
 
-	root := new(rootInboxListing)
+	root := new(inboxListing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, nil, err
