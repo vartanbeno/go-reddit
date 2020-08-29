@@ -90,7 +90,7 @@ if err != nil {
     <summary>Get r/golang's top 5 posts of all time.</summary>
 
 ```go
-result, _, err := client.Subreddit.TopPosts(context.Background(), "golang", &reddit.ListPostOptions{
+posts, _, err := client.Subreddit.TopPosts(context.Background(), "golang", &reddit.ListPostOptions{
     ListOptions: reddit.ListOptions{
         Limit: 5,
     },
@@ -99,7 +99,7 @@ result, _, err := client.Subreddit.TopPosts(context.Background(), "golang", &red
 if err != nil {
     return err
 }
-fmt.Printf("Received %d posts.\n", len(result.Posts))
+fmt.Printf("Received %d posts.\n", len(posts))
 ```
 </details>
 

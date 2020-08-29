@@ -252,7 +252,7 @@ func (s *EmojiService) Upload(ctx context.Context, subreddit string, createReque
 
 	err = CheckResponse(httpResponse)
 	if err != nil {
-		return &Response{httpResponse}, err
+		return newResponse(httpResponse), err
 	}
 
 	return s.upload(ctx, subreddit, createRequest, fields["key"])

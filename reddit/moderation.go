@@ -42,8 +42,8 @@ type ModAction struct {
 	SubredditID string `json:"sr_id36,omitempty"`
 }
 
-// GetActions gets a list of moderator actions on a subreddit.
-func (s *ModerationService) GetActions(ctx context.Context, subreddit string, opts *ListModActionOptions) (*ModActions, *Response, error) {
+// Actions gets a list of moderator actions on a subreddit.
+func (s *ModerationService) Actions(ctx context.Context, subreddit string, opts *ListModActionOptions) ([]*ModAction, *Response, error) {
 	path := fmt.Sprintf("r/%s/about/log", subreddit)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -60,13 +60,13 @@ func (s *ModerationService) GetActions(ctx context.Context, subreddit string, op
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getModActions(), resp, nil
+	return root.ModActions, resp, nil
 }
 
 // AcceptInvite accepts a pending invite to moderate the specified subreddit.
@@ -162,7 +162,7 @@ func (s *ModerationService) LeaveContributor(ctx context.Context, subredditID st
 }
 
 // Edited gets posts and comments that have been edited recently.
-func (s *ModerationService) Edited(ctx context.Context, subreddit string, opts *ListOptions) (*Posts, *Comments, *Response, error) {
+func (s *ModerationService) Edited(ctx context.Context, subreddit string, opts *ListOptions) ([]*Post, []*Comment, *Response, error) {
 	path := fmt.Sprintf("r/%s/about/edited", subreddit)
 
 	path, err := addOptions(path, opts)
@@ -175,13 +175,13 @@ func (s *ModerationService) Edited(ctx context.Context, subreddit string, opts *
 		return nil, nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	return root.getPosts(), root.getComments(), resp, nil
+	return root.Posts, root.Comments, resp, nil
 }
 
 // IgnoreReports prevents reports on a post or comment from causing notifications.

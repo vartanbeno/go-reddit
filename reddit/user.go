@@ -146,12 +146,12 @@ func (s *UserService) UsernameAvailable(ctx context.Context, username string) (b
 }
 
 // Overview returns a list of your posts and comments.
-func (s *UserService) Overview(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Comments, *Response, error) {
+func (s *UserService) Overview(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, []*Comment, *Response, error) {
 	return s.OverviewOf(ctx, s.client.Username, opts)
 }
 
 // OverviewOf returns a list of the user's posts and comments.
-func (s *UserService) OverviewOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Posts, *Comments, *Response, error) {
+func (s *UserService) OverviewOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Post, []*Comment, *Response, error) {
 	path := fmt.Sprintf("user/%s/overview", username)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -163,22 +163,22 @@ func (s *UserService) OverviewOf(ctx context.Context, username string, opts *Lis
 		return nil, nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, nil, resp, err
 	}
 
-	return root.getPosts(), root.getComments(), resp, nil
+	return root.Posts, root.Comments, resp, nil
 }
 
 // Posts returns a list of your posts.
-func (s *UserService) Posts(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+func (s *UserService) Posts(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	return s.PostsOf(ctx, s.client.Username, opts)
 }
 
 // PostsOf returns a list of the user's posts.
-func (s *UserService) PostsOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+func (s *UserService) PostsOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted", username)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -190,22 +190,22 @@ func (s *UserService) PostsOf(ctx context.Context, username string, opts *ListUs
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getPosts(), resp, nil
+	return root.Posts, resp, nil
 }
 
 // Comments returns a list of your comments.
-func (s *UserService) Comments(ctx context.Context, opts *ListUserOverviewOptions) (*Comments, *Response, error) {
+func (s *UserService) Comments(ctx context.Context, opts *ListUserOverviewOptions) ([]*Comment, *Response, error) {
 	return s.CommentsOf(ctx, s.client.Username, opts)
 }
 
 // CommentsOf returns a list of the user's comments.
-func (s *UserService) CommentsOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Comments, *Response, error) {
+func (s *UserService) CommentsOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Comment, *Response, error) {
 	path := fmt.Sprintf("user/%s/comments", username)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -217,17 +217,17 @@ func (s *UserService) CommentsOf(ctx context.Context, username string, opts *Lis
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getComments(), resp, nil
+	return root.Comments, resp, nil
 }
 
 // Saved returns a list of the user's saved posts and comments.
-func (s *UserService) Saved(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Comments, *Response, error) {
+func (s *UserService) Saved(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, []*Comment, *Response, error) {
 	path := fmt.Sprintf("user/%s/saved", s.client.Username)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -239,23 +239,23 @@ func (s *UserService) Saved(ctx context.Context, opts *ListUserOverviewOptions) 
 		return nil, nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, nil, resp, err
 	}
 
-	return root.getPosts(), root.getComments(), resp, nil
+	return root.Posts, root.Comments, resp, nil
 }
 
 // Upvoted returns a list of your upvoted posts.
-func (s *UserService) Upvoted(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+func (s *UserService) Upvoted(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	return s.UpvotedOf(ctx, s.client.Username, opts)
 }
 
 // UpvotedOf returns a list of the user's upvoted posts.
 // The user's votes must be public for this to work (unless the user is you).
-func (s *UserService) UpvotedOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+func (s *UserService) UpvotedOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/upvoted", username)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -267,23 +267,23 @@ func (s *UserService) UpvotedOf(ctx context.Context, username string, opts *List
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getPosts(), resp, nil
+	return root.Posts, resp, nil
 }
 
 // Downvoted returns a list of your downvoted posts.
-func (s *UserService) Downvoted(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+func (s *UserService) Downvoted(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	return s.DownvotedOf(ctx, s.client.Username, opts)
 }
 
 // DownvotedOf returns a list of the user's downvoted posts.
 // The user's votes must be public for this to work (unless the user is you).
-func (s *UserService) DownvotedOf(ctx context.Context, username string, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+func (s *UserService) DownvotedOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/downvoted", username)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -295,17 +295,17 @@ func (s *UserService) DownvotedOf(ctx context.Context, username string, opts *Li
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getPosts(), resp, nil
+	return root.Posts, resp, nil
 }
 
 // Hidden returns a list of the user's hidden posts.
-func (s *UserService) Hidden(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+func (s *UserService) Hidden(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/hidden", s.client.Username)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -317,17 +317,17 @@ func (s *UserService) Hidden(ctx context.Context, opts *ListUserOverviewOptions)
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getPosts(), resp, nil
+	return root.Posts, resp, nil
 }
 
 // Gilded returns a list of the user's gilded posts.
-func (s *UserService) Gilded(ctx context.Context, opts *ListUserOverviewOptions) (*Posts, *Response, error) {
+func (s *UserService) Gilded(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/gilded", s.client.Username)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -339,13 +339,13 @@ func (s *UserService) Gilded(ctx context.Context, opts *ListUserOverviewOptions)
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getPosts(), resp, nil
+	return root.Posts, resp, nil
 }
 
 // GetFriendship returns relationship details with the specified user.
@@ -517,7 +517,7 @@ func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]Trophy
 }
 
 // Popular gets the user subreddits with the most activity.
-func (s *UserService) Popular(ctx context.Context, opts *ListOptions) (*Subreddits, *Response, error) {
+func (s *UserService) Popular(ctx context.Context, opts *ListOptions) ([]*Subreddit, *Response, error) {
 	path := "users/popular"
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -529,17 +529,17 @@ func (s *UserService) Popular(ctx context.Context, opts *ListOptions) (*Subreddi
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getSubreddits(), resp, nil
+	return root.Subreddits, resp, nil
 }
 
 // New gets the most recently created user subreddits.
-func (s *UserService) New(ctx context.Context, opts *ListUserOverviewOptions) (*Subreddits, *Response, error) {
+func (s *UserService) New(ctx context.Context, opts *ListUserOverviewOptions) ([]*Subreddit, *Response, error) {
 	path := "users/new"
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -551,18 +551,18 @@ func (s *UserService) New(ctx context.Context, opts *ListUserOverviewOptions) (*
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getSubreddits(), resp, nil
+	return root.Subreddits, resp, nil
 }
 
 // Search for users.
 // todo: maybe include the sort option? (relevance, activity)
-func (s *UserService) Search(ctx context.Context, query string, opts *ListOptions) (*Users, *Response, error) {
+func (s *UserService) Search(ctx context.Context, query string, opts *ListOptions) ([]*User, *Response, error) {
 	path := "users/search"
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -582,11 +582,11 @@ func (s *UserService) Search(ctx context.Context, query string, opts *ListOption
 		return nil, nil, err
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.getUsers(), resp, nil
+	return root.Users, resp, nil
 }

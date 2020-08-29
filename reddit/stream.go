@@ -29,15 +29,15 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 	}
 
 	ticker := time.NewTicker(streamConfig.Interval)
-	posts := make(chan *Post)
-	errs := make(chan error)
+	postsCh := make(chan *Post)
+	errsCh := make(chan error)
 
 	var once sync.Once
 	stop := func() {
 		once.Do(func() {
 			ticker.Stop()
-			close(posts)
-			close(errs)
+			close(postsCh)
+			close(errsCh)
 		})
 	}
 
@@ -54,16 +54,16 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 		for ; ; <-ticker.C {
 			n++
 
-			result, err := s.getPosts(subreddit)
+			posts, err := s.getPosts(subreddit)
 			if err != nil {
-				errs <- err
+				errsCh <- err
 				if !infinite && n >= streamConfig.MaxRequests {
 					break
 				}
 				continue
 			}
 
-			for _, post := range result.Posts {
+			for _, post := range posts {
 				id := post.FullID
 
 				// if this post id is already part of the set, it means that it and the ones
@@ -78,7 +78,7 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 					break
 				}
 
-				posts <- post
+				postsCh <- post
 			}
 
 			if !infinite && n >= streamConfig.MaxRequests {
@@ -87,12 +87,12 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 		}
 	}()
 
-	return posts, errs, stop
+	return postsCh, errsCh, stop
 }
 
-func (s *StreamService) getPosts(subreddit string) (*Posts, error) {
-	result, _, err := s.client.Subreddit.NewPosts(context.Background(), subreddit, &ListOptions{Limit: 100})
-	return result, err
+func (s *StreamService) getPosts(subreddit string) ([]*Post, error) {
+	posts, _, err := s.client.Subreddit.NewPosts(context.Background(), subreddit, &ListOptions{Limit: 100})
+	return posts, err
 }
 
 type set map[string]struct{}

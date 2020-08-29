@@ -10,46 +10,42 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var expectedModActions = &ModActions{
-	ModActions: []*ModAction{
-		{
-			ID:      "ModAction_b4e7979a-c4ad-11ea-8440-0ea1b7c2b8f9",
-			Action:  "spamcomment",
-			Created: &Timestamp{time.Date(2020, 7, 13, 2, 8, 14, 0, time.UTC)},
+var expectedModActions = []*ModAction{
+	{
+		ID:      "ModAction_b4e7979a-c4ad-11ea-8440-0ea1b7c2b8f9",
+		Action:  "spamcomment",
+		Created: &Timestamp{time.Date(2020, 7, 13, 2, 8, 14, 0, time.UTC)},
 
-			Moderator:   "v_95",
-			ModeratorID: "164ab8",
+		Moderator:   "v_95",
+		ModeratorID: "164ab8",
 
-			TargetAuthor:    "testuser",
-			TargetID:        "t1_fxw10aa",
-			TargetPermalink: "/r/helloworldtestt/comments/hq6r3t/yo/fxw10aa/",
-			TargetBody:      "hi",
+		TargetAuthor:    "testuser",
+		TargetID:        "t1_fxw10aa",
+		TargetPermalink: "/r/helloworldtestt/comments/hq6r3t/yo/fxw10aa/",
+		TargetBody:      "hi",
 
-			Subreddit:   "helloworldtestt",
-			SubredditID: "2uquw1",
-		},
-		{
-			ID:      "ModAction_a0408162-c4ad-11ea-8239-0e3b48262e8b",
-			Action:  "sticky",
-			Created: &Timestamp{time.Date(2020, 7, 13, 2, 7, 38, 0, time.UTC)},
-
-			Moderator:   "v_95",
-			ModeratorID: "164ab8",
-
-			TargetAuthor:    "testuser",
-			TargetID:        "t3_hq6r3t",
-			TargetTitle:     "yo",
-			TargetPermalink: "/r/helloworldtestt/comments/hq6r3t/yo/",
-
-			Subreddit:   "helloworldtestt",
-			SubredditID: "2uquw1",
-		},
+		Subreddit:   "helloworldtestt",
+		SubredditID: "2uquw1",
 	},
-	After:  "ModAction_a0408162-c4ad-11ea-8239-0e3b48262e8b",
-	Before: "",
+	{
+		ID:      "ModAction_a0408162-c4ad-11ea-8239-0e3b48262e8b",
+		Action:  "sticky",
+		Created: &Timestamp{time.Date(2020, 7, 13, 2, 7, 38, 0, time.UTC)},
+
+		Moderator:   "v_95",
+		ModeratorID: "164ab8",
+
+		TargetAuthor:    "testuser",
+		TargetID:        "t3_hq6r3t",
+		TargetTitle:     "yo",
+		TargetPermalink: "/r/helloworldtestt/comments/hq6r3t/yo/",
+
+		Subreddit:   "helloworldtestt",
+		SubredditID: "2uquw1",
+	},
 }
 
-func TestModerationService_GetActions(t *testing.T) {
+func TestModerationService_Actions(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
@@ -70,9 +66,10 @@ func TestModerationService_GetActions(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	modActions, _, err := client.Moderation.GetActions(ctx, "testsubreddit", &ListModActionOptions{Type: "testtype", Moderator: "testmod"})
+	modActions, resp, err := client.Moderation.Actions(ctx, "testsubreddit", &ListModActionOptions{Type: "testtype", Moderator: "testmod"})
 	require.NoError(t, err)
 	require.Equal(t, expectedModActions, modActions)
+	require.Equal(t, "ModAction_a0408162-c4ad-11ea-8239-0e3b48262e8b", resp.After)
 }
 
 func TestModerationService_AcceptInvite(t *testing.T) {
@@ -209,18 +206,16 @@ func TestModerationService_Edited(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, comments, _, err := client.Moderation.Edited(ctx, "testsubreddit", nil)
+	posts, comments, resp, err := client.Moderation.Edited(ctx, "testsubreddit", nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t1_f0zsa37", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
 
-	require.Len(t, comments.Comments, 1)
-	require.Equal(t, expectedComment, comments.Comments[0])
-	require.Equal(t, "t1_f0zsa37", comments.After)
-	require.Equal(t, "", comments.Before)
+	require.Len(t, comments, 1)
+	require.Equal(t, expectedComment, comments[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
 }
 
 func TestModerationService_IgnoreReports(t *testing.T) {

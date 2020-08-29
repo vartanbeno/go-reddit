@@ -84,7 +84,7 @@ func (s *PostService) Get(ctx context.Context, id string) (*PostAndComments, *Re
 // Duplicates returns the post with the id, and a list of its duplicates.
 // id is the ID36 of the post, not its full id.
 // Example: instead of t3_abc123, use abc123.
-func (s *PostService) Duplicates(ctx context.Context, id string, opts *ListDuplicatePostOptions) (*Post, *Posts, *Response, error) {
+func (s *PostService) Duplicates(ctx context.Context, id string, opts *ListDuplicatePostOptions) (*Post, []*Post, *Response, error) {
 	path := fmt.Sprintf("duplicates/%s", id)
 	path, err := addOptions(path, opts)
 	if err != nil {
@@ -96,14 +96,17 @@ func (s *PostService) Duplicates(ctx context.Context, id string, opts *ListDupli
 		return nil, nil, nil, err
 	}
 
-	var root [2]rootListing
+	var root [2]listing
 	resp, err := s.client.Do(ctx, req, &root)
 	if err != nil {
 		return nil, nil, resp, err
 	}
 
-	post := root[0].Data.Things.Posts[0]
-	duplicates := root[1].getPosts()
+	post := root[0].Posts[0]
+	duplicates := root[1].Posts
+
+	resp.After = root[1].after
+	resp.Before = root[1].after
 
 	return post, duplicates, resp, nil
 }

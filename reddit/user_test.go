@@ -129,61 +129,55 @@ var expectedTrophies = []Trophy{
 	},
 }
 
-var expectedUserSubreddits = &Subreddits{
-	Subreddits: []*Subreddit{
-		{
-			ID:      "3kefx",
-			FullID:  "t5_3kefx",
-			Created: &Timestamp{time.Date(2017, 5, 11, 16, 37, 16, 0, time.UTC)},
+var expectedUserSubreddits = []*Subreddit{
+	{
+		ID:      "3kefx",
+		FullID:  "t5_3kefx",
+		Created: &Timestamp{time.Date(2017, 5, 11, 16, 37, 16, 0, time.UTC)},
 
-			URL:          "/user/nickofnight/",
-			Name:         "u_nickofnight",
-			NamePrefixed: "u/nickofnight",
-			Title:        "nickofnight",
-			Description:  "Stories written for Writing Prompts, NoSleep, and originals. Current series: The Carnival of Night ",
-			Type:         "user",
-		},
-		{
-			ID:      "3knn1",
-			FullID:  "t5_3knn1",
-			Created: &Timestamp{time.Date(2017, 5, 18, 2, 15, 55, 0, time.UTC)},
-
-			URL:                  "/user/shittymorph/",
-			Name:                 "u_shittymorph",
-			NamePrefixed:         "u/shittymorph",
-			Title:                "shittymorph",
-			Description:          "In nineteen ninety eight the undertaker threw mankind off hеll in a cell, and plummeted sixteen feet through an announcer's table.",
-			Type:                 "user",
-			SuggestedCommentSort: "qa",
-		},
+		URL:          "/user/nickofnight/",
+		Name:         "u_nickofnight",
+		NamePrefixed: "u/nickofnight",
+		Title:        "nickofnight",
+		Description:  "Stories written for Writing Prompts, NoSleep, and originals. Current series: The Carnival of Night ",
+		Type:         "user",
 	},
-	After: "t5_3knn1",
+	{
+		ID:      "3knn1",
+		FullID:  "t5_3knn1",
+		Created: &Timestamp{time.Date(2017, 5, 18, 2, 15, 55, 0, time.UTC)},
+
+		URL:                  "/user/shittymorph/",
+		Name:                 "u_shittymorph",
+		NamePrefixed:         "u/shittymorph",
+		Title:                "shittymorph",
+		Description:          "In nineteen ninety eight the undertaker threw mankind off hеll in a cell, and plummeted sixteen feet through an announcer's table.",
+		Type:                 "user",
+		SuggestedCommentSort: "qa",
+	},
 }
 
-var expectedSearchUsers = &Users{
-	Users: []*User{
-		{
-			ID:      "179965",
-			Name:    "washingtonpost",
-			Created: &Timestamp{time.Date(2017, 4, 20, 21, 23, 58, 0, time.UTC)},
+var expectedSearchUsers = []*User{
+	{
+		ID:      "179965",
+		Name:    "washingtonpost",
+		Created: &Timestamp{time.Date(2017, 4, 20, 21, 23, 58, 0, time.UTC)},
 
-			PostKarma:    1075227,
-			CommentKarma: 339569,
+		PostKarma:    1075227,
+		CommentKarma: 339569,
 
-			HasVerifiedEmail: true,
-		},
-		{
-			ID:      "11kowl2w",
-			Name:    "reuters",
-			Created: &Timestamp{time.Date(2018, 3, 15, 1, 50, 4, 0, time.UTC)},
-
-			PostKarma:    76744,
-			CommentKarma: 42717,
-
-			HasVerifiedEmail: true,
-		},
+		HasVerifiedEmail: true,
 	},
-	After: "t2_11kowl2w",
+	{
+		ID:      "11kowl2w",
+		Name:    "reuters",
+		Created: &Timestamp{time.Date(2018, 3, 15, 1, 50, 4, 0, time.UTC)},
+
+		PostKarma:    76744,
+		CommentKarma: 42717,
+
+		HasVerifiedEmail: true,
+	},
 }
 
 func TestUserService_Get(t *testing.T) {
@@ -263,18 +257,16 @@ func TestUserService_Overview(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, comments, _, err := client.User.Overview(ctx, nil)
+	posts, comments, resp, err := client.User.Overview(ctx, nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t1_f0zsa37", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
 
-	require.Len(t, comments.Comments, 1)
-	require.Equal(t, expectedComment, comments.Comments[0])
-	require.Equal(t, "t1_f0zsa37", comments.After)
-	require.Equal(t, "", comments.Before)
+	require.Len(t, comments, 1)
+	require.Equal(t, expectedComment, comments[0])
+
+	require.Equal(t, "t1_f0zsa37", resp.After)
 }
 
 func TestUserService_OverviewOf(t *testing.T) {
@@ -289,18 +281,16 @@ func TestUserService_OverviewOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, comments, _, err := client.User.OverviewOf(ctx, "user2", nil)
+	posts, comments, resp, err := client.User.OverviewOf(ctx, "user2", nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t1_f0zsa37", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
 
-	require.Len(t, comments.Comments, 1)
-	require.Equal(t, expectedComment, comments.Comments[0])
-	require.Equal(t, "t1_f0zsa37", comments.After)
-	require.Equal(t, "", comments.Before)
+	require.Len(t, comments, 1)
+	require.Equal(t, expectedComment, comments[0])
+
+	require.Equal(t, "t1_f0zsa37", resp.After)
 }
 
 func TestUserService_Overview_Options(t *testing.T) {
@@ -347,13 +337,12 @@ func TestUserService_Posts(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Posts(ctx, nil)
+	posts, resp, err := client.User.Posts(ctx, nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t3_gczwql", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t3_gczwql", resp.After)
 }
 
 func TestUserService_PostsOf(t *testing.T) {
@@ -368,13 +357,12 @@ func TestUserService_PostsOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.PostsOf(ctx, "user2", nil)
+	posts, resp, err := client.User.PostsOf(ctx, "user2", nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t3_gczwql", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t3_gczwql", resp.After)
 }
 
 func TestUserService_Posts_Options(t *testing.T) {
@@ -419,13 +407,12 @@ func TestUserService_Comments(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	comments, _, err := client.User.Comments(ctx, nil)
+	comments, resp, err := client.User.Comments(ctx, nil)
 	require.NoError(t, err)
 
-	require.Len(t, comments.Comments, 1)
-	require.Equal(t, expectedComment, comments.Comments[0])
-	require.Equal(t, "t1_f0zsa37", comments.After)
-	require.Equal(t, "", comments.Before)
+	require.Len(t, comments, 1)
+	require.Equal(t, expectedComment, comments[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
 }
 
 func TestUserService_CommentsOf(t *testing.T) {
@@ -440,13 +427,12 @@ func TestUserService_CommentsOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	comments, _, err := client.User.CommentsOf(ctx, "user2", nil)
+	comments, resp, err := client.User.CommentsOf(ctx, "user2", nil)
 	require.NoError(t, err)
 
-	require.Len(t, comments.Comments, 1)
-	require.Equal(t, expectedComment, comments.Comments[0])
-	require.Equal(t, "t1_f0zsa37", comments.After)
-	require.Equal(t, "", comments.Before)
+	require.Len(t, comments, 1)
+	require.Equal(t, expectedComment, comments[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
 }
 
 func TestUserService_Comments_Options(t *testing.T) {
@@ -492,18 +478,16 @@ func TestUserService_Saved(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, comments, _, err := client.User.Saved(ctx, nil)
+	posts, comments, resp, err := client.User.Saved(ctx, nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t1_f0zsa37", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
 
-	require.Len(t, comments.Comments, 1)
-	require.Equal(t, expectedComment, comments.Comments[0])
-	require.Equal(t, "t1_f0zsa37", comments.After)
-	require.Equal(t, "", comments.Before)
+	require.Len(t, comments, 1)
+	require.Equal(t, expectedComment, comments[0])
+
+	require.Equal(t, "t1_f0zsa37", resp.After)
 }
 
 func TestUserService_Saved_Options(t *testing.T) {
@@ -549,13 +533,12 @@ func TestUserService_Upvoted(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Upvoted(ctx, nil)
+	posts, resp, err := client.User.Upvoted(ctx, nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t3_gczwql", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t3_gczwql", resp.After)
 }
 
 func TestUserService_Upvoted_Options(t *testing.T) {
@@ -602,13 +585,12 @@ func TestUserService_UpvotedOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.UpvotedOf(ctx, "user2", nil)
+	posts, resp, err := client.User.UpvotedOf(ctx, "user2", nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t3_gczwql", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t3_gczwql", resp.After)
 }
 
 func TestUserService_Downvoted(t *testing.T) {
@@ -624,13 +606,12 @@ func TestUserService_Downvoted(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Downvoted(ctx, nil)
+	posts, resp, err := client.User.Downvoted(ctx, nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t3_gczwql", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t3_gczwql", resp.After)
 }
 
 func TestUserService_Downvoted_Options(t *testing.T) {
@@ -677,13 +658,12 @@ func TestUserService_DownvotedOf(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.DownvotedOf(ctx, "user2", nil)
+	posts, resp, err := client.User.DownvotedOf(ctx, "user2", nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t3_gczwql", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t3_gczwql", resp.After)
 }
 
 func TestUserService_Hidden(t *testing.T) {
@@ -699,13 +679,12 @@ func TestUserService_Hidden(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Hidden(ctx, nil)
+	posts, resp, err := client.User.Hidden(ctx, nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t3_gczwql", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t3_gczwql", resp.After)
 }
 
 func TestUserService_Gilded(t *testing.T) {
@@ -721,13 +700,12 @@ func TestUserService_Gilded(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.User.Gilded(ctx, nil)
+	posts, resp, err := client.User.Gilded(ctx, nil)
 	require.NoError(t, err)
 
-	require.Len(t, posts.Posts, 1)
-	require.Equal(t, expectedPost, posts.Posts[0])
-	require.Equal(t, "t3_gczwql", posts.After)
-	require.Equal(t, "", posts.Before)
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t3_gczwql", resp.After)
 }
 
 func TestUserService_GetFriendship(t *testing.T) {
@@ -930,9 +908,10 @@ func TestUserService_Popular(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	userSubreddits, _, err := client.User.Popular(ctx, nil)
+	userSubreddits, resp, err := client.User.Popular(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedUserSubreddits, userSubreddits)
+	require.Equal(t, "t5_3knn1", resp.After)
 }
 
 func TestUserService_New(t *testing.T) {
@@ -947,9 +926,10 @@ func TestUserService_New(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	userSubreddits, _, err := client.User.New(ctx, nil)
+	userSubreddits, resp, err := client.User.New(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedUserSubreddits, userSubreddits)
+	require.Equal(t, "t5_3knn1", resp.After)
 }
 
 func TestUserService_Search(t *testing.T) {
@@ -972,7 +952,8 @@ func TestUserService_Search(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	users, _, err := client.User.Search(ctx, "test", nil)
+	users, resp, err := client.User.Search(ctx, "test", nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSearchUsers, users)
+	require.Equal(t, "t2_11kowl2w", resp.After)
 }

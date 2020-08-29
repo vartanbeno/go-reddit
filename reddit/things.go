@@ -20,24 +20,56 @@ const (
 )
 
 // thing is an entity on Reddit.
-// Its kind reprsents what it is and what is stored in the Data field
+// Its kind reprsents what it is and what is stored in the Data field.
 // e.g. t1 = comment, t2 = user, t3 = post, etc.
 type thing struct {
 	Kind string          `json:"kind"`
 	Data json.RawMessage `json:"data"`
 }
 
-type rootListing struct {
-	Kind string  `json:"kind"`
-	Data listing `json:"data"`
+type anchor interface {
+	After() string
+	Before() string
 }
 
-// listing holds things coming from the Reddit API
-// It also contains the after/before anchors useful for subsequent requests
+// listing holds things coming from the Reddit API.
+// It also contains the after/before anchors useful for subsequent requests.
 type listing struct {
-	Things things `json:"children"`
-	After  string `json:"after"`
-	Before string `json:"before"`
+	things
+	after  string
+	before string
+}
+
+var _ anchor = &listing{}
+
+func (l *listing) After() string {
+	return l.after
+}
+
+func (l *listing) Before() string {
+	return l.before
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (l *listing) UnmarshalJSON(b []byte) error {
+	root := new(struct {
+		Data struct {
+			Things things `json:"children"`
+			After  string `json:"after"`
+			Before string `json:"before"`
+		} `json:"data"`
+	})
+
+	err := json.Unmarshal(b, root)
+	if err != nil {
+		return err
+	}
+
+	l.things = root.Data.Things
+	l.after = root.Data.After
+	l.before = root.Data.Before
+
+	return nil
 }
 
 type things struct {
@@ -199,14 +231,16 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	root := new(rootListing)
+	root := new(listing)
 	err := json.Unmarshal(data, root)
 	if err != nil {
 		return err
 	}
 
-	r.Comments = root.Data.Things.Comments
-	r.More = root.getFirstMore()
+	r.Comments = root.Comments
+	if len(root.Mores) > 0 {
+		r.More = root.Mores[0]
+	}
 
 	return nil
 }
@@ -289,88 +323,6 @@ type Subreddit struct {
 	Favorite        bool `json:"user_has_favorited"`
 }
 
-func (l *rootListing) getComments() *Comments {
-	return &Comments{
-		Comments: l.Data.Things.Comments,
-		After:    l.Data.After,
-		Before:   l.Data.Before,
-	}
-}
-
-func (l *rootListing) getFirstMore() *More {
-	if len(l.Data.Things.Mores) == 0 {
-		return nil
-	}
-	return l.Data.Things.Mores[0]
-}
-
-func (l *rootListing) getUsers() *Users {
-	return &Users{
-		Users:  l.Data.Things.Users,
-		After:  l.Data.After,
-		Before: l.Data.Before,
-	}
-}
-
-func (l *rootListing) getPosts() *Posts {
-	return &Posts{
-		Posts:  l.Data.Things.Posts,
-		After:  l.Data.After,
-		Before: l.Data.Before,
-	}
-}
-
-func (l *rootListing) getSubreddits() *Subreddits {
-	return &Subreddits{
-		Subreddits: l.Data.Things.Subreddits,
-		After:      l.Data.After,
-		Before:     l.Data.Before,
-	}
-}
-
-func (l *rootListing) getModActions() *ModActions {
-	return &ModActions{
-		ModActions: l.Data.Things.ModActions,
-		After:      l.Data.After,
-		Before:     l.Data.Before,
-	}
-}
-
-// Comments is a list of comments
-type Comments struct {
-	Comments []*Comment `json:"comments"`
-	After    string     `json:"after"`
-	Before   string     `json:"before"`
-}
-
-// Users is a list of users
-type Users struct {
-	Users  []*User `json:"users"`
-	After  string  `json:"after"`
-	Before string  `json:"before"`
-}
-
-// Subreddits is a list of subreddits
-type Subreddits struct {
-	Subreddits []*Subreddit `json:"subreddits"`
-	After      string       `json:"after"`
-	Before     string       `json:"before"`
-}
-
-// Posts is a list of posts.
-type Posts struct {
-	Posts  []*Post `json:"posts"`
-	After  string  `json:"after"`
-	Before string  `json:"before"`
-}
-
-// ModActions is a list of moderator actions.
-type ModActions struct {
-	ModActions []*ModAction `json:"moderator_actions"`
-	After      string       `json:"after"`
-	Before     string       `json:"before"`
-}
-
 // PostAndComments is a post and its comments.
 type PostAndComments struct {
 	Post     *Post      `json:"post"`
@@ -383,20 +335,18 @@ type PostAndComments struct {
 // The 1st one contains the single post in its children array
 // The 2nd one contains the comments to the post
 func (pc *PostAndComments) UnmarshalJSON(data []byte) error {
-	var l [2]rootListing
+	var l [2]listing
 
 	err := json.Unmarshal(data, &l)
 	if err != nil {
 		return err
 	}
 
-	post := l[0].getPosts().Posts[0]
-	comments := l[1].getComments().Comments
-	moreComments := l[1].getFirstMore()
-
-	pc.Post = post
-	pc.Comments = comments
-	pc.More = moreComments
+	pc.Post = l[0].Posts[0]
+	pc.Comments = l[1].Comments
+	if len(l[1].Mores) > 0 {
+		pc.More = l[1].Mores[0]
+	}
 
 	return nil
 }

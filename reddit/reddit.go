@@ -269,12 +269,23 @@ func (c *Client) NewRequestWithForm(method string, path string, form url.Values)
 // Response is a Reddit response. This wraps the standard http.Response returned from Reddit.
 type Response struct {
 	*http.Response
+
+	// Pagination anchor indicating there are more results after this id.
+	After string
+	// Pagination anchor indicating there are more results before this id.
+	// todo: not sure yet if responses ever contain this
+	Before string
 }
 
 // newResponse creates a new Response for the provided http.Response.
 func newResponse(r *http.Response) *Response {
 	response := Response{Response: r}
 	return &response
+}
+
+func (r *Response) populateAnchors(a anchor) {
+	r.After = a.After()
+	r.Before = a.Before()
 }
 
 // Do sends an API request and returns the API response. The API response is JSON decoded and stored in the value
@@ -309,6 +320,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 			if err != nil {
 				return nil, err
 			}
+		}
+
+		if anchor, ok := v.(anchor); ok {
+			response.populateAnchors(anchor)
 		}
 	}
 

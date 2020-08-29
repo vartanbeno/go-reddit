@@ -155,59 +155,55 @@ var expectedPost2 = &Post{
 	AuthorID: "t2_164ab8",
 }
 
-var expectedPostDuplicates = &Posts{
-	Posts: []*Post{
-		{
-			ID:      "8kbs85",
-			FullID:  "t3_8kbs85",
-			Created: &Timestamp{time.Date(2018, 5, 18, 9, 10, 18, 0, time.UTC)},
-			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+var expectedPostDuplicates = []*Post{
+	{
+		ID:      "8kbs85",
+		FullID:  "t3_8kbs85",
+		Created: &Timestamp{time.Date(2018, 5, 18, 9, 10, 18, 0, time.UTC)},
+		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-			Permalink: "/r/test/comments/8kbs85/test/",
-			URL:       "http://example.com",
+		Permalink: "/r/test/comments/8kbs85/test/",
+		URL:       "http://example.com",
 
-			Title: "test",
+		Title: "test",
 
-			Likes: nil,
+		Likes: nil,
 
-			Score:            1,
-			UpvoteRatio:      0.66,
-			NumberOfComments: 1,
+		Score:            1,
+		UpvoteRatio:      0.66,
+		NumberOfComments: 1,
 
-			SubredditName:         "test",
-			SubredditNamePrefixed: "r/test",
-			SubredditID:           "t5_2qh23",
+		SubredditName:         "test",
+		SubredditNamePrefixed: "r/test",
+		SubredditID:           "t5_2qh23",
 
-			Author:   "GarlicoinAccount",
-			AuthorID: "t2_d2v1r90",
-		},
-		{
-			ID:      "le1tc",
-			FullID:  "t3_le1tc",
-			Created: &Timestamp{time.Date(2011, 10, 16, 13, 26, 40, 0, time.UTC)},
-			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
-
-			Permalink: "/r/test/comments/le1tc/test_to_see_if_this_fixes_the_problem_of_my_likes/",
-			URL:       "http://www.example.com",
-
-			Title: "Test to see if this fixes the problem of my \"likes\" from the last 7 months vanishing.",
-
-			Likes: nil,
-
-			Score:            2,
-			UpvoteRatio:      1,
-			NumberOfComments: 1,
-
-			SubredditName:         "test",
-			SubredditNamePrefixed: "r/test",
-			SubredditID:           "t5_2qh23",
-
-			Author:   "prog101",
-			AuthorID: "t2_8dyo",
-		},
+		Author:   "GarlicoinAccount",
+		AuthorID: "t2_d2v1r90",
 	},
-	After:  "t3_le1tc",
-	Before: "",
+	{
+		ID:      "le1tc",
+		FullID:  "t3_le1tc",
+		Created: &Timestamp{time.Date(2011, 10, 16, 13, 26, 40, 0, time.UTC)},
+		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+		Permalink: "/r/test/comments/le1tc/test_to_see_if_this_fixes_the_problem_of_my_likes/",
+		URL:       "http://www.example.com",
+
+		Title: "Test to see if this fixes the problem of my \"likes\" from the last 7 months vanishing.",
+
+		Likes: nil,
+
+		Score:            2,
+		UpvoteRatio:      1,
+		NumberOfComments: 1,
+
+		SubredditName:         "test",
+		SubredditNamePrefixed: "r/test",
+		SubredditID:           "t5_2qh23",
+
+		Author:   "prog101",
+		AuthorID: "t2_8dyo",
+	},
 }
 
 func TestPostService_Get(t *testing.T) {
@@ -248,7 +244,7 @@ func TestPostService_Duplicates(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	post, postDuplicates, _, err := client.Post.Duplicates(ctx, "abc123", &ListDuplicatePostOptions{
+	post, postDuplicates, resp, err := client.Post.Duplicates(ctx, "abc123", &ListDuplicatePostOptions{
 		ListOptions: ListOptions{
 			Limit: 2,
 		},
@@ -257,6 +253,7 @@ func TestPostService_Duplicates(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expectedPost2, post)
 	require.Equal(t, expectedPostDuplicates, postDuplicates)
+	require.Equal(t, "t3_le1tc", resp.After)
 }
 
 func TestPostService_SubmitText(t *testing.T) {

@@ -10,59 +10,55 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var expectedPosts = &Posts{
-	Posts: []*Post{
-		{
-			ID:      "agi5zf",
-			FullID:  "t3_agi5zf",
-			Created: &Timestamp{time.Date(2019, 1, 16, 5, 57, 51, 0, time.UTC)},
-			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+var expectedPosts = []*Post{
+	{
+		ID:      "agi5zf",
+		FullID:  "t3_agi5zf",
+		Created: &Timestamp{time.Date(2019, 1, 16, 5, 57, 51, 0, time.UTC)},
+		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-			Permalink: "/r/test/comments/agi5zf/test/",
-			URL:       "https://www.reddit.com/r/test/comments/agi5zf/test/",
+		Permalink: "/r/test/comments/agi5zf/test/",
+		URL:       "https://www.reddit.com/r/test/comments/agi5zf/test/",
 
-			Title: "test",
-			Body:  "test",
+		Title: "test",
+		Body:  "test",
 
-			Score:            253,
-			UpvoteRatio:      0.99,
-			NumberOfComments: 1634,
+		Score:            253,
+		UpvoteRatio:      0.99,
+		NumberOfComments: 1634,
 
-			SubredditName:         "test",
-			SubredditNamePrefixed: "r/test",
-			SubredditID:           "t5_2qh23",
+		SubredditName:         "test",
+		SubredditNamePrefixed: "r/test",
+		SubredditID:           "t5_2qh23",
 
-			Author:   "kmiller0112",
-			AuthorID: "t2_30a5ktgt",
+		Author:   "kmiller0112",
+		AuthorID: "t2_30a5ktgt",
 
-			IsSelfPost: true,
-			Stickied:   true,
-		},
-		{
-			ID:      "hyhquk",
-			FullID:  "t3_hyhquk",
-			Created: &Timestamp{time.Date(2020, 7, 27, 0, 5, 10, 0, time.UTC)},
-			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
-
-			Permalink: "/r/test/comments/hyhquk/veggies/",
-			URL:       "https://i.imgur.com/LrN2mPw.jpg",
-
-			Title: "Veggies",
-
-			Score:            4,
-			UpvoteRatio:      1,
-			NumberOfComments: 0,
-
-			SubredditName:         "test",
-			SubredditNamePrefixed: "r/test",
-			SubredditID:           "t5_2qh23",
-
-			Author:   "MuckleMcDuckle",
-			AuthorID: "t2_6fqntbwq",
-		},
+		IsSelfPost: true,
+		Stickied:   true,
 	},
-	After:  "t3_hyhquk",
-	Before: "",
+	{
+		ID:      "hyhquk",
+		FullID:  "t3_hyhquk",
+		Created: &Timestamp{time.Date(2020, 7, 27, 0, 5, 10, 0, time.UTC)},
+		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+		Permalink: "/r/test/comments/hyhquk/veggies/",
+		URL:       "https://i.imgur.com/LrN2mPw.jpg",
+
+		Title: "Veggies",
+
+		Score:            4,
+		UpvoteRatio:      1,
+		NumberOfComments: 0,
+
+		SubredditName:         "test",
+		SubredditNamePrefixed: "r/test",
+		SubredditID:           "t5_2qh23",
+
+		Author:   "MuckleMcDuckle",
+		AuthorID: "t2_6fqntbwq",
+	},
 }
 
 var expectedSubreddit = &Subreddit{
@@ -84,63 +80,59 @@ var expectedSubreddit = &Subreddit{
 	Subscribed:      true,
 }
 
-var expectedSubreddits = &Subreddits{
-	After:  "t5_2qh0u",
-	Before: "",
-	Subreddits: []*Subreddit{
-		{
-			ID:      "2qs0k",
-			FullID:  "t5_2qs0k",
-			Created: &Timestamp{time.Date(2009, 1, 25, 2, 25, 57, 0, time.UTC)},
+var expectedSubreddits = []*Subreddit{
+	{
+		ID:      "2qs0k",
+		FullID:  "t5_2qs0k",
+		Created: &Timestamp{time.Date(2009, 1, 25, 2, 25, 57, 0, time.UTC)},
 
-			URL:          "/r/Home/",
-			Name:         "Home",
-			NamePrefixed: "r/Home",
-			Title:        "Home",
-			Type:         "public",
+		URL:          "/r/Home/",
+		Name:         "Home",
+		NamePrefixed: "r/Home",
+		Title:        "Home",
+		Type:         "public",
 
-			Subscribers: 15336,
-			NSFW:        false,
-			UserIsMod:   false,
-			Subscribed:  true,
-			Favorite:    false,
-		},
-		{
-			ID:      "2qh1i",
-			FullID:  "t5_2qh1i",
-			Created: &Timestamp{time.Date(2008, 1, 25, 3, 52, 15, 0, time.UTC)},
+		Subscribers: 15336,
+		NSFW:        false,
+		UserIsMod:   false,
+		Subscribed:  true,
+		Favorite:    false,
+	},
+	{
+		ID:      "2qh1i",
+		FullID:  "t5_2qh1i",
+		Created: &Timestamp{time.Date(2008, 1, 25, 3, 52, 15, 0, time.UTC)},
 
-			URL:          "/r/AskReddit/",
-			Name:         "AskReddit",
-			NamePrefixed: "r/AskReddit",
-			Title:        "Ask Reddit...",
-			Description:  "r/AskReddit is the place to ask and answer thought-provoking questions.",
-			Type:         "public",
+		URL:          "/r/AskReddit/",
+		Name:         "AskReddit",
+		NamePrefixed: "r/AskReddit",
+		Title:        "Ask Reddit...",
+		Description:  "r/AskReddit is the place to ask and answer thought-provoking questions.",
+		Type:         "public",
 
-			Subscribers: 28449174,
-			NSFW:        false,
-			UserIsMod:   false,
-			Subscribed:  true,
-			Favorite:    true,
-		},
-		{
-			ID:      "2qh0u",
-			FullID:  "t5_2qh0u",
-			Created: &Timestamp{time.Date(2008, 1, 25, 0, 31, 9, 0, time.UTC)},
+		Subscribers: 28449174,
+		NSFW:        false,
+		UserIsMod:   false,
+		Subscribed:  true,
+		Favorite:    true,
+	},
+	{
+		ID:      "2qh0u",
+		FullID:  "t5_2qh0u",
+		Created: &Timestamp{time.Date(2008, 1, 25, 0, 31, 9, 0, time.UTC)},
 
-			URL:          "/r/pics/",
-			Name:         "pics",
-			NamePrefixed: "r/pics",
-			Title:        "Reddit Pics",
-			Description:  "A place for pictures and photographs.",
-			Type:         "public",
+		URL:          "/r/pics/",
+		Name:         "pics",
+		NamePrefixed: "r/pics",
+		Title:        "Reddit Pics",
+		Description:  "A place for pictures and photographs.",
+		Type:         "public",
 
-			Subscribers: 24987753,
-			NSFW:        false,
-			UserIsMod:   false,
-			Subscribed:  false,
-			Favorite:    false,
-		},
+		Subscribers: 24987753,
+		NSFW:        false,
+		UserIsMod:   false,
+		Subscribed:  false,
+		Favorite:    false,
 	},
 }
 
@@ -154,54 +146,51 @@ var expectedSubredditNames = []string{
 	"golang_jobs",
 }
 
-var expectedSearchPosts = &Posts{
-	Posts: []*Post{
-		{
-			ID:      "hybow9",
-			FullID:  "t3_hybow9",
-			Created: &Timestamp{time.Date(2020, 7, 26, 18, 14, 24, 0, time.UTC)},
-			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+var expectedSearchPosts = []*Post{
+	{
+		ID:      "hybow9",
+		FullID:  "t3_hybow9",
+		Created: &Timestamp{time.Date(2020, 7, 26, 18, 14, 24, 0, time.UTC)},
+		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
-			Permalink: "/r/WatchPeopleDieInside/comments/hybow9/pregnancy_test/",
-			URL:       "https://v.redd.it/ra4qnt8bt8d51",
+		Permalink: "/r/WatchPeopleDieInside/comments/hybow9/pregnancy_test/",
+		URL:       "https://v.redd.it/ra4qnt8bt8d51",
 
-			Title: "Pregnancy test",
+		Title: "Pregnancy test",
 
-			Score:            103829,
-			UpvoteRatio:      0.88,
-			NumberOfComments: 3748,
+		Score:            103829,
+		UpvoteRatio:      0.88,
+		NumberOfComments: 3748,
 
-			SubredditName:         "WatchPeopleDieInside",
-			SubredditNamePrefixed: "r/WatchPeopleDieInside",
-			SubredditID:           "t5_3h4zq",
+		SubredditName:         "WatchPeopleDieInside",
+		SubredditNamePrefixed: "r/WatchPeopleDieInside",
+		SubredditID:           "t5_3h4zq",
 
-			Author:   "chocolat_ice_cream",
-			AuthorID: "t2_3p32m02",
-		},
-		{
-			ID:      "hmwhd7",
-			FullID:  "t3_hmwhd7",
-			Created: &Timestamp{time.Date(2020, 7, 7, 15, 19, 42, 0, time.UTC)},
-			Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
-
-			Permalink: "/r/worldnews/comments/hmwhd7/brazilian_president_jair_bolsonaro_tests_positive/",
-			URL:       "https://www.theguardian.com/world/2020/jul/07/jair-bolsonaro-coronavirus-positive-test-brazil-president",
-
-			Title: "Brazilian president Jair Bolsonaro tests positive for coronavirus",
-
-			Score:            149238,
-			UpvoteRatio:      0.94,
-			NumberOfComments: 7415,
-
-			SubredditName:         "worldnews",
-			SubredditNamePrefixed: "r/worldnews",
-			SubredditID:           "t5_2qh13",
-
-			Author:   "Jeremy_Martin",
-			AuthorID: "t2_wgrkg",
-		},
+		Author:   "chocolat_ice_cream",
+		AuthorID: "t2_3p32m02",
 	},
-	After: "t3_hmwhd7",
+	{
+		ID:      "hmwhd7",
+		FullID:  "t3_hmwhd7",
+		Created: &Timestamp{time.Date(2020, 7, 7, 15, 19, 42, 0, time.UTC)},
+		Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
+
+		Permalink: "/r/worldnews/comments/hmwhd7/brazilian_president_jair_bolsonaro_tests_positive/",
+		URL:       "https://www.theguardian.com/world/2020/jul/07/jair-bolsonaro-coronavirus-positive-test-brazil-president",
+
+		Title: "Brazilian president Jair Bolsonaro tests positive for coronavirus",
+
+		Score:            149238,
+		UpvoteRatio:      0.94,
+		NumberOfComments: 7415,
+
+		SubredditName:         "worldnews",
+		SubredditNamePrefixed: "r/worldnews",
+		SubredditID:           "t5_2qh13",
+
+		Author:   "Jeremy_Martin",
+		AuthorID: "t2_wgrkg",
+	},
 }
 
 var expectedRandomSubreddit = &Subreddit{
@@ -301,9 +290,10 @@ func TestSubredditService_HotPosts(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.HotPosts(ctx, "test", nil)
+	posts, resp, err := client.Subreddit.HotPosts(ctx, "test", nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedPosts, posts)
+	require.Equal(t, "t3_hyhquk", resp.After)
 }
 
 func TestSubredditService_NewPosts(t *testing.T) {
@@ -318,9 +308,10 @@ func TestSubredditService_NewPosts(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.NewPosts(ctx, "test", nil)
+	posts, resp, err := client.Subreddit.NewPosts(ctx, "test", nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedPosts, posts)
+	require.Equal(t, "t3_hyhquk", resp.After)
 }
 
 func TestSubredditService_RisingPosts(t *testing.T) {
@@ -335,9 +326,10 @@ func TestSubredditService_RisingPosts(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.RisingPosts(ctx, "test", nil)
+	posts, resp, err := client.Subreddit.RisingPosts(ctx, "test", nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedPosts, posts)
+	require.Equal(t, "t3_hyhquk", resp.After)
 }
 
 func TestSubredditService_ControversialPosts(t *testing.T) {
@@ -352,9 +344,10 @@ func TestSubredditService_ControversialPosts(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.ControversialPosts(ctx, "test", nil)
+	posts, resp, err := client.Subreddit.ControversialPosts(ctx, "test", nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedPosts, posts)
+	require.Equal(t, "t3_hyhquk", resp.After)
 }
 
 func TestSubredditService_TopPosts(t *testing.T) {
@@ -369,9 +362,10 @@ func TestSubredditService_TopPosts(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.TopPosts(ctx, "test", nil)
+	posts, resp, err := client.Subreddit.TopPosts(ctx, "test", nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedPosts, posts)
+	require.Equal(t, "t3_hyhquk", resp.After)
 }
 
 func TestSubredditService_Get(t *testing.T) {
@@ -406,9 +400,10 @@ func TestSubredditService_Popular(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.Popular(ctx, nil)
+	subreddits, resp, err := client.Subreddit.Popular(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSubreddits, subreddits)
+	require.Equal(t, "t5_2qh0u", resp.After)
 }
 
 func TestSubredditService_New(t *testing.T) {
@@ -423,9 +418,10 @@ func TestSubredditService_New(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.New(ctx, nil)
+	subreddits, resp, err := client.Subreddit.New(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSubreddits, subreddits)
+	require.Equal(t, "t5_2qh0u", resp.After)
 }
 
 func TestSubredditService_Gold(t *testing.T) {
@@ -440,9 +436,10 @@ func TestSubredditService_Gold(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.Gold(ctx, nil)
+	subreddits, resp, err := client.Subreddit.Gold(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSubreddits, subreddits)
+	require.Equal(t, "t5_2qh0u", resp.After)
 }
 
 func TestSubredditService_Default(t *testing.T) {
@@ -457,9 +454,10 @@ func TestSubredditService_Default(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.Default(ctx, nil)
+	subreddits, resp, err := client.Subreddit.Default(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSubreddits, subreddits)
+	require.Equal(t, "t5_2qh0u", resp.After)
 }
 
 func TestSubredditService_Subscribed(t *testing.T) {
@@ -474,9 +472,10 @@ func TestSubredditService_Subscribed(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.Subscribed(ctx, nil)
+	subreddits, resp, err := client.Subreddit.Subscribed(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSubreddits, subreddits)
+	require.Equal(t, "t5_2qh0u", resp.After)
 }
 
 func TestSubredditService_Approved(t *testing.T) {
@@ -491,9 +490,10 @@ func TestSubredditService_Approved(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.Approved(ctx, nil)
+	subreddits, resp, err := client.Subreddit.Approved(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSubreddits, subreddits)
+	require.Equal(t, "t5_2qh0u", resp.After)
 }
 
 func TestSubredditService_Moderated(t *testing.T) {
@@ -508,9 +508,10 @@ func TestSubredditService_Moderated(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.Moderated(ctx, nil)
+	subreddits, resp, err := client.Subreddit.Moderated(ctx, nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSubreddits, subreddits)
+	require.Equal(t, "t5_2qh0u", resp.After)
 }
 
 func TestSubredditService_GetSticky1(t *testing.T) {
@@ -701,7 +702,7 @@ func TestSubredditService_Search(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	subreddits, _, err := client.Subreddit.Search(ctx, "golang", &ListSubredditOptions{
+	subreddits, resp, err := client.Subreddit.Search(ctx, "golang", &ListSubredditOptions{
 		ListOptions: ListOptions{
 			Limit: 10,
 		},
@@ -709,6 +710,7 @@ func TestSubredditService_Search(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.Equal(t, expectedSubreddits, subreddits)
+	require.Equal(t, "t5_2qh0u", resp.After)
 }
 
 func TestSubredditService_SearchNames(t *testing.T) {
@@ -756,9 +758,10 @@ func TestSubredditService_SearchPosts(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "", nil)
+	posts, resp, err := client.Subreddit.SearchPosts(ctx, "test", "", nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSearchPosts, posts)
+	require.Equal(t, "t3_hmwhd7", resp.After)
 }
 
 func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
@@ -782,9 +785,10 @@ func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "test", nil)
+	posts, resp, err := client.Subreddit.SearchPosts(ctx, "test", "test", nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSearchPosts, posts)
+	require.Equal(t, "t3_hmwhd7", resp.After)
 }
 
 func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
@@ -808,9 +812,10 @@ func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Subreddit.SearchPosts(ctx, "test", "test+golang+nba", nil)
+	posts, resp, err := client.Subreddit.SearchPosts(ctx, "test", "test+golang+nba", nil)
 	require.NoError(t, err)
 	require.Equal(t, expectedSearchPosts, posts)
+	require.Equal(t, "t3_hmwhd7", resp.After)
 }
 
 func TestSubredditService_Random(t *testing.T) {
