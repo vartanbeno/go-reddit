@@ -17,14 +17,9 @@ func main() {
 }
 
 func run() (err error) {
-	credentials := &reddit.Credentials{
-		ID:       "id",
-		Secret:   "secret",
-		Username: "username",
-		Password: "password",
-	}
+	withCredentials := reddit.WithCredentials("id", "secret", "username", "password")
 
-	client, err := reddit.NewClient(credentials)
+	client, err := reddit.NewClient(withCredentials)
 	if err != nil {
 		return
 	}
@@ -51,6 +46,5 @@ func run() (err error) {
 	}
 
 	fmt.Printf("The link post is available at: %s\n", post.URL)
-
 	return
 }

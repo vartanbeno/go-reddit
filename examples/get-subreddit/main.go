@@ -17,24 +17,11 @@ func main() {
 }
 
 func run() (err error) {
-	credentials := &reddit.Credentials{
-		ID:       "id",
-		Secret:   "secret",
-		Username: "username",
-		Password: "password",
-	}
-
-	client, err := reddit.NewClient(credentials)
-	if err != nil {
-		return
-	}
-
-	sr, _, err := client.Subreddit.Get(ctx, "golang")
+	sr, _, err := reddit.DefaultClient.Subreddit.Get(ctx, "golang")
 	if err != nil {
 		return
 	}
 
 	fmt.Printf("%s was created on %s and has %d subscribers.\n", sr.NamePrefixed, sr.Created.Local(), sr.Subscribers)
-
 	return
 }

@@ -18,14 +18,7 @@ func main() {
 }
 
 func run() (err error) {
-	credentials := &reddit.Credentials{
-		ID:       "id",
-		Secret:   "secret",
-		Username: "username",
-		Password: "password",
-	}
-
-	client, err := reddit.NewClient(credentials)
+	client, err := reddit.NewReadonlyClient()
 	if err != nil {
 		return
 	}
@@ -35,13 +28,7 @@ func run() (err error) {
 	client.Subreddit.Search(ctx, "programming", nil)
 	client.Subreddit.SearchNames(ctx, "monitor")
 	client.Subreddit.SearchPosts(ctx, "react", "webdev", nil)
-	client.User.Posts(ctx, &reddit.ListUserOverviewOptions{
-		ListOptions: reddit.ListOptions{
-			Limit: 50,
-		},
-		Sort: "top",
-		Time: "month",
-	})
+	client.Subreddit.HotPosts(ctx, "golang", &reddit.ListOptions{Limit: 5})
 
 	return
 }

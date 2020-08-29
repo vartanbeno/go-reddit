@@ -3,8 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"log"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/vartanbeno/go-reddit/reddit"
@@ -13,44 +14,35 @@ import (
 var ctx = context.Background()
 
 func main() {
-	if err := run(); err != nil {
-		log.Fatal(err)
-	}
-}
+	sig := make(chan os.Signal, 1)
+	defer close(sig)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 
-func run() (err error) {
-	credentials := &reddit.Credentials{
-		ID:       "id",
-		Secret:   "secret",
-		Username: "username",
-		Password: "password",
-	}
-
-	client, err := reddit.NewClient(credentials)
-	if err != nil {
-		return
-	}
-
-	posts, errs, stop := client.Stream.Posts("AskReddit", reddit.StreamInterval(time.Second*3), reddit.StreamDiscardInitial)
+	posts, errs, stop := reddit.DefaultClient.Stream.Posts("AskReddit", reddit.StreamInterval(time.Second*3), reddit.StreamDiscardInitial)
 	defer stop()
 
-	go func() {
-		for {
-			select {
-			case post, ok := <-posts:
-				if !ok {
-					return
-				}
-				fmt.Printf("Received post: %s\n", post.Title)
-			case err, ok := <-errs:
-				if !ok {
-					return
-				}
-				fmt.Fprintf(os.Stderr, "Error! %v\n", err)
-			}
-		}
-	}()
+	timer := time.NewTimer(time.Minute)
+	defer timer.Stop()
 
-	<-time.After(time.Minute)
-	return
+	for {
+		select {
+		case post, ok := <-posts:
+			if !ok {
+				return
+			}
+			fmt.Printf("Received post: %s\n", post.Title)
+		case err, ok := <-errs:
+			if !ok {
+				return
+			}
+			fmt.Fprintf(os.Stderr, "Error! %v\n", err)
+		case rcvSig, ok := <-sig:
+			if !ok {
+				return
+			}
+			fmt.Printf("Stopping due to %s signal\n", rcvSig)
+		case <-timer.C:
+			return
+		}
+	}
 }

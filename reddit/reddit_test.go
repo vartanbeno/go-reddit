@@ -32,7 +32,7 @@ func setup() (*Client, *http.ServeMux, func()) {
 	})
 
 	client, _ := NewClient(
-		&Credentials{"id1", "secret1", "user1", "password1"},
+		WithCredentials("id1", "secret1", "user1", "password1"),
 		WithBaseURL(server.URL),
 		WithTokenURL(server.URL+"/api/v1/access_token"),
 	)
@@ -82,7 +82,7 @@ func testClientServices(t *testing.T, c *Client) {
 }
 
 func testClientDefaultUserAgent(t *testing.T, c *Client) {
-	expectedUserAgent := fmt.Sprintf("golang:%s:v%s (by /u/)", libraryName, libraryVersion)
+	expectedUserAgent := fmt.Sprintf("golang:%s:v%s", libraryName, libraryVersion)
 	require.Equal(t, expectedUserAgent, c.UserAgent())
 }
 
@@ -92,21 +92,52 @@ func testClientDefaults(t *testing.T, c *Client) {
 }
 
 func TestNewClient(t *testing.T) {
-	c, err := NewClient(&Credentials{})
+	c, err := NewClient()
 	require.NoError(t, err)
 	testClientDefaults(t, c)
 }
 
 func TestNewClient_Error(t *testing.T) {
-	_, err := NewClient(nil)
-	require.EqualError(t, err, "must provide credentials to initialize *reddit.Client")
+	_, err := NewClient()
+	require.NoError(t, err)
 
 	errorOpt := func(c *Client) error {
 		return errors.New("foo")
 	}
 
-	_, err = NewClient(&Credentials{}, errorOpt)
+	_, err = NewClient(errorOpt)
 	require.EqualError(t, err, "foo")
+}
+
+func TestNewReadonlyClient(t *testing.T) {
+	c, err := NewReadonlyClient()
+	require.NoError(t, err)
+	require.Equal(t, c.BaseURL.String(), defaultBaseURLReadonly)
+}
+
+func TestNewReadonlyClient_Error(t *testing.T) {
+	_, err := NewReadonlyClient()
+	require.NoError(t, err)
+
+	errorOpt := func(c *Client) error {
+		return errors.New("foo")
+	}
+
+	_, err = NewReadonlyClient(errorOpt)
+	require.EqualError(t, err, "foo")
+}
+
+func TestDefaultClient(t *testing.T) {
+	require.NotNil(t, DefaultClient)
+}
+
+func TestClient_Readonly_NewRequest(t *testing.T) {
+	c, err := NewReadonlyClient()
+	require.NoError(t, err)
+
+	req, err := c.NewRequest(http.MethodGet, "r/golang", nil)
+	require.NoError(t, err)
+	require.Equal(t, defaultBaseURLReadonly+"/r/golang.json", req.URL.String())
 }
 
 func TestClient_OnRequestComplemented(t *testing.T) {

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -21,8 +20,9 @@ const (
 	libraryName    = "github.com/vartanbeno/go-reddit"
 	libraryVersion = "1.0.0"
 
-	defaultBaseURL  = "https://oauth.reddit.com"
-	defaultTokenURL = "https://www.reddit.com/api/v1/access_token"
+	defaultBaseURL         = "https://oauth.reddit.com"
+	defaultBaseURLReadonly = "https://reddit.com"
+	defaultTokenURL        = "https://www.reddit.com/api/v1/access_token"
 
 	mediaTypeJSON = "application/json"
 	mediaTypeForm = "application/x-www-form-urlencoded"
@@ -31,6 +31,9 @@ const (
 	headerAccept      = "Accept"
 	headerUserAgent   = "User-Agent"
 )
+
+// DefaultClient is a readonly client with limited access to the Reddit API.
+var DefaultClient, _ = NewReadonlyClient()
 
 // RequestCompletionCallback defines the type of the request callback function.
 type RequestCompletionCallback func(*http.Request, *http.Response)
@@ -113,16 +116,9 @@ func newClient() *Client {
 }
 
 // NewClient returns a new Reddit API client.
-func NewClient(creds *Credentials, opts ...Opt) (*Client, error) {
-	if creds == nil {
-		return nil, errors.New("must provide credentials to initialize *reddit.Client")
-	}
-
+// Use an Opt to configure the client credentials, such as WithCredentials or FromEnv.
+func NewClient(opts ...Opt) (*Client, error) {
 	client := newClient()
-	client.ID = creds.ID
-	client.Secret = creds.Secret
-	client.Username = creds.Username
-	client.Password = creds.Password
 
 	for _, opt := range opts {
 		if err := opt(client); err != nil {
@@ -134,31 +130,14 @@ func NewClient(creds *Credentials, opts ...Opt) (*Client, error) {
 		client.client = &http.Client{}
 	}
 
-	// We need to set a custom user agent, because using the one set by the
-	// stdlib gives us 429 Too Many Requests responses from the Reddit API.
 	userAgentTransport := &userAgentTransport{
 		userAgent: client.UserAgent(),
 		Base:      client.client.Transport,
 	}
 	client.client.Transport = userAgentTransport
 
-	// todo...
-	// Some endpoints (notably the ones to get random subreddits/posts) redirect to a
-	// reddit.com url, which returns a 403 Forbidden for some reason, unless the url's
-	// host is changed to oauth.reddit.com
 	if client.client.CheckRedirect == nil {
-		client.client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-			redirectURL := req.URL.String()
-			redirectURL = strings.Replace(redirectURL, "https://www.reddit.com", defaultBaseURL, 1)
-
-			reqURL, err := url.Parse(redirectURL)
-			if err != nil {
-				return err
-			}
-			req.URL = reqURL
-
-			return nil
-		}
+		client.client.CheckRedirect = client.redirect
 	}
 
 	oauthTransport := oauthTransport(client)
@@ -167,10 +146,71 @@ func NewClient(creds *Credentials, opts ...Opt) (*Client, error) {
 	return client, nil
 }
 
+// NewReadonlyClient returns a new read-only Reddit API client.
+// The client will have limited access to the Reddit API.
+// Options that modify credentials (such as WithCredentials or FromEnv) won't have any effect on this client.
+func NewReadonlyClient(opts ...Opt) (*Client, error) {
+	client := newClient()
+	client.BaseURL, _ = url.Parse(defaultBaseURLReadonly)
+
+	for _, opt := range opts {
+		if err := opt(client); err != nil {
+			return nil, err
+		}
+	}
+
+	if client.client == nil {
+		client.client = &http.Client{}
+	}
+
+	userAgentTransport := &userAgentTransport{
+		userAgent: client.UserAgent(),
+		Base:      client.client.Transport,
+	}
+	client.client.Transport = userAgentTransport
+
+	return client, nil
+}
+
+// todo...
+// Some endpoints (notably the ones to get random subreddits/posts) redirect to a
+// reddit.com url, which returns a 403 Forbidden for some reason, unless the url's
+// host is changed to oauth.reddit.com
+func (c *Client) redirect(req *http.Request, via []*http.Request) error {
+	redirectURL := req.URL.String()
+	redirectURL = strings.Replace(redirectURL, "https://www.reddit.com", defaultBaseURL, 1)
+
+	reqURL, err := url.Parse(redirectURL)
+	if err != nil {
+		return err
+	}
+	req.URL = reqURL
+
+	return nil
+}
+
+// The readonly Reddit url needs .json at the end of its path to return responses in JSON instead of HTML.
+func (c *Client) appendJSONExtensionToRequestPath(req *http.Request) {
+	readonlyURL, err := url.Parse(defaultBaseURLReadonly)
+	if err != nil {
+		return
+	}
+
+	if req.URL.Host != readonlyURL.Host {
+		return
+	}
+
+	req.URL.Path += ".json"
+}
+
 // UserAgent returns the client's user agent.
 func (c *Client) UserAgent() string {
 	if c.userAgent == "" {
-		c.userAgent = fmt.Sprintf("golang:%s:v%s (by /u/%s)", libraryName, libraryVersion, c.Username)
+		userAgent := fmt.Sprintf("golang:%s:v%s", libraryName, libraryVersion)
+		if c.Username != "" {
+			userAgent += fmt.Sprintf(" (by /u/%s)", c.Username)
+		}
+		c.userAgent = userAgent
 	}
 	return c.userAgent
 }
@@ -198,6 +238,7 @@ func (c *Client) NewRequest(method string, path string, body interface{}) (*http
 		return nil, err
 	}
 
+	c.appendJSONExtensionToRequestPath(req)
 	req.Header.Add(headerContentType, mediaTypeJSON)
 	req.Header.Add(headerAccept, mediaTypeJSON)
 
@@ -218,6 +259,7 @@ func (c *Client) NewRequestWithForm(method string, path string, form url.Values)
 		return nil, err
 	}
 
+	c.appendJSONExtensionToRequestPath(req)
 	req.Header.Add(headerContentType, mediaTypeForm)
 	req.Header.Add(headerAccept, mediaTypeJSON)
 

@@ -18,6 +18,8 @@ func cloneRequest(r *http.Request) *http.Request {
 }
 
 // Sets the User-Agent header for requests.
+// We need to set a custom user agent because using the one set by the
+// stdlib gives us 429 Too Many Requests responses from the Reddit API.
 type userAgentTransport struct {
 	userAgent string
 	Base      http.RoundTripper

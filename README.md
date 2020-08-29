@@ -3,7 +3,7 @@
 [![Actions Status](https://github.com/vartanbeno/go-reddit/workflows/tests/badge.svg)](https://github.com/vartanbeno/go-reddit/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit)
 
-Featured in [issue 327 of Golang Weekly](https://golangweekly.com/issues/327) 🎉
+**Featured in [issue 327 of Golang Weekly](https://golangweekly.com/issues/327) 🎉**
 
 go-reddit is a Go client library for accessing the Reddit API.
 
@@ -33,26 +33,35 @@ package main
 import "github.com/vartanbeno/go-reddit/reddit"
 
 func main() {
-    credentials := &reddit.Credentials{
-        ID:       "id",
-        Secret:   "secret",
-        Username: "username",
-        Password: "password",
-    }
-    client, _ := reddit.NewClient(credentials)
+    withCredentials := reddit.WithCredentials("id", "secret", "username", "password")
+    client, _ := reddit.NewClient(withCredentials)
 }
 ```
 
-You can pass in a number of options to `NewClient` that further configure the client. For example, to use a custom HTTP client:
+You can pass in a number of options to `NewClient` to further configure the client (see [reddit/reddit-options.go](reddit/reddit-options.go)). For example, to use a custom HTTP client:
 
 ```go
 httpClient := &http.Client{Timeout: time.Second * 30}
-client, _ := reddit.NewClient(credentials, reddit.WithHTTPClient(httpClient))
+client, _ := reddit.NewClient(withCredentials, reddit.WithHTTPClient(httpClient))
 ```
 
-If this option is not used, it will be set to `&http.Client{}` by default. More options are available in the [reddit/reddit-options.go](reddit/reddit-options.go) file.
+### Read-Only Mode
+
+The global `DefaultClient` variable is a valid, read-only client with limited access to the Reddit API, much like a logged out user. You can initialize your own via `NewReadonlyClient`:
+
+```go
+client, _ := reddit.NewReadonlyClient()
+```
 
 ## Examples
+
+<details>
+    <summary>Configure the client from environment variables.</summary>
+
+```go
+client, _ := reddit.NewClient(reddit.FromEnv)
+```
+</details>
 
 <details>
     <summary>Submit a comment.</summary>
