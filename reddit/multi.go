@@ -19,11 +19,6 @@ type MultiService struct {
 	client *Client
 }
 
-type multiRoot struct {
-	Kind string `json:"kind,omitempty"`
-	Data *Multi `json:"data,omitempty"`
-}
-
 // Multi is a multireddit, i.e. a customizable group of subreddits.
 // Users can create multis for custom navigation, instead of browsing
 // one subreddit or all subreddits at a time.
@@ -75,8 +70,8 @@ func (n *SubredditNames) MarshalJSON() ([]byte, error) {
 	type subreddit struct {
 		Name string `json:"name"`
 	}
-	var subreddits []subreddit
 
+	subreddits := make([]subreddit, 0)
 	for _, name := range *n {
 		subreddits = append(subreddits, subreddit{name})
 	}
@@ -128,17 +123,17 @@ func (s *MultiService) Get(ctx context.Context, multiPath string) (*Multi, *Resp
 		return nil, nil, err
 	}
 
-	root := new(multiRoot)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Data, resp, nil
+	return root.Multi(), resp, nil
 }
 
 // Mine returns your multireddits.
-func (s *MultiService) Mine(ctx context.Context) ([]Multi, *Response, error) {
+func (s *MultiService) Mine(ctx context.Context) ([]*Multi, *Response, error) {
 	path := "api/multi/mine"
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -146,23 +141,18 @@ func (s *MultiService) Mine(ctx context.Context) ([]Multi, *Response, error) {
 		return nil, nil, err
 	}
 
-	var root []multiRoot
-	resp, err := s.client.Do(ctx, req, &root)
+	root := new(things)
+	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	multis := make([]Multi, 0)
-	for _, multi := range root {
-		multis = append(multis, *multi.Data)
-	}
-
-	return multis, resp, nil
+	return root.Multis, resp, nil
 }
 
 // Of returns the user's public multireddits.
 // Or, if the user is you, all of your multireddits.
-func (s *MultiService) Of(ctx context.Context, username string) ([]Multi, *Response, error) {
+func (s *MultiService) Of(ctx context.Context, username string) ([]*Multi, *Response, error) {
 	path := fmt.Sprintf("api/multi/user/%s", username)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -170,18 +160,13 @@ func (s *MultiService) Of(ctx context.Context, username string) ([]Multi, *Respo
 		return nil, nil, err
 	}
 
-	var root []multiRoot
-	resp, err := s.client.Do(ctx, req, &root)
+	root := new(things)
+	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	multis := make([]Multi, 0)
-	for _, multi := range root {
-		multis = append(multis, *multi.Data)
-	}
-
-	return multis, resp, nil
+	return root.Multis, resp, nil
 }
 
 // Copy a multireddit.
@@ -201,13 +186,13 @@ func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) 
 		return nil, nil, err
 	}
 
-	root := new(multiRoot)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Data, resp, nil
+	return root.Multi(), resp, nil
 }
 
 // Create a multireddit.
@@ -223,13 +208,13 @@ func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrU
 		return nil, nil, err
 	}
 
-	root := new(multiRoot)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Data, resp, nil
+	return root.Multi(), resp, nil
 }
 
 // Update a multireddit.
@@ -246,13 +231,13 @@ func (s *MultiService) Update(ctx context.Context, multiPath string, updateReque
 		return nil, nil, err
 	}
 
-	root := new(multiRoot)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Data, resp, nil
+	return root.Multi(), resp, nil
 }
 
 // Delete a multireddit.

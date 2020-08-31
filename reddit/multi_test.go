@@ -74,7 +74,7 @@ func TestMultiService_Mine(t *testing.T) {
 
 	multis, _, err := client.Multi.Mine(ctx)
 	require.NoError(t, err)
-	require.Equal(t, []Multi{*expectedMulti, *expectedMulti2}, multis)
+	require.Equal(t, []*Multi{expectedMulti, expectedMulti2}, multis)
 }
 
 func TestMultiService_Of(t *testing.T) {
@@ -91,7 +91,7 @@ func TestMultiService_Of(t *testing.T) {
 
 	multis, _, err := client.Multi.Of(ctx, "test")
 	require.NoError(t, err)
-	require.Equal(t, []Multi{*expectedMulti, *expectedMulti2}, multis)
+	require.Equal(t, []*Multi{expectedMulti, expectedMulti2}, multis)
 }
 
 func TestMultiService_Copy(t *testing.T) {

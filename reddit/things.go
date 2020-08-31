@@ -7,7 +7,7 @@ import (
 
 const (
 	kindComment    = "t1"
-	kindAccount    = "t2"
+	kindUser       = "t2"
 	kindPost       = "t3"
 	kindMessage    = "t4"
 	kindSubreddit  = "t5"
@@ -18,6 +18,7 @@ const (
 	kindUserList   = "UserList"
 	kindMore       = "more"
 	kindModAction  = "modaction"
+	kindMulti      = "LabeledMulti"
 )
 
 // thing is an entity on Reddit.
@@ -48,7 +49,7 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(Comment)
 	case kindMore:
 		v = new(More)
-	case kindAccount:
+	case kindUser:
 		v = new(User)
 	case kindPost:
 		v = new(Post)
@@ -56,6 +57,8 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(Subreddit)
 	case kindModAction:
 		v = new(ModAction)
+	case kindMulti:
+		v = new(Multi)
 	default:
 		return fmt.Errorf("unrecognized kind: %q", t.Kind)
 	}
@@ -96,6 +99,11 @@ func (t *thing) Subreddit() *Subreddit {
 
 func (t *thing) ModAction() *ModAction {
 	v, _ := t.Data.(*ModAction)
+	return v
+}
+
+func (t *thing) Multi() *Multi {
+	v, _ := t.Data.(*Multi)
 	return v
 }
 
@@ -149,6 +157,7 @@ type things struct {
 	Posts      []*Post
 	Subreddits []*Subreddit
 	ModActions []*ModAction
+	Multis     []*Multi
 }
 
 // init initializes or clears the listing.
@@ -159,6 +168,7 @@ func (t *things) init() {
 	t.Posts = make([]*Post, 0)
 	t.Subreddits = make([]*Subreddit, 0)
 	t.ModActions = make([]*ModAction, 0)
+	t.Multis = make([]*Multi, 0)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -189,6 +199,8 @@ func (t *things) add(things ...thing) {
 			t.Subreddits = append(t.Subreddits, v)
 		case *ModAction:
 			t.ModActions = append(t.ModActions, v)
+		case *Multi:
+			t.Multis = append(t.Multis, v)
 		}
 	}
 }

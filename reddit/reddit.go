@@ -341,7 +341,7 @@ func (c *Client) id(ctx context.Context) (string, *Response, error) {
 		return "", resp, err
 	}
 
-	c.redditID = fmt.Sprintf("%s_%s", kindAccount, self.ID)
+	c.redditID = fmt.Sprintf("%s_%s", kindUser, self.ID)
 	return c.redditID, resp, nil
 }
 

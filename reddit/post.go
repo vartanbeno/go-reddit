@@ -20,7 +20,7 @@ type PostService struct {
 	client *Client
 }
 
-type submittedLinkRoot struct {
+type rootSubmittedPost struct {
 	JSON struct {
 		Data *Submitted `json:"data,omitempty"`
 	} `json:"json"`
@@ -125,7 +125,7 @@ func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *R
 		return nil, nil, err
 	}
 
-	root := new(submittedLinkRoot)
+	root := new(rootSubmittedPost)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
