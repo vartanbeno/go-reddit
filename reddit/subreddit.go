@@ -17,11 +17,6 @@ type SubredditService struct {
 	client *Client
 }
 
-type rootSubreddit struct {
-	Kind string     `json:"kind,omitempty"`
-	Data *Subreddit `json:"data,omitempty"`
-}
-
 type rootSubredditNames struct {
 	Names []string `json:"names,omitempty"`
 }
@@ -133,13 +128,13 @@ func (s *SubredditService) Get(ctx context.Context, name string) (*Subreddit, *R
 		return nil, nil, err
 	}
 
-	root := new(rootSubreddit)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Data, resp, nil
+	return root.Subreddit(), resp, nil
 }
 
 // Popular returns popular subreddits.

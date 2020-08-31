@@ -15,11 +15,6 @@ type UserService struct {
 	client *Client
 }
 
-type rootUser struct {
-	Kind string `json:"kind,omitempty"`
-	Data *User  `json:"data,omitempty"`
-}
-
 // User represents a Reddit user.
 type User struct {
 	// this is not the full ID, watch out.
@@ -83,13 +78,13 @@ func (s *UserService) Get(ctx context.Context, username string) (*User, *Respons
 		return nil, nil, err
 	}
 
-	root := new(rootUser)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Data, resp, nil
+	return root.User(), resp, nil
 }
 
 // GetMultipleByID returns multiple users from their full IDs.

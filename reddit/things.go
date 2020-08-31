@@ -2,6 +2,7 @@ package reddit
 
 import (
 	"encoding/json"
+	"fmt"
 )
 
 const (
@@ -23,8 +24,79 @@ const (
 // Its kind reprsents what it is and what is stored in the Data field.
 // e.g. t1 = comment, t2 = user, t3 = post, etc.
 type thing struct {
-	Kind string          `json:"kind"`
-	Data json.RawMessage `json:"data"`
+	Kind string      `json:"kind"`
+	Data interface{} `json:"data"`
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (t *thing) UnmarshalJSON(b []byte) error {
+	root := new(struct {
+		Kind string          `json:"kind"`
+		Data json.RawMessage `json:"data"`
+	})
+
+	err := json.Unmarshal(b, root)
+	if err != nil {
+		return err
+	}
+
+	t.Kind = root.Kind
+	var v interface{}
+
+	switch t.Kind {
+	case kindComment:
+		v = new(Comment)
+	case kindMore:
+		v = new(More)
+	case kindAccount:
+		v = new(User)
+	case kindPost:
+		v = new(Post)
+	case kindSubreddit:
+		v = new(Subreddit)
+	case kindModAction:
+		v = new(ModAction)
+	default:
+		return fmt.Errorf("unrecognized kind: %q", t.Kind)
+	}
+
+	err = json.Unmarshal(root.Data, v)
+	if err != nil {
+		return err
+	}
+
+	t.Data = v
+	return nil
+}
+
+func (t *thing) Comment() *Comment {
+	v, _ := t.Data.(*Comment)
+	return v
+}
+
+func (t *thing) More() *More {
+	v, _ := t.Data.(*More)
+	return v
+}
+
+func (t *thing) User() *User {
+	v, _ := t.Data.(*User)
+	return v
+}
+
+func (t *thing) Post() *Post {
+	v, _ := t.Data.(*Post)
+	return v
+}
+
+func (t *thing) Subreddit() *Subreddit {
+	v, _ := t.Data.(*Subreddit)
+	return v
+}
+
+func (t *thing) ModAction() *ModAction {
+	v, _ := t.Data.(*ModAction)
+	return v
 }
 
 type anchor interface {
@@ -32,15 +104,13 @@ type anchor interface {
 	Before() string
 }
 
-// listing holds things coming from the Reddit API.
+// listing is a list of things coming from the Reddit API.
 // It also contains the after/before anchors useful for subsequent requests.
 type listing struct {
 	things
 	after  string
 	before string
 }
-
-var _ anchor = &listing{}
 
 func (l *listing) After() string {
 	return l.after
@@ -100,42 +170,27 @@ func (t *things) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
+	t.add(things...)
+	return nil
+}
+
+func (t *things) add(things ...thing) {
 	for _, thing := range things {
-		switch thing.Kind {
-		case kindComment:
-			v := new(Comment)
-			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.Comments = append(t.Comments, v)
-			}
-		case kindMore:
-			v := new(More)
-			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.Mores = append(t.Mores, v)
-			}
-		case kindAccount:
-			v := new(User)
-			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.Users = append(t.Users, v)
-			}
-		case kindPost:
-			v := new(Post)
-			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.Posts = append(t.Posts, v)
-			}
-		case kindSubreddit:
-			v := new(Subreddit)
-			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.Subreddits = append(t.Subreddits, v)
-			}
-		case kindModAction:
-			v := new(ModAction)
-			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.ModActions = append(t.ModActions, v)
-			}
+		switch v := thing.Data.(type) {
+		case *Comment:
+			t.Comments = append(t.Comments, v)
+		case *More:
+			t.Mores = append(t.Mores, v)
+		case *User:
+			t.Users = append(t.Users, v)
+		case *Post:
+			t.Posts = append(t.Posts, v)
+		case *Subreddit:
+			t.Subreddits = append(t.Subreddits, v)
+		case *ModAction:
+			t.ModActions = append(t.ModActions, v)
 		}
 	}
-
-	return nil
 }
 
 // Comment is a comment posted by a user.

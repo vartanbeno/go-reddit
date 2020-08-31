@@ -35,13 +35,16 @@ type Message struct {
 	IsComment bool `json:"was_comment"`
 }
 
+type inboxThing struct {
+	Kind string   `json:"kind"`
+	Data *Message `json:"data"`
+}
+
 type inboxListing struct {
 	inboxThings
 	after  string
 	before string
 }
-
-var _ anchor = &inboxListing{}
 
 func (l *inboxListing) After() string {
 	return l.after
@@ -73,14 +76,12 @@ func (l *inboxListing) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// The returned JSON for comments is a bit different.
-// It looks for like the Message struct.
 type inboxThings struct {
 	Comments []*Message
 	Messages []*Message
 }
 
-// init initializes or clears the inbox.
+// init initializes or clears the listing.
 func (t *inboxThings) init() {
 	t.Comments = make([]*Message, 0)
 	t.Messages = make([]*Message, 0)
@@ -90,27 +91,24 @@ func (t *inboxThings) init() {
 func (t *inboxThings) UnmarshalJSON(b []byte) error {
 	t.init()
 
-	var things []thing
+	var things []inboxThing
 	if err := json.Unmarshal(b, &things); err != nil {
 		return err
 	}
 
+	t.add(things...)
+	return nil
+}
+
+func (t *inboxThings) add(things ...inboxThing) {
 	for _, thing := range things {
 		switch thing.Kind {
 		case kindComment:
-			v := new(Message)
-			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.Comments = append(t.Comments, v)
-			}
+			t.Comments = append(t.Comments, thing.Data)
 		case kindMessage:
-			v := new(Message)
-			if err := json.Unmarshal(thing.Data, v); err == nil {
-				t.Messages = append(t.Messages, v)
-			}
+			t.Messages = append(t.Messages, thing.Data)
 		}
 	}
-
-	return nil
 }
 
 // SendMessageRequest represents a request to send a message.
