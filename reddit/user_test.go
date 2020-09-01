@@ -116,7 +116,7 @@ var expectedBlocked = &Blocked{
 	Created:   &Timestamp{time.Date(2020, 6, 16, 16, 49, 50, 0, time.UTC)},
 }
 
-var expectedTrophies = []Trophy{
+var expectedTrophies = []*Trophy{
 	{
 		ID:          "",
 		Name:        "Three-Year Club",

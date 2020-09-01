@@ -11,7 +11,7 @@ const (
 	kindPost       = "t3"
 	kindMessage    = "t4"
 	kindSubreddit  = "t5"
-	kindAward      = "t6"
+	kindTrophy     = "t6"
 	kindListing    = "Listing"
 	kindKarmaList  = "KarmaList"
 	kindTrophyList = "TrophyList"
@@ -59,6 +59,10 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(ModAction)
 	case kindMulti:
 		v = new(Multi)
+	case kindTrophy:
+		v = new(Trophy)
+	case kindTrophyList:
+		v = new(trophyList)
 	default:
 		return fmt.Errorf("unrecognized kind: %q", t.Kind)
 	}
@@ -72,39 +76,49 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (t *thing) Comment() *Comment {
-	v, _ := t.Data.(*Comment)
-	return v
+func (t *thing) Comment() (v *Comment, ok bool) {
+	v, ok = t.Data.(*Comment)
+	return
 }
 
-func (t *thing) More() *More {
-	v, _ := t.Data.(*More)
-	return v
+func (t *thing) More() (v *More, ok bool) {
+	v, ok = t.Data.(*More)
+	return
 }
 
-func (t *thing) User() *User {
-	v, _ := t.Data.(*User)
-	return v
+func (t *thing) User() (v *User, ok bool) {
+	v, ok = t.Data.(*User)
+	return
 }
 
-func (t *thing) Post() *Post {
-	v, _ := t.Data.(*Post)
-	return v
+func (t *thing) Post() (v *Post, ok bool) {
+	v, ok = t.Data.(*Post)
+	return
 }
 
-func (t *thing) Subreddit() *Subreddit {
-	v, _ := t.Data.(*Subreddit)
-	return v
+func (t *thing) Subreddit() (v *Subreddit, ok bool) {
+	v, ok = t.Data.(*Subreddit)
+	return
 }
 
-func (t *thing) ModAction() *ModAction {
-	v, _ := t.Data.(*ModAction)
-	return v
+func (t *thing) ModAction() (v *ModAction, ok bool) {
+	v, ok = t.Data.(*ModAction)
+	return
 }
 
-func (t *thing) Multi() *Multi {
-	v, _ := t.Data.(*Multi)
-	return v
+func (t *thing) Multi() (v *Multi, ok bool) {
+	v, ok = t.Data.(*Multi)
+	return
+}
+
+func (t *thing) Trophy() (v *Trophy, ok bool) {
+	v, ok = t.Data.(*Trophy)
+	return
+}
+
+func (t *thing) TrophyList() ([]*Trophy, bool) {
+	v, ok := t.Data.(*trophyList)
+	return *v, ok
 }
 
 type anchor interface {
@@ -203,6 +217,28 @@ func (t *things) add(things ...thing) {
 			t.Multis = append(t.Multis, v)
 		}
 	}
+}
+
+type trophyList []*Trophy
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (l *trophyList) UnmarshalJSON(b []byte) error {
+	root := new(struct {
+		Trophies []thing `json:"trophies"`
+	})
+
+	err := json.Unmarshal(b, root)
+	if err != nil {
+		return err
+	}
+
+	for _, thing := range root.Trophies {
+		if trophy, ok := thing.Trophy(); ok {
+			*l = append(*l, trophy)
+		}
+	}
+
+	return nil
 }
 
 // Comment is a comment posted by a user.

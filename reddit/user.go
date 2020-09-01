@@ -51,18 +51,6 @@ type Blocked struct {
 	Created   *Timestamp `json:"date,omitempty"`
 }
 
-type rootTrophyListing struct {
-	Kind string `json:"kind,omitempty"`
-	Data struct {
-		Trophies []rootTrophy `json:"trophies"`
-	} `json:"data"`
-}
-
-type rootTrophy struct {
-	Kind string  `json:"kind,omitempty"`
-	Data *Trophy `json:"data,omitempty"`
-}
-
 // Trophy is a Reddit award.
 type Trophy struct {
 	ID          string `json:"id"`
@@ -84,7 +72,8 @@ func (s *UserService) Get(ctx context.Context, username string) (*User, *Respons
 		return nil, resp, err
 	}
 
-	return root.User(), resp, nil
+	user, _ := root.User()
+	return user, resp, nil
 }
 
 // GetMultipleByID returns multiple users from their full IDs.
@@ -482,12 +471,12 @@ func (s *UserService) UnblockByID(ctx context.Context, id string) (*Response, er
 }
 
 // Trophies returns a list of your trophies.
-func (s *UserService) Trophies(ctx context.Context) ([]Trophy, *Response, error) {
+func (s *UserService) Trophies(ctx context.Context) ([]*Trophy, *Response, error) {
 	return s.TrophiesOf(ctx, s.client.Username)
 }
 
 // TrophiesOf returns a list of the specified user's trophies.
-func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]Trophy, *Response, error) {
+func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]*Trophy, *Response, error) {
 	path := fmt.Sprintf("api/v1/user/%s/trophies", username)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -495,19 +484,13 @@ func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]Trophy
 		return nil, nil, err
 	}
 
-	root := new(rootTrophyListing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	var trophies []Trophy
-	for _, trophy := range root.Data.Trophies {
-		if trophy.Data != nil {
-			trophies = append(trophies, *trophy.Data)
-		}
-	}
-
+	trophies, _ := root.TrophyList()
 	return trophies, resp, nil
 }
 

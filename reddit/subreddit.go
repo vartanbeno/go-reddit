@@ -134,7 +134,8 @@ func (s *SubredditService) Get(ctx context.Context, name string) (*Subreddit, *R
 		return nil, resp, err
 	}
 
-	return root.Subreddit(), resp, nil
+	sr, _ := root.Subreddit()
+	return sr, resp, nil
 }
 
 // Popular returns popular subreddits.

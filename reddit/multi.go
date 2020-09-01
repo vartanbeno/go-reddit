@@ -129,7 +129,8 @@ func (s *MultiService) Get(ctx context.Context, multiPath string) (*Multi, *Resp
 		return nil, resp, err
 	}
 
-	return root.Multi(), resp, nil
+	multi, _ := root.Multi()
+	return multi, resp, nil
 }
 
 // Mine returns your multireddits.
@@ -192,7 +193,8 @@ func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) 
 		return nil, resp, err
 	}
 
-	return root.Multi(), resp, nil
+	multi, _ := root.Multi()
+	return multi, resp, nil
 }
 
 // Create a multireddit.
@@ -214,7 +216,8 @@ func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrU
 		return nil, resp, err
 	}
 
-	return root.Multi(), resp, nil
+	multi, _ := root.Multi()
+	return multi, resp, nil
 }
 
 // Update a multireddit.
@@ -237,7 +240,8 @@ func (s *MultiService) Update(ctx context.Context, multiPath string, updateReque
 		return nil, resp, err
 	}
 
-	return root.Multi(), resp, nil
+	multi, _ := root.Multi()
+	return multi, resp, nil
 }
 
 // Delete a multireddit.

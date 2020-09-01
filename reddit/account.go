@@ -293,7 +293,7 @@ func (s *AccountService) UpdateSettings(ctx context.Context, settings *Settings)
 }
 
 // Trophies returns a list of your trophies.
-func (s *AccountService) Trophies(ctx context.Context) ([]Trophy, *Response, error) {
+func (s *AccountService) Trophies(ctx context.Context) ([]*Trophy, *Response, error) {
 	path := "api/v1/me/trophies"
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -301,19 +301,13 @@ func (s *AccountService) Trophies(ctx context.Context) ([]Trophy, *Response, err
 		return nil, nil, err
 	}
 
-	root := new(rootTrophyListing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	var trophies []Trophy
-	for _, trophy := range root.Data.Trophies {
-		if trophy.Data != nil {
-			trophies = append(trophies, *trophy.Data)
-		}
-	}
-
+	trophies, _ := root.TrophyList()
 	return trophies, resp, nil
 }
 

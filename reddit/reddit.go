@@ -190,7 +190,7 @@ func (c *Client) redirect(req *http.Request, via []*http.Request) error {
 }
 
 // The readonly Reddit url needs .json at the end of its path to return responses in JSON instead of HTML.
-func (c *Client) appendJSONExtensionToRequestPath(req *http.Request) {
+func (c *Client) appendJSONExtensionToRequestURLPath(req *http.Request) {
 	readonlyURL, err := url.Parse(defaultBaseURLReadonly)
 	if err != nil {
 		return
@@ -238,7 +238,7 @@ func (c *Client) NewRequest(method string, path string, body interface{}) (*http
 		return nil, err
 	}
 
-	c.appendJSONExtensionToRequestPath(req)
+	c.appendJSONExtensionToRequestURLPath(req)
 	req.Header.Add(headerContentType, mediaTypeJSON)
 	req.Header.Add(headerAccept, mediaTypeJSON)
 
@@ -259,7 +259,7 @@ func (c *Client) NewRequestWithForm(method string, path string, form url.Values)
 		return nil, err
 	}
 
-	c.appendJSONExtensionToRequestPath(req)
+	c.appendJSONExtensionToRequestURLPath(req)
 	req.Header.Add(headerContentType, mediaTypeForm)
 	req.Header.Add(headerAccept, mediaTypeJSON)
 
