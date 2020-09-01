@@ -1,19 +1,7 @@
-<div align='center'>
-<br />
-<img src='./images/logo.jpeg' alt='go-reddit logo' height='200'>
+# go-reddit
 
----
-
-<div id='badges' align='center'>
-
-  [![Actions Status](https://github.com/vartanbeno/go-reddit/workflows/tests/badge.svg)](https://github.com/vartanbeno/go-reddit/actions)
-  [![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit)
-
-</div>
-
-</div>
-
-## Overview
+[![Actions Status](https://github.com/vartanbeno/go-reddit/workflows/tests/badge.svg)](https://github.com/vartanbeno/go-reddit/actions)
+[![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit)
 
 **Featured in [issue 327 of Golang Weekly](https://golangweekly.com/issues/327) 🎉**
 
