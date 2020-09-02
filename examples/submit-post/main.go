@@ -24,7 +24,7 @@ func run() (err error) {
 		return
 	}
 
-	post, _, err := client.Post.SubmitText(ctx, reddit.SubmitTextOptions{
+	post, _, err := client.Post.SubmitText(ctx, reddit.SubmitTextRequest{
 		Subreddit: "test",
 		Title:     "This is a title",
 		Text:      "This is some text",
@@ -35,7 +35,7 @@ func run() (err error) {
 
 	fmt.Printf("The text post is available at: %s\n", post.URL)
 
-	post, _, err = client.Post.SubmitLink(ctx, reddit.SubmitLinkOptions{
+	post, _, err = client.Post.SubmitLink(ctx, reddit.SubmitLinkRequest{
 		Subreddit: "test",
 		Title:     "This is a title",
 		URL:       "http://example.com",

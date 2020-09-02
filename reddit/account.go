@@ -14,11 +14,6 @@ type AccountService struct {
 	client *Client
 }
 
-type rootSubredditKarma struct {
-	Kind string           `json:"kind,omitempty"`
-	Data []SubredditKarma `json:"data,omitempty"`
-}
-
 // SubredditKarma holds user karma data for the subreddit.
 type SubredditKarma struct {
 	Subreddit    string `json:"sr"`
@@ -239,7 +234,7 @@ func (s *AccountService) Info(ctx context.Context) (*User, *Response, error) {
 }
 
 // Karma returns a breakdown of your karma per subreddit.
-func (s *AccountService) Karma(ctx context.Context) ([]SubredditKarma, *Response, error) {
+func (s *AccountService) Karma(ctx context.Context) ([]*SubredditKarma, *Response, error) {
 	path := "api/v1/me/karma"
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -247,13 +242,14 @@ func (s *AccountService) Karma(ctx context.Context) ([]SubredditKarma, *Response
 		return nil, nil, err
 	}
 
-	root := new(rootSubredditKarma)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Data, resp, nil
+	karma, _ := root.Karma()
+	return karma, resp, nil
 }
 
 // Settings returns your account settings.

@@ -21,7 +21,7 @@ var expectedInfo = &User{
 	NSFW:             true,
 }
 
-var expectedKarma = []SubredditKarma{
+var expectedKarma = []*SubredditKarma{
 	{Subreddit: "nba", PostKarma: 144, CommentKarma: 21999},
 	{Subreddit: "redditdev", PostKarma: 19, CommentKarma: 4},
 	{Subreddit: "test", PostKarma: 1, CommentKarma: 0},

@@ -281,7 +281,7 @@ func TestPostService_SubmitText(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	submittedPost, _, err := client.Post.SubmitText(ctx, SubmitTextOptions{
+	submittedPost, _, err := client.Post.SubmitText(ctx, SubmitTextRequest{
 		Subreddit: "test",
 		Title:     "Test Title",
 		Text:      "Test Text",
@@ -318,7 +318,7 @@ func TestPostService_SubmitLink(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	submittedPost, _, err := client.Post.SubmitLink(ctx, SubmitLinkOptions{
+	submittedPost, _, err := client.Post.SubmitLink(ctx, SubmitLinkRequest{
 		Subreddit:   "test",
 		Title:       "Test Title",
 		URL:         "https://www.example.com",

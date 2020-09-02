@@ -21,12 +21,39 @@ const (
 	kindMulti      = "LabeledMulti"
 )
 
+type anchor interface {
+	After() string
+	Before() string
+}
+
 // thing is an entity on Reddit.
 // Its kind reprsents what it is and what is stored in the Data field.
 // e.g. t1 = comment, t2 = user, t3 = post, etc.
 type thing struct {
 	Kind string      `json:"kind"`
 	Data interface{} `json:"data"`
+}
+
+func (t *thing) After() string {
+	if t == nil {
+		return ""
+	}
+	a, ok := t.Data.(anchor)
+	if !ok {
+		return ""
+	}
+	return a.After()
+}
+
+func (t *thing) Before() string {
+	if t == nil {
+		return ""
+	}
+	a, ok := t.Data.(anchor)
+	if !ok {
+		return ""
+	}
+	return a.Before()
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -45,6 +72,8 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 	var v interface{}
 
 	switch t.Kind {
+	case kindListing:
+		v = new(listing)
 	case kindComment:
 		v = new(Comment)
 	case kindMore:
@@ -63,6 +92,8 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(Trophy)
 	case kindTrophyList:
 		v = new(trophyList)
+	case kindKarmaList:
+		v = new([]*SubredditKarma)
 	default:
 		return fmt.Errorf("unrecognized kind: %q", t.Kind)
 	}
@@ -74,6 +105,11 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 
 	t.Data = v
 	return nil
+}
+
+func (t *thing) Listing() (v *listing, ok bool) {
+	v, ok = t.Data.(*listing)
+	return
 }
 
 func (t *thing) Comment() (v *Comment, ok bool) {
@@ -118,18 +154,24 @@ func (t *thing) Trophy() (v *Trophy, ok bool) {
 
 func (t *thing) TrophyList() ([]*Trophy, bool) {
 	v, ok := t.Data.(*trophyList)
+	if !ok {
+		return nil, ok
+	}
 	return *v, ok
 }
 
-type anchor interface {
-	After() string
-	Before() string
+func (t *thing) Karma() ([]*SubredditKarma, bool) {
+	v, ok := t.Data.(*[]*SubredditKarma)
+	if !ok {
+		return nil, ok
+	}
+	return *v, ok
 }
 
 // listing is a list of things coming from the Reddit API.
 // It also contains the after/before anchors useful for subsequent requests.
 type listing struct {
-	things
+	things things
 	after  string
 	before string
 }
@@ -145,11 +187,9 @@ func (l *listing) Before() string {
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (l *listing) UnmarshalJSON(b []byte) error {
 	root := new(struct {
-		Data struct {
-			Things things `json:"children"`
-			After  string `json:"after"`
-			Before string `json:"before"`
-		} `json:"data"`
+		Things things `json:"children"`
+		After  string `json:"after"`
+		Before string `json:"before"`
 	})
 
 	err := json.Unmarshal(b, root)
@@ -157,11 +197,60 @@ func (l *listing) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
-	l.things = root.Data.Things
-	l.after = root.Data.After
-	l.before = root.Data.Before
+	l.things = root.Things
+	l.after = root.After
+	l.before = root.Before
 
 	return nil
+}
+
+func (l *listing) Comments() []*Comment {
+	if l == nil {
+		return nil
+	}
+	return l.things.Comments
+}
+
+func (l *listing) Mores() []*More {
+	if l == nil {
+		return nil
+	}
+	return l.things.Mores
+}
+
+func (l *listing) Users() []*User {
+	if l == nil {
+		return nil
+	}
+	return l.things.Users
+}
+
+func (l *listing) Posts() []*Post {
+	if l == nil {
+		return nil
+	}
+	return l.things.Posts
+}
+
+func (l *listing) Subreddits() []*Subreddit {
+	if l == nil {
+		return nil
+	}
+	return l.things.Subreddits
+}
+
+func (l *listing) ModActions() []*ModAction {
+	if l == nil {
+		return nil
+	}
+	return l.things.ModActions
+}
+
+func (l *listing) Multis() []*Multi {
+	if l == nil {
+		return nil
+	}
+	return l.things.Multis
 }
 
 type things struct {
@@ -334,15 +423,17 @@ func (r *Replies) UnmarshalJSON(data []byte) error {
 		return nil
 	}
 
-	root := new(listing)
+	root := new(thing)
 	err := json.Unmarshal(data, root)
 	if err != nil {
 		return err
 	}
 
-	r.Comments = root.Comments
-	if len(root.Mores) > 0 {
-		r.More = root.Mores[0]
+	listing, _ := root.Listing()
+
+	r.Comments = listing.Comments()
+	if len(listing.Mores()) > 0 {
+		r.More = listing.Mores()[0]
 	}
 
 	return nil
@@ -438,17 +529,20 @@ type PostAndComments struct {
 // The 1st one contains the single post in its children array
 // The 2nd one contains the comments to the post
 func (pc *PostAndComments) UnmarshalJSON(data []byte) error {
-	var l [2]listing
+	var root [2]thing
 
-	err := json.Unmarshal(data, &l)
+	err := json.Unmarshal(data, &root)
 	if err != nil {
 		return err
 	}
 
-	pc.Post = l[0].Posts[0]
-	pc.Comments = l[1].Comments
-	if len(l[1].Mores) > 0 {
-		pc.More = l[1].Mores[0]
+	listing1, _ := root[0].Listing()
+	listing2, _ := root[1].Listing()
+
+	pc.Post = listing1.Posts()[0]
+	pc.Comments = listing2.Comments()
+	if len(listing2.Mores()) > 0 {
+		pc.More = listing2.Mores()[0]
 	}
 
 	return nil

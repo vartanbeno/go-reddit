@@ -60,13 +60,14 @@ func (s *ModerationService) Actions(ctx context.Context, subreddit string, opts 
 		return nil, nil, err
 	}
 
-	root := new(listing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.ModActions, resp, nil
+	listing, _ := root.Listing()
+	return listing.ModActions(), resp, nil
 }
 
 // AcceptInvite accepts a pending invite to moderate the specified subreddit.
@@ -175,13 +176,14 @@ func (s *ModerationService) Edited(ctx context.Context, subreddit string, opts *
 		return nil, nil, nil, err
 	}
 
-	root := new(listing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
-	return root.Posts, root.Comments, resp, nil
+	listing, _ := root.Listing()
+	return listing.Posts(), listing.Comments(), resp, nil
 }
 
 // IgnoreReports prevents reports on a post or comment from causing notifications.

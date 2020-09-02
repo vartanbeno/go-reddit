@@ -60,13 +60,14 @@ func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit 
 		return nil, nil, err
 	}
 
-	root := new(listing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Posts, resp, nil
+	listing, _ := root.Listing()
+	return listing.Posts(), resp, nil
 }
 
 // HotPosts returns the hottest posts from the specified subreddit.
@@ -269,10 +270,11 @@ func (s *SubredditService) Search(ctx context.Context, query string, opts *ListS
 		return nil, nil, err
 	}
 
-	type params struct {
+	params := struct {
 		Query string `url:"q"`
-	}
-	path, err = addOptions(path, params{query})
+	}{query}
+
+	path, err = addOptions(path, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -282,13 +284,14 @@ func (s *SubredditService) Search(ctx context.Context, query string, opts *ListS
 		return nil, nil, err
 	}
 
-	root := new(listing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Subreddits, resp, nil
+	listing, _ := root.Listing()
+	return listing.Subreddits(), resp, nil
 }
 
 // SearchNames searches for subreddits with names beginning with the query provided.
@@ -323,13 +326,14 @@ func (s *SubredditService) SearchPosts(ctx context.Context, query string, subred
 		return nil, nil, err
 	}
 
-	type params struct {
+	notAll := !strings.EqualFold(subreddit, "all")
+
+	params := struct {
 		Query              string `url:"q"`
 		RestrictSubreddits bool   `url:"restrict_sr,omitempty"`
-	}
+	}{query, notAll}
 
-	notAll := !strings.EqualFold(subreddit, "all")
-	path, err = addOptions(path, params{query, notAll})
+	path, err = addOptions(path, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -339,13 +343,14 @@ func (s *SubredditService) SearchPosts(ctx context.Context, query string, subred
 		return nil, nil, err
 	}
 
-	root := new(listing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Posts, resp, nil
+	listing, _ := root.Listing()
+	return listing.Posts(), resp, nil
 }
 
 func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts *ListSubredditOptions) ([]*Subreddit, *Response, error) {
@@ -359,24 +364,25 @@ func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts 
 		return nil, nil, err
 	}
 
-	root := new(listing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Subreddits, resp, nil
+	listing, _ := root.Listing()
+	return listing.Subreddits(), resp, nil
 }
 
 // getSticky returns one of the 2 stickied posts of the subreddit (if they exist).
 // Num should be equal to 1 or 2, depending on which one you want.
 func (s *SubredditService) getSticky(ctx context.Context, subreddit string, num int) (*PostAndComments, *Response, error) {
-	type params struct {
+	params := struct {
 		Num int `url:"num"`
-	}
+	}{num}
 
 	path := fmt.Sprintf("r/%s/about/sticky", subreddit)
-	path, err := addOptions(path, params{num})
+	path, err := addOptions(path, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -402,12 +408,12 @@ func (s *SubredditService) random(ctx context.Context, nsfw bool) (*Subreddit, *
 		path = "r/randnsfw"
 	}
 
-	type params struct {
+	params := struct {
 		ExpandSubreddit bool `url:"sr_detail"`
 		Limit           int  `url:"limit,omitempty"`
-	}
+	}{true, 1}
 
-	path, err := addOptions(path, params{true, 1})
+	path, err := addOptions(path, params)
 	if err != nil {
 		return nil, nil, err
 	}

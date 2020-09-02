@@ -33,8 +33,8 @@ type Submitted struct {
 	URL    string `json:"url,omitempty"`
 }
 
-// SubmitTextOptions are options used for text posts.
-type SubmitTextOptions struct {
+// SubmitTextRequest are options used for text posts.
+type SubmitTextRequest struct {
 	Subreddit string `url:"sr,omitempty"`
 	Title     string `url:"title,omitempty"`
 	Text      string `url:"text,omitempty"`
@@ -47,8 +47,8 @@ type SubmitTextOptions struct {
 	Spoiler     bool  `url:"spoiler,omitempty"`
 }
 
-// SubmitLinkOptions are options used for link posts.
-type SubmitLinkOptions struct {
+// SubmitLinkRequest are options used for link posts.
+type SubmitLinkRequest struct {
 	Subreddit string `url:"sr,omitempty"`
 	Title     string `url:"title,omitempty"`
 	URL       string `url:"url,omitempty"`
@@ -96,17 +96,20 @@ func (s *PostService) Duplicates(ctx context.Context, id string, opts *ListDupli
 		return nil, nil, nil, err
 	}
 
-	var root [2]listing
+	var root [2]thing
 	resp, err := s.client.Do(ctx, req, &root)
 	if err != nil {
 		return nil, nil, resp, err
 	}
 
-	post := root[0].Posts[0]
-	duplicates := root[1].Posts
+	listing1, _ := root[0].Listing()
+	listing2, _ := root[1].Listing()
 
-	resp.After = root[1].after
-	resp.Before = root[1].after
+	post := listing1.Posts()[0]
+	duplicates := listing2.Posts()
+
+	resp.After = listing2.After()
+	resp.Before = listing2.Before()
 
 	return post, duplicates, resp, nil
 }
@@ -135,21 +138,21 @@ func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *R
 }
 
 // SubmitText submits a text post.
-func (s *PostService) SubmitText(ctx context.Context, opts SubmitTextOptions) (*Submitted, *Response, error) {
-	type submit struct {
-		SubmitTextOptions
+func (s *PostService) SubmitText(ctx context.Context, opts SubmitTextRequest) (*Submitted, *Response, error) {
+	form := struct {
+		SubmitTextRequest
 		Kind string `url:"kind,omitempty"`
-	}
-	return s.submit(ctx, &submit{opts, "self"})
+	}{opts, "self"}
+	return s.submit(ctx, form)
 }
 
 // SubmitLink submits a link post.
-func (s *PostService) SubmitLink(ctx context.Context, opts SubmitLinkOptions) (*Submitted, *Response, error) {
-	type submit struct {
-		SubmitLinkOptions
+func (s *PostService) SubmitLink(ctx context.Context, opts SubmitLinkRequest) (*Submitted, *Response, error) {
+	form := struct {
+		SubmitLinkRequest
 		Kind string `url:"kind,omitempty"`
-	}
-	return s.submit(ctx, &submit{opts, "link"})
+	}{opts, "link"}
+	return s.submit(ctx, form)
 }
 
 // Edit a post.

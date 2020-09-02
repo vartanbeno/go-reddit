@@ -735,14 +735,13 @@ func TestUserService_Friend(t *testing.T) {
 	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPut, r.Method)
 
-		type request struct {
+		var request struct {
 			Username string `json:"name"`
 		}
 
-		var req request
-		err := json.NewDecoder(r.Body).Decode(&req)
+		err := json.NewDecoder(r.Body).Decode(&request)
 		require.NoError(t, err)
-		require.Equal(t, "test123", req.Username)
+		require.Equal(t, "test123", request.Username)
 
 		fmt.Fprint(w, blob)
 	})

@@ -52,11 +52,12 @@ type CollectionCreateRequest struct {
 func (s *CollectionService) Get(ctx context.Context, id string) (*Collection, *Response, error) {
 	path := "api/v1/collections/collection"
 
-	type params struct {
+	params := struct {
 		ID           string `url:"collection_id"`
 		IncludePosts bool   `url:"include_links"`
-	}
-	path, err := addOptions(path, params{id, false})
+	}{id, false}
+
+	path, err := addOptions(path, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -79,10 +80,11 @@ func (s *CollectionService) Get(ctx context.Context, id string) (*Collection, *R
 func (s *CollectionService) FromSubreddit(ctx context.Context, id string) ([]*Collection, *Response, error) {
 	path := "api/v1/collections/subreddit_collections"
 
-	type params struct {
+	params := struct {
 		SubredditID string `url:"sr_fullname"`
-	}
-	path, err := addOptions(path, params{id})
+	}{id}
+
+	path, err := addOptions(path, params)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -24,13 +24,14 @@ func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*C
 		return nil, nil, nil, nil, err
 	}
 
-	root := new(listing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, nil, nil, resp, err
 	}
 
-	return root.Posts, root.Comments, root.Subreddits, resp, nil
+	listing, _ := root.Listing()
+	return listing.Posts(), listing.Comments(), listing.Subreddits(), resp, nil
 }
 
 // GetPosts returns posts from their full IDs.
@@ -42,11 +43,12 @@ func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]*Post,
 		return nil, nil, err
 	}
 
-	root := new(listing)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	return root.Posts, resp, nil
+	listing, _ := root.Listing()
+	return listing.Posts(), resp, nil
 }
