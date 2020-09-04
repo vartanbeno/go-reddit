@@ -81,16 +81,8 @@ type inboxThings struct {
 	Messages []*Message
 }
 
-// init initializes or clears the listing.
-func (t *inboxThings) init() {
-	t.Comments = make([]*Message, 0)
-	t.Messages = make([]*Message, 0)
-}
-
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (t *inboxThings) UnmarshalJSON(b []byte) error {
-	t.init()
-
 	var things []inboxThing
 	if err := json.Unmarshal(b, &things); err != nil {
 		return err

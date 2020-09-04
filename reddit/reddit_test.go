@@ -71,6 +71,7 @@ func testClientServices(t *testing.T, c *Client) {
 		"Stream",
 		"Subreddit",
 		"User",
+		"Wiki",
 	}
 
 	cp := reflect.ValueOf(c)

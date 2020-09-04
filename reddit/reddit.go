@@ -78,6 +78,7 @@ type Client struct {
 	Stream     *StreamService
 	Subreddit  *SubredditService
 	User       *UserService
+	Wiki       *WikiService
 
 	oauth2Transport *oauth2.Transport
 
@@ -107,6 +108,7 @@ func newClient() *Client {
 	client.Stream = &StreamService{client: client}
 	client.Subreddit = &SubredditService{client: client}
 	client.User = &UserService{client: client}
+	client.Wiki = &WikiService{client: client}
 
 	postAndCommentService := &postAndCommentService{client: client}
 	client.Comment = &CommentService{client: client, postAndCommentService: postAndCommentService}

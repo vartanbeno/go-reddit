@@ -6,19 +6,21 @@ import (
 )
 
 const (
-	kindComment    = "t1"
-	kindUser       = "t2"
-	kindPost       = "t3"
-	kindMessage    = "t4"
-	kindSubreddit  = "t5"
-	kindTrophy     = "t6"
-	kindListing    = "Listing"
-	kindKarmaList  = "KarmaList"
-	kindTrophyList = "TrophyList"
-	kindUserList   = "UserList"
-	kindMore       = "more"
-	kindModAction  = "modaction"
-	kindMulti      = "LabeledMulti"
+	kindComment          = "t1"
+	kindUser             = "t2"
+	kindPost             = "t3"
+	kindMessage          = "t4"
+	kindSubreddit        = "t5"
+	kindTrophy           = "t6"
+	kindListing          = "Listing"
+	kindKarmaList        = "KarmaList"
+	kindTrophyList       = "TrophyList"
+	kindUserList         = "UserList"
+	kindMore             = "more"
+	kindModAction        = "modaction"
+	kindMulti            = "LabeledMulti"
+	kindWikiPageListing  = "wikipagelisting"
+	kindWikiPageSettings = "wikipagesettings"
 )
 
 type anchor interface {
@@ -94,6 +96,10 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(trophyList)
 	case kindKarmaList:
 		v = new([]*SubredditKarma)
+	case kindWikiPageListing:
+		v = new([]string)
+	case kindWikiPageSettings:
+		v = new(WikiPageSettings)
 	default:
 		return fmt.Errorf("unrecognized kind: %q", t.Kind)
 	}
@@ -166,6 +172,19 @@ func (t *thing) Karma() ([]*SubredditKarma, bool) {
 		return nil, ok
 	}
 	return *v, ok
+}
+
+func (t *thing) WikiPages() ([]string, bool) {
+	v, ok := t.Data.(*[]string)
+	if !ok {
+		return nil, ok
+	}
+	return *v, ok
+}
+
+func (t *thing) WikiPageSettings() (v *WikiPageSettings, ok bool) {
+	v, ok = t.Data.(*WikiPageSettings)
+	return
 }
 
 // listing is a list of things coming from the Reddit API.
@@ -263,21 +282,8 @@ type things struct {
 	Multis     []*Multi
 }
 
-// init initializes or clears the listing.
-func (t *things) init() {
-	t.Comments = make([]*Comment, 0)
-	t.Mores = make([]*More, 0)
-	t.Users = make([]*User, 0)
-	t.Posts = make([]*Post, 0)
-	t.Subreddits = make([]*Subreddit, 0)
-	t.ModActions = make([]*ModAction, 0)
-	t.Multis = make([]*Multi, 0)
-}
-
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (t *things) UnmarshalJSON(b []byte) error {
-	t.init()
-
 	var things []thing
 	if err := json.Unmarshal(b, &things); err != nil {
 		return err
