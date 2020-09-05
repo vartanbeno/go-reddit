@@ -19,6 +19,7 @@ const (
 	kindMore             = "more"
 	kindModAction        = "modaction"
 	kindMulti            = "LabeledMulti"
+	kindWikiPage         = "wikipage"
 	kindWikiPageListing  = "wikipagelisting"
 	kindWikiPageSettings = "wikipagesettings"
 )
@@ -96,6 +97,8 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(trophyList)
 	case kindKarmaList:
 		v = new([]*SubredditKarma)
+	case kindWikiPage:
+		v = new(WikiPage)
 	case kindWikiPageListing:
 		v = new([]string)
 	case kindWikiPageSettings:
@@ -172,6 +175,11 @@ func (t *thing) Karma() ([]*SubredditKarma, bool) {
 		return nil, ok
 	}
 	return *v, ok
+}
+
+func (t *thing) WikiPage() (v *WikiPage, ok bool) {
+	v, ok = t.Data.(*WikiPage)
+	return
 }
 
 func (t *thing) WikiPages() ([]string, bool) {

@@ -19,6 +19,48 @@ type WikiService struct {
 	client *Client
 }
 
+// WikiPage is a wiki page in a subreddit.
+type WikiPage struct {
+	Content   string `json:"content_md,omitempty"`
+	Reason    string `json:"reason,omitempty"`
+	MayRevise bool   `json:"may_revise"`
+
+	RevisionID   string     `json:"revision_id,omitempty"`
+	RevisionDate *Timestamp `json:"revision_date,omitempty"`
+	RevisionBy   *User      `json:"revision_by,omitempty"`
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (p *WikiPage) UnmarshalJSON(b []byte) error {
+	root := new(struct {
+		Content   string `json:"content_md,omitempty"`
+		Reason    string `json:"reason,omitempty"`
+		MayRevise bool   `json:"may_revise"`
+
+		RevisionID   string     `json:"revision_id,omitempty"`
+		RevisionDate *Timestamp `json:"revision_date,omitempty"`
+		RevisionBy   thing      `json:"revision_by,omitempty"`
+	})
+
+	err := json.Unmarshal(b, root)
+	if err != nil {
+		return err
+	}
+
+	p.Content = root.Content
+	p.Reason = root.Reason
+	p.MayRevise = root.MayRevise
+
+	p.RevisionID = root.RevisionID
+	p.RevisionDate = root.RevisionDate
+
+	if user, ok := root.RevisionBy.User(); ok {
+		p.RevisionBy = user
+	}
+
+	return nil
+}
+
 // WikiPagePermissionLevel defines who can edit a specific wiki page in a subreddit.
 type WikiPagePermissionLevel int
 
@@ -71,6 +113,25 @@ func (s *WikiPageSettings) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// Page gets a wiki page.
+func (s *WikiService) Page(ctx context.Context, subreddit, page string) (*WikiPage, *Response, error) {
+	path := fmt.Sprintf("r/%s/wiki/%s", subreddit, page)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(thing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	wikiPage, _ := root.WikiPage()
+	return wikiPage, resp, nil
+}
+
 // Pages retrieves a list of wiki pages in the subreddit.
 // Returns 403 Forbidden if the wiki is disabled.
 func (s *WikiService) Pages(ctx context.Context, subreddit string) ([]string, *Response, error) {
@@ -87,8 +148,8 @@ func (s *WikiService) Pages(ctx context.Context, subreddit string) ([]string, *R
 		return nil, resp, err
 	}
 
-	pages, _ := root.WikiPages()
-	return pages, resp, nil
+	wikiPages, _ := root.WikiPages()
+	return wikiPages, resp, nil
 }
 
 // Settings gets the subreddit's wiki page's settings.
@@ -167,4 +228,27 @@ func (s *WikiService) Deny(ctx context.Context, subreddit, page, username string
 	}
 
 	return s.client.Do(ctx, req, nil)
+}
+
+// Discussions gets a list of discussions (posts) about the wiki page.
+func (s *WikiService) Discussions(ctx context.Context, subreddit, page string, opts *ListOptions) ([]*Post, *Response, error) {
+	path := fmt.Sprintf("r/%s/wiki/discussions/%s", subreddit, page)
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(thing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	listing, _ := root.Listing()
+	return listing.Posts(), resp, nil
 }
