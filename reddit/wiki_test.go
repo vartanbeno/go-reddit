@@ -75,6 +75,45 @@ var expectedWikiPageDiscussions = []*Post{
 	},
 }
 
+var expectedWikiPageRevisions = []*WikiPageRevision{
+	{
+		ID:      "3b28c343-effb-11ea-859e-0efe313b2cd3",
+		Page:    "index",
+		Created: &Timestamp{time.Date(2020, 9, 6, 4, 41, 29, 0, time.UTC)},
+		Reason:  "reverted back 1 day",
+		Hidden:  false,
+		Author: &User{
+			ID:      "164ab8",
+			Name:    "v_95",
+			Created: &Timestamp{time.Date(2017, 3, 12, 4, 56, 47, 0, time.UTC)},
+
+			PostKarma:    691,
+			CommentKarma: 22235,
+
+			HasVerifiedEmail: true,
+			NSFW:             true,
+		},
+	},
+	{
+		ID:      "d217592d-effa-11ea-90af-0e913d9ded0b",
+		Page:    "index",
+		Created: &Timestamp{time.Date(2020, 9, 6, 4, 38, 33, 0, time.UTC)},
+		Reason:  "reverted back 10 minutes",
+		Hidden:  false,
+		Author: &User{
+			ID:      "164ab8",
+			Name:    "v_95",
+			Created: &Timestamp{time.Date(2017, 3, 12, 4, 56, 47, 0, time.UTC)},
+
+			PostKarma:    691,
+			CommentKarma: 22235,
+
+			HasVerifiedEmail: true,
+			NSFW:             true,
+		},
+	},
+}
+
 func TestWikiService_Page(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -88,6 +127,31 @@ func TestWikiService_Page(t *testing.T) {
 	})
 
 	wikiPage, _, err := client.Wiki.Page(ctx, "testsubreddit", "testpage")
+	require.NoError(t, err)
+	require.Equal(t, expectedWikiPage, wikiPage)
+}
+
+func TestWikiService_PageRevision(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/wiki/page.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/wiki/testpage", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("v", "testrevision")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	wikiPage, _, err := client.Wiki.PageRevision(ctx, "testsubreddit", "testpage", "testrevision")
 	require.NoError(t, err)
 	require.Equal(t, expectedWikiPage, wikiPage)
 }
@@ -110,6 +174,55 @@ func TestWikiService_Pages(t *testing.T) {
 	wikiPages, _, err := client.Wiki.Pages(ctx, "testsubreddit")
 	require.NoError(t, err)
 	require.Equal(t, []string{"faq", "index"}, wikiPages)
+}
+
+func TestWikiService_Edit(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/wiki/edit", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("page", "testpage")
+		form.Set("content", "testcontent")
+		form.Set("reason", "testreason")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Wiki.Edit(ctx, nil)
+	require.EqualError(t, err, "editRequest: cannot be nil")
+
+	_, err = client.Wiki.Edit(ctx, &WikiPageEditRequest{
+		Subreddit: "testsubreddit",
+		Page:      "testpage",
+		Content:   "testcontent",
+		Reason:    "testreason",
+	})
+	require.NoError(t, err)
+}
+
+func TestWikiService_Revert(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/wiki/revert", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("page", "testpage")
+		form.Set("revision", "testrevision")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Wiki.Revert(ctx, "testsubreddit", "testpage", "testrevision")
+	require.NoError(t, err)
 }
 
 func TestWikiService_Settings(t *testing.T) {
@@ -161,6 +274,94 @@ func TestWikiService_UpdateSettings(t *testing.T) {
 	require.Equal(t, expectedWikiPageSettings, wikiPageSettings)
 }
 
+func TestWikiService_Discussions(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/wiki/discussions.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/wiki/discussions/testpage", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	wikiPageDiscussions, _, err := client.Wiki.Discussions(ctx, "testsubreddit", "testpage", nil)
+	require.NoError(t, err)
+	require.Equal(t, expectedWikiPageDiscussions, wikiPageDiscussions)
+}
+
+func TestWikiService_ToggleVisibility(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/wiki/hide", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("page", "testpage")
+		form.Set("revision", "testrevision")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, `{"status": true}`)
+	})
+
+	hidden, _, err := client.Wiki.ToggleVisibility(ctx, "testsubreddit", "testpage", "testrevision")
+	require.NoError(t, err)
+	require.True(t, hidden)
+}
+
+func TestWikiService_Revisions(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/wiki/revisions.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/wiki/revisions", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	wikiPageRevisions, _, err := client.Wiki.Revisions(ctx, "testsubreddit", nil)
+	require.NoError(t, err)
+	require.Equal(t, expectedWikiPageRevisions, wikiPageRevisions)
+}
+
+func TestWikiService_RevisionsPage(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/wiki/revisions.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/wiki/revisions/testpage", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+
+		form := url.Values{}
+		form.Set("limit", "10")
+		form.Set("after", "WikiRevision_wikiId1")
+		form.Set("before", "WikiRevision_wikiId2")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.Form)
+
+		fmt.Fprint(w, blob)
+	})
+
+	wikiPageRevisions, _, err := client.Wiki.RevisionsPage(ctx, "testsubreddit", "testpage", &ListOptions{
+		Limit:  10,
+		After:  "wikiId1",
+		Before: "wikiId2",
+	})
+	require.NoError(t, err)
+	require.Equal(t, expectedWikiPageRevisions, wikiPageRevisions)
+}
+
 func TestWikiService_Allow(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -199,21 +400,4 @@ func TestWikiService_Deny(t *testing.T) {
 
 	_, err := client.Wiki.Deny(ctx, "testsubreddit", "testpage", "testusername")
 	require.NoError(t, err)
-}
-
-func TestWikiService_Discussions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
-
-	blob, err := readFileContents("../testdata/wiki/discussions.json")
-	require.NoError(t, err)
-
-	mux.HandleFunc("/r/testsubreddit/wiki/discussions/testpage", func(w http.ResponseWriter, r *http.Request) {
-		require.Equal(t, http.MethodGet, r.Method)
-		fmt.Fprint(w, blob)
-	})
-
-	wikiPageDiscussions, _, err := client.Wiki.Discussions(ctx, "testsubreddit", "testpage", nil)
-	require.NoError(t, err)
-	require.Equal(t, expectedWikiPageDiscussions, wikiPageDiscussions)
 }
