@@ -193,6 +193,102 @@ func TestModerationService_LeaveContributor(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestModerationService_Reported(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	// contains posts and comments
+	blob, err := readFileContents("../testdata/user/overview.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/about/reports", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, comments, resp, err := client.Moderation.Reported(ctx, "testsubreddit", nil)
+	require.NoError(t, err)
+
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
+
+	require.Len(t, comments, 1)
+	require.Equal(t, expectedComment, comments[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
+}
+
+func TestModerationService_Spam(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	// contains posts and comments
+	blob, err := readFileContents("../testdata/user/overview.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/about/spam", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, comments, resp, err := client.Moderation.Spam(ctx, "testsubreddit", nil)
+	require.NoError(t, err)
+
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
+
+	require.Len(t, comments, 1)
+	require.Equal(t, expectedComment, comments[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
+}
+
+func TestModerationService_Queue(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	// contains posts and comments
+	blob, err := readFileContents("../testdata/user/overview.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/about/modqueue", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, comments, resp, err := client.Moderation.Queue(ctx, "testsubreddit", nil)
+	require.NoError(t, err)
+
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
+
+	require.Len(t, comments, 1)
+	require.Equal(t, expectedComment, comments[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
+}
+
+func TestModerationService_Unmoderated(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	// contains posts and comments
+	blob, err := readFileContents("../testdata/user/overview.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/about/unmoderated", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, resp, err := client.Moderation.Unmoderated(ctx, "testsubreddit", nil)
+	require.NoError(t, err)
+
+	require.Len(t, posts, 1)
+	require.Equal(t, expectedPost, posts[0])
+	require.Equal(t, "t1_f0zsa37", resp.After)
+}
+
 func TestModerationService_Edited(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()

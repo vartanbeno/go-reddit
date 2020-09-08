@@ -42,32 +42,71 @@ type ModAction struct {
 	SubredditID string `json:"sr_id36,omitempty"`
 }
 
+// ModPermissions are the different permissions moderators have or don't have on a subreddit.
+// Read about them here: https://mods.reddithelp.com/hc/en-us/articles/360009381491-User-Management-moderators-and-permissions
+type ModPermissions struct {
+	All          bool `permission:"all"`
+	Access       bool `permission:"access"`
+	ChatConfig   bool `permission:"chat_config"`
+	ChatOperator bool `permission:"chat_operator"`
+	Config       bool `permission:"config"`
+	Flair        bool `permission:"flair"`
+	Mail         bool `permission:"mail"`
+	Posts        bool `permission:"posts"`
+	Wiki         bool `permission:"wiki"`
+}
+
+func (p *ModPermissions) String() (s string) {
+	if p == nil {
+		return "+all"
+	}
+
+	t := reflect.TypeOf(*p)
+	v := reflect.ValueOf(*p)
+
+	for i := 0; i < t.NumField(); i++ {
+		if v.Field(i).Kind() != reflect.Bool {
+			continue
+		}
+
+		permission := t.Field(i).Tag.Get("permission")
+		permitted := v.Field(i).Bool()
+
+		if permitted {
+			s += "+"
+		} else {
+			s += "-"
+		}
+
+		s += permission
+
+		if i != t.NumField()-1 {
+			s += ","
+		}
+	}
+
+	return
+}
+
+// BanConfig configures the ban of the user being banned.
+type BanConfig struct {
+	Reason string `url:"reason,omitempty"`
+	// Not visible to the user being banned.
+	ModNote string `url:"note,omitempty"`
+	// How long the ban will last. 0-999. Leave nil for permanent.
+	Days *int `url:"duration,omitempty"`
+	// Note to include in the ban message to the user.
+	Message string `url:"ban_message,omitempty"`
+}
+
 // Actions gets a list of moderator actions on a subreddit.
 func (s *ModerationService) Actions(ctx context.Context, subreddit string, opts *ListModActionOptions) ([]*ModAction, *Response, error) {
 	path := fmt.Sprintf("r/%s/about/log", subreddit)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	path, err = addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.ModActions(), resp, nil
+	return l.ModActions(), resp, nil
 }
 
 // AcceptInvite accepts a pending invite to moderate the specified subreddit.
@@ -162,28 +201,55 @@ func (s *ModerationService) LeaveContributor(ctx context.Context, subredditID st
 	return s.client.Do(ctx, req, nil)
 }
 
+// Reported returns posts and comments that have been reported.
+func (s *ModerationService) Reported(ctx context.Context, subreddit string, opts *ListOptions) ([]*Post, []*Comment, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/reports", subreddit)
+	l, resp, err := s.client.getListing(ctx, path, opts)
+	if err != nil {
+		return nil, nil, resp, err
+	}
+	return l.Posts(), l.Comments(), resp, nil
+}
+
+// Spam returns posts and comments marked as spam.
+func (s *ModerationService) Spam(ctx context.Context, subreddit string, opts *ListOptions) ([]*Post, []*Comment, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/spam", subreddit)
+	l, resp, err := s.client.getListing(ctx, path, opts)
+	if err != nil {
+		return nil, nil, resp, err
+	}
+	return l.Posts(), l.Comments(), resp, nil
+}
+
+// Queue returns posts and comments requiring moderator reviews, such as one that have been
+// reported or caught in the spam filter.
+func (s *ModerationService) Queue(ctx context.Context, subreddit string, opts *ListOptions) ([]*Post, []*Comment, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/modqueue", subreddit)
+	l, resp, err := s.client.getListing(ctx, path, opts)
+	if err != nil {
+		return nil, nil, resp, err
+	}
+	return l.Posts(), l.Comments(), resp, nil
+}
+
+// Unmoderated returns posts that have yet to be approved/removed by a mod.
+func (s *ModerationService) Unmoderated(ctx context.Context, subreddit string, opts *ListOptions) ([]*Post, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/unmoderated", subreddit)
+	l, resp, err := s.client.getListing(ctx, path, opts)
+	if err != nil {
+		return nil, resp, err
+	}
+	return l.Posts(), resp, nil
+}
+
 // Edited gets posts and comments that have been edited recently.
 func (s *ModerationService) Edited(ctx context.Context, subreddit string, opts *ListOptions) ([]*Post, []*Comment, *Response, error) {
 	path := fmt.Sprintf("r/%s/about/edited", subreddit)
-
-	path, err := addOptions(path, opts)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, resp, err
 	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), listing.Comments(), resp, nil
+	return l.Posts(), l.Comments(), resp, nil
 }
 
 // IgnoreReports prevents reports on a post or comment from causing notifications.
@@ -214,52 +280,6 @@ func (s *ModerationService) UnignoreReports(ctx context.Context, id string) (*Re
 	}
 
 	return s.client.Do(ctx, req, nil)
-}
-
-// ModPermissions are the different permissions moderators have or don't have on a subreddit.
-// Read about them here: https://mods.reddithelp.com/hc/en-us/articles/360009381491-User-Management-moderators-and-permissions
-type ModPermissions struct {
-	All          bool `permission:"all"`
-	Access       bool `permission:"access"`
-	ChatConfig   bool `permission:"chat_config"`
-	ChatOperator bool `permission:"chat_operator"`
-	Config       bool `permission:"config"`
-	Flair        bool `permission:"flair"`
-	Mail         bool `permission:"mail"`
-	Posts        bool `permission:"posts"`
-	Wiki         bool `permission:"wiki"`
-}
-
-func (p *ModPermissions) String() (s string) {
-	if p == nil {
-		return "+all"
-	}
-
-	t := reflect.TypeOf(*p)
-	v := reflect.ValueOf(*p)
-
-	for i := 0; i < t.NumField(); i++ {
-		if v.Field(i).Kind() != reflect.Bool {
-			continue
-		}
-
-		permission := t.Field(i).Tag.Get("permission")
-		permitted := v.Field(i).Bool()
-
-		if permitted {
-			s += "+"
-		} else {
-			s += "-"
-		}
-
-		s += permission
-
-		if i != t.NumField()-1 {
-			s += ","
-		}
-	}
-
-	return
 }
 
 // Invite a user to become a moderator of the subreddit.
@@ -303,17 +323,6 @@ func (s *ModerationService) SetPermissions(ctx context.Context, subreddit string
 	}
 
 	return s.client.Do(ctx, req, nil)
-}
-
-// BanConfig configures the ban of the user being banned.
-type BanConfig struct {
-	Reason string `url:"reason,omitempty"`
-	// Not visible to the user being banned.
-	ModNote string `url:"note,omitempty"`
-	// How long the ban will last. 0-999. Leave nil for permanent.
-	Days *int `url:"duration,omitempty"`
-	// Note to include in the ban message to the user.
-	Message string `url:"ban_message,omitempty"`
 }
 
 // Ban a user from the subreddit.

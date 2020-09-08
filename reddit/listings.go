@@ -3,7 +3,6 @@ package reddit
 import (
 	"context"
 	"fmt"
-	"net/http"
 	"strings"
 )
 
@@ -17,38 +16,25 @@ type ListingsService struct {
 
 // Get posts, comments, and subreddits from their full IDs.
 func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*Comment, []*Subreddit, *Response, error) {
-	path := fmt.Sprintf("api/info?id=%s", strings.Join(ids, ","))
+	path := "api/info"
+	params := struct {
+		IDs []string `url:"id,omitempty,comma"`
+	}{ids}
 
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, params)
 	if err != nil {
 		return nil, nil, nil, resp, err
 	}
 
-	listing, _ := root.Listing()
-	return listing.Posts(), listing.Comments(), listing.Subreddits(), resp, nil
+	return l.Posts(), l.Comments(), l.Subreddits(), resp, nil
 }
 
 // GetPosts returns posts from their full IDs.
 func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("by_id/%s", strings.Join(ids, ","))
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), resp, nil
+	return l.Posts(), resp, nil
 }

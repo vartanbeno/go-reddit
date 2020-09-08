@@ -391,6 +391,27 @@ func CheckResponse(r *http.Response) error {
 	return errorResponse
 }
 
+func (c *Client) getListing(ctx context.Context, path string, opts interface{}) (*listing, *Response, error) {
+	path, err := addOptions(path, opts)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := c.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(thing)
+	resp, err := c.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	listing, _ := root.Listing()
+	return listing, resp, nil
+}
+
 // ListOptions specifies the optional parameters to various API calls that return a listing.
 type ListOptions struct {
 	// Maximum number of items to be returned.

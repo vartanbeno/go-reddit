@@ -486,7 +486,7 @@ type Post struct {
 	Title string `json:"title,omitempty"`
 	Body  string `json:"selftext,omitempty"`
 
-	// Indicates if you've upvote/downvoted (true/false).
+	// Indicates if you've upvoted/downvoted (true/false).
 	// If neither, it will be nil.
 	Likes *bool `json:"likes"`
 
@@ -497,6 +497,7 @@ type Post struct {
 	SubredditName         string `json:"subreddit,omitempty"`
 	SubredditNamePrefixed string `json:"subreddit_name_prefixed,omitempty"`
 	SubredditID           string `json:"subreddit_id,omitempty"`
+	SubredditSubscribers  int    `json:"subreddit_subscribers"`
 
 	Author   string `json:"author,omitempty"`
 	AuthorID string `json:"author_fullname,omitempty"`

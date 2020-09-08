@@ -69,6 +69,7 @@ var expectedWikiPageDiscussions = []*Post{
 		SubredditName:         "helloworldtestt",
 		SubredditNamePrefixed: "r/helloworldtestt",
 		SubredditID:           "t5_2uquw1",
+		SubredditSubscribers:  2,
 
 		Author:   "v_95",
 		AuthorID: "t2_164ab8",

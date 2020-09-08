@@ -31,6 +31,7 @@ var expectedListingPosts = []*Post{
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
 		SubredditID:           "t5_2qh23",
+		SubredditSubscribers:  8202,
 
 		Author:   "v_95",
 		AuthorID: "t2_164ab8",
@@ -106,6 +107,7 @@ var expectedListingPosts2 = []*Post{
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
 		SubredditID:           "t5_2qh23",
+		SubredditSubscribers:  8201,
 
 		Author:   "v_95",
 		AuthorID: "t2_164ab8",
@@ -131,6 +133,7 @@ var expectedListingPosts2 = []*Post{
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
 		SubredditID:           "t5_2qh23",
+		SubredditSubscribers:  8201,
 
 		Author:   "v_95",
 		AuthorID: "t2_164ab8",

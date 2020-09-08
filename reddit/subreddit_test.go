@@ -30,6 +30,7 @@ var expectedPosts = []*Post{
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
 		SubredditID:           "t5_2qh23",
+		SubredditSubscribers:  8154,
 
 		Author:   "kmiller0112",
 		AuthorID: "t2_30a5ktgt",
@@ -55,6 +56,7 @@ var expectedPosts = []*Post{
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
 		SubredditID:           "t5_2qh23",
+		SubredditSubscribers:  8154,
 
 		Author:   "MuckleMcDuckle",
 		AuthorID: "t2_6fqntbwq",
@@ -165,6 +167,7 @@ var expectedSearchPosts = []*Post{
 		SubredditName:         "WatchPeopleDieInside",
 		SubredditNamePrefixed: "r/WatchPeopleDieInside",
 		SubredditID:           "t5_3h4zq",
+		SubredditSubscribers:  2599948,
 
 		Author:   "chocolat_ice_cream",
 		AuthorID: "t2_3p32m02",
@@ -187,6 +190,7 @@ var expectedSearchPosts = []*Post{
 		SubredditName:         "worldnews",
 		SubredditNamePrefixed: "r/worldnews",
 		SubredditID:           "t5_2qh13",
+		SubredditSubscribers:  24651441,
 
 		Author:   "Jeremy_Martin",
 		AuthorID: "t2_wgrkg",

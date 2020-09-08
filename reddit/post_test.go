@@ -30,6 +30,7 @@ var expectedPostAndComments = &PostAndComments{
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
 		SubredditID:           "t5_2qh23",
+		SubredditSubscribers:  8077,
 
 		Author:   "testuser",
 		AuthorID: "t2_testuser",
@@ -122,6 +123,7 @@ var expectedEditedPost = &Post{
 	SubredditName:         "test",
 	SubredditNamePrefixed: "r/test",
 	SubredditID:           "t5_2qh23",
+	SubredditSubscribers:  8128,
 
 	Author:   "v_95",
 	AuthorID: "t2_164ab8",
@@ -150,6 +152,7 @@ var expectedPost2 = &Post{
 	SubredditName:         "test",
 	SubredditNamePrefixed: "r/test",
 	SubredditID:           "t5_2qh23",
+	SubredditSubscribers:  8278,
 
 	Author:   "v_95",
 	AuthorID: "t2_164ab8",
@@ -176,6 +179,7 @@ var expectedPostDuplicates = []*Post{
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
 		SubredditID:           "t5_2qh23",
+		SubredditSubscribers:  8278,
 
 		Author:   "GarlicoinAccount",
 		AuthorID: "t2_d2v1r90",
@@ -200,6 +204,7 @@ var expectedPostDuplicates = []*Post{
 		SubredditName:         "test",
 		SubredditNamePrefixed: "r/test",
 		SubredditID:           "t5_2qh23",
+		SubredditSubscribers:  8278,
 
 		Author:   "prog101",
 		AuthorID: "t2_8dyo",

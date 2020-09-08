@@ -67,6 +67,7 @@ var expectedPost = &Post{
 	SubredditName:         "redditdev",
 	SubredditNamePrefixed: "r/redditdev",
 	SubredditID:           "t5_2qizd",
+	SubredditSubscribers:  37829,
 
 	Author:   "v_95",
 	AuthorID: "t2_164ab8",
