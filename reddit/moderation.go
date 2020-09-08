@@ -438,3 +438,57 @@ func (s *ModerationService) deleteRelationship(ctx context.Context, subreddit, u
 
 	return s.client.Do(ctx, req, nil)
 }
+
+// Distinguish your post or comment via its full ID, adding a moderator tag to it.
+// todo: add how=admin and how=special? They require special privileges.
+func (s *ModerationService) Distinguish(ctx context.Context, id string) (*Response, error) {
+	path := "api/distinguish"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("how", "yes")
+	form.Set("id", id)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// DistinguishAndSticky your comment via its full ID, adding a moderator tag to it
+// and stickying the comment at the top of the thread.
+func (s *ModerationService) DistinguishAndSticky(ctx context.Context, id string) (*Response, error) {
+	path := "api/distinguish"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("how", "yes")
+	form.Set("sticky", "true")
+	form.Set("id", id)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Undistinguish your post or comment via its full ID, removing the moderator tag from it.
+func (s *ModerationService) Undistinguish(ctx context.Context, id string) (*Response, error) {
+	path := "api/distinguish"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("how", "no")
+	form.Set("id", id)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}

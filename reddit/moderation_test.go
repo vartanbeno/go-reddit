@@ -666,3 +666,67 @@ func TestModerationService_UnapproveUserWiki(t *testing.T) {
 	_, err := client.Moderation.UnapproveUserWiki(ctx, "testsubreddit", "testuser")
 	require.NoError(t, err)
 }
+
+func TestModerationService_Distinguish(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/distinguish", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("how", "yes")
+		form.Set("id", "t1_123")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.Distinguish(ctx, "t1_123")
+	require.NoError(t, err)
+}
+
+func TestModerationService_DistinguishAndSticky(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/distinguish", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("how", "yes")
+		form.Set("sticky", "true")
+		form.Set("id", "t1_123")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.DistinguishAndSticky(ctx, "t1_123")
+	require.NoError(t, err)
+}
+
+func TestModerationService_Undistinguish(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/distinguish", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("how", "no")
+		form.Set("id", "t1_123")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Moderation.Undistinguish(ctx, "t1_123")
+	require.NoError(t, err)
+}
