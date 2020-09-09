@@ -1,0 +1,20 @@
+{
+  "text": "lol",
+  "allowableContent": "all",
+  "modOnly": false,
+  "cssClass": "",
+  "id": "be0a6110-f23c-11ea-862f-0e08890d7323",
+  "textEditable": false,
+  "overrideCss": false,
+  "richtext": [
+    {
+      "e": "text",
+      "t": "lol"
+    }
+  ],
+  "maxEmojis": 1,
+  "flairType": "LINK_FLAIR",
+  "backgroundColor": "#fafafa",
+  "textColor": "dark",
+  "type": "richtext"
+}

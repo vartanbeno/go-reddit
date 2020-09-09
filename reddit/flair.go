@@ -40,7 +40,7 @@ type FlairSummary struct {
 }
 
 // ConfigureFlairRequest represents a request to configure a subreddit's flair settings.
-// Not setting an attribute can have unexpected side effects.
+// Not setting an attribute can have unexpected side effects, so assign every one just in case.
 type ConfigureFlairRequest struct {
 	// Enable user flair in the subreddit.
 	UserFlairEnabled *bool `url:"flair_enabled,omitempty"`
@@ -48,10 +48,58 @@ type ConfigureFlairRequest struct {
 	UserFlairPosition string `url:"flair_position,omitempty"`
 	// Allow users to assign their own flair.
 	UserFlairSelfAssignEnabled *bool `url:"flair_self_assign_enabled,omitempty"`
+
 	// One of: none, left, right.
 	PostFlairPosition string `url:"link_flair_position,omitempty"`
 	// Allow submitters to assign their own post flair.
 	PostFlairSelfAssignEnabled *bool `url:"link_flair_self_assign_enabled,omitempty"`
+}
+
+// FlairTemplateCreateOrUpdateRequest represents a request to create/update a flair template.
+// Not setting an attribute can have unexpected side effects, so assign every one just in case.
+type FlairTemplateCreateOrUpdateRequest struct {
+	// The id of the template. Only provide this if it's an update request.
+	// If provided and it's not a valid id, the template will be created.
+	ID string `url:"flair_template_id,omitempty"`
+
+	// One of: all, emoji, text.
+	AllowableContent string `url:"allowable_content,omitempty"`
+	// No longer than 64 characters.
+	Text string `url:"text,omitempty"`
+	// One of: light, dark.
+	TextColor string `url:"text_color,omitempty"`
+	// Allow user to edit the text of the flair.
+	TextEditable *bool `url:"text_editable,omitempty"`
+
+	ModOnly *bool `url:"mod_only,omitempty"`
+
+	// Between 1 and 10 (inclusive). Default: 10.
+	MaxEmojis *int `url:"max_emojis,omitempty"`
+
+	// One of: none, transparent, 6-digit rgb hex color, e.g. #AABBCC.
+	BackgroundColor string `url:"background_color,omitempty"`
+	CSSClass        string `url:"css_class,omitempty"`
+}
+
+// FlairTemplate is a generic flair structure that can users can use next to their username
+// or posts in a subreddit.
+type FlairTemplate struct {
+	ID string `json:"id"`
+	// USER_FLAIR (for users) or LINK_FLAIR (for posts).
+	Type    string `json:"flairType"`
+	ModOnly bool   `json:"modOnly"`
+
+	AllowableContent string              `json:"allowableContent"`
+	Text             string              `json:"text"`
+	TextType         string              `json:"type"`
+	TextColor        string              `json:"textColor"`
+	TextEditable     bool                `json:"textEditable"`
+	RichText         []map[string]string `json:"richtext"`
+
+	OverrideCSS     bool   `json:"overrideCss"`
+	MaxEmojis       int    `json:"maxEmojis"`
+	BackgroundColor string `json:"backgroundColor"`
+	CSSClass        string `json:"cssClass"`
 }
 
 // GetUserFlairs returns the user flairs from the subreddit.
@@ -164,6 +212,66 @@ func (s *FlairService) Disable(ctx context.Context, subreddit string) (*Response
 	return s.client.Do(ctx, req, nil)
 }
 
+// UpsertUserTemplate creates a user flair template, or updates it if the request.ID is valid.
+// It returns the created/updated flair template.
+func (s *FlairService) UpsertUserTemplate(ctx context.Context, subreddit string, request *FlairTemplateCreateOrUpdateRequest) (*FlairTemplate, *Response, error) {
+	if request == nil {
+		return nil, nil, errors.New("request: cannot be nil")
+	}
+
+	path := fmt.Sprintf("r/%s/api/flairtemplate_v2", subreddit)
+
+	form, err := query.Values(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	form.Set("api_type", "json")
+	form.Set("flair_type", "USER_FLAIR")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(FlairTemplate)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, nil
+}
+
+// UpsertPostTemplate creates a post flair template, or updates it if the request.ID is valid.
+// It returns the created/updated flair template.
+func (s *FlairService) UpsertPostTemplate(ctx context.Context, subreddit string, request *FlairTemplateCreateOrUpdateRequest) (*FlairTemplate, *Response, error) {
+	if request == nil {
+		return nil, nil, errors.New("request: cannot be nil")
+	}
+
+	path := fmt.Sprintf("r/%s/api/flairtemplate_v2", subreddit)
+
+	form, err := query.Values(request)
+	if err != nil {
+		return nil, nil, err
+	}
+	form.Set("api_type", "json")
+	form.Set("flair_type", "LINK_FLAIR")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(FlairTemplate)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, nil
+}
+
 // Delete the flair of the user.
 func (s *FlairService) Delete(ctx context.Context, subreddit, username string) (*Response, error) {
 	path := fmt.Sprintf("r/%s/api/deleteflair", subreddit)
@@ -225,5 +333,25 @@ func (s *FlairService) DeleteAllPostTemplates(ctx context.Context, subreddit str
 		return nil, err
 	}
 
+	return s.client.Do(ctx, req, nil)
+}
+
+// ReorderUserTemplates reorders the user flair templates in the order provided in the slice.
+func (s *FlairService) ReorderUserTemplates(ctx context.Context, subreddit string, ids []string) (*Response, error) {
+	path := fmt.Sprintf("api/v1/%s/flair_template_order/USER_FLAIR", subreddit)
+	req, err := s.client.NewRequest(http.MethodPatch, path, ids)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.Do(ctx, req, nil)
+}
+
+// ReorderPostTemplates reorders the post flair templates in the order provided in the slice.
+func (s *FlairService) ReorderPostTemplates(ctx context.Context, subreddit string, ids []string) (*Response, error) {
+	path := fmt.Sprintf("api/v1/%s/flair_template_order/LINK_FLAIR", subreddit)
+	req, err := s.client.NewRequest(http.MethodPatch, path, ids)
+	if err != nil {
+		return nil, err
+	}
 	return s.client.Do(ctx, req, nil)
 }

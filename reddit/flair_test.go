@@ -1,6 +1,7 @@
 package reddit
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -60,6 +61,26 @@ var expectedListUserFlairs = []*FlairSummary{
 		User: "TestUser2",
 		Text: "TestFlair2",
 	},
+}
+
+var expectedFlairTemplate = &FlairTemplate{
+	ID:      "be0a6110-f23c-11ea-862f-0e08890d7323",
+	Type:    "LINK_FLAIR",
+	ModOnly: false,
+
+	AllowableContent: "all",
+	Text:             "lol",
+	TextType:         "richtext",
+	TextColor:        "dark",
+	TextEditable:     false,
+	RichText: []map[string]string{
+		{"e": "text", "t": "lol"},
+	},
+
+	OverrideCSS:     false,
+	MaxEmojis:       1,
+	BackgroundColor: "#fafafa",
+	CSSClass:        "",
 }
 
 func TestFlairService_GetUserFlairs(t *testing.T) {
@@ -186,6 +207,98 @@ func TestFlairService_Disable(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestFlairService_UpsertUserTemplate(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/flair/flair-template.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/flairtemplate_v2", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("flair_type", "USER_FLAIR")
+		form.Set("allowable_content", "all")
+		form.Set("text", "testtext")
+		form.Set("text_color", "dark")
+		form.Set("text_editable", "false")
+		form.Set("mod_only", "true")
+		form.Set("max_emojis", "5")
+		form.Set("background_color", "transparent")
+		form.Set("css_class", "testclass")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, blob)
+	})
+
+	_, _, err = client.Flair.UpsertUserTemplate(ctx, "testsubreddit", nil)
+	require.EqualError(t, err, "request: cannot be nil")
+
+	flairTemplate, _, err := client.Flair.UpsertUserTemplate(ctx, "testsubreddit", &FlairTemplateCreateOrUpdateRequest{
+		AllowableContent: "all",
+		ModOnly:          Bool(true),
+		Text:             "testtext",
+		TextColor:        "dark",
+		TextEditable:     Bool(false),
+		MaxEmojis:        Int(5),
+		BackgroundColor:  "transparent",
+		CSSClass:         "testclass",
+	})
+	require.NoError(t, err)
+	require.Equal(t, expectedFlairTemplate, flairTemplate)
+}
+
+func TestFlairService_UpsertPostTemplate(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/flair/flair-template.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/flairtemplate_v2", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("flair_type", "LINK_FLAIR")
+		form.Set("flair_template_id", "testid")
+		form.Set("allowable_content", "text")
+		form.Set("text", "testtext")
+		form.Set("text_color", "light")
+		form.Set("text_editable", "true")
+		form.Set("mod_only", "false")
+		form.Set("background_color", "#fafafa")
+		form.Set("css_class", "testclass")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, blob)
+	})
+
+	_, _, err = client.Flair.UpsertPostTemplate(ctx, "testsubreddit", nil)
+	require.EqualError(t, err, "request: cannot be nil")
+
+	flairTemplate, _, err := client.Flair.UpsertPostTemplate(ctx, "testsubreddit", &FlairTemplateCreateOrUpdateRequest{
+		ID:               "testid",
+		AllowableContent: "text",
+		ModOnly:          Bool(false),
+		Text:             "testtext",
+		TextColor:        "light",
+		TextEditable:     Bool(true),
+		BackgroundColor:  "#fafafa",
+		CSSClass:         "testclass",
+	})
+	require.NoError(t, err)
+	require.Equal(t, expectedFlairTemplate, flairTemplate)
+}
+
 func TestFlairService_Delete(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -263,5 +376,39 @@ func TestFlairService_DeleteAllPostTemplates(t *testing.T) {
 	})
 
 	_, err := client.Flair.DeleteAllPostTemplates(ctx, "testsubreddit")
+	require.NoError(t, err)
+}
+
+func TestFlairService_ReorderUserTemplates(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/testsubreddit/flair_template_order/USER_FLAIR", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPatch, r.Method)
+
+		var ids []string
+		err := json.NewDecoder(r.Body).Decode(&ids)
+		require.NoError(t, err)
+		require.Equal(t, []string{"test1", "test2", "test3", "test4"}, ids)
+	})
+
+	_, err := client.Flair.ReorderUserTemplates(ctx, "testsubreddit", []string{"test1", "test2", "test3", "test4"})
+	require.NoError(t, err)
+}
+
+func TestFlairService_ReorderPostTemplates(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/v1/testsubreddit/flair_template_order/LINK_FLAIR", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPatch, r.Method)
+
+		var ids []string
+		err := json.NewDecoder(r.Body).Decode(&ids)
+		require.NoError(t, err)
+		require.Equal(t, []string{"test1", "test2", "test3", "test4"}, ids)
+	})
+
+	_, err := client.Flair.ReorderPostTemplates(ctx, "testsubreddit", []string{"test1", "test2", "test3", "test4"})
 	require.NoError(t, err)
 }
