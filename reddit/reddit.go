@@ -218,7 +218,7 @@ func (c *Client) UserAgent() string {
 }
 
 // NewRequest creates an API request with a JSON body.
-// The path is the relative URL which will be resolves to the BaseURL of the Client.
+// The path is the relative URL which will be resolved to the BaseURL of the Client.
 // It should always be specified without a preceding slash.
 func (c *Client) NewRequest(method string, path string, body interface{}) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(path)

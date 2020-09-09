@@ -3,6 +3,7 @@ package reddit
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -110,4 +111,77 @@ func TestFlairService_ListUserFlairs(t *testing.T) {
 	userFlairs, _, err := client.Flair.ListUserFlairs(ctx, "testsubreddit")
 	require.NoError(t, err)
 	require.Equal(t, expectedListUserFlairs, userFlairs)
+}
+
+func TestFlairService_Configure(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/flairconfig", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("flair_enabled", "true")
+		form.Set("flair_position", "right")
+		form.Set("flair_self_assign_enabled", "false")
+		form.Set("link_flair_position", "left")
+		form.Set("link_flair_self_assign_enabled", "false")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.Configure(ctx, "testsubreddit", nil)
+	require.EqualError(t, err, "request: cannot be nil")
+
+	_, err = client.Flair.Configure(ctx, "testsubreddit", &ConfigureFlairRequest{
+		UserFlairEnabled:           Bool(true),
+		UserFlairPosition:          "right",
+		UserFlairSelfAssignEnabled: Bool(false),
+		PostFlairPosition:          "left",
+		PostFlairSelfAssignEnabled: Bool(false),
+	})
+	require.NoError(t, err)
+}
+
+func TestFlairService_Enable(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/setflairenabled", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("flair_enabled", "true")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.Enable(ctx, "testsubreddit")
+	require.NoError(t, err)
+}
+
+func TestFlairService_Disable(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/setflairenabled", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("flair_enabled", "false")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.Disable(ctx, "testsubreddit")
+	require.NoError(t, err)
 }
