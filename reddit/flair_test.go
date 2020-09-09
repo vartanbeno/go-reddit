@@ -185,3 +185,83 @@ func TestFlairService_Disable(t *testing.T) {
 	_, err := client.Flair.Disable(ctx, "testsubreddit")
 	require.NoError(t, err)
 }
+
+func TestFlairService_Delete(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/deleteflair", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.Delete(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+}
+
+func TestFlairService_DeleteTemplate(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/deleteflairtemplate", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("flair_template_id", "testtemplate")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.DeleteTemplate(ctx, "testsubreddit", "testtemplate")
+	require.NoError(t, err)
+}
+
+func TestFlairService_DeleteAllUserTemplates(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/clearflairtemplates", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("flair_type", "USER_FLAIR")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.DeleteAllUserTemplates(ctx, "testsubreddit")
+	require.NoError(t, err)
+}
+
+func TestFlairService_DeleteAllPostTemplates(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/clearflairtemplates", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("flair_type", "LINK_FLAIR")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.DeleteAllPostTemplates(ctx, "testsubreddit")
+	require.NoError(t, err)
+}

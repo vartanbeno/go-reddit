@@ -163,3 +163,67 @@ func (s *FlairService) Disable(ctx context.Context, subreddit string) (*Response
 
 	return s.client.Do(ctx, req, nil)
 }
+
+// Delete the flair of the user.
+func (s *FlairService) Delete(ctx context.Context, subreddit, username string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/deleteflair", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// DeleteTemplate deletes the flair template via its id.
+func (s *FlairService) DeleteTemplate(ctx context.Context, subreddit, id string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/deleteflairtemplate", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("flair_template_id", id)
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// DeleteAllUserTemplates deletes all user flair templates.
+func (s *FlairService) DeleteAllUserTemplates(ctx context.Context, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/clearflairtemplates", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("flair_type", "USER_FLAIR")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// DeleteAllPostTemplates deletes all post flair templates.
+func (s *FlairService) DeleteAllPostTemplates(ctx context.Context, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/clearflairtemplates", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("flair_type", "LINK_FLAIR")
+
+	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
