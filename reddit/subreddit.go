@@ -187,12 +187,10 @@ func (s *SubredditService) GetSticky2(ctx context.Context, subreddit string) (*P
 
 func (s *SubredditService) handleSubscription(ctx context.Context, form url.Values) (*Response, error) {
 	path := "api/subscribe"
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
-
 	return s.client.Do(ctx, req, nil)
 }
 
@@ -237,7 +235,7 @@ func (s *SubredditService) Favorite(ctx context.Context, subreddit string) (*Res
 	form.Set("make_favorite", "true")
 	form.Set("api_type", "json")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +252,7 @@ func (s *SubredditService) Unfavorite(ctx context.Context, subreddit string) (*R
 	form.Set("make_favorite", "false")
 	form.Set("api_type", "json")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -425,7 +423,7 @@ func (s *SubredditService) random(ctx context.Context, nsfw bool) (*Subreddit, *
 
 	root := new(struct {
 		Data struct {
-			Children []struct {
+			Children [1]struct {
 				Data struct {
 					Subreddit *Subreddit `json:"sr_detail"`
 				} `json:"data"`
@@ -437,12 +435,8 @@ func (s *SubredditService) random(ctx context.Context, nsfw bool) (*Subreddit, *
 		return nil, resp, err
 	}
 
-	var sr *Subreddit
-	if len(root.Data.Children) > 0 {
-		sr = root.Data.Children[0].Data.Subreddit
-	}
-
-	return sr, resp, nil
+	subreddit := root.Data.Children[0].Data.Subreddit
+	return subreddit, resp, nil
 }
 
 // Random returns a random SFW subreddit.

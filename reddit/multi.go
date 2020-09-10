@@ -109,15 +109,12 @@ func (r *MultiCreateOrUpdateRequest) Form() url.Values {
 }
 
 type rootMultiDescription struct {
-	Data struct {
-		Body string `json:"body_md"`
-	} `json:"data"`
+	Body string `json:"body_md"`
 }
 
 // Get the multireddit from its url path.
 func (s *MultiService) Get(ctx context.Context, multiPath string) (*Multi, *Response, error) {
 	path := fmt.Sprintf("api/multi/%s", multiPath)
-
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -136,7 +133,6 @@ func (s *MultiService) Get(ctx context.Context, multiPath string) (*Multi, *Resp
 // Mine returns your multireddits.
 func (s *MultiService) Mine(ctx context.Context) ([]*Multi, *Response, error) {
 	path := "api/multi/mine"
-
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -155,7 +151,6 @@ func (s *MultiService) Mine(ctx context.Context) ([]*Multi, *Response, error) {
 // Or, if the user is you, all of your multireddits.
 func (s *MultiService) Of(ctx context.Context, username string) ([]*Multi, *Response, error) {
 	path := fmt.Sprintf("api/multi/user/%s", username)
-
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
 	if err != nil {
 		return nil, nil, err
@@ -182,7 +177,7 @@ func (s *MultiService) Copy(ctx context.Context, copyRequest *MultiCopyRequest) 
 		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -204,8 +199,7 @@ func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrU
 	}
 
 	path := "api/multi"
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, createRequest.Form())
+	req, err := s.client.NewRequest(http.MethodPost, path, createRequest.Form())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -228,8 +222,7 @@ func (s *MultiService) Update(ctx context.Context, multiPath string, updateReque
 	}
 
 	path := fmt.Sprintf("api/multi/%s", multiPath)
-
-	req, err := s.client.NewRequestWithForm(http.MethodPut, path, updateRequest.Form())
+	req, err := s.client.NewRequest(http.MethodPut, path, updateRequest.Form())
 	if err != nil {
 		return nil, nil, err
 	}
@@ -247,17 +240,15 @@ func (s *MultiService) Update(ctx context.Context, multiPath string, updateReque
 // Delete a multireddit.
 func (s *MultiService) Delete(ctx context.Context, multiPath string) (*Response, error) {
 	path := fmt.Sprintf("api/multi/%s", multiPath)
-
 	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	return s.client.Do(ctx, req, nil)
 }
 
-// GetDescription gets a multireddit's description.
-func (s *MultiService) GetDescription(ctx context.Context, multiPath string) (string, *Response, error) {
+// Description gets a multireddit's description.
+func (s *MultiService) Description(ctx context.Context, multiPath string) (string, *Response, error) {
 	path := fmt.Sprintf("api/multi/%s/description", multiPath)
 
 	req, err := s.client.NewRequest(http.MethodGet, path, nil)
@@ -265,13 +256,14 @@ func (s *MultiService) GetDescription(ctx context.Context, multiPath string) (st
 		return "", nil, err
 	}
 
-	root := new(rootMultiDescription)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return "", resp, err
 	}
 
-	return root.Data.Body, resp, nil
+	multiDescription, _ := root.MultiDescription()
+	return multiDescription, resp, nil
 }
 
 // UpdateDescription updates a multireddit's description.
@@ -281,18 +273,19 @@ func (s *MultiService) UpdateDescription(ctx context.Context, multiPath string, 
 	form := url.Values{}
 	form.Set("model", fmt.Sprintf(`{"body_md":"%s"}`, description))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPut, path, form)
+	req, err := s.client.NewRequest(http.MethodPut, path, form)
 	if err != nil {
 		return "", nil, err
 	}
 
-	root := new(rootMultiDescription)
+	root := new(thing)
 	resp, err := s.client.Do(ctx, req, root)
 	if err != nil {
 		return "", resp, err
 	}
 
-	return root.Data.Body, resp, nil
+	multiDescription, _ := root.MultiDescription()
+	return multiDescription, resp, nil
 }
 
 // AddSubreddit adds a subreddit to a multireddit.
@@ -302,7 +295,7 @@ func (s *MultiService) AddSubreddit(ctx context.Context, multiPath string, subre
 	form := url.Values{}
 	form.Set("model", fmt.Sprintf(`{"name":"%s"}`, subreddit))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPut, path, form)
+	req, err := s.client.NewRequest(http.MethodPut, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -313,11 +306,9 @@ func (s *MultiService) AddSubreddit(ctx context.Context, multiPath string, subre
 // DeleteSubreddit removes a subreddit from a multireddit.
 func (s *MultiService) DeleteSubreddit(ctx context.Context, multiPath string, subreddit string) (*Response, error) {
 	path := fmt.Sprintf("api/multi/%s/r/%s", multiPath, subreddit)
-
 	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	return s.client.Do(ctx, req, nil)
 }

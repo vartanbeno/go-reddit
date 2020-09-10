@@ -172,7 +172,7 @@ func (s *FlairService) Configure(ctx context.Context, subreddit string, request 
 	}
 	form.Set("api_type", "json")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -188,7 +188,7 @@ func (s *FlairService) Enable(ctx context.Context, subreddit string) (*Response,
 	form.Set("api_type", "json")
 	form.Set("flair_enabled", "true")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -204,7 +204,7 @@ func (s *FlairService) Disable(ctx context.Context, subreddit string) (*Response
 	form.Set("api_type", "json")
 	form.Set("flair_enabled", "false")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (s *FlairService) UpsertUserTemplate(ctx context.Context, subreddit string,
 	form.Set("api_type", "json")
 	form.Set("flair_type", "USER_FLAIR")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -258,7 +258,7 @@ func (s *FlairService) UpsertPostTemplate(ctx context.Context, subreddit string,
 	form.Set("api_type", "json")
 	form.Set("flair_type", "LINK_FLAIR")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -280,7 +280,7 @@ func (s *FlairService) Delete(ctx context.Context, subreddit, username string) (
 	form.Set("api_type", "json")
 	form.Set("name", username)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -296,7 +296,7 @@ func (s *FlairService) DeleteTemplate(ctx context.Context, subreddit, id string)
 	form.Set("api_type", "json")
 	form.Set("flair_template_id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -312,7 +312,7 @@ func (s *FlairService) DeleteAllUserTemplates(ctx context.Context, subreddit str
 	form.Set("api_type", "json")
 	form.Set("flair_type", "USER_FLAIR")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -328,7 +328,7 @@ func (s *FlairService) DeleteAllPostTemplates(ctx context.Context, subreddit str
 	form.Set("api_type", "json")
 	form.Set("flair_type", "LINK_FLAIR")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -339,7 +339,7 @@ func (s *FlairService) DeleteAllPostTemplates(ctx context.Context, subreddit str
 // ReorderUserTemplates reorders the user flair templates in the order provided in the slice.
 func (s *FlairService) ReorderUserTemplates(ctx context.Context, subreddit string, ids []string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/%s/flair_template_order/USER_FLAIR", subreddit)
-	req, err := s.client.NewRequest(http.MethodPatch, path, ids)
+	req, err := s.client.NewJSONRequest(http.MethodPatch, path, ids)
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +349,7 @@ func (s *FlairService) ReorderUserTemplates(ctx context.Context, subreddit strin
 // ReorderPostTemplates reorders the post flair templates in the order provided in the slice.
 func (s *FlairService) ReorderPostTemplates(ctx context.Context, subreddit string, ids []string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/%s/flair_template_order/LINK_FLAIR", subreddit)
-	req, err := s.client.NewRequest(http.MethodPatch, path, ids)
+	req, err := s.client.NewJSONRequest(http.MethodPatch, path, ids)
 	if err != nil {
 		return nil, err
 	}

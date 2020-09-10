@@ -366,7 +366,7 @@ func (s *UserService) Friend(ctx context.Context, username string) (*Relationshi
 	}{username}
 
 	path := fmt.Sprintf("api/v1/me/friends/%s", username)
-	req, err := s.client.NewRequest(http.MethodPut, path, body)
+	req, err := s.client.NewJSONRequest(http.MethodPut, path, body)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -397,7 +397,7 @@ func (s *UserService) Block(ctx context.Context, username string) (*Blocked, *Re
 	form := url.Values{}
 	form.Set("name", username)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -418,7 +418,7 @@ func (s *UserService) BlockByID(ctx context.Context, id string) (*Blocked, *Resp
 	form := url.Values{}
 	form.Set("account_id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -446,7 +446,7 @@ func (s *UserService) Unblock(ctx context.Context, username string) (*Response, 
 	form.Set("type", "enemy")
 	form.Set("container", selfID)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -468,7 +468,7 @@ func (s *UserService) UnblockByID(ctx context.Context, id string) (*Response, er
 	form.Set("type", "enemy")
 	form.Set("container", selfID)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

@@ -217,7 +217,7 @@ func TestMultiService_Delete(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestMultiService_GetDescription(t *testing.T) {
+func TestMultiService_Description(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
@@ -229,7 +229,7 @@ func TestMultiService_GetDescription(t *testing.T) {
 		fmt.Fprint(w, blob)
 	})
 
-	description, _, err := client.Multi.GetDescription(ctx, "user/testuser/m/testmulti")
+	description, _, err := client.Multi.Description(ctx, "user/testuser/m/testmulti")
 	require.NoError(t, err)
 	require.Equal(t, "hello world", description)
 }

@@ -19,6 +19,7 @@ const (
 	kindMore             = "more"
 	kindModAction        = "modaction"
 	kindMulti            = "LabeledMulti"
+	kindMultiDescription = "LabeledMultiDescription"
 	kindWikiPage         = "wikipage"
 	kindWikiPageListing  = "wikipagelisting"
 	kindWikiPageSettings = "wikipagesettings"
@@ -91,6 +92,8 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(ModAction)
 	case kindMulti:
 		v = new(Multi)
+	case kindMultiDescription:
+		v = new(rootMultiDescription)
 	case kindTrophy:
 		v = new(Trophy)
 	case kindTrophyList:
@@ -153,6 +156,14 @@ func (t *thing) ModAction() (v *ModAction, ok bool) {
 
 func (t *thing) Multi() (v *Multi, ok bool) {
 	v, ok = t.Data.(*Multi)
+	return
+}
+
+func (t *thing) MultiDescription() (s string, ok bool) {
+	v, ok := t.Data.(*rootMultiDescription)
+	if ok {
+		s = v.Body
+	}
 	return
 }
 

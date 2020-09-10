@@ -116,7 +116,7 @@ func (s *ModerationService) AcceptInvite(ctx context.Context, subreddit string) 
 	form := url.Values{}
 	form.Set("api_type", "json")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -131,7 +131,7 @@ func (s *ModerationService) Approve(ctx context.Context, id string) (*Response, 
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (s *ModerationService) Remove(ctx context.Context, id string) (*Response, e
 	form.Set("id", id)
 	form.Set("spam", "false")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (s *ModerationService) RemoveSpam(ctx context.Context, id string) (*Respons
 	form.Set("id", id)
 	form.Set("spam", "true")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func (s *ModerationService) Leave(ctx context.Context, subredditID string) (*Res
 	form := url.Values{}
 	form.Set("id", subredditID)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -193,7 +193,7 @@ func (s *ModerationService) LeaveContributor(ctx context.Context, subredditID st
 	form := url.Values{}
 	form.Set("id", subredditID)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -259,7 +259,7 @@ func (s *ModerationService) IgnoreReports(ctx context.Context, id string) (*Resp
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -274,7 +274,7 @@ func (s *ModerationService) UnignoreReports(ctx context.Context, id string) (*Re
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -293,7 +293,7 @@ func (s *ModerationService) Invite(ctx context.Context, subreddit string, userna
 	form.Set("type", "moderator_invite")
 	form.Set("permissions", permissions.String())
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -317,7 +317,7 @@ func (s *ModerationService) SetPermissions(ctx context.Context, subreddit string
 	form.Set("type", "moderator_invite")
 	form.Set("permissions", permissions.String())
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -338,7 +338,7 @@ func (s *ModerationService) Ban(ctx context.Context, subreddit string, username 
 	form.Set("name", username)
 	form.Set("type", "banned")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -364,7 +364,7 @@ func (s *ModerationService) BanWiki(ctx context.Context, subreddit string, usern
 	form.Set("name", username)
 	form.Set("type", "wikibanned")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -415,7 +415,7 @@ func (s *ModerationService) createRelationship(ctx context.Context, subreddit, u
 	form.Set("name", username)
 	form.Set("type", relationship)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -431,7 +431,7 @@ func (s *ModerationService) deleteRelationship(ctx context.Context, subreddit, u
 	form.Set("name", username)
 	form.Set("type", relationship)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -449,7 +449,7 @@ func (s *ModerationService) Distinguish(ctx context.Context, id string) (*Respon
 	form.Set("how", "yes")
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -468,7 +468,7 @@ func (s *ModerationService) DistinguishAndSticky(ctx context.Context, id string)
 	form.Set("sticky", "true")
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -485,7 +485,7 @@ func (s *ModerationService) Undistinguish(ctx context.Context, id string) (*Resp
 	form.Set("how", "no")
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

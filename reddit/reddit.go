@@ -217,10 +217,36 @@ func (c *Client) UserAgent() string {
 	return c.userAgent
 }
 
-// NewRequest creates an API request with a JSON body.
+// NewRequest creates an API request with form data as the body.
+// The path is the relative URL which will be resolves to the BaseURL of the Client.
+// It should always be specified without a preceding slash.
+func (c *Client) NewRequest(method string, path string, form url.Values) (*http.Request, error) {
+	u, err := c.BaseURL.Parse(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var body io.Reader
+	if form != nil {
+		body = strings.NewReader(form.Encode())
+	}
+
+	req, err := http.NewRequest(method, u.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	c.appendJSONExtensionToRequestURLPath(req)
+	req.Header.Add(headerContentType, mediaTypeForm)
+	req.Header.Add(headerAccept, mediaTypeJSON)
+
+	return req, nil
+}
+
+// NewJSONRequest creates an API request with a JSON body.
 // The path is the relative URL which will be resolved to the BaseURL of the Client.
 // It should always be specified without a preceding slash.
-func (c *Client) NewRequest(method string, path string, body interface{}) (*http.Request, error) {
+func (c *Client) NewJSONRequest(method string, path string, body interface{}) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(path)
 	if err != nil {
 		return nil, err
@@ -242,27 +268,6 @@ func (c *Client) NewRequest(method string, path string, body interface{}) (*http
 
 	c.appendJSONExtensionToRequestURLPath(req)
 	req.Header.Add(headerContentType, mediaTypeJSON)
-	req.Header.Add(headerAccept, mediaTypeJSON)
-
-	return req, nil
-}
-
-// NewRequestWithForm creates an API request with form data.
-// The path is the relative URL which will be resolves to the BaseURL of the Client.
-// It should always be specified without a preceding slash.
-func (c *Client) NewRequestWithForm(method string, path string, form url.Values) (*http.Request, error) {
-	u, err := c.BaseURL.Parse(path)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest(method, u.String(), strings.NewReader(form.Encode()))
-	if err != nil {
-		return nil, err
-	}
-
-	c.appendJSONExtensionToRequestURLPath(req)
-	req.Header.Add(headerContentType, mediaTypeForm)
 	req.Header.Add(headerAccept, mediaTypeJSON)
 
 	return req, nil

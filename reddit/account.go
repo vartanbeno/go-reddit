@@ -274,7 +274,7 @@ func (s *AccountService) Settings(ctx context.Context) (*Settings, *Response, er
 func (s *AccountService) UpdateSettings(ctx context.Context, settings *Settings) (*Settings, *Response, error) {
 	path := "api/v1/me/prefs"
 
-	req, err := s.client.NewRequest(http.MethodPatch, path, settings)
+	req, err := s.client.NewJSONRequest(http.MethodPatch, path, settings)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -391,7 +391,7 @@ func (s *AccountService) AddTrusted(ctx context.Context, username string) (*Resp
 	form.Set("api_type", "json")
 	form.Set("name", username)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -407,7 +407,7 @@ func (s *AccountService) RemoveTrusted(ctx context.Context, username string) (*R
 	form := url.Values{}
 	form.Set("name", username)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

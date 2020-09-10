@@ -32,7 +32,7 @@ func (s *postAndCommentService) Delete(ctx context.Context, id string) (*Respons
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func (s *postAndCommentService) Save(ctx context.Context, id string) (*Response,
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (s *postAndCommentService) Unsave(ctx context.Context, id string) (*Respons
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *postAndCommentService) EnableReplies(ctx context.Context, id string) (*
 	form.Set("id", id)
 	form.Set("state", "true")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (s *postAndCommentService) DisableReplies(ctx context.Context, id string) (
 	form.Set("id", id)
 	form.Set("state", "false")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (s *postAndCommentService) Lock(ctx context.Context, id string) (*Response,
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (s *postAndCommentService) Unlock(ctx context.Context, id string) (*Respons
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func (s *postAndCommentService) vote(ctx context.Context, id string, vote vote) 
 	form.Set("dir", fmt.Sprint(vote))
 	form.Set("rank", "10")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (s *postAndCommentService) RemoveVote(ctx context.Context, id string) (*Res
 	return s.vote(ctx, id, novote)
 }
 
-// Report reports a post or comment.
+// Report a post or comment.
 // The reason must not be longer than 100 characters.
 func (s *postAndCommentService) Report(ctx context.Context, id string, reason string) (*Response, error) {
 	path := "api/report"
@@ -173,7 +173,7 @@ func (s *postAndCommentService) Report(ctx context.Context, id string, reason st
 	form.Set("thing_id", id)
 	form.Set("reason", reason)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

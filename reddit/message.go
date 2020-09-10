@@ -118,12 +118,10 @@ type SendMessageRequest struct {
 // This endpoint is heavily rate limited.
 func (s *MessageService) ReadAll(ctx context.Context) (*Response, error) {
 	path := "api/read_all_messages"
-
 	req, err := s.client.NewRequest(http.MethodPost, path, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	return s.client.Do(ctx, req, nil)
 }
 
@@ -138,7 +136,7 @@ func (s *MessageService) Read(ctx context.Context, ids ...string) (*Response, er
 	form := url.Values{}
 	form.Set("id", strings.Join(ids, ","))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +155,7 @@ func (s *MessageService) Unread(ctx context.Context, ids ...string) (*Response, 
 	form := url.Values{}
 	form.Set("id", strings.Join(ids, ","))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +170,7 @@ func (s *MessageService) Block(ctx context.Context, id string) (*Response, error
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -191,7 +189,7 @@ func (s *MessageService) Collapse(ctx context.Context, ids ...string) (*Response
 	form := url.Values{}
 	form.Set("id", strings.Join(ids, ","))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -210,7 +208,7 @@ func (s *MessageService) Uncollapse(ctx context.Context, ids ...string) (*Respon
 	form := url.Values{}
 	form.Set("id", strings.Join(ids, ","))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +223,7 @@ func (s *MessageService) Delete(ctx context.Context, id string) (*Response, erro
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +245,7 @@ func (s *MessageService) Send(ctx context.Context, sendRequest *SendMessageReque
 	}
 	form.Set("api_type", "json")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

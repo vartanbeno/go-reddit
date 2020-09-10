@@ -104,12 +104,10 @@ func (s *EmojiService) Get(ctx context.Context, subreddit string) ([]*Emoji, []*
 // Delete the emoji from the subreddit.
 func (s *EmojiService) Delete(ctx context.Context, subreddit string, emoji string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/%s/emoji/%s", subreddit, emoji)
-
 	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	return s.client.Do(ctx, req, nil)
 }
 
@@ -122,7 +120,7 @@ func (s *EmojiService) SetSize(ctx context.Context, subreddit string, height, wi
 	form.Set("height", fmt.Sprint(height))
 	form.Set("width", fmt.Sprint(width))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -133,12 +131,10 @@ func (s *EmojiService) SetSize(ctx context.Context, subreddit string, height, wi
 // DisableCustomSize disables the custom emoji size in the subreddit.
 func (s *EmojiService) DisableCustomSize(ctx context.Context, subreddit string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/%s/emoji_custom_size", subreddit)
-
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, nil)
+	req, err := s.client.NewRequest(http.MethodPost, path, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	return s.client.Do(ctx, req, nil)
 }
 
@@ -152,7 +148,7 @@ func (s *EmojiService) lease(ctx context.Context, subreddit, imagePath string) (
 		form.Set("mimetype", "image/png")
 	}
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return "", nil, nil, err
 	}
@@ -191,7 +187,7 @@ func (s *EmojiService) upload(ctx context.Context, subreddit string, createReque
 	}
 	form.Set("s3_key", awsKey)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -276,7 +272,7 @@ func (s *EmojiService) Update(ctx context.Context, subreddit string, updateReque
 		return nil, err
 	}
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

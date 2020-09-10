@@ -116,7 +116,7 @@ func (s *CollectionService) Create(ctx context.Context, createRequest *Collectio
 		return nil, nil, err
 	}
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -137,7 +137,7 @@ func (s *CollectionService) Delete(ctx context.Context, id string) (*Response, e
 	form := url.Values{}
 	form.Set("collection_id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -153,7 +153,7 @@ func (s *CollectionService) AddPost(ctx context.Context, postID, collectionID st
 	form.Set("link_fullname", postID)
 	form.Set("collection_id", collectionID)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (s *CollectionService) RemovePost(ctx context.Context, postID, collectionID
 	form.Set("link_fullname", postID)
 	form.Set("collection_id", collectionID)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +185,7 @@ func (s *CollectionService) ReorderPosts(ctx context.Context, collectionID strin
 	form.Set("collection_id", collectionID)
 	form.Set("link_ids", strings.Join(postIDs, ","))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (s *CollectionService) UpdateTitle(ctx context.Context, id string, title st
 	form.Set("collection_id", id)
 	form.Set("title", title)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (s *CollectionService) UpdateDescription(ctx context.Context, id string, de
 	form.Set("collection_id", id)
 	form.Set("description", description)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -233,7 +233,7 @@ func (s *CollectionService) UpdateLayoutTimeline(ctx context.Context, id string)
 	form.Set("collection_id", id)
 	form.Set("display_layout", "TIMELINE")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -249,7 +249,7 @@ func (s *CollectionService) UpdateLayoutGallery(ctx context.Context, id string) 
 	form.Set("collection_id", id)
 	form.Set("display_layout", "GALLERY")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -265,7 +265,7 @@ func (s *CollectionService) Follow(ctx context.Context, id string) (*Response, e
 	form.Set("collection_id", id)
 	form.Set("follow", "true")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +281,7 @@ func (s *CollectionService) Unfollow(ctx context.Context, id string) (*Response,
 	form.Set("collection_id", id)
 	form.Set("follow", "false")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

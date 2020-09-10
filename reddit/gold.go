@@ -20,12 +20,10 @@ type GoldService struct {
 // This requires you to own Reddit coins and will consume them.
 func (s *GoldService) Gild(ctx context.Context, id string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/gold/gild/%s", id)
-
 	req, err := s.client.NewRequest(http.MethodPost, path, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	return s.client.Do(ctx, req, nil)
 }
 
@@ -41,7 +39,7 @@ func (s *GoldService) Give(ctx context.Context, username string, months int) (*R
 	form := url.Values{}
 	form.Set("months", fmt.Sprint(months))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

@@ -244,7 +244,7 @@ func (s *WikiService) Edit(ctx context.Context, editRequest *WikiPageEditRequest
 	}
 
 	path := fmt.Sprintf("r/%s/api/wiki/edit", editRequest.Subreddit)
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +260,7 @@ func (s *WikiService) Revert(ctx context.Context, subreddit, page, revisionID st
 	form.Set("page", page)
 	form.Set("revision", revisionID)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -299,7 +299,7 @@ func (s *WikiService) UpdateSettings(ctx context.Context, subreddit, page string
 	}
 
 	path := fmt.Sprintf("r/%s/wiki/settings/%s", subreddit, page)
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -346,7 +346,7 @@ func (s *WikiService) ToggleVisibility(ctx context.Context, subreddit, page, rev
 	form.Set("page", page)
 	form.Set("revision", revisionID)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return false, nil, err
 	}
@@ -416,7 +416,7 @@ func (s *WikiService) Allow(ctx context.Context, subreddit, page, username strin
 	form.Set("page", page)
 	form.Set("username", username)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -432,7 +432,7 @@ func (s *WikiService) Deny(ctx context.Context, subreddit, page, username string
 	form.Set("page", page)
 	form.Set("username", username)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

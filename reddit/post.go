@@ -123,7 +123,7 @@ func (s *PostService) submit(ctx context.Context, v interface{}) (*Submitted, *R
 	}
 	form.Set("api_type", "json")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -165,7 +165,7 @@ func (s *PostService) Edit(ctx context.Context, id string, text string) (*Post, 
 	form.Set("thing_id", id)
 	form.Set("text", text)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -190,7 +190,7 @@ func (s *PostService) Hide(ctx context.Context, ids ...string) (*Response, error
 	form := url.Values{}
 	form.Set("id", strings.Join(ids, ","))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (s *PostService) Unhide(ctx context.Context, ids ...string) (*Response, err
 	form := url.Values{}
 	form.Set("id", strings.Join(ids, ","))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +224,7 @@ func (s *PostService) MarkNSFW(ctx context.Context, id string) (*Response, error
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -239,7 +239,7 @@ func (s *PostService) UnmarkNSFW(ctx context.Context, id string) (*Response, err
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -254,7 +254,7 @@ func (s *PostService) Spoiler(ctx context.Context, id string) (*Response, error)
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -269,7 +269,7 @@ func (s *PostService) Unspoiler(ctx context.Context, id string) (*Response, erro
 	form := url.Values{}
 	form.Set("id", id)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -292,7 +292,7 @@ func (s *PostService) Sticky(ctx context.Context, id string, bottom bool) (*Resp
 		form.Set("num", "1")
 	}
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -309,7 +309,7 @@ func (s *PostService) Unsticky(ctx context.Context, id string) (*Response, error
 	form.Set("id", id)
 	form.Set("state", "false")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -341,7 +341,7 @@ func (s *PostService) PinToProfile(ctx context.Context, id string) (*Response, e
 	form.Set("to_profile", "true")
 	// form.Set("num", fmt.Sprint(pos))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -359,7 +359,7 @@ func (s *PostService) UnpinFromProfile(ctx context.Context, id string) (*Respons
 	form.Set("state", "false")
 	form.Set("to_profile", "true")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -377,7 +377,7 @@ func (s *PostService) setSuggestedSort(ctx context.Context, id string, sort stri
 	form.Set("id", id)
 	form.Set("sort", sort)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -441,7 +441,7 @@ func (s *PostService) EnableContestMode(ctx context.Context, id string) (*Respon
 	form.Set("id", id)
 	form.Set("state", "true")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -458,7 +458,7 @@ func (s *PostService) DisableContestMode(ctx context.Context, id string) (*Respo
 	form.Set("id", id)
 	form.Set("state", "false")
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -488,7 +488,7 @@ func (s *PostService) LoadMoreComments(ctx context.Context, pc *PostAndComments)
 
 	// This was originally a GET, but with POST you can send a bigger payload
 	// since it's in the body and not the URI.
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
@@ -575,7 +575,7 @@ func (s *PostService) MarkVisited(ctx context.Context, ids ...string) (*Response
 	form := url.Values{}
 	form.Set("links", strings.Join(ids, ","))
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}

@@ -28,7 +28,7 @@ func (s *CommentService) Submit(ctx context.Context, parentID string, text strin
 	form.Set("parent", parentID)
 	form.Set("text", text)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -52,7 +52,7 @@ func (s *CommentService) Edit(ctx context.Context, id string, text string) (*Com
 	form.Set("thing_id", id)
 	form.Set("text", text)
 
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -88,7 +88,7 @@ func (s *CommentService) LoadMoreReplies(ctx context.Context, comment *Comment) 
 
 	// This was originally a GET, but with POST you can send a bigger payload
 	// since it's in the body and not the URI.
-	req, err := s.client.NewRequestWithForm(http.MethodPost, path, form)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
 	}
