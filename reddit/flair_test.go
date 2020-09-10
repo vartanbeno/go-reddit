@@ -83,6 +83,45 @@ var expectedFlairTemplate = &FlairTemplate{
 	CSSClass:        "",
 }
 
+var expectedFlairChoices = []*FlairChoice{
+	{
+		TemplateID: "c4edd5ce-40e8-11e7-b814-0ef91bd65558",
+		Text:       "Reddit API",
+		Editable:   false,
+		Position:   "left",
+		CSSClass:   "",
+	},
+	{
+		TemplateID: "49bb3d06-0dad-11e7-b897-0e42c2400b7a",
+		Text:       "PRAW",
+		Editable:   false,
+		Position:   "left",
+		CSSClass:   "",
+	},
+	{
+		TemplateID: "f1905376-40e9-11e7-a0dc-0e2f53ef3712",
+		Text:       "snoowrap",
+		Editable:   false,
+		Position:   "left",
+		CSSClass:   "",
+	},
+	{
+		TemplateID: "03dc6ea8-40e9-11e7-8abb-0eb85aed0bce",
+		Text:       "Other API Wrapper",
+		Editable:   false,
+		Position:   "left",
+		CSSClass:   "",
+	},
+}
+
+var expectedFlairChoice = &FlairChoice{
+	TemplateID: "03dc6ea8-40e9-11e7-8abb-0eb85aed0bce",
+	Text:       "Other API Wrapper",
+	Editable:   false,
+	Position:   "left",
+	CSSClass:   "",
+}
+
 func TestFlairService_GetUserFlairs(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -411,4 +450,107 @@ func TestFlairService_ReorderPostTemplates(t *testing.T) {
 
 	_, err := client.Flair.ReorderPostTemplates(ctx, "testsubreddit", []string{"test1", "test2", "test3", "test4"})
 	require.NoError(t, err)
+}
+
+func TestFlairService_Choices(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/flair/choices.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/flairselector", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("name", "user1")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, blob)
+	})
+
+	choices, current, _, err := client.Flair.Choices(ctx, "testsubreddit")
+	require.NoError(t, err)
+	require.Equal(t, expectedFlairChoices, choices)
+	require.Equal(t, expectedFlairChoice, current)
+}
+
+func TestFlairService_ChoicesOf(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/flair/choices.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/flairselector", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("name", "testuser")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, blob)
+	})
+
+	choices, current, _, err := client.Flair.ChoicesOf(ctx, "testsubreddit", "testuser")
+	require.NoError(t, err)
+	require.Equal(t, expectedFlairChoices, choices)
+	require.Equal(t, expectedFlairChoice, current)
+}
+
+func TestFlairService_ChoicesForPost(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/flair/choices.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/api/flairselector", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("link", "t3_123")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, blob)
+	})
+
+	choices, current, _, err := client.Flair.ChoicesForPost(ctx, "t3_123")
+	require.NoError(t, err)
+	require.Equal(t, expectedFlairChoices, choices)
+	require.Equal(t, expectedFlairChoice, current)
+}
+
+func TestFlairService_ChoicesForNewPost(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/flair/choices.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/flairselector", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("is_newlink", "true")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, blob)
+	})
+
+	choices, _, err := client.Flair.ChoicesForNewPost(ctx, "testsubreddit")
+	require.NoError(t, err)
+	require.Equal(t, expectedFlairChoices, choices)
 }

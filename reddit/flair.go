@@ -39,6 +39,15 @@ type FlairSummary struct {
 	CSSClass string `json:"flair_css_class,omitempty"`
 }
 
+// FlairChoice is a choice of flair when selecting one for yourself or for a post.
+type FlairChoice struct {
+	TemplateID string `json:"flair_template_id"`
+	Text       string `json:"flair_text"`
+	Editable   bool   `json:"flair_text_editable"`
+	Position   string `json:"flair_position"`
+	CSSClass   string `json:"flair_css_class"`
+}
+
 // ConfigureFlairRequest represents a request to configure a subreddit's flair settings.
 // Not setting an attribute can have unexpected side effects, so assign every one just in case.
 type ConfigureFlairRequest struct {
@@ -337,6 +346,7 @@ func (s *FlairService) DeleteAllPostTemplates(ctx context.Context, subreddit str
 }
 
 // ReorderUserTemplates reorders the user flair templates in the order provided in the slice.
+// The order should contain every single flair id of this flair type; omitting any id will result in an error.
 func (s *FlairService) ReorderUserTemplates(ctx context.Context, subreddit string, ids []string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/%s/flair_template_order/USER_FLAIR", subreddit)
 	req, err := s.client.NewJSONRequest(http.MethodPatch, path, ids)
@@ -347,6 +357,7 @@ func (s *FlairService) ReorderUserTemplates(ctx context.Context, subreddit strin
 }
 
 // ReorderPostTemplates reorders the post flair templates in the order provided in the slice.
+// The order should contain every single flair id of this flair type; omitting any id will result in an error.
 func (s *FlairService) ReorderPostTemplates(ctx context.Context, subreddit string, ids []string) (*Response, error) {
 	path := fmt.Sprintf("api/v1/%s/flair_template_order/LINK_FLAIR", subreddit)
 	req, err := s.client.NewJSONRequest(http.MethodPatch, path, ids)
@@ -354,4 +365,56 @@ func (s *FlairService) ReorderPostTemplates(ctx context.Context, subreddit strin
 		return nil, err
 	}
 	return s.client.Do(ctx, req, nil)
+}
+
+// Choices returns a list of flairs you can assign to yourself in the subreddit, and your current one.
+func (s *FlairService) Choices(ctx context.Context, subreddit string) ([]*FlairChoice, *FlairChoice, *Response, error) {
+	return s.ChoicesOf(ctx, subreddit, s.client.Username)
+}
+
+// ChoicesOf returns a list of flairs the user can assign to themself in the subreddit, and their current one.
+// Unless the user is you, this only works if you're a moderator of the subreddit.
+func (s *FlairService) ChoicesOf(ctx context.Context, subreddit, username string) ([]*FlairChoice, *FlairChoice, *Response, error) {
+	path := fmt.Sprintf("r/%s/api/flairselector", subreddit)
+	form := url.Values{}
+	form.Set("name", username)
+	return s.choices(ctx, path, form)
+}
+
+// ChoicesForPost returns a list of flairs you can assign to an existing post, and the current one assigned to it.
+// If the post isn't yours, this only works if you're the moderator of the subreddit it's in.
+func (s *FlairService) ChoicesForPost(ctx context.Context, postID string) ([]*FlairChoice, *FlairChoice, *Response, error) {
+	path := "api/flairselector"
+	form := url.Values{}
+	form.Set("link", postID)
+	return s.choices(ctx, path, form)
+}
+
+// ChoicesForNewPost returns a list of flairs you can assign to a new post in a subreddit.
+func (s *FlairService) ChoicesForNewPost(ctx context.Context, subreddit string) ([]*FlairChoice, *Response, error) {
+	path := fmt.Sprintf("r/%s/api/flairselector", subreddit)
+
+	form := url.Values{}
+	form.Set("is_newlink", "true")
+
+	choices, _, resp, err := s.choices(ctx, path, form)
+	return choices, resp, err
+}
+
+func (s *FlairService) choices(ctx context.Context, path string, form url.Values) ([]*FlairChoice, *FlairChoice, *Response, error) {
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	root := new(struct {
+		Choices []*FlairChoice `json:"choices"`
+		Current *FlairChoice   `json:"current"`
+	})
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, nil, resp, err
+	}
+
+	return root.Choices, root.Current, resp, nil
 }

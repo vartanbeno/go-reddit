@@ -1,0 +1,38 @@
+{
+  "current": {
+    "flair_css_class": "",
+    "flair_template_id": "03dc6ea8-40e9-11e7-8abb-0eb85aed0bce",
+    "flair_text": "Other API Wrapper",
+    "flair_position": "left"
+  },
+  "choices": [
+    {
+      "flair_css_class": "",
+      "flair_template_id": "c4edd5ce-40e8-11e7-b814-0ef91bd65558",
+      "flair_text_editable": false,
+      "flair_position": "left",
+      "flair_text": "Reddit API"
+    },
+    {
+      "flair_css_class": "",
+      "flair_template_id": "49bb3d06-0dad-11e7-b897-0e42c2400b7a",
+      "flair_text_editable": false,
+      "flair_position": "left",
+      "flair_text": "PRAW"
+    },
+    {
+      "flair_css_class": "",
+      "flair_template_id": "f1905376-40e9-11e7-a0dc-0e2f53ef3712",
+      "flair_text_editable": false,
+      "flair_position": "left",
+      "flair_text": "snoowrap"
+    },
+    {
+      "flair_css_class": "",
+      "flair_template_id": "03dc6ea8-40e9-11e7-8abb-0eb85aed0bce",
+      "flair_text_editable": false,
+      "flair_position": "left",
+      "flair_text": "Other API Wrapper"
+    }
+  ]
+}
