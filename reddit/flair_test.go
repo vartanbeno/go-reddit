@@ -554,3 +554,105 @@ func TestFlairService_ChoicesForNewPost(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, expectedFlairChoices, choices)
 }
+
+func TestFlairService_Select(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/selectflair", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "user1")
+		form.Set("flair_template_id", "id123")
+		form.Set("text", "text123")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.Select(ctx, "testsubreddit", nil)
+	require.EqualError(t, err, "request: cannot be nil")
+
+	_, err = client.Flair.Select(ctx, "testsubreddit", &FlairSelectRequest{
+		ID:   "id123",
+		Text: "text123",
+	})
+	require.NoError(t, err)
+}
+
+func TestFlairService_Assign(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/selectflair", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testuser")
+		form.Set("flair_template_id", "id123")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.Assign(ctx, "testsubreddit", "testuser", nil)
+	require.EqualError(t, err, "request: cannot be nil")
+
+	_, err = client.Flair.Assign(ctx, "testsubreddit", "testuser", &FlairSelectRequest{
+		ID: "id123",
+	})
+	require.NoError(t, err)
+}
+
+func TestFlairService_SelectForPost(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/selectflair", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("link", "t3_123")
+		form.Set("flair_template_id", "id123")
+		form.Set("text", "text123")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.SelectForPost(ctx, "t3_123", nil)
+	require.EqualError(t, err, "request: cannot be nil")
+
+	_, err = client.Flair.SelectForPost(ctx, "t3_123", &FlairSelectRequest{
+		ID:   "id123",
+		Text: "text123",
+	})
+	require.NoError(t, err)
+}
+
+func TestFlairService_RemoveFromPost(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/selectflair", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("link", "t3_123")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Flair.RemoveFromPost(ctx, "t3_123")
+	require.NoError(t, err)
+}

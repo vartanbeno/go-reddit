@@ -111,6 +111,15 @@ type FlairTemplate struct {
 	CSSClass        string `json:"cssClass"`
 }
 
+// FlairSelectRequest represents a request to select a flair.
+type FlairSelectRequest struct {
+	// The id of the template.
+	ID string `url:"flair_template_id,omitempty"`
+	// No longer than 64 characters.
+	// Only use this if the flair is editable (it is by default if you're a mod of the subreddit).
+	Text string `url:"text,omitempty"`
+}
+
 // GetUserFlairs returns the user flairs from the subreddit.
 func (s *FlairService) GetUserFlairs(ctx context.Context, subreddit string) ([]*Flair, *Response, error) {
 	path := fmt.Sprintf("r/%s/api/user_flair_v2", subreddit)
@@ -417,4 +426,73 @@ func (s *FlairService) choices(ctx context.Context, path string, form url.Values
 	}
 
 	return root.Choices, root.Current, resp, nil
+}
+
+// Select a flair to display next to your username in the subreddit.
+func (s *FlairService) Select(ctx context.Context, subreddit string, request *FlairSelectRequest) (*Response, error) {
+	return s.Assign(ctx, subreddit, s.client.Username, request)
+}
+
+// Assign a flair to another user in the subreddit.
+// This only works if you're a moderator of the subreddit, or if the user is you.
+func (s *FlairService) Assign(ctx context.Context, subreddit, user string, request *FlairSelectRequest) (*Response, error) {
+	if request == nil {
+		return nil, errors.New("request: cannot be nil")
+	}
+
+	path := fmt.Sprintf("r/%s/api/selectflair", subreddit)
+
+	form, err := query.Values(request)
+	if err != nil {
+		return nil, err
+	}
+	form.Set("api_type", "json")
+	form.Set("name", user)
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// SelectForPost assigns a flair to the post.
+// If the post isn't yours, you have to be a moderator of the post's subreddit for this to work.
+func (s *FlairService) SelectForPost(ctx context.Context, postID string, request *FlairSelectRequest) (*Response, error) {
+	if request == nil {
+		return nil, errors.New("request: cannot be nil")
+	}
+
+	path := "api/selectflair"
+
+	form, err := query.Values(request)
+	if err != nil {
+		return nil, err
+	}
+	form.Set("api_type", "json")
+	form.Set("link", postID)
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// RemoveFromPost removes the flair from the post.
+func (s *FlairService) RemoveFromPost(ctx context.Context, postID string) (*Response, error) {
+	path := "api/selectflair"
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("link", postID)
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }
