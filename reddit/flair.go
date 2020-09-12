@@ -1,7 +1,9 @@
 package reddit
 
 import (
+	"bytes"
 	"context"
+	"encoding/csv"
 	"errors"
 	"fmt"
 	"net/http"
@@ -48,9 +50,9 @@ type FlairChoice struct {
 	CSSClass   string `json:"flair_css_class"`
 }
 
-// ConfigureFlairRequest represents a request to configure a subreddit's flair settings.
+// RequestConfigureFlair represents a request to configure a subreddit's flair settings.
 // Not setting an attribute can have unexpected side effects, so assign every one just in case.
-type ConfigureFlairRequest struct {
+type RequestConfigureFlair struct {
 	// Enable user flair in the subreddit.
 	UserFlairEnabled *bool `url:"flair_enabled,omitempty"`
 	// One of: left, right.
@@ -120,6 +122,23 @@ type FlairSelectRequest struct {
 	Text string `url:"text,omitempty"`
 }
 
+// FlairChangeRequest represents a request to change a user's flair.
+// If Text and CSSClass are empty, the request will just clear the user's flair.
+type FlairChangeRequest struct {
+	User     string
+	Text     string
+	CSSClass string
+}
+
+// FlairChangeResponse represents a response to a FlairChangeRequest.
+type FlairChangeResponse struct {
+	// Whether or not the request was successful.
+	OK       bool              `json:"ok"`
+	Status   string            `json:"status"`
+	Warnings map[string]string `json:"warnings,omitempty"`
+	Errors   map[string]string `json:"errors,omitempty"`
+}
+
 // GetUserFlairs returns the user flairs from the subreddit.
 func (s *FlairService) GetUserFlairs(ctx context.Context, subreddit string) ([]*Flair, *Response, error) {
 	path := fmt.Sprintf("r/%s/api/user_flair_v2", subreddit)
@@ -177,7 +196,7 @@ func (s *FlairService) ListUserFlairs(ctx context.Context, subreddit string) ([]
 }
 
 // Configure the subreddit's flair settings.
-func (s *FlairService) Configure(ctx context.Context, subreddit string, request *ConfigureFlairRequest) (*Response, error) {
+func (s *FlairService) Configure(ctx context.Context, subreddit string, request *RequestConfigureFlair) (*Response, error) {
 	if request == nil {
 		return nil, errors.New("request: cannot be nil")
 	}
@@ -482,6 +501,7 @@ func (s *FlairService) SelectForPost(ctx context.Context, postID string, request
 }
 
 // RemoveFromPost removes the flair from the post.
+// If the post isn't yours, you have to be a moderator of the post's subreddit for this to work.
 func (s *FlairService) RemoveFromPost(ctx context.Context, postID string) (*Response, error) {
 	path := "api/selectflair"
 
@@ -495,4 +515,48 @@ func (s *FlairService) RemoveFromPost(ctx context.Context, postID string) (*Resp
 	}
 
 	return s.client.Do(ctx, req, nil)
+}
+
+// Change the flair of multiple users in the subreddit at once.
+// You have to be a moderator of the subreddit for this to work.
+func (s *FlairService) Change(ctx context.Context, subreddit string, requests []FlairChangeRequest) ([]*FlairChangeResponse, *Response, error) {
+	if len(requests) == 0 || len(requests) > 100 {
+		return nil, nil, errors.New("requests: must provide between 1 and 100")
+	}
+
+	records := make([][]string, len(requests))
+	for i, req := range requests {
+		records[i] = []string{req.User, req.Text, req.CSSClass}
+	}
+
+	buf := new(bytes.Buffer)
+	w := csv.NewWriter(buf)
+
+	err := w.WriteAll(records)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	err = w.Error()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	path := fmt.Sprintf("r/%s/api/flaircsv", subreddit)
+
+	form := url.Values{}
+	form.Set("flair_csv", buf.String())
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var root []*FlairChangeResponse
+	resp, err := s.client.Do(ctx, req, &root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, nil
 }

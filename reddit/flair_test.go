@@ -122,6 +122,35 @@ var expectedFlairChoice = &FlairChoice{
 	CSSClass:   "",
 }
 
+var expectedFlairChanges = []*FlairChangeResponse{
+	{
+		OK:       false,
+		Status:   "skipped",
+		Warnings: map[string]string{},
+		Errors: map[string]string{
+			"user": "unable to resolve user `testuser1', ignoring",
+		},
+	},
+	{
+		OK:       true,
+		Status:   "added flair for user testuser2",
+		Warnings: map[string]string{},
+		Errors:   map[string]string{},
+	},
+	{
+		OK:       true,
+		Status:   "added flair for user testuser3",
+		Warnings: map[string]string{},
+		Errors:   map[string]string{},
+	},
+	{
+		OK:       true,
+		Status:   "removed flair for user testuser4",
+		Warnings: map[string]string{},
+		Errors:   map[string]string{},
+	},
+}
+
 func TestFlairService_GetUserFlairs(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -196,7 +225,7 @@ func TestFlairService_Configure(t *testing.T) {
 	_, err := client.Flair.Configure(ctx, "testsubreddit", nil)
 	require.EqualError(t, err, "request: cannot be nil")
 
-	_, err = client.Flair.Configure(ctx, "testsubreddit", &ConfigureFlairRequest{
+	_, err = client.Flair.Configure(ctx, "testsubreddit", &RequestConfigureFlair{
 		UserFlairEnabled:           Bool(true),
 		UserFlairPosition:          "right",
 		UserFlairSelfAssignEnabled: Bool(false),
@@ -655,4 +684,41 @@ func TestFlairService_RemoveFromPost(t *testing.T) {
 
 	_, err := client.Flair.RemoveFromPost(ctx, "t3_123")
 	require.NoError(t, err)
+}
+
+func TestFlairService_Change(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/flair/csv-change.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/flaircsv", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("flair_csv", `testuser1,testtext1,testclass1
+testuser2,testtext2,testclass2
+testuser3,testtext3,testclass3
+testuser4,testtext4,testclass4
+`)
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, blob)
+	})
+
+	_, _, err = client.Flair.Change(ctx, "testsubreddit", nil)
+	require.EqualError(t, err, "requests: must provide between 1 and 100")
+
+	changes, _, err := client.Flair.Change(ctx, "testsubreddit", []FlairChangeRequest{
+		{"testuser1", "testtext1", "testclass1"},
+		{"testuser2", "testtext2", "testclass2"},
+		{"testuser3", "testtext3", "testclass3"},
+		{"testuser4", "testtext4", "testclass4"},
+	})
+	require.NoError(t, err)
+	require.Equal(t, expectedFlairChanges, changes)
 }

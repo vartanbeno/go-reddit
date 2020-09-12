@@ -1,0 +1,28 @@
+[
+  {
+    "errors": {
+      "user": "unable to resolve user `testuser1', ignoring"
+    },
+    "ok": false,
+    "status": "skipped",
+    "warnings": {}
+  },
+  {
+    "errors": {},
+    "ok": true,
+    "status": "added flair for user testuser2",
+    "warnings": {}
+  },
+  {
+    "errors": {},
+    "ok": true,
+    "status": "added flair for user testuser3",
+    "warnings": {}
+  },
+  {
+    "errors": {},
+    "ok": true,
+    "status": "removed flair for user testuser4",
+    "warnings": {}
+  }
+]
