@@ -2,11 +2,14 @@ package reddit
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"github.com/google/go-querystring/query"
 )
 
 // SubredditService handles communication with the subreddit
@@ -41,6 +44,100 @@ type Ban struct {
 	// nil means the ban is permanent
 	DaysLeft *int   `json:"days_left"`
 	Note     string `json:"note,omitempty"`
+}
+
+// SubredditRule is a rule in the subreddit.
+type SubredditRule struct {
+	// One of: comment, link (i.e. post), or all (i.e. both comment and link).
+	Kind string `json:"kind,omitempty"`
+	// Short description of the rule.
+	Name string `json:"short_name,omitempty"`
+	// The reason that will appear when a thing is reported in violation to this rule.
+	ViolationReason string     `json:"violation_reason,omitempty"`
+	Description     string     `json:"description,omitempty"`
+	Priority        int        `json:"priority"`
+	Created         *Timestamp `json:"created_utc,omitempty"`
+}
+
+// SubredditRuleCreateRequest represents a request to add a subreddit rule.
+type SubredditRuleCreateRequest struct {
+	// One of: comment, link (i.e. post) or all (i.e. both).
+	Kind string `url:"kind"`
+	// Short description of the rule. No longer than 100 characters.
+	Name string `url:"short_name"`
+	// The reason that will appear when a thing is reported in violation to this rule.
+	// If this is empty, Reddit will set its value to Name by default.
+	// No longer than 100 characters.
+	ViolationReason string `url:"violation_reason,omitempty"`
+	// Optional. No longer than 500 characters.
+	Description string `url:"description,omitempty"`
+}
+
+func (r *SubredditRuleCreateRequest) validate() error {
+	if r == nil {
+		return errors.New("*SubredditRuleCreateRequest: cannot be nil")
+	}
+
+	switch r.Kind {
+	case "comment", "link", "all":
+		// intentionally left blank
+	default:
+		return errors.New("(*SubredditRuleCreateRequest).Kind: must be one of: comment, link, all")
+	}
+
+	if r.Name == "" || len(r.Name) > 100 {
+		return errors.New("(*SubredditRuleCreateRequest).Name: must be between 1-100 characters")
+	}
+
+	if len(r.ViolationReason) > 100 {
+		return errors.New("(*SubredditRuleCreateRequest).ViolationReason: cannot be longer than 100 characters")
+	}
+
+	if len(r.Description) > 500 {
+		return errors.New("(*SubredditRuleCreateRequest).Description: cannot be longer than 500 characters")
+	}
+
+	return nil
+}
+
+// SubredditTrafficStats hold information about subreddit traffic.
+type SubredditTrafficStats struct {
+	// Traffic data is returned in the form of day, hour, and month.
+	// Start is a timestamp indicating the start of the category, i.e.
+	// start of the day for day, start of the hour for hour, and start of the month for month.
+	Start       *Timestamp `json:"start"`
+	UniqueViews int        `json:"unique_views"`
+	TotalViews  int        `json:"total_views"`
+	// This is only available for "day" traffic, not hour and month.
+	// Therefore, it is always 0 by default for hour and month.
+	Subscribers int `json:"subscribers"`
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (s *SubredditTrafficStats) UnmarshalJSON(b []byte) error {
+	var data [4]int
+	err := json.Unmarshal(b, &data)
+	if err != nil {
+		return err
+	}
+
+	timestampByteValue, err := json.Marshal(data[0])
+	if err != nil {
+		return err
+	}
+
+	timestamp := new(Timestamp)
+	err = timestamp.UnmarshalJSON(timestampByteValue)
+	if err != nil {
+		return err
+	}
+
+	s.Start = timestamp
+	s.UniqueViews = data[1]
+	s.TotalViews = data[2]
+	s.Subscribers = data[3]
+
+	return nil
 }
 
 // todo: interface{}, seriously?
@@ -653,4 +750,69 @@ func (s *SubredditService) Moderators(ctx context.Context, subreddit string) ([]
 	}
 
 	return root.Data.Moderators, resp, nil
+}
+
+// Rules gets the rules of the subreddit.
+func (s *SubredditService) Rules(ctx context.Context, subreddit string) ([]*SubredditRule, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/rules", subreddit)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(struct {
+		Rules []*SubredditRule `json:"rules"`
+	})
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Rules, resp, nil
+}
+
+// CreateRule adds a rule to the subreddit.
+func (s *SubredditService) CreateRule(ctx context.Context, subreddit string, request *SubredditRuleCreateRequest) (*Response, error) {
+	err := request.validate()
+	if err != nil {
+		return nil, err
+	}
+
+	form, err := query.Values(request)
+	if err != nil {
+		return nil, err
+	}
+	form.Set("api_type", "json")
+
+	path := fmt.Sprintf("r/%s/api/add_subreddit_rule", subreddit)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Traffic gets the traffic data of the subreddit.
+// It returns traffic data by day, hour, and month, respectively.
+func (s *SubredditService) Traffic(ctx context.Context, subreddit string) ([]*SubredditTrafficStats, []*SubredditTrafficStats, []*SubredditTrafficStats, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/traffic", subreddit)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+
+	root := new(struct {
+		Day   []*SubredditTrafficStats `json:"day"`
+		Hour  []*SubredditTrafficStats `json:"hour"`
+		Month []*SubredditTrafficStats `json:"month"`
+	})
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, nil, nil, resp, err
+	}
+
+	return root.Day, root.Hour, root.Month, resp, nil
 }

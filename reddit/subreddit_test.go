@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"testing"
 	"time"
 
@@ -272,6 +273,47 @@ var expectedModerators = []*Moderator{
 		},
 		Permissions: []string{"all"},
 	},
+}
+
+var expectedRules = []*SubredditRule{
+	{
+		Kind:            "link",
+		Name:            "Read the Rules Before Posting",
+		ViolationReason: "Read the Rules Before Posting",
+		Description:     "https://www.reddit.com/r/Fitness/wiki/rules",
+		Priority:        0,
+		Created:         &Timestamp{time.Date(2019, 5, 22, 5, 32, 58, 0, time.UTC)},
+	},
+	{
+		Kind:            "link",
+		Name:            "Read the Wiki Before Posting",
+		ViolationReason: "Read the Wiki Before Posting",
+		Description:     "https://thefitness.wiki",
+		Priority:        1,
+		Created:         &Timestamp{time.Date(2019, 11, 9, 7, 56, 33, 0, time.UTC)},
+	},
+}
+
+var expectedDayTraffic = []*SubredditTrafficStats{
+	{&Timestamp{time.Date(2020, 9, 13, 0, 0, 0, 0, time.UTC)}, 0, 0, 0},
+	{&Timestamp{time.Date(2020, 9, 12, 0, 0, 0, 0, time.UTC)}, 1, 12, 0},
+	{&Timestamp{time.Date(2020, 9, 11, 0, 0, 0, 0, time.UTC)}, 5, 85, 0},
+	{&Timestamp{time.Date(2020, 9, 10, 0, 0, 0, 0, time.UTC)}, 4, 20, 0},
+	{&Timestamp{time.Date(2020, 9, 9, 0, 0, 0, 0, time.UTC)}, 2, 64, 0},
+	{&Timestamp{time.Date(2020, 9, 8, 0, 0, 0, 0, time.UTC)}, 2, 95, 0},
+	{&Timestamp{time.Date(2020, 9, 7, 0, 0, 0, 0, time.UTC)}, 3, 41, 0},
+}
+
+var expectedHourTraffic = []*SubredditTrafficStats{
+	{&Timestamp{time.Date(2020, 9, 12, 20, 0, 0, 0, time.UTC)}, 1, 12, 0},
+	{&Timestamp{time.Date(2020, 9, 11, 3, 0, 0, 0, time.UTC)}, 4, 57, 0},
+	{&Timestamp{time.Date(2020, 9, 11, 2, 0, 0, 0, time.UTC)}, 4, 28, 0},
+}
+
+var expectedMonthTraffic = []*SubredditTrafficStats{
+	{&Timestamp{time.Date(2020, 9, 1, 0, 0, 0, 0, time.UTC)}, 7, 481, 0},
+	{&Timestamp{time.Date(2020, 8, 1, 0, 0, 0, 0, time.UTC)}, 5, 346, 0},
+	{&Timestamp{time.Date(2020, 7, 1, 0, 0, 0, 0, time.UTC)}, 4, 264, 0},
 }
 
 func TestSubredditService_HotPosts(t *testing.T) {
@@ -1020,4 +1062,96 @@ func TestSubredditService_Moderators(t *testing.T) {
 	moderators, _, err := client.Subreddit.Moderators(ctx, "test")
 	require.NoError(t, err)
 	require.Equal(t, expectedModerators, moderators)
+}
+
+func TestSubredditService_Rules(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/subreddit/rules.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/about/rules", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	rules, _, err := client.Subreddit.Rules(ctx, "testsubreddit")
+	require.NoError(t, err)
+	require.Equal(t, expectedRules, rules)
+}
+
+func TestSubredditService_CreateRule(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/add_subreddit_rule", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("kind", "all")
+		form.Set("short_name", "testname")
+		form.Set("violation_reason", "testreason")
+		form.Set("description", "testdescription")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.CreateRule(ctx, "testsubreddit", &SubredditRuleCreateRequest{
+		Kind:            "all",
+		Name:            "testname",
+		ViolationReason: "testreason",
+		Description:     "testdescription",
+	})
+	require.NoError(t, err)
+}
+
+func TestSubredditService_CreateRule_Error(t *testing.T) {
+	client, _, teardown := setup()
+	defer teardown()
+
+	_, err := client.Subreddit.CreateRule(ctx, "testsubreddit", nil)
+	require.EqualError(t, err, "*SubredditRuleCreateRequest: cannot be nil")
+
+	_, err = client.Subreddit.CreateRule(ctx, "testsubreddit", &SubredditRuleCreateRequest{Kind: "invalid"})
+	require.EqualError(t, err, "(*SubredditRuleCreateRequest).Kind: must be one of: comment, link, all")
+
+	_, err = client.Subreddit.CreateRule(ctx, "testsubreddit", &SubredditRuleCreateRequest{Kind: "all", Name: ""})
+	require.EqualError(t, err, "(*SubredditRuleCreateRequest).Name: must be between 1-100 characters")
+
+	_, err = client.Subreddit.CreateRule(ctx, "testsubreddit", &SubredditRuleCreateRequest{
+		Kind:            "all",
+		Name:            "testname",
+		ViolationReason: strings.Repeat("x", 101),
+	})
+	require.EqualError(t, err, "(*SubredditRuleCreateRequest).ViolationReason: cannot be longer than 100 characters")
+
+	_, err = client.Subreddit.CreateRule(ctx, "testsubreddit", &SubredditRuleCreateRequest{
+		Kind:        "all",
+		Name:        "testname",
+		Description: strings.Repeat("x", 501),
+	})
+	require.EqualError(t, err, "(*SubredditRuleCreateRequest).Description: cannot be longer than 500 characters")
+}
+
+func TestSubredditService_Traffic(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/subreddit/traffic.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/about/traffic", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	dayTraffic, hourTraffic, monthTraffic, _, err := client.Subreddit.Traffic(ctx, "testsubreddit")
+	require.NoError(t, err)
+	require.Equal(t, expectedDayTraffic, dayTraffic)
+	require.Equal(t, expectedHourTraffic, hourTraffic)
+	require.Equal(t, expectedMonthTraffic, monthTraffic)
 }
