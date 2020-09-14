@@ -137,24 +137,11 @@ func (s *UserService) Overview(ctx context.Context, opts *ListUserOverviewOption
 // OverviewOf returns a list of the user's posts and comments.
 func (s *UserService) OverviewOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Post, []*Comment, *Response, error) {
 	path := fmt.Sprintf("user/%s/overview", username)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), listing.Comments(), resp, nil
+	return l.Posts(), l.Comments(), resp, nil
 }
 
 // Posts returns a list of your posts.
@@ -165,24 +152,11 @@ func (s *UserService) Posts(ctx context.Context, opts *ListUserOverviewOptions) 
 // PostsOf returns a list of the user's posts.
 func (s *UserService) PostsOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/submitted", username)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), resp, nil
+	return l.Posts(), resp, nil
 }
 
 // Comments returns a list of your comments.
@@ -193,47 +167,21 @@ func (s *UserService) Comments(ctx context.Context, opts *ListUserOverviewOption
 // CommentsOf returns a list of the user's comments.
 func (s *UserService) CommentsOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Comment, *Response, error) {
 	path := fmt.Sprintf("user/%s/comments", username)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Comments(), resp, nil
+	return l.Comments(), resp, nil
 }
 
 // Saved returns a list of the user's saved posts and comments.
 func (s *UserService) Saved(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, []*Comment, *Response, error) {
 	path := fmt.Sprintf("user/%s/saved", s.client.Username)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), listing.Comments(), resp, nil
+	return l.Posts(), l.Comments(), resp, nil
 }
 
 // Upvoted returns a list of your upvoted posts.
@@ -245,24 +193,11 @@ func (s *UserService) Upvoted(ctx context.Context, opts *ListUserOverviewOptions
 // The user's votes must be public for this to work (unless the user is you).
 func (s *UserService) UpvotedOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/upvoted", username)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), resp, nil
+	return l.Posts(), resp, nil
 }
 
 // Downvoted returns a list of your downvoted posts.
@@ -274,70 +209,31 @@ func (s *UserService) Downvoted(ctx context.Context, opts *ListUserOverviewOptio
 // The user's votes must be public for this to work (unless the user is you).
 func (s *UserService) DownvotedOf(ctx context.Context, username string, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/downvoted", username)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), resp, nil
+	return l.Posts(), resp, nil
 }
 
 // Hidden returns a list of the user's hidden posts.
 func (s *UserService) Hidden(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/hidden", s.client.Username)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), resp, nil
+	return l.Posts(), resp, nil
 }
 
 // Gilded returns a list of the user's gilded posts.
 func (s *UserService) Gilded(ctx context.Context, opts *ListUserOverviewOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("user/%s/gilded", s.client.Username)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), resp, nil
+	return l.Posts(), resp, nil
 }
 
 // GetFriendship returns relationship details with the specified user.
@@ -503,78 +399,30 @@ func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]*Troph
 // Popular gets the user subreddits with the most activity.
 func (s *UserService) Popular(ctx context.Context, opts *ListOptions) ([]*Subreddit, *Response, error) {
 	path := "users/popular"
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Subreddits(), resp, nil
+	return l.Subreddits(), resp, nil
 }
 
 // New gets the most recently created user subreddits.
 func (s *UserService) New(ctx context.Context, opts *ListUserOverviewOptions) ([]*Subreddit, *Response, error) {
 	path := "users/new"
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Subreddits(), resp, nil
+	return l.Subreddits(), resp, nil
 }
 
 // Search for users.
 // todo: maybe include the sort option? (relevance, activity)
 func (s *UserService) Search(ctx context.Context, query string, opts *ListOptions) ([]*User, *Response, error) {
-	path := "users/search"
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	params := struct {
-		Query string `url:"q"`
-	}{query}
-
-	path, err = addOptions(path, params)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	path := fmt.Sprintf("users/search?q=%s", query)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Users(), resp, nil
+	return l.Users(), resp, nil
 }

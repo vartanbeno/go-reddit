@@ -317,24 +317,11 @@ func (s *WikiService) UpdateSettings(ctx context.Context, subreddit, page string
 // Discussions gets a list of discussions (posts) about the wiki page.
 func (s *WikiService) Discussions(ctx context.Context, subreddit, page string, opts *ListOptions) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("r/%s/wiki/discussions/%s", subreddit, page)
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), resp, nil
+	return l.Posts(), resp, nil
 }
 
 // ToggleVisibility toggles the public visibility of a wiki page revision.

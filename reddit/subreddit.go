@@ -155,31 +155,16 @@ func (s *SubredditTrafficStats) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-// todo: interface{}, seriously?
 func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit string, opts interface{}) ([]*Post, *Response, error) {
 	path := sort
 	if subreddit != "" {
 		path = fmt.Sprintf("r/%s/%s", subreddit, sort)
 	}
-
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Posts(), resp, nil
+	return l.Posts(), resp, nil
 }
 
 // HotPosts returns the hottest posts from the specified subreddit.
@@ -374,34 +359,12 @@ func (s *SubredditService) Unfavorite(ctx context.Context, subreddit string) (*R
 
 // Search for subreddits.
 func (s *SubredditService) Search(ctx context.Context, query string, opts *ListSubredditOptions) ([]*Subreddit, *Response, error) {
-	path := "subreddits/search"
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	params := struct {
-		Query string `url:"q"`
-	}{query}
-
-	path, err = addOptions(path, params)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	path := fmt.Sprintf("subreddits/search?q=%s", query)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Subreddits(), resp, nil
+	return l.Subreddits(), resp, nil
 }
 
 // SearchNames searches for subreddits with names beginning with the query provided.
@@ -464,24 +427,11 @@ func (s *SubredditService) SearchPosts(ctx context.Context, query string, subred
 }
 
 func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts *ListSubredditOptions) ([]*Subreddit, *Response, error) {
-	path, err := addOptions(path, opts)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	l, resp, err := s.client.getListing(ctx, path, opts)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	listing, _ := root.Listing()
-	return listing.Subreddits(), resp, nil
+	return l.Subreddits(), resp, nil
 }
 
 // getSticky returns one of the 2 stickied posts of the subreddit (if they exist).
