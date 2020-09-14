@@ -6,8 +6,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/google/go-querystring/query"
@@ -840,54 +844,6 @@ func (s *SubredditService) UpdateStyleSheet(ctx context.Context, subreddit, styl
 	return s.client.Do(ctx, req, nil)
 }
 
-// RemoveHeaderImage removes the subreddit's custom header image.
-// The call succeeds even if there's no header image.
-func (s *SubredditService) RemoveHeaderImage(ctx context.Context, subreddit string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/delete_sr_header", subreddit)
-
-	form := url.Values{}
-	form.Set("api_type", "json")
-
-	req, err := s.client.NewRequest(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
-}
-
-// RemoveMobileIcon removes the subreddit's custom mobile icon.
-// The call succeeds even if there's no mobile icon.
-func (s *SubredditService) RemoveMobileIcon(ctx context.Context, subreddit string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/delete_sr_icon", subreddit)
-
-	form := url.Values{}
-	form.Set("api_type", "json")
-
-	req, err := s.client.NewRequest(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
-}
-
-// RemoveMobileBanner removes the subreddit's custom mobile banner.
-// The call succeeds even if there's no mobile banner.
-func (s *SubredditService) RemoveMobileBanner(ctx context.Context, subreddit string) (*Response, error) {
-	path := fmt.Sprintf("r/%s/api/delete_sr_banner", subreddit)
-
-	form := url.Values{}
-	form.Set("api_type", "json")
-
-	req, err := s.client.NewRequest(http.MethodPost, path, form)
-	if err != nil {
-		return nil, err
-	}
-
-	return s.client.Do(ctx, req, nil)
-}
-
 // RemoveImage removes an image from the subreddit's custom image set.
 // The call succeeds even if the named image does not exist.
 func (s *SubredditService) RemoveImage(ctx context.Context, subreddit, imageName string) (*Response, error) {
@@ -903,4 +859,146 @@ func (s *SubredditService) RemoveImage(ctx context.Context, subreddit, imageName
 	}
 
 	return s.client.Do(ctx, req, nil)
+}
+
+// RemoveHeader removes the subreddit's current header image.
+// The call succeeds even if there's no header image.
+func (s *SubredditService) RemoveHeader(ctx context.Context, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/delete_sr_header", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// RemoveMobileHeader removes the subreddit's current mobile header.
+// The call succeeds even if there's no mobile header.
+func (s *SubredditService) RemoveMobileHeader(ctx context.Context, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/delete_sr_banner", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// RemoveMobileIcon removes the subreddit's current mobile icon.
+// The call succeeds even if there's no mobile icon.
+func (s *SubredditService) RemoveMobileIcon(ctx context.Context, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/delete_sr_icon", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+func (s *SubredditService) uploadImage(ctx context.Context, subreddit, imagePath, imageType, imageName string) (string, *Response, error) {
+	file, err := os.Open(imagePath)
+	if err != nil {
+		return "", nil, err
+	}
+	defer file.Close()
+
+	form := url.Values{}
+	form.Set("upload_type", imageType)
+	form.Set("name", imageName)
+	form.Set("img_type", "png")
+
+	ext := filepath.Ext(file.Name())
+	if strings.EqualFold(ext, ".jpg") {
+		form.Set("img_type", "jpg")
+	}
+
+	body := new(bytes.Buffer)
+	writer := multipart.NewWriter(body)
+
+	for k := range form {
+		writer.WriteField(k, form.Get(k))
+	}
+
+	part, err := writer.CreateFormFile("file", file.Name())
+	if err != nil {
+		return "", nil, err
+	}
+
+	_, err = io.Copy(part, file)
+	if err != nil {
+		return "", nil, err
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return "", nil, err
+	}
+
+	path := fmt.Sprintf("r/%s/api/upload_sr_img", subreddit)
+	u, err := s.client.BaseURL.Parse(path)
+	if err != nil {
+		return "", nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, u.String(), body)
+	if err != nil {
+		return "", nil, err
+	}
+	req.Header.Set(headerContentType, writer.FormDataContentType())
+
+	root := new(struct {
+		Errors      []string `json:"errors"`
+		ErrorValues []string `json:"errors_values"`
+		ImageSource string   `json:"img_src"`
+	})
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return "", resp, err
+	}
+
+	if len(root.ErrorValues) > 0 {
+		err = fmt.Errorf("could not upload image: %s", strings.Join(root.ErrorValues, "; "))
+		return "", resp, err
+	}
+
+	return root.ImageSource, resp, nil
+}
+
+// UploadImage uploads an image to the subreddit.
+// If an image with the image name already exists, it it replaced.
+// A successful call returns a link to the uploaded image.
+func (s *SubredditService) UploadImage(ctx context.Context, subreddit, imagePath, imageName string) (string, *Response, error) {
+	return s.uploadImage(ctx, subreddit, imagePath, "img", imageName)
+}
+
+// UploadHeader uploads an image to be user as the subreddit's header image.
+// A successful call returns a link to the uploaded image.
+func (s *SubredditService) UploadHeader(ctx context.Context, subreddit, imagePath, imageName string) (string, *Response, error) {
+	return s.uploadImage(ctx, subreddit, imagePath, "header", imageName)
+}
+
+// UploadMobileHeader uploads an image to be user as the subreddit's mobile header image.
+// A successful call returns a link to the uploaded image.
+func (s *SubredditService) UploadMobileHeader(ctx context.Context, subreddit, imagePath, imageName string) (string, *Response, error) {
+	return s.uploadImage(ctx, subreddit, imagePath, "banner", imageName)
+}
+
+// UploadMobileIcon uploads an image to be user as the subreddit's mobile icon.
+// A successful call returns a link to the uploaded image.
+func (s *SubredditService) UploadMobileIcon(ctx context.Context, subreddit, imagePath, imageName string) (string, *Response, error) {
+	return s.uploadImage(ctx, subreddit, imagePath, "icon", imageName)
 }

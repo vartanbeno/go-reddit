@@ -1,9 +1,13 @@
 package reddit
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -1227,7 +1231,27 @@ func TestSubredditService_UpdateStyleSheet(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestSubredditService_RemoveHeaderImage(t *testing.T) {
+func TestSubredditService_RemoveImage(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/delete_sr_img", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("img_name", "testimage")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.RemoveImage(ctx, "testsubreddit", "testimage")
+	require.NoError(t, err)
+}
+
+func TestSubredditService_RemoveHeader(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
@@ -1242,7 +1266,26 @@ func TestSubredditService_RemoveHeaderImage(t *testing.T) {
 		require.Equal(t, form, r.PostForm)
 	})
 
-	_, err := client.Subreddit.RemoveHeaderImage(ctx, "testsubreddit")
+	_, err := client.Subreddit.RemoveHeader(ctx, "testsubreddit")
+	require.NoError(t, err)
+}
+
+func TestSubredditService_RemoveMobileHeader(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/delete_sr_banner", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.RemoveMobileHeader(ctx, "testsubreddit")
 	require.NoError(t, err)
 }
 
@@ -1265,41 +1308,218 @@ func TestSubredditService_RemoveMobileIcon(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestSubredditService_RemoveMobileBanner(t *testing.T) {
+func TestSubredditService_UploadImage(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/r/testsubreddit/api/delete_sr_banner", func(w http.ResponseWriter, r *http.Request) {
+	imageFile, err := ioutil.TempFile("/tmp", "emoji*.png")
+	require.NoError(t, err)
+	defer func() {
+		imageFile.Close()
+		os.Remove(imageFile.Name())
+	}()
+
+	_, err = imageFile.WriteString("this is a test")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/upload_sr_img", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 
-		form := url.Values{}
-		form.Set("api_type", "json")
+		_, file, err := r.FormFile("file")
+		require.NoError(t, err)
 
-		err := r.ParseForm()
+		rdr, err := file.Open()
+		require.NoError(t, err)
+
+		buf := new(bytes.Buffer)
+		_, err = io.Copy(buf, rdr)
+		require.NoError(t, err)
+		require.Equal(t, "this is a test", buf.String())
+
+		form := url.Values{}
+		form.Set("upload_type", "img")
+		form.Set("name", "testname")
+		form.Set("img_type", "png")
+
+		err = r.ParseForm()
 		require.NoError(t, err)
 		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, `{
+			"img_src": "https://example.com/test.png"
+		}`)
 	})
 
-	_, err := client.Subreddit.RemoveMobileBanner(ctx, "testsubreddit")
+	link, _, err := client.Subreddit.UploadImage(ctx, "testsubreddit", imageFile.Name(), "testname")
 	require.NoError(t, err)
+	require.Equal(t, "https://example.com/test.png", link)
 }
 
-func TestSubredditService_RemoveImage(t *testing.T) {
+func TestSubredditService_UploadHeader(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
 
-	mux.HandleFunc("/r/testsubreddit/api/delete_sr_img", func(w http.ResponseWriter, r *http.Request) {
+	imageFile, err := ioutil.TempFile("/tmp", "emoji*.png")
+	require.NoError(t, err)
+	defer func() {
+		imageFile.Close()
+		os.Remove(imageFile.Name())
+	}()
+
+	_, err = imageFile.WriteString("this is a test")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/upload_sr_img", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
 
-		form := url.Values{}
-		form.Set("api_type", "json")
-		form.Set("img_name", "testimage")
+		_, file, err := r.FormFile("file")
+		require.NoError(t, err)
 
-		err := r.ParseForm()
+		rdr, err := file.Open()
+		require.NoError(t, err)
+
+		buf := new(bytes.Buffer)
+		_, err = io.Copy(buf, rdr)
+		require.NoError(t, err)
+		require.Equal(t, "this is a test", buf.String())
+
+		form := url.Values{}
+		form.Set("upload_type", "header")
+		form.Set("name", "testname")
+		form.Set("img_type", "png")
+
+		err = r.ParseForm()
 		require.NoError(t, err)
 		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, `{
+			"img_src": "https://example.com/test.png"
+		}`)
 	})
 
-	_, err := client.Subreddit.RemoveImage(ctx, "testsubreddit", "testimage")
+	link, _, err := client.Subreddit.UploadHeader(ctx, "testsubreddit", imageFile.Name(), "testname")
 	require.NoError(t, err)
+	require.Equal(t, "https://example.com/test.png", link)
+}
+
+func TestSubredditService_UploadMobileHeader(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	imageFile, err := ioutil.TempFile("/tmp", "emoji*.png")
+	require.NoError(t, err)
+	defer func() {
+		imageFile.Close()
+		os.Remove(imageFile.Name())
+	}()
+
+	_, err = imageFile.WriteString("this is a test")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/upload_sr_img", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		_, file, err := r.FormFile("file")
+		require.NoError(t, err)
+
+		rdr, err := file.Open()
+		require.NoError(t, err)
+
+		buf := new(bytes.Buffer)
+		_, err = io.Copy(buf, rdr)
+		require.NoError(t, err)
+		require.Equal(t, "this is a test", buf.String())
+
+		form := url.Values{}
+		form.Set("upload_type", "banner")
+		form.Set("name", "testname")
+		form.Set("img_type", "png")
+
+		err = r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, `{
+			"img_src": "https://example.com/test.png"
+		}`)
+	})
+
+	link, _, err := client.Subreddit.UploadMobileHeader(ctx, "testsubreddit", imageFile.Name(), "testname")
+	require.NoError(t, err)
+	require.Equal(t, "https://example.com/test.png", link)
+}
+
+func TestSubredditService_UploadMobileIcon(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	imageFile, err := ioutil.TempFile("/tmp", "emoji*.jpg")
+	require.NoError(t, err)
+	defer func() {
+		imageFile.Close()
+		os.Remove(imageFile.Name())
+	}()
+
+	_, err = imageFile.WriteString("this is a test")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/api/upload_sr_img", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		_, file, err := r.FormFile("file")
+		require.NoError(t, err)
+
+		rdr, err := file.Open()
+		require.NoError(t, err)
+
+		buf := new(bytes.Buffer)
+		_, err = io.Copy(buf, rdr)
+		require.NoError(t, err)
+		require.Equal(t, "this is a test", buf.String())
+
+		form := url.Values{}
+		form.Set("upload_type", "icon")
+		form.Set("name", "testname")
+		form.Set("img_type", "jpg")
+
+		err = r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+
+		fmt.Fprint(w, `{
+			"img_src": "https://example.com/test.jpg"
+		}`)
+	})
+
+	link, _, err := client.Subreddit.UploadMobileIcon(ctx, "testsubreddit", imageFile.Name(), "testname")
+	require.NoError(t, err)
+	require.Equal(t, "https://example.com/test.jpg", link)
+}
+
+func TestSubredditService_UploadImage_Error(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	imageFile, err := ioutil.TempFile("/tmp", "emoji*.jpg")
+	require.NoError(t, err)
+	defer func() {
+		imageFile.Close()
+		os.Remove(imageFile.Name())
+	}()
+
+	mux.HandleFunc("/r/testsubreddit/api/upload_sr_img", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+		fmt.Fprint(w, `{
+			"errors_values": [
+				"error one",
+				"error two"
+			]
+		}`)
+	})
+
+	_, _, err = client.Subreddit.UploadImage(ctx, "testsubreddit", "does-not-exist.jpg", "testname")
+	require.EqualError(t, err, "open does-not-exist.jpg: no such file or directory")
+
+	_, _, err = client.Subreddit.UploadImage(ctx, "testsubreddit", imageFile.Name(), "testname")
+	require.EqualError(t, err, "could not upload image: error one; error two")
 }
