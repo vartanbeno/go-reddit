@@ -1,0 +1,14 @@
+{
+  "kind": "stylesheet",
+  "data": {
+    "images": [
+      {
+        "url": "http://b.thumbs.redditmedia.com/q5Wb6hTPm2Bd6Of9_xMrTu4n5qgAljJNqtnbE3Tging.png",
+        "link": "url(%%gopher%%)",
+        "name": "gopher"
+      }
+    ],
+    "subreddit_id": "t5_2rc7j",
+    "stylesheet": ".flair-gopher {\n    background: url(%%gopher%%) no-repeat;\n    border: 0;\n    padding: 0;\n    width: 16px;\n    height: 16px;\n}"
+  }
+}

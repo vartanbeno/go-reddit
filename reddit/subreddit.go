@@ -1,6 +1,7 @@
 package reddit
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -111,6 +112,20 @@ type SubredditTrafficStats struct {
 	// This is only available for "day" traffic, not hour and month.
 	// Therefore, it is always 0 by default for hour and month.
 	Subscribers int `json:"subscribers"`
+}
+
+// SubredditImage is an image part of the image set of a subreddit.
+type SubredditImage struct {
+	Name string `json:"name"`
+	Link string `json:"link"`
+	URL  string `json:"url"`
+}
+
+// SubredditStyleSheet contains the subreddit's styling information.
+type SubredditStyleSheet struct {
+	SubredditID string            `json:"subreddit_id"`
+	Images      []*SubredditImage `json:"images"`
+	StyleSheet  string            `json:"stylesheet"`
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -815,4 +830,127 @@ func (s *SubredditService) Traffic(ctx context.Context, subreddit string) ([]*Su
 	}
 
 	return root.Day, root.Hour, root.Month, resp, nil
+}
+
+// StyleSheet returns the subreddit's style sheet, as well as some information about images.
+func (s *SubredditService) StyleSheet(ctx context.Context, subreddit string) (*SubredditStyleSheet, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/stylesheet", subreddit)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(thing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	styleSheet, _ := root.StyleSheet()
+	return styleSheet, resp, nil
+}
+
+// StyleSheetRaw returns the subreddit's style sheet with all comments and newlines stripped.
+func (s *SubredditService) StyleSheetRaw(ctx context.Context, subreddit string) (string, *Response, error) {
+	path := fmt.Sprintf("r/%s/stylesheet", subreddit)
+
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return "", nil, err
+	}
+
+	buf := new(bytes.Buffer)
+	resp, err := s.client.Do(ctx, req, buf)
+	if err != nil {
+		return "", resp, err
+	}
+
+	return buf.String(), resp, nil
+}
+
+// UpdateStyleSheet updates the style sheet of the subreddit.
+// Providing a reason is optional.
+func (s *SubredditService) UpdateStyleSheet(ctx context.Context, subreddit, styleSheet, reason string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/subreddit_stylesheet", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("op", "save")
+	form.Set("stylesheet_contents", styleSheet)
+	if reason != "" {
+		form.Set("reason", reason)
+	}
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// RemoveHeaderImage removes the subreddit's custom header image.
+// The call succeeds even if there's no header image.
+func (s *SubredditService) RemoveHeaderImage(ctx context.Context, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/delete_sr_header", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// RemoveMobileIcon removes the subreddit's custom mobile icon.
+// The call succeeds even if there's no mobile icon.
+func (s *SubredditService) RemoveMobileIcon(ctx context.Context, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/delete_sr_icon", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// RemoveMobileBanner removes the subreddit's custom mobile banner.
+// The call succeeds even if there's no mobile banner.
+func (s *SubredditService) RemoveMobileBanner(ctx context.Context, subreddit string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/delete_sr_banner", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// RemoveImage removes an image from the subreddit's custom image set.
+// The call succeeds even if the named image does not exist.
+func (s *SubredditService) RemoveImage(ctx context.Context, subreddit, imageName string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/delete_sr_img", subreddit)
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("img_name", imageName)
+
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }

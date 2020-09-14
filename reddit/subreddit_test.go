@@ -316,6 +316,24 @@ var expectedMonthTraffic = []*SubredditTrafficStats{
 	{&Timestamp{time.Date(2020, 7, 1, 0, 0, 0, 0, time.UTC)}, 4, 264, 0},
 }
 
+var expectedStyleSheet = &SubredditStyleSheet{
+	SubredditID: "t5_2rc7j",
+	Images: []*SubredditImage{
+		{
+			Name: "gopher",
+			Link: "url(%%gopher%%)",
+			URL:  "http://b.thumbs.redditmedia.com/q5Wb6hTPm2Bd6Of9_xMrTu4n5qgAljJNqtnbE3Tging.png",
+		},
+	},
+	StyleSheet: `.flair-gopher {
+    background: url(%%gopher%%) no-repeat;
+    border: 0;
+    padding: 0;
+    width: 16px;
+    height: 16px;
+}`,
+}
+
 func TestSubredditService_HotPosts(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -1154,4 +1172,134 @@ func TestSubredditService_Traffic(t *testing.T) {
 	require.Equal(t, expectedDayTraffic, dayTraffic)
 	require.Equal(t, expectedHourTraffic, hourTraffic)
 	require.Equal(t, expectedMonthTraffic, monthTraffic)
+}
+
+func TestSubredditService_StyleSheet(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/subreddit/stylesheet.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/about/stylesheet", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	styleSheet, _, err := client.Subreddit.StyleSheet(ctx, "testsubreddit")
+	require.NoError(t, err)
+	require.Equal(t, expectedStyleSheet, styleSheet)
+}
+
+func TestSubredditService_StyleSheetRaw(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/stylesheet", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, "* { box-sizing: border-box; }")
+	})
+
+	styleSheet, _, err := client.Subreddit.StyleSheetRaw(ctx, "testsubreddit")
+	require.NoError(t, err)
+	require.Equal(t, "* { box-sizing: border-box; }", styleSheet)
+}
+
+func TestSubredditService_UpdateStyleSheet(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/subreddit_stylesheet", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("op", "save")
+		form.Set("stylesheet_contents", "* { box-sizing: border-box; }")
+		form.Set("reason", "testreason")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.UpdateStyleSheet(ctx, "testsubreddit", "* { box-sizing: border-box; }", "testreason")
+	require.NoError(t, err)
+}
+
+func TestSubredditService_RemoveHeaderImage(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/delete_sr_header", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.RemoveHeaderImage(ctx, "testsubreddit")
+	require.NoError(t, err)
+}
+
+func TestSubredditService_RemoveMobileIcon(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/delete_sr_icon", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.RemoveMobileIcon(ctx, "testsubreddit")
+	require.NoError(t, err)
+}
+
+func TestSubredditService_RemoveMobileBanner(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/delete_sr_banner", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.RemoveMobileBanner(ctx, "testsubreddit")
+	require.NoError(t, err)
+}
+
+func TestSubredditService_RemoveImage(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/delete_sr_img", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("img_name", "testimage")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.RemoveImage(ctx, "testsubreddit", "testimage")
+	require.NoError(t, err)
 }

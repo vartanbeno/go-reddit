@@ -23,6 +23,7 @@ const (
 	kindWikiPage         = "wikipage"
 	kindWikiPageListing  = "wikipagelisting"
 	kindWikiPageSettings = "wikipagesettings"
+	kindStyleSheet       = "stylesheet"
 )
 
 type anchor interface {
@@ -106,6 +107,8 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new([]string)
 	case kindWikiPageSettings:
 		v = new(WikiPageSettings)
+	case kindStyleSheet:
+		v = new(SubredditStyleSheet)
 	default:
 		return fmt.Errorf("unrecognized kind: %q", t.Kind)
 	}
@@ -203,6 +206,11 @@ func (t *thing) WikiPages() ([]string, bool) {
 
 func (t *thing) WikiPageSettings() (v *WikiPageSettings, ok bool) {
 	v, ok = t.Data.(*WikiPageSettings)
+	return
+}
+
+func (t *thing) StyleSheet() (v *SubredditStyleSheet, ok bool) {
+	v, ok = t.Data.(*SubredditStyleSheet)
 	return
 }
 
