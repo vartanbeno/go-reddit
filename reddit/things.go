@@ -17,6 +17,7 @@ const (
 	kindTrophyList       = "TrophyList"
 	kindUserList         = "UserList"
 	kindMore             = "more"
+	kindLiveThread       = "LiveUpdateEvent"
 	kindModAction        = "modaction"
 	kindMulti            = "LabeledMulti"
 	kindMultiDescription = "LabeledMultiDescription"
@@ -89,6 +90,8 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(Post)
 	case kindSubreddit:
 		v = new(Subreddit)
+	case kindLiveThread:
+		v = new(LiveThread)
 	case kindModAction:
 		v = new(ModAction)
 	case kindMulti:
@@ -149,6 +152,11 @@ func (t *thing) Post() (v *Post, ok bool) {
 
 func (t *thing) Subreddit() (v *Subreddit, ok bool) {
 	v, ok = t.Data.(*Subreddit)
+	return
+}
+
+func (t *thing) LiveThread() (v *LiveThread, ok bool) {
+	v, ok = t.Data.(*LiveThread)
 	return
 }
 

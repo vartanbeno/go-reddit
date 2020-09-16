@@ -71,6 +71,7 @@ type Client struct {
 	Flair      *FlairService
 	Gold       *GoldService
 	Listings   *ListingsService
+	LiveThread *LiveThreadService
 	Message    *MessageService
 	Moderation *ModerationService
 	Multi      *MultiService
@@ -102,6 +103,7 @@ func newClient() *Client {
 	client.Flair = &FlairService{client: client}
 	client.Gold = &GoldService{client: client}
 	client.Listings = &ListingsService{client: client}
+	client.LiveThread = &LiveThreadService{client: client}
 	client.Message = &MessageService{client: client}
 	client.Moderation = &ModerationService{client: client}
 	client.Multi = &MultiService{client: client}

@@ -64,6 +64,7 @@ func testClientServices(t *testing.T, c *Client) {
 		"Flair",
 		"Gold",
 		"Listings",
+		"LiveThread",
 		"Message",
 		"Moderation",
 		"Multi",
