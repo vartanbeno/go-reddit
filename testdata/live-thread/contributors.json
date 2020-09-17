@@ -1,0 +1,19 @@
+{
+  "kind": "UserList",
+  "data": {
+    "children": [
+        {
+          "rel_id": null,
+          "permissions": ["all"],
+          "id": "t2_test1",
+          "name": "test1"
+        },
+        {
+          "rel_id": null,
+          "permissions": ["all"],
+          "id": "t2_test2",
+          "name": "test2"
+        }
+    ]
+  }
+}
