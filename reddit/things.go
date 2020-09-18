@@ -307,14 +307,22 @@ func (l *listing) Multis() []*Multi {
 	return l.things.Multis
 }
 
+func (l *listing) LiveThreads() []*LiveThread {
+	if l == nil {
+		return nil
+	}
+	return l.things.LiveThreads
+}
+
 type things struct {
-	Comments   []*Comment
-	Mores      []*More
-	Users      []*User
-	Posts      []*Post
-	Subreddits []*Subreddit
-	ModActions []*ModAction
-	Multis     []*Multi
+	Comments    []*Comment
+	Mores       []*More
+	Users       []*User
+	Posts       []*Post
+	Subreddits  []*Subreddit
+	ModActions  []*ModAction
+	Multis      []*Multi
+	LiveThreads []*LiveThread
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -345,6 +353,8 @@ func (t *things) add(things ...thing) {
 			t.ModActions = append(t.ModActions, v)
 		case *Multi:
 			t.Multis = append(t.Multis, v)
+		case *LiveThread:
+			t.LiveThreads = append(t.LiveThreads, v)
 		}
 	}
 }

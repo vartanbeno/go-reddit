@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"reflect"
+	"strings"
 
 	"github.com/google/go-querystring/query"
 )
@@ -40,13 +42,13 @@ type LiveThread struct {
 	NSFW         bool `json:"nsfw"`
 }
 
-// LiveThreadCreateRequest represents a request to create a live thread.
-type LiveThreadCreateRequest struct {
+// LiveThreadCreateOrUpdateRequest represents a request to create/update a live thread.
+type LiveThreadCreateOrUpdateRequest struct {
 	// No longer than 120 characters.
-	Title       string `url:"title"`
+	Title       string `url:"title,omitempty"`
 	Description string `url:"description,omitempty"`
 	Resources   string `url:"resources,omitempty"`
-	NSFW        bool   `url:"nsfw,omitempty"`
+	NSFW        *bool  `url:"nsfw,omitempty"`
 }
 
 // LiveThreadContributor is a user that can contribute to a live thread.
@@ -122,6 +124,50 @@ func (c *LiveThreadContributors) unmarshalMany(b []byte) error {
 	return nil
 }
 
+// LiveThreadPermissions are the different permissions contributors have or don't have for a live thread.
+// Read about them here: https://mods.reddithelp.com/hc/en-us/articles/360009381491-User-Management-moderators-and-permissions
+type LiveThreadPermissions struct {
+	All         bool `permission:"all"`
+	Close       bool `permission:"close"`
+	Discussions bool `permission:"discussions"`
+	Edit        bool `permission:"edit"`
+	Manage      bool `permission:"manage"`
+	Settings    bool `permission:"settings"`
+	Update      bool `permission:"update"`
+}
+
+func (p *LiveThreadPermissions) String() (s string) {
+	if p == nil {
+		return "+all"
+	}
+
+	t := reflect.TypeOf(*p)
+	v := reflect.ValueOf(*p)
+
+	for i := 0; i < t.NumField(); i++ {
+		if v.Field(i).Kind() != reflect.Bool {
+			continue
+		}
+
+		permission := t.Field(i).Tag.Get("permission")
+		permitted := v.Field(i).Bool()
+
+		if permitted {
+			s += "+"
+		} else {
+			s += "-"
+		}
+
+		s += permission
+
+		if i != t.NumField()-1 {
+			s += ","
+		}
+	}
+
+	return
+}
+
 // Get information about a live thread.
 func (s *LiveThreadService) Get(ctx context.Context, id string) (*LiveThread, *Response, error) {
 	path := fmt.Sprintf("live/%s/about", id)
@@ -140,10 +186,23 @@ func (s *LiveThreadService) Get(ctx context.Context, id string) (*LiveThread, *R
 	return t, resp, nil
 }
 
+// GetMultiple gets information about multiple live threads.
+func (s *LiveThreadService) GetMultiple(ctx context.Context, ids ...string) ([]*LiveThread, *Response, error) {
+	if len(ids) == 0 {
+		return nil, nil, errors.New("must provide at least 1 id")
+	}
+	path := fmt.Sprintf("api/live/by_id/%s", strings.Join(ids, ","))
+	l, resp, err := s.client.getListing(ctx, path, nil)
+	if err != nil {
+		return nil, resp, err
+	}
+	return l.LiveThreads(), resp, nil
+}
+
 // Create a live thread and get its id.
-func (s *LiveThreadService) Create(ctx context.Context, request *LiveThreadCreateRequest) (string, *Response, error) {
+func (s *LiveThreadService) Create(ctx context.Context, request *LiveThreadCreateOrUpdateRequest) (string, *Response, error) {
 	if request == nil {
-		return "", nil, errors.New("*LiveThreadCreateRequest: cannot be nil")
+		return "", nil, errors.New("*LiveThreadCreateOrUpdateRequest: cannot be nil")
 	}
 
 	form, err := query.Values(request)
@@ -171,6 +230,47 @@ func (s *LiveThreadService) Create(ctx context.Context, request *LiveThreadCreat
 	}
 
 	return root.JSON.Data.ID, resp, nil
+}
+
+// Close the thread permanently, disallowing future updates.
+func (s *LiveThreadService) Close(ctx context.Context, id string) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+
+	path := fmt.Sprintf("api/live/%s/close_thread", id)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Configure the thread.
+// Requires the "settings" permission.
+func (s *LiveThreadService) Configure(ctx context.Context, id string, request *LiveThreadCreateOrUpdateRequest) (*Response, error) {
+	if request == nil {
+		return nil, errors.New("*LiveThreadCreateOrUpdateRequest: cannot be nil")
+	}
+
+	form, err := query.Values(request)
+	if err != nil {
+		return nil, err
+	}
+	form.Set("api_type", "json")
+
+	path := fmt.Sprintf("api/live/%s/edit", id)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	resp, err := s.client.Do(ctx, req, nil)
+	if err != nil {
+		return resp, err
+	}
+
+	return resp, nil
 }
 
 // Contributors gets a list of users that are contributors to the live thread.
@@ -213,6 +313,99 @@ func (s *LiveThreadService) Leave(ctx context.Context, id string) (*Response, er
 	form.Set("api_type", "json")
 
 	path := fmt.Sprintf("api/live/%s/leave_contributor", id)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Invite another user to contribute to the live thread.
+// If permissions is nil, all permissions will be granted.
+// Requires the "manage" permission.
+func (s *LiveThreadService) Invite(ctx context.Context, id, username string, permissions *LiveThreadPermissions) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "liveupdate_contributor_invite")
+	form.Set("permissions", permissions.String())
+
+	path := fmt.Sprintf("/api/live/%s/invite_contributor", id)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Uninvite a user that's been invited to contribute to a live thread via their full ID.
+// Requires the "manage" permission.
+func (s *LiveThreadService) Uninvite(ctx context.Context, threadID, userID string) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", userID)
+
+	path := fmt.Sprintf("/api/live/%s/rm_contributor_invite", threadID)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// SetPermissions sets the permissions for the contributor in the live thread.
+// If permissions is nil, all permissions will be granted.
+// Requires the "manage" permission.
+func (s *LiveThreadService) SetPermissions(ctx context.Context, id, username string, permissions *LiveThreadPermissions) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
+	form.Set("type", "liveupdate_contributor_invite")
+	form.Set("permissions", permissions.String())
+
+	path := fmt.Sprintf("/api/live/%s/set_contributor_permissions", id)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Revoke a user's contributorship via their full ID.
+// Requires the "manage" permission.
+func (s *LiveThreadService) Revoke(ctx context.Context, threadID, userID string) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", userID)
+
+	path := fmt.Sprintf("/api/live/%s/rm_contributor", threadID)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Report the live thread.
+// The reason should be one of:
+// spam, vote-manipulation, personal-information, sexualizing-minors, site-breaking
+func (s *LiveThreadService) Report(ctx context.Context, id, reason string) (*Response, error) {
+	switch reason {
+	case "spam", "vote-manipulation", "personal-information", "sexualizing-minors", "site-breaking":
+	default:
+		return nil, errors.New("invalid reason for reporting live thread: " + reason)
+	}
+
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("type", reason)
+
+	path := fmt.Sprintf("api/live/%s/report", id)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err

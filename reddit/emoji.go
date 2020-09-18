@@ -45,6 +45,7 @@ type EmojiCreateOrUpdateRequest struct {
 }
 
 func (r *EmojiCreateOrUpdateRequest) validate() error {
+	// todo if r == nil { ... }
 	if r.Name == "" {
 		return errors.New("name: cannot be empty")
 	}

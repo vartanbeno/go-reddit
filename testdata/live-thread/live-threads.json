@@ -1,0 +1,61 @@
+{
+  "kind": "Listing",
+  "data": {
+    "modhash": null,
+    "dist": 2,
+    "children": [
+      {
+        "kind": "LiveUpdateEvent",
+        "data": {
+          "total_views": null,
+          "description": "test",
+          "description_html": "&lt;div class=\"md\"&gt;&lt;p&gt;test&lt;/p&gt;\n&lt;/div&gt;",
+          "created": 1600248027.0,
+          "title": "test",
+          "created_utc": 1600219227.0,
+          "button_cta": "",
+          "websocket_url": "wss://ws-078adc7cb2099a9df.wss.redditmedia.com/live/15nevtv8e54dh?m=AQAA7rxiX6EpLYFCFZ0KJD4lVAPaMt0A1z2-xJ1b2dWCmxNIfMwL",
+          "name": "LiveUpdateEvent_15nevtv8e54dh",
+          "is_announcement": false,
+          "state": "live",
+          "announcement_url": "",
+          "nsfw": false,
+          "viewer_count": 6,
+          "num_times_dismissable": 1,
+          "viewer_count_fuzzed": true,
+          "resources_html": "",
+          "id": "15nevtv8e54dh",
+          "resources": "",
+          "icon": ""
+        }
+      },
+      {
+        "kind": "LiveUpdateEvent",
+        "data": {
+          "total_views": null,
+          "description": "test 2",
+          "description_html": "&lt;div class=\"md\"&gt;&lt;p&gt;test 2&lt;/p&gt;\n&lt;/div&gt;",
+          "created": 1600248037.0,
+          "title": "test 2",
+          "created_utc": 1600219237.0,
+          "button_cta": "",
+          "websocket_url": "wss://ws-078adc7cb2099a9df.wss.redditmedia.com/live/15ndkho8e54dh?m=AQAA7rxiX6EpLYFCFZ0KJD4lVAPaMt0A1z2-xJ1b2dWCmxNIfMwL",
+          "name": "LiveUpdateEvent_15ndkho8e54dh",
+          "is_announcement": false,
+          "state": "live",
+          "announcement_url": "",
+          "nsfw": false,
+          "viewer_count": 6,
+          "num_times_dismissable": 1,
+          "viewer_count_fuzzed": true,
+          "resources_html": "",
+          "id": "15ndkho8e54dh",
+          "resources": "",
+          "icon": ""
+        }
+      }
+    ],
+    "after": null,
+    "before": null
+  }
+}
