@@ -221,40 +221,26 @@ func (p *LiveThreadPermissions) String() (s string) {
 // This returns an empty 204 response if no thread is currently featured.
 func (s *LiveThreadService) Now(ctx context.Context) (*LiveThread, *Response, error) {
 	path := "api/live/happening_now"
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		if err == io.EOF && resp != nil && resp.StatusCode == http.StatusNoContent {
 			return nil, resp, nil
 		}
 		return nil, resp, err
 	}
-
-	t, _ := root.LiveThread()
-	return t, resp, nil
+	liveThread, _ := t.LiveThread()
+	return liveThread, resp, nil
 }
 
 // Get information about a live thread.
 func (s *LiveThreadService) Get(ctx context.Context, id string) (*LiveThread, *Response, error) {
 	path := fmt.Sprintf("live/%s/about", id)
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	t, _ := root.LiveThread()
-	return t, resp, nil
+	liveThread, _ := t.LiveThread()
+	return liveThread, resp, nil
 }
 
 // GetMultiple gets information about multiple live threads.

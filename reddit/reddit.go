@@ -398,7 +398,9 @@ func CheckResponse(r *http.Response) error {
 	return errorResponse
 }
 
-func (c *Client) getListing(ctx context.Context, path string, opts interface{}) (*listing, *Response, error) {
+// A lot of Reddit's responses returns a "thing": { "kind": "...", "data": {...} }
+// So this is just a nice convenient method to have.
+func (c *Client) getThing(ctx context.Context, path string, opts interface{}) (*thing, *Response, error) {
 	path, err := addOptions(path, opts)
 	if err != nil {
 		return nil, nil, err
@@ -409,14 +411,22 @@ func (c *Client) getListing(ctx context.Context, path string, opts interface{}) 
 		return nil, nil, err
 	}
 
-	root := new(thing)
-	resp, err := c.Do(ctx, req, root)
+	t := new(thing)
+	resp, err := c.Do(ctx, req, t)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	listing, _ := root.Listing()
-	return listing, resp, nil
+	return t, resp, nil
+}
+
+func (c *Client) getListing(ctx context.Context, path string, opts interface{}) (*listing, *Response, error) {
+	t, resp, err := c.getThing(ctx, path, opts)
+	if err != nil {
+		return nil, resp, err
+	}
+	l, _ := t.Listing()
+	return l, resp, nil
 }
 
 // ListOptions specifies the optional parameters to various API calls that return a listing.

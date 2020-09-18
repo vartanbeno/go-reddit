@@ -236,19 +236,11 @@ func (s *AccountService) Info(ctx context.Context) (*User, *Response, error) {
 // Karma returns a breakdown of your karma per subreddit.
 func (s *AccountService) Karma(ctx context.Context) ([]*SubredditKarma, *Response, error) {
 	path := "api/v1/me/karma"
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	karma, _ := root.Karma()
+	karma, _ := t.Karma()
 	return karma, resp, nil
 }
 
@@ -291,19 +283,11 @@ func (s *AccountService) UpdateSettings(ctx context.Context, settings *Settings)
 // Trophies returns a list of your trophies.
 func (s *AccountService) Trophies(ctx context.Context) ([]*Trophy, *Response, error) {
 	path := "api/v1/me/trophies"
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	trophies, _ := root.TrophyList()
+	trophies, _ := t.TrophyList()
 	return trophies, resp, nil
 }
 

@@ -225,18 +225,12 @@ func (s *SubredditService) Get(ctx context.Context, name string) (*Subreddit, *R
 	}
 
 	path := fmt.Sprintf("r/%s/about", name)
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	sr, _ := root.Subreddit()
+	sr, _ := t.Subreddit()
 	return sr, resp, nil
 }
 
@@ -410,24 +404,13 @@ func (s *SubredditService) SearchPosts(ctx context.Context, query string, subred
 		RestrictSubreddits bool   `url:"restrict_sr,omitempty"`
 	}{query, notAll}
 
-	path, err = addOptions(path, params)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, params)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	listing, _ := root.Listing()
-	return listing.Posts(), resp, nil
+	l, _ := t.Listing()
+	return l.Posts(), resp, nil
 }
 
 func (s *SubredditService) getSubreddits(ctx context.Context, path string, opts *ListSubredditOptions) ([]*Subreddit, *Response, error) {
@@ -789,19 +772,11 @@ func (s *SubredditService) Traffic(ctx context.Context, subreddit string) ([]*Su
 // StyleSheet returns the subreddit's style sheet, as well as some information about images.
 func (s *SubredditService) StyleSheet(ctx context.Context, subreddit string) (*SubredditStyleSheet, *Response, error) {
 	path := fmt.Sprintf("r/%s/about/stylesheet", subreddit)
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	styleSheet, _ := root.StyleSheet()
+	styleSheet, _ := t.StyleSheet()
 	return styleSheet, resp, nil
 }
 

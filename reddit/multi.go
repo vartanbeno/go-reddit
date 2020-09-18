@@ -100,14 +100,6 @@ type MultiCreateOrUpdateRequest struct {
 	Visibility string `json:"visibility,omitempty"`
 }
 
-// Form parameterizes the fields and returns the form.
-func (r *MultiCreateOrUpdateRequest) Form() url.Values {
-	byteValue, _ := json.Marshal(r)
-	form := url.Values{}
-	form.Set("model", string(byteValue))
-	return form
-}
-
 type rootMultiDescription struct {
 	Body string `json:"body_md"`
 }
@@ -115,18 +107,11 @@ type rootMultiDescription struct {
 // Get the multireddit from its url path.
 func (s *MultiService) Get(ctx context.Context, multiPath string) (*Multi, *Response, error) {
 	path := fmt.Sprintf("api/multi/%s", multiPath)
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	multi, _ := root.Multi()
+	multi, _ := t.Multi()
 	return multi, resp, nil
 }
 
@@ -198,8 +183,16 @@ func (s *MultiService) Create(ctx context.Context, createRequest *MultiCreateOrU
 		return nil, nil, errors.New("createRequest: cannot be nil")
 	}
 
+	byteValue, err := json.Marshal(createRequest)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	form := url.Values{}
+	form.Set("model", string(byteValue))
+
 	path := "api/multi"
-	req, err := s.client.NewRequest(http.MethodPost, path, createRequest.Form())
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -221,8 +214,16 @@ func (s *MultiService) Update(ctx context.Context, multiPath string, updateReque
 		return nil, nil, errors.New("updateRequest: cannot be nil")
 	}
 
+	byteValue, err := json.Marshal(updateRequest)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	form := url.Values{}
+	form.Set("model", string(byteValue))
+
 	path := fmt.Sprintf("api/multi/%s", multiPath)
-	req, err := s.client.NewRequest(http.MethodPut, path, updateRequest.Form())
+	req, err := s.client.NewRequest(http.MethodPut, path, form)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -250,29 +251,20 @@ func (s *MultiService) Delete(ctx context.Context, multiPath string) (*Response,
 // Description gets a multireddit's description.
 func (s *MultiService) Description(ctx context.Context, multiPath string) (string, *Response, error) {
 	path := fmt.Sprintf("api/multi/%s/description", multiPath)
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return "", nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return "", resp, err
 	}
-
-	multiDescription, _ := root.MultiDescription()
+	multiDescription, _ := t.MultiDescription()
 	return multiDescription, resp, nil
 }
 
 // UpdateDescription updates a multireddit's description.
 func (s *MultiService) UpdateDescription(ctx context.Context, multiPath string, description string) (string, *Response, error) {
-	path := fmt.Sprintf("api/multi/%s/description", multiPath)
-
 	form := url.Values{}
 	form.Set("model", fmt.Sprintf(`{"body_md":"%s"}`, description))
 
+	path := fmt.Sprintf("api/multi/%s/description", multiPath)
 	req, err := s.client.NewRequest(http.MethodPut, path, form)
 	if err != nil {
 		return "", nil, err

@@ -61,18 +61,11 @@ type Trophy struct {
 // Get returns information about the user.
 func (s *UserService) Get(ctx context.Context, username string) (*User, *Response, error) {
 	path := fmt.Sprintf("user/%s/about", username)
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	user, _ := root.User()
+	user, _ := t.User()
 	return user, resp, nil
 }
 
@@ -380,19 +373,11 @@ func (s *UserService) Trophies(ctx context.Context) ([]*Trophy, *Response, error
 // TrophiesOf returns a list of the specified user's trophies.
 func (s *UserService) TrophiesOf(ctx context.Context, username string) ([]*Trophy, *Response, error) {
 	path := fmt.Sprintf("api/v1/user/%s/trophies", username)
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	trophies, _ := root.TrophyList()
+	trophies, _ := t.TrophyList()
 	return trophies, resp, nil
 }
 

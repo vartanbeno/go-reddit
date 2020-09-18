@@ -192,23 +192,12 @@ func (s *WikiService) PageRevision(ctx context.Context, subreddit, page, revisio
 		RevisionID string `url:"v,omitempty"`
 	}{revisionID}
 
-	path, err := addOptions(path, params)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, params)
 	if err != nil {
 		return nil, resp, err
 	}
 
-	wikiPage, _ := root.WikiPage()
+	wikiPage, _ := t.WikiPage()
 	return wikiPage, resp, nil
 }
 
@@ -216,19 +205,11 @@ func (s *WikiService) PageRevision(ctx context.Context, subreddit, page, revisio
 // Returns 403 Forbidden if the wiki is disabled.
 func (s *WikiService) Pages(ctx context.Context, subreddit string) ([]string, *Response, error) {
 	path := fmt.Sprintf("r/%s/wiki/pages", subreddit)
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	wikiPages, _ := root.WikiPages()
+	wikiPages, _ := t.WikiPages()
 	return wikiPages, resp, nil
 }
 
@@ -271,19 +252,11 @@ func (s *WikiService) Revert(ctx context.Context, subreddit, page, revisionID st
 // Settings gets the subreddit's wiki page's settings.
 func (s *WikiService) Settings(ctx context.Context, subreddit, page string) (*WikiPageSettings, *Response, error) {
 	path := fmt.Sprintf("r/%s/wiki/settings/%s", subreddit, page)
-
-	req, err := s.client.NewRequest(http.MethodGet, path, nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	root := new(thing)
-	resp, err := s.client.Do(ctx, req, root)
+	t, resp, err := s.client.getThing(ctx, path, nil)
 	if err != nil {
 		return nil, resp, err
 	}
-
-	settings, _ := root.WikiPageSettings()
+	settings, _ := t.WikiPageSettings()
 	return settings, resp, nil
 }
 
