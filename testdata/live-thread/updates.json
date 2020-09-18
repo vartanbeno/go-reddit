@@ -11,7 +11,18 @@
           "name": "LiveUpdate_5e46cd94-f968-11ea-9a6a-0e1933241e7d",
           "mobile_embeds": [],
           "author": "testuser1",
-          "embeds": [],
+          "embeds": [
+            {
+              "url": "https://example.com",
+              "width": 485,
+              "height": 0
+            },
+            {
+              "url": "https://reddit.com",
+              "width": 485,
+              "height": 0
+            }
+          ],
           "created": 1600432524.0,
           "created_utc": 1600403724.0,
           "body_html": "&lt;div class=\"md\"&gt;&lt;p&gt;test 2&lt;/p&gt;\n&lt;/div&gt;",

@@ -36,7 +36,7 @@ type LiveThread struct {
 	ViewerCount       int    `json:"viewer_count"`
 	ViewerCountFuzzed bool   `json:"viewer_count_fuzzed"`
 
-	// Empty when a list thread has ended.
+	// Empty when a live thread has ended.
 	WebSocketURL string `json:"websocket_url,omitempty"`
 
 	Announcement bool `json:"is_announcement"`
@@ -50,10 +50,44 @@ type LiveThreadUpdate struct {
 	Author  string     `json:"author,omitempty"`
 	Created *Timestamp `json:"created_utc,omitempty"`
 
-	Body string `json:"body,omitempty"`
-	// todo: add "embeds" field?
+	Body         string   `json:"body,omitempty"`
+	EmbeddedURLs []string `json:"embeds,omitempty"`
+	Stricken     bool     `json:"stricken"`
+}
 
-	Stricken bool `json:"stricken"`
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (u *LiveThreadUpdate) UnmarshalJSON(b []byte) error {
+	root := new(struct {
+		ID      string     `json:"id"`
+		FullID  string     `json:"name"`
+		Author  string     `json:"author"`
+		Created *Timestamp `json:"created_utc"`
+
+		Body         string `json:"body"`
+		EmbeddedURLs []struct {
+			URL string `json:"url"`
+		} `json:"embeds"`
+		Stricken bool `json:"stricken"`
+	})
+
+	err := json.Unmarshal(b, root)
+	if err != nil {
+		return err
+	}
+
+	u.ID = root.ID
+	u.FullID = root.FullID
+	u.Author = root.Author
+	u.Created = root.Created
+
+	u.Body = root.Body
+	u.Stricken = root.Stricken
+
+	for _, eu := range root.EmbeddedURLs {
+		u.EmbeddedURLs = append(u.EmbeddedURLs, eu.URL)
+	}
+
+	return nil
 }
 
 // LiveThreadCreateOrUpdateRequest represents a request to create/update a live thread.
@@ -432,7 +466,6 @@ func (s *LiveThreadService) Accept(ctx context.Context, id string) (*Response, e
 }
 
 // Leave the live thread by abdicating your status as contributor.
-// todo: test as the author who leaves the thread.
 func (s *LiveThreadService) Leave(ctx context.Context, id string) (*Response, error) {
 	form := url.Values{}
 	form.Set("api_type", "json")

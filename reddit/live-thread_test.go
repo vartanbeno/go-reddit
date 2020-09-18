@@ -75,7 +75,8 @@ var expectedLiveThreadUpdates = []*LiveThreadUpdate{
 		Author:  "testuser1",
 		Created: &Timestamp{time.Date(2020, 9, 18, 4, 35, 24, 0, time.UTC)},
 
-		Body: "test 2",
+		Body:         "test 2",
+		EmbeddedURLs: []string{"https://example.com", "https://reddit.com"},
 
 		Stricken: true,
 	},
