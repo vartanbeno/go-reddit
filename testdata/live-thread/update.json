@@ -1,0 +1,26 @@
+{
+  "kind": "Listing",
+  "data": {
+    "modhash": null,
+    "dist": null,
+    "children": [
+      {
+        "kind": "LiveUpdate",
+        "data": {
+          "body": "test 1",
+          "name": "LiveUpdate_fc44f204-f964-11ea-b148-0e2e56a0425f",
+          "mobile_embeds": [],
+          "author": "testuser1",
+          "embeds": [],
+          "created": 1600431071.0,
+          "created_utc": 1600402271.0,
+          "body_html": "&lt;div class=\"md\"&gt;&lt;p&gt;test 1&lt;/p&gt;\n&lt;/div&gt;",
+          "stricken": true,
+          "id": "fc44f204-f964-11ea-b148-0e2e56a0425f"
+        }
+      }
+    ],
+    "after": null,
+    "before": null
+  }
+}

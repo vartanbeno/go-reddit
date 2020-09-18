@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 	"reflect"
@@ -40,6 +41,19 @@ type LiveThread struct {
 
 	Announcement bool `json:"is_announcement"`
 	NSFW         bool `json:"nsfw"`
+}
+
+// LiveThreadUpdate is an update in a live thread.
+type LiveThreadUpdate struct {
+	ID      string     `json:"id,omitempty"`
+	FullID  string     `json:"name,omitempty"`
+	Author  string     `json:"author,omitempty"`
+	Created *Timestamp `json:"created_utc,omitempty"`
+
+	Body string `json:"body,omitempty"`
+	// todo: add "embeds" field?
+
+	Stricken bool `json:"stricken"`
 }
 
 // LiveThreadCreateOrUpdateRequest represents a request to create/update a live thread.
@@ -133,7 +147,8 @@ type LiveThreadPermissions struct {
 	Edit        bool `permission:"edit"`
 	Manage      bool `permission:"manage"`
 	Settings    bool `permission:"settings"`
-	Update      bool `permission:"update"`
+	// Posting updates to the thread.
+	Update bool `permission:"update"`
 }
 
 func (p *LiveThreadPermissions) String() (s string) {
@@ -168,6 +183,28 @@ func (p *LiveThreadPermissions) String() (s string) {
 	return
 }
 
+// Now gets information about the currently featured live thread.
+// This returns an empty 204 response if no thread is currently featured.
+func (s *LiveThreadService) Now(ctx context.Context) (*LiveThread, *Response, error) {
+	path := "api/live/happening_now"
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(thing)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		if err == io.EOF && resp != nil && resp.StatusCode == http.StatusNoContent {
+			return nil, resp, nil
+		}
+		return nil, resp, err
+	}
+
+	t, _ := root.LiveThread()
+	return t, resp, nil
+}
+
 // Get information about a live thread.
 func (s *LiveThreadService) Get(ctx context.Context, id string) (*LiveThread, *Response, error) {
 	path := fmt.Sprintf("live/%s/about", id)
@@ -197,6 +234,94 @@ func (s *LiveThreadService) GetMultiple(ctx context.Context, ids ...string) ([]*
 		return nil, resp, err
 	}
 	return l.LiveThreads(), resp, nil
+}
+
+// Update the live thread by posting an update to it.
+// Requires the "update" permission.
+func (s *LiveThreadService) Update(ctx context.Context, id, text string) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("body", text)
+
+	path := fmt.Sprintf("/api/live/%s/update", id)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Updates gets a list of updates posted in the live thread.
+func (s *LiveThreadService) Updates(ctx context.Context, id string, opts *ListOptions) ([]*LiveThreadUpdate, *Response, error) {
+	path := fmt.Sprintf("live/%s", id)
+	l, resp, err := s.client.getListing(ctx, path, opts)
+	if err != nil {
+		return nil, resp, err
+	}
+	return l.LiveThreadUpdates(), resp, nil
+}
+
+// UpdateByID gets a specific update in the live thread by its id.
+// The ID of the update is the "short" one, i.e. the one that doesn't start with "LiveUpdate_".
+func (s *LiveThreadService) UpdateByID(ctx context.Context, threadID, updateID string) (*LiveThreadUpdate, *Response, error) {
+	path := fmt.Sprintf("live/%s/updates/%s", threadID, updateID)
+
+	// this endpoint returns a listing
+	l, resp, err := s.client.getListing(ctx, path, nil)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	var update *LiveThreadUpdate
+	updates := l.LiveThreadUpdates()
+	if len(updates) > 0 {
+		update = updates[0]
+	}
+
+	return update, resp, nil
+}
+
+// Discussions gets a list of discussions (posts) about the live thread.
+func (s *LiveThreadService) Discussions(ctx context.Context, id string, opts *ListOptions) ([]*Post, *Response, error) {
+	path := fmt.Sprintf("live/%s/discussions", id)
+	l, resp, err := s.client.getListing(ctx, path, opts)
+	if err != nil {
+		return nil, resp, err
+	}
+	return l.Posts(), resp, nil
+}
+
+// Strike (mark incorrect and cross out) the content of an update.
+// You must either be the author of the update or have the "edit" permission.
+func (s *LiveThreadService) Strike(ctx context.Context, threadID, updateID string) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", updateID)
+
+	path := fmt.Sprintf("api/live/%s/strike_update", threadID)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Delete an update from the live thread.
+// You must either be the author of the update or have the "edit" permission.
+func (s *LiveThreadService) Delete(ctx context.Context, threadID, updateID string) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("id", updateID)
+
+	path := fmt.Sprintf("api/live/%s/delete_update", threadID)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
 }
 
 // Create a live thread and get its id.
@@ -363,6 +488,25 @@ func (s *LiveThreadService) SetPermissions(ctx context.Context, id, username str
 	form := url.Values{}
 	form.Set("api_type", "json")
 	form.Set("name", username)
+	form.Set("type", "liveupdate_contributor")
+	form.Set("permissions", permissions.String())
+
+	path := fmt.Sprintf("/api/live/%s/set_contributor_permissions", id)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// SetPermissionsForInvite sets the permissions for a contributor who's yet to accept/refuse their invite.
+// If permissions is nil, all permissions will be granted.
+// Requires the "manage" permission.
+func (s *LiveThreadService) SetPermissionsForInvite(ctx context.Context, id, username string, permissions *LiveThreadPermissions) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("name", username)
 	form.Set("type", "liveupdate_contributor_invite")
 	form.Set("permissions", permissions.String())
 
@@ -383,6 +527,38 @@ func (s *LiveThreadService) Revoke(ctx context.Context, threadID, userID string)
 	form.Set("id", userID)
 
 	path := fmt.Sprintf("/api/live/%s/rm_contributor", threadID)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// HideDiscussion hides a linked post from the live thread's discussion sidebar.
+// The postID should be the base36 ID of the post, i.e. not its full id.
+func (s *LiveThreadService) HideDiscussion(ctx context.Context, threadID, postID string) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("link", postID)
+
+	path := fmt.Sprintf("/api/live/%s/hide_discussion", threadID)
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// UnhideDiscussion unhides a linked post from the live thread's discussion sidebar.
+// The postID should be the base36 ID of the post, i.e. not its full id.
+func (s *LiveThreadService) UnhideDiscussion(ctx context.Context, threadID, postID string) (*Response, error) {
+	form := url.Values{}
+	form.Set("api_type", "json")
+	form.Set("link", postID)
+
+	path := fmt.Sprintf("/api/live/%s/unhide_discussion", threadID)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err

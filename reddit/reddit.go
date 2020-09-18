@@ -322,12 +322,12 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 		if w, ok := v.(io.Writer); ok {
 			_, err = io.Copy(w, response.Body)
 			if err != nil {
-				return nil, err
+				return response, err
 			}
 		} else {
 			err = json.NewDecoder(response.Body).Decode(v)
 			if err != nil {
-				return nil, err
+				return response, err
 			}
 		}
 

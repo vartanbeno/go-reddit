@@ -18,6 +18,7 @@ const (
 	kindUserList         = "UserList"
 	kindMore             = "more"
 	kindLiveThread       = "LiveUpdateEvent"
+	kindLiveThreadUpdate = "LiveUpdate"
 	kindModAction        = "modaction"
 	kindMulti            = "LabeledMulti"
 	kindMultiDescription = "LabeledMultiDescription"
@@ -92,6 +93,8 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(Subreddit)
 	case kindLiveThread:
 		v = new(LiveThread)
+	case kindLiveThreadUpdate:
+		v = new(LiveThreadUpdate)
 	case kindModAction:
 		v = new(ModAction)
 	case kindMulti:
@@ -157,6 +160,11 @@ func (t *thing) Subreddit() (v *Subreddit, ok bool) {
 
 func (t *thing) LiveThread() (v *LiveThread, ok bool) {
 	v, ok = t.Data.(*LiveThread)
+	return
+}
+
+func (t *thing) LiveThreadUpdate() (v *LiveThreadUpdate, ok bool) {
+	v, ok = t.Data.(*LiveThreadUpdate)
 	return
 }
 
@@ -314,15 +322,23 @@ func (l *listing) LiveThreads() []*LiveThread {
 	return l.things.LiveThreads
 }
 
+func (l *listing) LiveThreadUpdates() []*LiveThreadUpdate {
+	if l == nil {
+		return nil
+	}
+	return l.things.LiveThreadUpdates
+}
+
 type things struct {
-	Comments    []*Comment
-	Mores       []*More
-	Users       []*User
-	Posts       []*Post
-	Subreddits  []*Subreddit
-	ModActions  []*ModAction
-	Multis      []*Multi
-	LiveThreads []*LiveThread
+	Comments          []*Comment
+	Mores             []*More
+	Users             []*User
+	Posts             []*Post
+	Subreddits        []*Subreddit
+	ModActions        []*ModAction
+	Multis            []*Multi
+	LiveThreads       []*LiveThread
+	LiveThreadUpdates []*LiveThreadUpdate
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -355,6 +371,8 @@ func (t *things) add(things ...thing) {
 			t.Multis = append(t.Multis, v)
 		case *LiveThread:
 			t.LiveThreads = append(t.LiveThreads, v)
+		case *LiveThreadUpdate:
+			t.LiveThreadUpdates = append(t.LiveThreadUpdates, v)
 		}
 	}
 }
