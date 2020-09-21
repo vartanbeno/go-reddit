@@ -32,7 +32,7 @@ func TestGoldService_Give(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Gold.Give(ctx, "testuser", 0)

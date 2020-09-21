@@ -87,7 +87,7 @@ func TestModerationService_AcceptInvite(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
@@ -108,7 +108,7 @@ func TestModerationService_Approve(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Moderation.Approve(ctx, "t3_test")
@@ -128,7 +128,7 @@ func TestModerationService_Remove(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Moderation.Remove(ctx, "t3_test")
@@ -148,7 +148,7 @@ func TestModerationService_RemoveSpam(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Moderation.RemoveSpam(ctx, "t3_test")
@@ -167,7 +167,7 @@ func TestModerationService_Leave(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Moderation.Leave(ctx, "t5_test")
@@ -186,7 +186,7 @@ func TestModerationService_LeaveContributor(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Moderation.LeaveContributor(ctx, "t5_test")

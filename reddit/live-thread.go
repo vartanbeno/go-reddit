@@ -263,7 +263,7 @@ func (s *LiveThreadService) Update(ctx context.Context, id, text string) (*Respo
 	form.Set("api_type", "json")
 	form.Set("body", text)
 
-	path := fmt.Sprintf("/api/live/%s/update", id)
+	path := fmt.Sprintf("api/live/%s/update", id)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
@@ -475,7 +475,7 @@ func (s *LiveThreadService) Invite(ctx context.Context, id, username string, per
 	form.Set("type", "liveupdate_contributor_invite")
 	form.Set("permissions", permissions.String())
 
-	path := fmt.Sprintf("/api/live/%s/invite_contributor", id)
+	path := fmt.Sprintf("api/live/%s/invite_contributor", id)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
@@ -491,7 +491,7 @@ func (s *LiveThreadService) Uninvite(ctx context.Context, threadID, userID strin
 	form.Set("api_type", "json")
 	form.Set("id", userID)
 
-	path := fmt.Sprintf("/api/live/%s/rm_contributor_invite", threadID)
+	path := fmt.Sprintf("api/live/%s/rm_contributor_invite", threadID)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
@@ -510,7 +510,7 @@ func (s *LiveThreadService) SetPermissions(ctx context.Context, id, username str
 	form.Set("type", "liveupdate_contributor")
 	form.Set("permissions", permissions.String())
 
-	path := fmt.Sprintf("/api/live/%s/set_contributor_permissions", id)
+	path := fmt.Sprintf("api/live/%s/set_contributor_permissions", id)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
@@ -529,7 +529,7 @@ func (s *LiveThreadService) SetPermissionsForInvite(ctx context.Context, id, use
 	form.Set("type", "liveupdate_contributor_invite")
 	form.Set("permissions", permissions.String())
 
-	path := fmt.Sprintf("/api/live/%s/set_contributor_permissions", id)
+	path := fmt.Sprintf("api/live/%s/set_contributor_permissions", id)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
@@ -545,7 +545,7 @@ func (s *LiveThreadService) Revoke(ctx context.Context, threadID, userID string)
 	form.Set("api_type", "json")
 	form.Set("id", userID)
 
-	path := fmt.Sprintf("/api/live/%s/rm_contributor", threadID)
+	path := fmt.Sprintf("api/live/%s/rm_contributor", threadID)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
@@ -561,7 +561,7 @@ func (s *LiveThreadService) HideDiscussion(ctx context.Context, threadID, postID
 	form.Set("api_type", "json")
 	form.Set("link", postID)
 
-	path := fmt.Sprintf("/api/live/%s/hide_discussion", threadID)
+	path := fmt.Sprintf("api/live/%s/hide_discussion", threadID)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err
@@ -577,7 +577,7 @@ func (s *LiveThreadService) UnhideDiscussion(ctx context.Context, threadID, post
 	form.Set("api_type", "json")
 	form.Set("link", postID)
 
-	path := fmt.Sprintf("/api/live/%s/unhide_discussion", threadID)
+	path := fmt.Sprintf("api/live/%s/unhide_discussion", threadID)
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {
 		return nil, err

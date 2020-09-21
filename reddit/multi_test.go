@@ -112,7 +112,7 @@ func TestMultiService_Copy(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
@@ -249,7 +249,7 @@ func TestMultiService_UpdateDescription(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
@@ -271,7 +271,7 @@ func TestMultiService_AddSubreddit(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Multi.AddSubreddit(ctx, "user/testuser/m/testmulti", "golang")

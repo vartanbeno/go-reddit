@@ -297,7 +297,7 @@ func TestAccountService_AddTrusted(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Account.AddTrusted(ctx, "test123")
@@ -316,7 +316,7 @@ func TestAccountService_RemoveTrusted(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Account.RemoveTrusted(ctx, "test123")

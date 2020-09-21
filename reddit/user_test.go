@@ -781,7 +781,7 @@ func TestUserService_Block(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
@@ -806,7 +806,7 @@ func TestUserService_BlockByID(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
@@ -832,7 +832,7 @@ func TestUserService_Unblock(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.User.Unblock(ctx, "test123")
@@ -855,7 +855,7 @@ func TestUserService_UnblockByID(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.User.UnblockByID(ctx, "abc123")

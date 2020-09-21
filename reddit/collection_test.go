@@ -138,7 +138,7 @@ func TestCollectionService_Create(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
@@ -167,7 +167,7 @@ func TestCollectionService_Delete(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.Delete(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
@@ -187,7 +187,7 @@ func TestCollectionService_AddPost(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.AddPost(ctx, "t3_hs03f3", "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
@@ -207,7 +207,7 @@ func TestCollectionService_RemovePost(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.RemovePost(ctx, "t3_hs03f3", "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
@@ -227,7 +227,7 @@ func TestCollectionService_ReorderPosts(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.ReorderPosts(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7", "t3_hs0cyh", "t3_hqrg8s", "t3_hs03f3")
@@ -247,7 +247,7 @@ func TestCollectionService_UpdateTitle(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.UpdateTitle(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7", "Test Title")
@@ -267,7 +267,7 @@ func TestCollectionService_UpdateDescription(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.UpdateDescription(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7", "Test Description")
@@ -287,7 +287,7 @@ func TestCollectionService_UpdateLayoutTimeline(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.UpdateLayoutTimeline(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
@@ -307,7 +307,7 @@ func TestCollectionService_UpdateLayoutGallery(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.UpdateLayoutGallery(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
@@ -327,7 +327,7 @@ func TestCollectionService_Follow(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.Follow(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")
@@ -347,7 +347,7 @@ func TestCollectionService_Unfollow(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Collection.Unfollow(ctx, "37f1e52d-7ec9-466b-b4cc-59e86e071ed7")

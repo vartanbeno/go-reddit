@@ -70,7 +70,7 @@ func TestMessageService_Read(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Message.Read(ctx)
@@ -92,7 +92,7 @@ func TestMessageService_Unread(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Message.Unread(ctx)
@@ -114,7 +114,7 @@ func TestMessageService_Block(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Message.Block(ctx, "test")
@@ -133,7 +133,7 @@ func TestMessageService_Collapse(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Message.Collapse(ctx)
@@ -155,7 +155,7 @@ func TestMessageService_Uncollapse(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Message.Uncollapse(ctx)
@@ -177,7 +177,7 @@ func TestMessageService_Delete(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Message.Delete(ctx, "test")
@@ -200,7 +200,7 @@ func TestMessageService_Send(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Message.Send(ctx, nil)

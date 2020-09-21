@@ -631,7 +631,7 @@ func TestSubredditService_Subscribe(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Subreddit.Subscribe(ctx, "test", "golang", "nba")
@@ -651,7 +651,7 @@ func TestSubredditService_SubscribeByID(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Subreddit.SubscribeByID(ctx, "t5_test1", "t5_test2", "t5_test3")
@@ -671,7 +671,7 @@ func TestSubredditService_Unsubscribe(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Subreddit.Unsubscribe(ctx, "test", "golang", "nba")
@@ -691,7 +691,7 @@ func TestSubredditService_UnsubscribeByID(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Subreddit.UnsubscribeByID(ctx, "t5_test1", "t5_test2", "t5_test3")
@@ -712,7 +712,7 @@ func TestSubredditService_Favorite(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Subreddit.Favorite(ctx, "testsubreddit")
@@ -733,7 +733,7 @@ func TestSubredditService_Unfavorite(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Subreddit.Unfavorite(ctx, "testsubreddit")

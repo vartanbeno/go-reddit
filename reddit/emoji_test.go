@@ -88,7 +88,7 @@ func TestEmojiService_SetSize(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Emoji.SetSize(ctx, "testsubreddit", 20, 20)
@@ -106,7 +106,7 @@ func TestEmojiService_DisableCustomSize(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Emoji.DisableCustomSize(ctx, "testsubreddit")
@@ -142,7 +142,7 @@ func TestEmojiService_Upload(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 
 		fmt.Fprint(w, blob)
 	})
@@ -168,7 +168,7 @@ func TestEmojiService_Upload(t *testing.T) {
 		// for some reason this has to come after the FormFile call
 		err = r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	mux.HandleFunc("/api/v1/testsubreddit/emoji.json", func(w http.ResponseWriter, r *http.Request) {
@@ -183,7 +183,7 @@ func TestEmojiService_Upload(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err = client.Emoji.Upload(ctx, "testsubreddit", nil, emojiFile.Name())
@@ -215,7 +215,7 @@ func TestEmojiService_Update(t *testing.T) {
 
 		err := r.ParseForm()
 		require.NoError(t, err)
-		require.Equal(t, form, r.Form)
+		require.Equal(t, form, r.PostForm)
 	})
 
 	_, err := client.Emoji.Update(ctx, "testsubreddit", nil)
