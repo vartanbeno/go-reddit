@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // APIError is an error coming from Reddit.
@@ -44,14 +45,14 @@ type JSONErrorResponse struct {
 }
 
 func (r *JSONErrorResponse) Error() string {
-	var message string
-	if len(r.JSON.Errors) > 0 {
-		message = r.JSON.Errors[0].Error()
+	errorMessages := make([]string, len(r.JSON.Errors))
+	for i, err := range r.JSON.Errors {
+		errorMessages[i] = err.Error()
 	}
 
 	return fmt.Sprintf(
 		"%s %s: %d %s",
-		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, message,
+		r.Response.Request.Method, r.Response.Request.URL, r.Response.StatusCode, strings.Join(errorMessages, ";"),
 	)
 }
 

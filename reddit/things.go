@@ -6,26 +6,27 @@ import (
 )
 
 const (
-	kindComment          = "t1"
-	kindUser             = "t2"
-	kindPost             = "t3"
-	kindMessage          = "t4"
-	kindSubreddit        = "t5"
-	kindTrophy           = "t6"
-	kindListing          = "Listing"
-	kindKarmaList        = "KarmaList"
-	kindTrophyList       = "TrophyList"
-	kindUserList         = "UserList"
-	kindMore             = "more"
-	kindLiveThread       = "LiveUpdateEvent"
-	kindLiveThreadUpdate = "LiveUpdate"
-	kindModAction        = "modaction"
-	kindMulti            = "LabeledMulti"
-	kindMultiDescription = "LabeledMultiDescription"
-	kindWikiPage         = "wikipage"
-	kindWikiPageListing  = "wikipagelisting"
-	kindWikiPageSettings = "wikipagesettings"
-	kindStyleSheet       = "stylesheet"
+	kindComment           = "t1"
+	kindUser              = "t2"
+	kindPost              = "t3"
+	kindMessage           = "t4"
+	kindSubreddit         = "t5"
+	kindTrophy            = "t6"
+	kindListing           = "Listing"
+	kindSubredditSettings = "subreddit_settings"
+	kindKarmaList         = "KarmaList"
+	kindTrophyList        = "TrophyList"
+	kindUserList          = "UserList"
+	kindMore              = "more"
+	kindLiveThread        = "LiveUpdateEvent"
+	kindLiveThreadUpdate  = "LiveUpdate"
+	kindModAction         = "modaction"
+	kindMulti             = "LabeledMulti"
+	kindMultiDescription  = "LabeledMultiDescription"
+	kindWikiPage          = "wikipage"
+	kindWikiPageListing   = "wikipagelisting"
+	kindWikiPageSettings  = "wikipagesettings"
+	kindStyleSheet        = "stylesheet"
 )
 
 type anchor interface {
@@ -91,6 +92,8 @@ func (t *thing) UnmarshalJSON(b []byte) error {
 		v = new(Post)
 	case kindSubreddit:
 		v = new(Subreddit)
+	case kindSubredditSettings:
+		v = new(SubredditSettings)
 	case kindLiveThread:
 		v = new(LiveThread)
 	case kindLiveThreadUpdate:
@@ -155,6 +158,11 @@ func (t *thing) Post() (v *Post, ok bool) {
 
 func (t *thing) Subreddit() (v *Subreddit, ok bool) {
 	v, ok = t.Data.(*Subreddit)
+	return
+}
+
+func (t *thing) SubredditSettings() (v *SubredditSettings, ok bool) {
+	v, ok = t.Data.(*SubredditSettings)
 	return
 }
 

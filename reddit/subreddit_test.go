@@ -338,6 +338,68 @@ var expectedStyleSheet = &SubredditStyleSheet{
 }`,
 }
 
+var expectedSubredditSettings = &SubredditSettings{
+	ID: "t5_test",
+
+	Type: String("private"),
+
+	Language: String("en"),
+
+	Title:                 String("hello!"),
+	Description:           String("description"),
+	Sidebar:               String("sidebar"),
+	SubmissionText:        String(""),
+	WelcomeMessage:        String(""),
+	WelcomeMessageEnabled: Bool(false),
+
+	AllowCrossposts:            Bool(false),
+	AllowChatPosts:             Bool(true),
+	AllowPollPosts:             Bool(false),
+	AllowFreeFormReports:       Bool(true),
+	AllowOriginalContent:       Bool(false),
+	AllowImages:                Bool(true),
+	AllowMultipleImagesPerPost: Bool(true),
+
+	ExcludeSitewideBannedUsersContent: Bool(false),
+
+	CrowdControlChalLevel: Int(2),
+
+	AllOriginalContent: Bool(false),
+
+	SuggestedCommentSort: nil,
+
+	SubmitLinkPostLabel: String("submit a link!"),
+	SubmitTextPostLabel: String("submit a post!"),
+
+	PostType: String("any"),
+
+	SpamFilterStrengthLinkPosts: String("low"),
+	SpamFilterStrengthTextPosts: String("low"),
+	SpamFilterStrengthComments:  String("low"),
+
+	ShowContentThumbnails:              Bool(false),
+	ExpandMediaPreviewsOnCommentsPages: Bool(true),
+
+	CollapseDeletedComments:    Bool(false),
+	MinutesToHideCommentScores: Int(0),
+
+	SpoilersEnabled: Bool(true),
+
+	HeaderMouseoverText: String("hello!"),
+
+	MobileColour: String(""),
+
+	HideAds: Bool(false),
+	NSFW:    Bool(false),
+
+	AllowDiscoveryInHighTrafficFeeds: Bool(true),
+	AllowDiscoveryByIndividualUsers:  Bool(true),
+
+	WikiMode:              String("modonly"),
+	WikiMinimumAccountAge: Int(0),
+	WikiMinimumKarma:      Int(0),
+}
+
 func TestSubredditService_HotPosts(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -1522,4 +1584,21 @@ func TestSubredditService_UploadImage_Error(t *testing.T) {
 
 	_, _, err = client.Subreddit.UploadImage(ctx, "testsubreddit", imageFile.Name(), "testname")
 	require.EqualError(t, err, "could not upload image: error one; error two")
+}
+
+func TestSubredditService_GetSettings(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/subreddit/settings.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/testsubreddit/about/edit", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	subredditSettings, _, err := client.Subreddit.GetSettings(ctx, "testsubreddit")
+	require.NoError(t, err)
+	require.Equal(t, expectedSubredditSettings, subredditSettings)
 }

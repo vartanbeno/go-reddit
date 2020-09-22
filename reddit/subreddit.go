@@ -159,6 +159,103 @@ func (s *SubredditTrafficStats) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// SubredditSettings are a subreddit's settings.
+type SubredditSettings struct {
+	// The id of the subreddit.
+	ID string `url:"-" json:"subreddit_id,omitempty"`
+
+	// One of: public, restricted, private, gold_restricted, archived, employees_only, gold_only, user.
+	Type *string `url:"type,omitempty" json:"subreddit_type,omitempty"`
+
+	// A valid IETF language tag (underscore separated).
+	Language *string `url:"lang,omitempty" json:"language,omitempty"`
+
+	// No longer than 100 characters.
+	Title *string `url:"title,omitempty" json:"title,omitempty"`
+	// Raw markdown text. No longer than 500 characters.
+	Description *string `url:"public_description,omitempty" json:"public_description,omitempty"`
+	// Raw markdown text. No longer than 10240 characters.
+	Sidebar *string `url:"description,omitempty" json:"description,omitempty"`
+	// Raw markdown text. No longer than 1024 characters.
+	SubmissionText *string `url:"submit_text,omitempty" json:"submit_text,omitempty"`
+	// Raw markdown text. No longer than 5000 characters.
+	WelcomeMessage        *string `url:"welcome_message_text,omitempty" json:"welcome_message_text,omitempty"`
+	WelcomeMessageEnabled *bool   `url:"welcome_message_enabled,omitempty" json:"welcome_message_enabled,omitempty"`
+
+	AllowCrossposts      *bool `url:"allow_post_crossposts,omitempty" json:"allow_post_crossposts,omitempty"`
+	AllowChatPosts       *bool `url:"allow_chat_post_creation,omitempty" json:"allow_chat_post_creation,omitempty"`
+	AllowPollPosts       *bool `url:"allow_polls,omitempty" json:"allow_polls,omitempty"`
+	AllowFreeFormReports *bool `url:"free_form_reports,omitempty" json:"free_form_reports,omitempty"`
+	AllowOriginalContent *bool `url:"original_content_tag_enabled,omitempty" json:"original_content_tag_enabled,omitempty"`
+	// Allow image uploads and links to image hosting sites.
+	AllowImages                *bool `url:"allow_images,omitempty" json:"allow_images,omitempty"`
+	AllowMultipleImagesPerPost *bool `url:"allow_galleries,omitempty" json:"allow_galleries,omitempty"`
+
+	ExcludeSitewideBannedUsersContent *bool `url:"exclude_banned_modqueue,omitempty" json:"exclude_banned_modqueue,omitempty"`
+
+	// An integer from 0 to 3.
+	CrowdControlChalLevel *int `url:"crowd_control_chat_level,omitempty" json:"crowd_control_chat_level,omitempty"`
+
+	// Mark all posts in this subreddit as Original Content (OC) on the desktop redesign.
+	AllOriginalContent *bool `url:"all_original_content,omitempty" json:"all_original_content,omitempty"`
+
+	// One of: none (recommended), confidence, top, new, controversial, old, random, qa, live.
+	SuggestedCommentSort *string `url:"suggested_comment_sort,omitempty" json:"suggested_comment_sort,omitempty"`
+
+	// No longer than 60 characters.
+	SubmitLinkPostLabel *string `url:"submit_link_label,omitempty" json:"submit_link_label,omitempty"`
+	// No longer than 60 characters.
+	SubmitTextPostLabel *string `url:"submit_text_label,omitempty" json:"submit_text_label,omitempty"`
+
+	// One of: any, link, self.
+	PostType *string `url:"link_type,omitempty" json:"content_options,omitempty"`
+
+	// One of: low (disable most filtering), high (standard), all (filter everything, requiring mod approval).
+	SpamFilterStrengthLinkPosts *string `url:"spam_links,omitempty" json:"spam_links,omitempty"`
+	// One of: low (disable most filtering), high (standard), all (filter everything, requiring mod approval).
+	SpamFilterStrengthTextPosts *string `url:"spam_selfposts,omitempty" json:"spam_selfposts,omitempty"`
+	// One of: low (disable most filtering), high (standard), all (filter everything, requiring mod approval).
+	SpamFilterStrengthComments *string `url:"spam_comments,omitempty" json:"spam_comments,omitempty"`
+
+	ShowContentThumbnails              *bool `url:"show_media,omitempty" json:"show_media,omitempty"`
+	ExpandMediaPreviewsOnCommentsPages *bool `url:"show_media_preview,omitempty" json:"show_media_preview,omitempty"`
+
+	CollapseDeletedComments *bool `url:"collapse_deleted_comments,omitempty" json:"collapse_deleted_comments,omitempty"`
+	// An integer between 0 and 1440.
+	MinutesToHideCommentScores *int `url:"comment_score_hide_mins,omitempty" json:"comment_score_hide_mins,omitempty"`
+
+	// Enable marking posts as containing spoilers.
+	SpoilersEnabled *bool `url:"spoilers_enabled,omitempty" json:"spoilers_enabled,omitempty"`
+
+	// If there's an image header set, hovering the mouse over it will display this text.
+	HeaderMouseoverText *string `url:"header-title,omitempty" json:"header_hover_text,omitempty"`
+
+	// 6-digit rgb hex colour, e.g. #AABBCC.
+	// Thematic colour for the subreddit on mobile.
+	MobileColour *string `url:"key_color,omitempty" json:"key_color,omitempty"`
+
+	// Can only be set to true if subreddit type is gold_only.
+	HideAds *bool `url:"hide_ads,omitempty" json:"hide_ads,omitempty"`
+	// Require viewers to be over 18 years old.
+	NSFW *bool `url:"over_18,omitempty" json:"over_18,omitempty"`
+
+	// Show up in high-traffic feeds: Allow your community to be in r/all, r/popular, and trending lists where it can be
+	// seen by the general Reddit population.
+	AllowDiscoveryInHighTrafficFeeds *bool `url:"allow_top,omitempty" json:"default_set,omitempty"`
+	// Get recommended to individual redditors. Let Reddit recommend your community to people who have similar interests.
+	AllowDiscoveryByIndividualUsers *bool `url:"allow_discovery,omitempty" json:"allow_discovery,omitempty"`
+
+	// One of:
+	// - disabled: wiki is disabled for everyone except mods.
+	// - modonly: only mods, approved wiki contributors, or those on a page's edit list may edit.
+	// - anyone: anyone who can submit to the subreddit may edit.
+	WikiMode *string `url:"wikimode,omitempty" json:"wikimode,omitempty"`
+	// Account age (in days) required to create and edit wiki pages.
+	WikiMinimumAccountAge *int `url:"wiki_edit_age,omitempty" json:"wiki_edit_age,omitempty"`
+	// Subreddit karma required to create and edit wiki pages.
+	WikiMinimumKarma *int `url:"wiki_edit_karma,omitempty" json:"wiki_edit_karma,omitempty"`
+}
+
 func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit string, opts interface{}) ([]*Post, *Response, error) {
 	path := sort
 	if subreddit != "" {
@@ -976,4 +1073,61 @@ func (s *SubredditService) UploadMobileHeader(ctx context.Context, subreddit, im
 // A successful call returns a link to the uploaded image.
 func (s *SubredditService) UploadMobileIcon(ctx context.Context, subreddit, imagePath, imageName string) (string, *Response, error) {
 	return s.uploadImage(ctx, subreddit, imagePath, "icon", imageName)
+}
+
+// Create a subreddit.
+func (s *SubredditService) Create(ctx context.Context, name string, request *SubredditSettings) (*Response, error) {
+	if request == nil {
+		return nil, errors.New("*SubredditSettings: cannot be nil")
+	}
+
+	form, err := query.Values(request)
+	if err != nil {
+		return nil, err
+	}
+	form.Set("name", name)
+	form.Set("api_type", "json")
+
+	path := "api/site_admin"
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// Edit a subreddit.
+// This endpoint expects all values of the request to be provided.
+// To make this easier, it might be useful to get the subreddit's current settings via GetSettings(), and use that as a starting point.
+func (s *SubredditService) Edit(ctx context.Context, subredditID string, request *SubredditSettings) (*Response, error) {
+	if request == nil {
+		return nil, errors.New("*SubredditSettings: cannot be nil")
+	}
+
+	form, err := query.Values(request)
+	if err != nil {
+		return nil, err
+	}
+	form.Set("sr", subredditID)
+	form.Set("api_type", "json")
+
+	path := "api/site_admin"
+	req, err := s.client.NewRequest(http.MethodPost, path, form)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.client.Do(ctx, req, nil)
+}
+
+// GetSettings gets the settings of a subreddit.
+func (s *SubredditService) GetSettings(ctx context.Context, subreddit string) (*SubredditSettings, *Response, error) {
+	path := fmt.Sprintf("r/%s/about/edit", subreddit)
+	t, resp, err := s.client.getThing(ctx, path, nil)
+	if err != nil {
+		return nil, resp, err
+	}
+	settings, _ := t.SubredditSettings()
+	return settings, resp, nil
 }
