@@ -256,6 +256,51 @@ type SubredditSettings struct {
 	WikiMinimumKarma *int `url:"wiki_edit_karma,omitempty" json:"wiki_edit_karma,omitempty"`
 }
 
+// SubredditPostRequirements is a list of moderator-designed requirements to post to a subreddit.
+type SubredditPostRequirements struct {
+	// Sentence or two on how to successfully post to the subreddit.
+	Guidelines              string `json:"guidelines_text"`
+	GuidelinesDisplayPolicy string `json:"guidelines_display_policy"`
+
+	TitleMinLength int `json:"title_text_min_length"`
+	TitleMaxLength int `json:"title_text_max_length"`
+
+	BodyMinLength int `json:"body_text_min_length"`
+	BodyMaxLength int `json:"body_text_max_length"`
+
+	// Do not allow any of these words in the title.
+	TitleBlacklistedStrings []string `json:"title_blacklisted_strings"`
+	// Do not allow any of these words in the body.
+	BodyBlacklistedStrings []string `json:"body_blacklisted_strings"`
+
+	// Require at least one of these words in the title.
+	TitleRequiredStrings []string `json:"title_required_strings"`
+	// Require at least one of these words in the body.
+	BodyRequiredStrings []string `json:"body_required_strings"`
+
+	// Block link posts with these domains.
+	DomainBlacklist []string `json:"domain_blacklist"`
+	// Only allow link posts with these domains.
+	DomainWhitelist []string `json:"domain_whitelist"`
+
+	// One of: required, notAllowed, none.
+	// Meaning that a selftext post's body is required, not allowed, or optional, respectively.
+	BodyRestrictionPolicy string `json:"body_restriction_policy"`
+	LinkRestrictionPolicy string `json:"link_restriction_policy"`
+
+	GalleryMinItems            int    `json:"gallery_min_items"`
+	GalleryMaxItems            int    `json:"gallery_max_items"`
+	GalleryCaptionsRequirement string `json:"gallery_captions_requirement"`
+	GalleryURLsRequirement     string `json:"gallery_urls_requirement"`
+
+	// Prevent users from posting a link that was already posted to your community within x days of the original.
+	LinkRepostAge int  `json:"link_repost_age"`
+	FlairRequired bool `json:"is_flair_required"`
+
+	TitleRegexes []string `json:"title_regexes"`
+	BodyRegexes  []string `json:"body_regexes"`
+}
+
 func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit string, opts interface{}) ([]*Post, *Response, error) {
 	path := sort
 	if subreddit != "" {
@@ -1099,7 +1144,8 @@ func (s *SubredditService) Create(ctx context.Context, name string, request *Sub
 
 // Edit a subreddit.
 // This endpoint expects all values of the request to be provided.
-// To make this easier, it might be useful to get the subreddit's current settings via GetSettings(), and use that as a starting point.
+// To make this easier, it might be useful to get the subreddit's current settings via GetSettings(),
+// and use that as a starting point. It even returns the subreddit's ID, which is needed for this.
 func (s *SubredditService) Edit(ctx context.Context, subredditID string, request *SubredditSettings) (*Response, error) {
 	if request == nil {
 		return nil, errors.New("*SubredditSettings: cannot be nil")
@@ -1130,4 +1176,22 @@ func (s *SubredditService) GetSettings(ctx context.Context, subreddit string) (*
 	}
 	settings, _ := t.SubredditSettings()
 	return settings, resp, nil
+}
+
+// PostRequirements returns the subreddit's moderator-designed requirements to post to it.
+// Clients may use the values returned by this method to pre-validate submissions to the subreddit.
+func (s *SubredditService) PostRequirements(ctx context.Context, subreddit string) (*SubredditPostRequirements, *Response, error) {
+	path := fmt.Sprintf("api/v1/%s/post_requirements", subreddit)
+	req, err := s.client.NewRequest(http.MethodGet, path, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(SubredditPostRequirements)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root, resp, nil
 }

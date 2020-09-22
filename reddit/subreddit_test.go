@@ -400,6 +400,40 @@ var expectedSubredditSettings = &SubredditSettings{
 	WikiMinimumKarma:      Int(0),
 }
 
+var expectedSubredditPostRequirements = &SubredditPostRequirements{
+	Guidelines:              "test",
+	GuidelinesDisplayPolicy: "",
+
+	TitleMinLength: 50,
+	TitleMaxLength: 200,
+
+	BodyMinLength: 50,
+	BodyMaxLength: 2000,
+
+	TitleBlacklistedStrings: []string{"no"},
+	BodyBlacklistedStrings:  []string{"no"},
+
+	TitleRequiredStrings: []string{"yes"},
+	BodyRequiredStrings:  []string{"yes"},
+
+	DomainBlacklist: []string{"example.com"},
+	DomainWhitelist: []string{},
+
+	BodyRestrictionPolicy: "none",
+	LinkRestrictionPolicy: "none",
+
+	GalleryMinItems:            2,
+	GalleryMaxItems:            20,
+	GalleryCaptionsRequirement: "none",
+	GalleryURLsRequirement:     "none",
+
+	LinkRepostAge: 2,
+	FlairRequired: false,
+
+	TitleRegexes: []string{},
+	BodyRegexes:  []string{},
+}
+
 func TestSubredditService_HotPosts(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -1586,6 +1620,128 @@ func TestSubredditService_UploadImage_Error(t *testing.T) {
 	require.EqualError(t, err, "could not upload image: error one; error two")
 }
 
+func TestSubredditService_Create(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/site_admin", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("name", "testsubreddit")
+		form.Set("type", "private")
+		form.Set("lang", "en")
+		form.Set("title", "hello!")
+		form.Set("public_description", "description")
+		form.Set("description", "sidebar")
+		form.Set("submit_text", "")
+		form.Set("welcome_message_text", "")
+		form.Set("welcome_message_enabled", "false")
+		form.Set("allow_post_crossposts", "false")
+		form.Set("allow_chat_post_creation", "true")
+		form.Set("allow_polls", "false")
+		form.Set("free_form_reports", "true")
+		form.Set("original_content_tag_enabled", "false")
+		form.Set("allow_images", "true")
+		form.Set("allow_galleries", "true")
+		form.Set("exclude_banned_modqueue", "false")
+		form.Set("crowd_control_chat_level", "2")
+		form.Set("all_original_content", "false")
+		form.Set("submit_link_label", "submit a link!")
+		form.Set("submit_text_label", "submit a post!")
+		form.Set("link_type", "any")
+		form.Set("spam_links", "low")
+		form.Set("spam_selfposts", "low")
+		form.Set("spam_comments", "low")
+		form.Set("show_media", "false")
+		form.Set("show_media_preview", "true")
+		form.Set("collapse_deleted_comments", "false")
+		form.Set("comment_score_hide_mins", "0")
+		form.Set("spoilers_enabled", "true")
+		form.Set("header-title", "hello!")
+		form.Set("key_color", "")
+		form.Set("hide_ads", "false")
+		form.Set("over_18", "false")
+		form.Set("allow_top", "true")
+		form.Set("allow_discovery", "true")
+		form.Set("wikimode", "modonly")
+		form.Set("wiki_edit_age", "0")
+		form.Set("wiki_edit_karma", "0")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.Create(ctx, "testsubreddit", nil)
+	require.EqualError(t, err, "*SubredditSettings: cannot be nil")
+
+	_, err = client.Subreddit.Create(ctx, "testsubreddit", expectedSubredditSettings)
+	require.NoError(t, err)
+}
+
+func TestSubredditService_Edit(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/api/site_admin", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		form := url.Values{}
+		form.Set("api_type", "json")
+		form.Set("sr", "t5_test")
+		form.Set("type", "private")
+		form.Set("lang", "en")
+		form.Set("title", "hello!")
+		form.Set("public_description", "description")
+		form.Set("description", "sidebar")
+		form.Set("submit_text", "")
+		form.Set("welcome_message_text", "")
+		form.Set("welcome_message_enabled", "false")
+		form.Set("allow_post_crossposts", "false")
+		form.Set("allow_chat_post_creation", "true")
+		form.Set("allow_polls", "false")
+		form.Set("free_form_reports", "true")
+		form.Set("original_content_tag_enabled", "false")
+		form.Set("allow_images", "true")
+		form.Set("allow_galleries", "true")
+		form.Set("exclude_banned_modqueue", "false")
+		form.Set("crowd_control_chat_level", "2")
+		form.Set("all_original_content", "false")
+		form.Set("submit_link_label", "submit a link!")
+		form.Set("submit_text_label", "submit a post!")
+		form.Set("link_type", "any")
+		form.Set("spam_links", "low")
+		form.Set("spam_selfposts", "low")
+		form.Set("spam_comments", "low")
+		form.Set("show_media", "false")
+		form.Set("show_media_preview", "true")
+		form.Set("collapse_deleted_comments", "false")
+		form.Set("comment_score_hide_mins", "0")
+		form.Set("spoilers_enabled", "true")
+		form.Set("header-title", "hello!")
+		form.Set("key_color", "")
+		form.Set("hide_ads", "false")
+		form.Set("over_18", "false")
+		form.Set("allow_top", "true")
+		form.Set("allow_discovery", "true")
+		form.Set("wikimode", "modonly")
+		form.Set("wiki_edit_age", "0")
+		form.Set("wiki_edit_karma", "0")
+
+		err := r.ParseForm()
+		require.NoError(t, err)
+		require.Equal(t, form, r.PostForm)
+	})
+
+	_, err := client.Subreddit.Edit(ctx, "t5_test", nil)
+	require.EqualError(t, err, "*SubredditSettings: cannot be nil")
+
+	_, err = client.Subreddit.Edit(ctx, "t5_test", expectedSubredditSettings)
+	require.NoError(t, err)
+}
+
 func TestSubredditService_GetSettings(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -1601,4 +1757,21 @@ func TestSubredditService_GetSettings(t *testing.T) {
 	subredditSettings, _, err := client.Subreddit.GetSettings(ctx, "testsubreddit")
 	require.NoError(t, err)
 	require.Equal(t, expectedSubredditSettings, subredditSettings)
+}
+
+func TestSubredditService_PostRequirements(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	blob, err := readFileContents("../testdata/subreddit/post-requirements.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/api/v1/testsubreddit/post_requirements", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	postRequirements, _, err := client.Subreddit.PostRequirements(ctx, "testsubreddit")
+	require.NoError(t, err)
+	require.Equal(t, expectedSubredditPostRequirements, postRequirements)
 }
