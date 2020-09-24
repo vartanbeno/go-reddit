@@ -1,0 +1,122 @@
+{
+  "items": {
+    "widget_15osq4jms4tdo": {
+      "styles": {
+        "headerColor": null,
+        "backgroundColor": null
+      },
+      "kind": "custom",
+      "imageData": [
+        {
+          "url": "https://www.redditstatic.com/image-processing.png",
+          "width": 640,
+          "name": "test",
+          "height": 192
+        }
+      ],
+      "text": "some image",
+      "stylesheetUrl": "https://styles.redditmedia.com/t5_2uquw1/styles/customWidget-stylesheet-n2q86gjf04o51.css",
+      "height": 500,
+      "textHtml": "&lt;!-- SC_OFF --&gt;&lt;div class=\"md\"&gt;&lt;p&gt;some image&lt;/p&gt;\n&lt;/div&gt;&lt;!-- SC_ON --&gt;",
+      "shortName": "custom image widget",
+      "id": "widget_15osq4jms4tdo",
+      "css": "* {}"
+    },
+    "widget_rules-2uquw1": {
+      "styles": {
+        "headerColor": "",
+        "backgroundColor": ""
+      },
+      "kind": "subreddit-rules",
+      "display": "compact",
+      "shortName": "Subreddit Rules",
+      "data": [
+        {
+          "violationReason": "post violation",
+          "description": "be nice",
+          "createdUtc": 1600057179.0,
+          "priority": 1,
+          "descriptionHtml": "&lt;!-- SC_OFF --&gt;&lt;div class=\"md\"&gt;&lt;p&gt;be nice&lt;/p&gt;\n&lt;/div&gt;&lt;!-- SC_ON --&gt;",
+          "shortName": "post"
+        }
+      ],
+      "id": "widget_rules-2uquw1"
+    },
+    "widget_id-card-2uquw1": {
+      "styles": {
+        "headerColor": "",
+        "backgroundColor": ""
+      },
+      "kind": "id-card",
+      "description": "Community Description",
+      "subscribersText": "subscriberz",
+      "currentlyViewingCount": 3,
+      "subscribersCount": 2,
+      "currentlyViewingText": "viewerz",
+      "shortName": "Community Details",
+      "id": "widget_id-card-2uquw1"
+    },
+    "widget_15owrhqvgfhke": {
+      "styles": {
+        "headerColor": null,
+        "backgroundColor": null
+      },
+      "kind": "menu",
+      "data": [
+        {
+          "url": "https://example.com",
+          "text": "link1"
+        },
+        {
+          "text": "test",
+          "children": [
+            {
+              "url": "https://example.com",
+              "text": "link2"
+            },
+            {
+              "url": "https://example.com",
+              "text": "link3"
+            }
+          ]
+        }
+      ],
+      "id": "widget_15owrhqvgfhke",
+      "showWiki": true
+    },
+    "widget_moderators-2uquw1": {
+      "styles": {
+        "headerColor": null,
+        "backgroundColor": null
+      },
+      "kind": "moderators",
+      "mods": [
+        {
+          "name": "testuser",
+          "authorFlairType": "richtext",
+          "authorFlairTextColor": "dark",
+          "authorFlairBackgroundColor": "",
+          "authorFlairRichText": [
+            {
+              "e": "text",
+              "t": "test"
+            }
+          ],
+          "authorFlairText": "test"
+        }
+      ],
+      "totalMods": 1,
+      "id": "widget_moderators-2uquw1"
+    }
+  },
+  "layout": {
+    "idCardWidget": "widget_id-card-2uquw1",
+    "topbar": {
+      "order": ["widget_15owrhqvgfhke"]
+    },
+    "sidebar": {
+      "order": ["widget_rules-2uquw1", "widget_15osq4jms4tdo"]
+    },
+    "moderatorWidget": "widget_moderators-2uquw1"
+  }
+}

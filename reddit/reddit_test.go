@@ -72,6 +72,7 @@ func testClientServices(t *testing.T, c *Client) {
 		"Stream",
 		"Subreddit",
 		"User",
+		"Widget",
 		"Wiki",
 	}
 
