@@ -25,6 +25,10 @@ type Widget interface {
 }
 
 const (
+	widgetKindTextArea         = "textarea"
+	widgetKindButton           = "button"
+	widgetKindImage            = "image"
+	widgetKindCommunityList    = "community-list"
 	widgetKindMenu             = "menu"
 	widgetKindCommunityDetails = "id-card"
 	widgetKindModerators       = "moderators"
@@ -55,6 +59,14 @@ func (l *WidgetList) UnmarshalJSON(data []byte) error {
 
 		var widget Widget
 		switch root.Kind {
+		case widgetKindTextArea:
+			widget = new(TextAreaWidget)
+		case widgetKindButton:
+			widget = new(ButtonWidget)
+		case widgetKindImage:
+			widget = new(ImageWidget)
+		case widgetKindCommunityList:
+			widget = new(CommunityListWidget)
 		case widgetKindMenu:
 			widget = new(MenuWidget)
 		case widgetKindCommunityDetails:
@@ -85,6 +97,56 @@ type widget struct {
 	ID    string       `json:"id,omitempty"`
 	Kind  string       `json:"kind,omitempty"`
 	Style *WidgetStyle `json:"styles,omitempty"`
+}
+
+// TextAreaWidget displays a box of text in the subreddit.
+type TextAreaWidget struct {
+	widget
+
+	Name string `json:"shortName,omitempty"`
+	Text string `json:"text,omitempty"`
+}
+
+func (w *TextAreaWidget) kind() string {
+	return widgetKindTextArea
+}
+
+// ButtonWidget displays up to 10 button style links with customizable font colors for each button.
+type ButtonWidget struct {
+	widget
+
+	Name        string          `json:"shortName,omitempty"`
+	Description string          `json:"description,omitempty"`
+	Buttons     []*WidgetButton `json:"buttons,omitempty"`
+}
+
+func (w *ButtonWidget) kind() string {
+	return widgetKindButton
+}
+
+// ImageWidget display a random image from up to 10 selected images.
+// The image can be clickable links.
+type ImageWidget struct {
+	widget
+
+	Name   string             `json:"shortName,omitempty"`
+	Images []*WidgetImageLink `json:"data,omitempty"`
+}
+
+func (w *ImageWidget) kind() string {
+	return widgetKindImage
+}
+
+// CommunityListWidget display a list of up to 10 other communities (subreddits).
+type CommunityListWidget struct {
+	widget
+
+	Name        string             `json:"shortName,omitempty"`
+	Communities []*WidgetCommunity `json:"data,omitempty"`
+}
+
+func (w *CommunityListWidget) kind() string {
+	return widgetKindCommunityList
 }
 
 // MenuWidget displays tabs for your community's menu. These can be direct links or submenus that
@@ -216,8 +278,8 @@ func (*CustomWidget) kind() string {
 
 // WidgetStyle contains style information for the widget.
 type WidgetStyle struct {
-	HeaderColor     string `json:"headerColor"`
-	BackgroundColor string `json:"backgroundColor"`
+	HeaderColor     string `json:"headerColor,omitempty"`
+	BackgroundColor string `json:"backgroundColor,omitempty"`
 }
 
 // WidgetImage is an image in a widget.
@@ -283,6 +345,40 @@ func (l *WidgetLinkList) UnmarshalJSON(data []byte) error {
 	}
 
 	return nil
+}
+
+// WidgetImageLink is an image that links to an URL within a widget.
+type WidgetImageLink struct {
+	URL     string `json:"url,omitempty"`
+	LinkURL string `json:"linkURL,omitempty"`
+}
+
+// WidgetCommunity is a community (subreddit) that's displayed in a widget.
+type WidgetCommunity struct {
+	Name        string `json:"name,omitempty"`
+	Subscribers int    `json:"subscribers"`
+	Subscribed  bool   `json:"isSubscribed"`
+	NSFW        bool   `json:"isNSFW"`
+}
+
+// WidgetButton is a button that's part of a widget.
+type WidgetButton struct {
+	Text      string `json:"text,omitempty"`
+	URL       string `json:"url,omitempty"`
+	TextColor string `json:"textColor,omitempty"`
+	FillColor string `json:"fillColor,omitempty"`
+	// The color of the button's "outline".
+	StrokeColor string                  `json:"color,omitempty"`
+	HoverState  *WidgetButtonHoverState `json:"hoverState,omitempty"`
+}
+
+// WidgetButtonHoverState is the behaviour of a button that's part of a widget when it's hovered over with the mouse.
+type WidgetButtonHoverState struct {
+	Text      string `json:"text,omitempty"`
+	TextColor string `json:"textColor,omitempty"`
+	FillColor string `json:"fillColor,omitempty"`
+	// The color of the button's "outline".
+	StrokeColor string `json:"color,omitempty"`
 }
 
 // Get the subreddit's widgets.

@@ -1,5 +1,92 @@
 {
   "items": {
+    "widget_15p7borvnnw5a": {
+      "styles": {
+        "headerColor": "#373c3f",
+        "backgroundColor": "#cc5289"
+      },
+      "kind": "textarea",
+      "textHtml": "&lt;!-- SC_OFF --&gt;&lt;div class=\"md\"&gt;&lt;p&gt;test text&lt;/p&gt;\n&lt;/div&gt;&lt;!-- SC_ON --&gt;",
+      "text": "test text",
+      "shortName": "test title",
+      "id": "widget_15p7borvnnw5a"
+    },
+    "widget_15paxrbiodp8v": {
+      "styles": {
+        "headerColor": "",
+        "backgroundColor": ""
+      },
+      "kind": "button",
+      "description": "test description",
+      "buttons": [
+        {
+          "kind": "text",
+          "hoverState": {
+            "color": "#000000",
+            "text": "test text",
+            "kind": "text",
+            "textColor": "#000000",
+            "fillColor": "#00a6a5"
+          },
+          "url": "https://example.com",
+          "text": "test text",
+          "color": "#73ad34",
+          "fillColor": "#014980",
+          "textColor": "#ff66ac"
+        }
+      ],
+      "descriptionHtml": "&lt;!-- SC_OFF --&gt;&lt;div class=\"md\"&gt;&lt;p&gt;toto&lt;/p&gt;\n&lt;/div&gt;&lt;!-- SC_ON --&gt;",
+      "shortName": "test text",
+      "id": "widget_15paxrbiodp8v"
+    },
+    "widget_15p7o01nqr5tu": {
+      "styles": {
+        "headerColor": null,
+        "backgroundColor": null
+      },
+      "kind": "image",
+      "data": [
+        {
+          "url": "https://www.redditstatic.com/image-processing.png",
+          "width": 64,
+          "linkUrl": "https://example.com",
+          "height": 64
+        }
+      ],
+      "shortName": "test title",
+      "id": "widget_15p7o01nqr5tu"
+    },
+    "widget_15p7qwb2kxc6j": {
+      "styles": {
+        "headerColor": "#ffb000",
+        "backgroundColor": ""
+      },
+      "kind": "community-list",
+      "data": [
+        {
+          "iconUrl": "https://b.thumbs.redditmedia.com/lh3XYdayDnfF474A_Ro9fBWUViOibSr4BoTpx0ETyvg.png",
+          "name": "nba",
+          "subscribers": 3571840,
+          "primaryColor": "#ffa500",
+          "isSubscribed": true,
+          "type": "subreddit",
+          "communityIcon": "https://styles.redditmedia.com/t5_2qo4s/styles/communityIcon_1podsfdai4301.png?width=256&amp;s=90f8734cee5cfb8e06306013d830d43e31d68f27",
+          "isNSFW": false
+        },
+        {
+          "iconUrl": "",
+          "name": "golang",
+          "subscribers": 125961,
+          "primaryColor": "",
+          "isSubscribed": true,
+          "type": "subreddit",
+          "communityIcon": "https://styles.redditmedia.com/t5_2rc7j/styles/communityIcon_wy4riduoe9k11.png?width=256&amp;s=0d681daaa8d4b6271e6be788d0f9379f0661e04a",
+          "isNSFW": false
+        }
+      ],
+      "shortName": "test title",
+      "id": "widget_15p7qwb2kxc6j"
+    },
     "widget_15osq4jms4tdo": {
       "styles": {
         "headerColor": null,
