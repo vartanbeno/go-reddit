@@ -3,6 +3,7 @@ package reddit
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -22,6 +23,8 @@ type Widget interface {
 	// kind returns the widget kind.
 	// having un unexported method on an exported interface means it cannot be implemented by a client.
 	kind() string
+	// GetID returns the widget's id.
+	GetID() string
 }
 
 const (
@@ -36,6 +39,47 @@ const (
 	widgetKindCustom           = "custom"
 )
 
+type rootWidget struct {
+	Data Widget
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (w *rootWidget) UnmarshalJSON(data []byte) error {
+	root := new(struct {
+		Kind string `json:"kind"`
+	})
+
+	err := json.Unmarshal(data, root)
+	if err != nil {
+		return err
+	}
+
+	switch root.Kind {
+	case widgetKindTextArea:
+		w.Data = new(TextAreaWidget)
+	case widgetKindButton:
+		w.Data = new(ButtonWidget)
+	case widgetKindImage:
+		w.Data = new(ImageWidget)
+	case widgetKindCommunityList:
+		w.Data = new(CommunityListWidget)
+	case widgetKindMenu:
+		w.Data = new(MenuWidget)
+	case widgetKindCommunityDetails:
+		w.Data = new(CommunityDetailsWidget)
+	case widgetKindModerators:
+		w.Data = new(ModeratorsWidget)
+	case widgetKindSubredditRules:
+		w.Data = new(SubredditRulesWidget)
+	case widgetKindCustom:
+		w.Data = new(CustomWidget)
+	default:
+		return fmt.Errorf("unrecognized widget kind: %q", root.Kind)
+	}
+
+	return json.Unmarshal(data, w.Data)
+}
+
 // WidgetList is a list of widgets.
 type WidgetList []Widget
 
@@ -47,46 +91,14 @@ func (l *WidgetList) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	type widgetKind struct {
-		Kind string `json:"kind"`
-	}
 	for _, w := range widgetMap {
-		root := new(widgetKind)
+		root := new(rootWidget)
 		err = json.Unmarshal(w, root)
 		if err != nil {
 			return err
 		}
 
-		var widget Widget
-		switch root.Kind {
-		case widgetKindTextArea:
-			widget = new(TextAreaWidget)
-		case widgetKindButton:
-			widget = new(ButtonWidget)
-		case widgetKindImage:
-			widget = new(ImageWidget)
-		case widgetKindCommunityList:
-			widget = new(CommunityListWidget)
-		case widgetKindMenu:
-			widget = new(MenuWidget)
-		case widgetKindCommunityDetails:
-			widget = new(CommunityDetailsWidget)
-		case widgetKindModerators:
-			widget = new(ModeratorsWidget)
-		case widgetKindSubredditRules:
-			widget = new(SubredditRulesWidget)
-		case widgetKindCustom:
-			widget = new(CustomWidget)
-		default:
-			continue
-		}
-
-		err = json.Unmarshal(w, widget)
-		if err != nil {
-			return err
-		}
-
-		*l = append(*l, widget)
+		*l = append(*l, root.Data)
 	}
 
 	return nil
@@ -99,16 +111,15 @@ type widget struct {
 	Style *WidgetStyle `json:"styles,omitempty"`
 }
 
+func (w *widget) kind() string  { return w.Kind }
+func (w *widget) GetID() string { return w.ID }
+
 // TextAreaWidget displays a box of text in the subreddit.
 type TextAreaWidget struct {
 	widget
 
 	Name string `json:"shortName,omitempty"`
 	Text string `json:"text,omitempty"`
-}
-
-func (w *TextAreaWidget) kind() string {
-	return widgetKindTextArea
 }
 
 // ButtonWidget displays up to 10 button style links with customizable font colors for each button.
@@ -120,10 +131,6 @@ type ButtonWidget struct {
 	Buttons     []*WidgetButton `json:"buttons,omitempty"`
 }
 
-func (w *ButtonWidget) kind() string {
-	return widgetKindButton
-}
-
 // ImageWidget display a random image from up to 10 selected images.
 // The image can be clickable links.
 type ImageWidget struct {
@@ -131,10 +138,6 @@ type ImageWidget struct {
 
 	Name   string             `json:"shortName,omitempty"`
 	Images []*WidgetImageLink `json:"data,omitempty"`
-}
-
-func (w *ImageWidget) kind() string {
-	return widgetKindImage
 }
 
 // CommunityListWidget display a list of up to 10 other communities (subreddits).
@@ -145,10 +148,6 @@ type CommunityListWidget struct {
 	Communities []*WidgetCommunity `json:"data,omitempty"`
 }
 
-func (w *CommunityListWidget) kind() string {
-	return widgetKindCommunityList
-}
-
 // MenuWidget displays tabs for your community's menu. These can be direct links or submenus that
 // create a drop-down menu to multiple links.
 type MenuWidget struct {
@@ -156,10 +155,6 @@ type MenuWidget struct {
 
 	ShowWiki bool           `json:"showWiki"`
 	Links    WidgetLinkList `json:"data,omitempty"`
-}
-
-func (w *MenuWidget) kind() string {
-	return widgetKindMenu
 }
 
 // CommunityDetailsWidget displays your subscriber count, users online, and community description,
@@ -178,20 +173,12 @@ type CommunityDetailsWidget struct {
 	CurrentlyViewingText string `json:"currentlyViewingText,omitempty"`
 }
 
-func (*CommunityDetailsWidget) kind() string {
-	return widgetKindCommunityDetails
-}
-
 // ModeratorsWidget displays the list of moderators of the subreddit.
 type ModeratorsWidget struct {
 	widget
 
 	Mods  []string `json:"mods"`
 	Total int      `json:"totalMods"`
-}
-
-func (*ModeratorsWidget) kind() string {
-	return widgetKindModerators
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -227,10 +214,6 @@ type SubredditRulesWidget struct {
 	// One of: full (includes description), compact (rule is collapsed).
 	Display string   `json:"display,omitempty"`
 	Rules   []string `json:"rules,omitempty"`
-}
-
-func (*SubredditRulesWidget) kind() string {
-	return widgetKindSubredditRules
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -270,10 +253,6 @@ type CustomWidget struct {
 	StyleSheet    string         `json:"css,omitempty"`
 	StyleSheetURL string         `json:"stylesheetUrl,omitempty"`
 	Images        []*WidgetImage `json:"imageData,omitempty"`
-}
-
-func (*CustomWidget) kind() string {
-	return widgetKindCustom
 }
 
 // WidgetStyle contains style information for the widget.
@@ -381,6 +360,52 @@ type WidgetButtonHoverState struct {
 	StrokeColor string `json:"color,omitempty"`
 }
 
+// WidgetCreateRequest represents a request to create a widget.
+type WidgetCreateRequest interface {
+	requestKind() string
+}
+
+// TextAreaWidgetCreateRequest represents a requets to create a text area widget.
+type TextAreaWidgetCreateRequest struct {
+	Style *WidgetStyle `json:"styles,omitempty"`
+	// No longer than 30 characters.
+	Name string `json:"shortName,omitempty"`
+	// Raw markdown text.
+	Text string `json:"text,omitempty"`
+}
+
+func (*TextAreaWidgetCreateRequest) requestKind() string { return widgetKindTextArea }
+
+// MarshalJSON implements the json.Marshaler interface.
+func (r *TextAreaWidgetCreateRequest) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Kind  string       `json:"kind"`
+		Style *WidgetStyle `json:"styles,omitempty"`
+		Name  string       `json:"shortName,omitempty"`
+		Text  string       `json:"text,omitempty"`
+	}{r.requestKind(), r.Style, r.Name, r.Text})
+}
+
+// CommunityListWidgetCreateRequest represents a requets to create a community list widget.
+type CommunityListWidgetCreateRequest struct {
+	Style *WidgetStyle `json:"styles,omitempty"`
+	// No longer than 30 characters.
+	Name        string   `json:"shortName,omitempty"`
+	Communities []string `json:"data,omitempty"`
+}
+
+func (*CommunityListWidgetCreateRequest) requestKind() string { return widgetKindCommunityList }
+
+// MarshalJSON implements the json.Marshaler interface.
+func (r *CommunityListWidgetCreateRequest) MarshalJSON() ([]byte, error) {
+	return json.Marshal(struct {
+		Kind        string       `json:"kind"`
+		Style       *WidgetStyle `json:"styles,omitempty"`
+		Name        string       `json:"shortName,omitempty"`
+		Communities []string     `json:"data,omitempty"`
+	}{r.requestKind(), r.Style, r.Name, r.Communities})
+}
+
 // Get the subreddit's widgets.
 func (s *WidgetService) Get(ctx context.Context, subreddit string) ([]Widget, *Response, error) {
 	path := fmt.Sprintf("r/%s/api/widgets?progressive_images=true", subreddit)
@@ -400,10 +425,43 @@ func (s *WidgetService) Get(ctx context.Context, subreddit string) ([]Widget, *R
 	return root.Widgets, resp, nil
 }
 
+// Create a widget for the subreddit.
+func (s *WidgetService) Create(ctx context.Context, subreddit string, request WidgetCreateRequest) (Widget, *Response, error) {
+	if request == nil {
+		return nil, nil, errors.New("WidgetCreateRequest: cannot be nil")
+	}
+
+	path := fmt.Sprintf("r/%s/api/widget", subreddit)
+	req, err := s.client.NewJSONRequest(http.MethodPost, path, request)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootWidget)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Data, resp, nil
+}
+
 // Delete a widget via its id.
 func (s *WidgetService) Delete(ctx context.Context, subreddit, id string) (*Response, error) {
 	path := fmt.Sprintf("r/%s/api/widget/%s", subreddit, id)
 	req, err := s.client.NewRequest(http.MethodDelete, path, nil)
+	if err != nil {
+		return nil, err
+	}
+	return s.client.Do(ctx, req, nil)
+}
+
+// Reorder the widgets in the subreddit.
+// The order should contain every single widget id in the subreddit; omitting any id will result in an error.
+// The id list should only contain sidebar widgets. It should exclude the community details and moderators widgets.
+func (s *WidgetService) Reorder(ctx context.Context, subreddit string, ids []string) (*Response, error) {
+	path := fmt.Sprintf("r/%s/api/widget_order/sidebar", subreddit)
+	req, err := s.client.NewJSONRequest(http.MethodPatch, path, ids)
 	if err != nil {
 		return nil, err
 	}

@@ -1,6 +1,7 @@
 package reddit
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -195,6 +196,49 @@ func TestWidgetService_Get(t *testing.T) {
 	require.ElementsMatch(t, expectedWidgets, widgets)
 }
 
+func TestWidgetService_Create(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/widget", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPost, r.Method)
+
+		body := new(struct {
+			Name string `json:"shortName"`
+			Text string `json:"text"`
+		})
+
+		err := json.NewDecoder(r.Body).Decode(body)
+		require.NoError(t, err)
+		require.Equal(t, "test name", body.Name)
+		require.Equal(t, "test text", body.Text)
+
+		fmt.Fprint(w, `{
+			"text": "test text",
+			"kind": "textarea",
+			"shortName": "test name",
+			"id": "id123"
+		}`)
+	})
+
+	_, _, err := client.Widget.Create(ctx, "testsubreddit", nil)
+	require.EqualError(t, err, "WidgetCreateRequest: cannot be nil")
+
+	createdWidget, _, err := client.Widget.Create(ctx, "testsubreddit", &TextAreaWidgetCreateRequest{
+		Name: "test name",
+		Text: "test text",
+	})
+	require.NoError(t, err)
+	require.Equal(t, &TextAreaWidget{
+		widget: widget{
+			ID:   "id123",
+			Kind: "textarea",
+		},
+		Name: "test name",
+		Text: "test text",
+	}, createdWidget)
+}
+
 func TestWidgetService_Delete(t *testing.T) {
 	client, mux, teardown := setup()
 	defer teardown()
@@ -204,5 +248,22 @@ func TestWidgetService_Delete(t *testing.T) {
 	})
 
 	_, err := client.Widget.Delete(ctx, "testsubreddit", "abc123")
+	require.NoError(t, err)
+}
+
+func TestWidgetService_Reorder(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	mux.HandleFunc("/r/testsubreddit/api/widget_order/sidebar", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPatch, r.Method)
+
+		var ids []string
+		err := json.NewDecoder(r.Body).Decode(&ids)
+		require.NoError(t, err)
+		require.Equal(t, []string{"test1", "test2", "test3", "test4"}, ids)
+	})
+
+	_, err := client.Widget.Reorder(ctx, "testsubreddit", []string{"test1", "test2", "test3", "test4"})
 	require.NoError(t, err)
 }
