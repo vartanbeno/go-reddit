@@ -122,6 +122,10 @@ More examples are available in the [examples](examples) folder.
 
 The package design is heavily inspired from [Google's GitHub API client](https://github.com/google/go-github) and [DigitalOcean's API client](https://github.com/digitalocean/godo).
 
+## Contributing
+
+Contributions are welcome! For any bug reports/feature requests, feel free to open an issue or submit a pull request.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
