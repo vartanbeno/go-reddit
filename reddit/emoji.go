@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/google/go-querystring/query"
@@ -63,6 +64,7 @@ func (e *emojis) UnmarshalJSON(data []byte) (err error) {
 		return
 	}
 
+	*e = make(emojis, 0, len(emojiMap))
 	for emojiName, emojiValue := range emojiMap {
 		emoji := new(Emoji)
 		err = json.Unmarshal(emojiValue, emoji)
@@ -120,8 +122,8 @@ func (s *EmojiService) SetSize(ctx context.Context, subreddit string, height, wi
 	path := fmt.Sprintf("api/v1/%s/emoji_custom_size", subreddit)
 
 	form := url.Values{}
-	form.Set("height", fmt.Sprint(height))
-	form.Set("width", fmt.Sprint(width))
+	form.Set("height", strconv.Itoa(height))
+	form.Set("width", strconv.Itoa(width))
 
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {

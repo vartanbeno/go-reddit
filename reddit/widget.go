@@ -91,6 +91,7 @@ func (l *WidgetList) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	*l = make(WidgetList, 0, len(widgetMap))
 	for _, w := range widgetMap {
 		root := new(rootWidget)
 		err = json.Unmarshal(w, root)
@@ -301,6 +302,7 @@ func (l *WidgetLinkList) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
+	*l = make(WidgetLinkList, 0, len(dataMap))
 	for _, d := range dataMap {
 		var widgetLinkDataMap map[string]json.RawMessage
 		err = json.Unmarshal(d, &widgetLinkDataMap)

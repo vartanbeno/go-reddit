@@ -339,7 +339,7 @@ func (s *PostService) PinToProfile(ctx context.Context, id string) (*Response, e
 	form.Set("id", id)
 	form.Set("state", "true")
 	form.Set("to_profile", "true")
-	// form.Set("num", fmt.Sprint(pos))
+	// form.Set("num", strconv.Itoa(pos))
 
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {

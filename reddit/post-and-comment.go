@@ -2,9 +2,9 @@ package reddit
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // postAndCommentService handles communication with the post and comment
@@ -137,7 +137,7 @@ func (s *postAndCommentService) vote(ctx context.Context, id string, vote vote) 
 
 	form := url.Values{}
 	form.Set("id", id)
-	form.Set("dir", fmt.Sprint(vote))
+	form.Set("dir", strconv.Itoa(int(vote)))
 	form.Set("rank", "10")
 
 	req, err := s.client.NewRequest(http.MethodPost, path, form)

@@ -58,8 +58,9 @@ func (n *SubredditNames) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	for _, sr := range subreddits {
-		*n = append(*n, sr.Name)
+	*n = make(SubredditNames, len(subreddits))
+	for i, sr := range subreddits {
+		(*n)[i] = sr.Name
 	}
 
 	return nil

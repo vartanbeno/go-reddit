@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 // GoldService handles communication with the gold
@@ -37,7 +38,7 @@ func (s *GoldService) Give(ctx context.Context, username string, months int) (*R
 	path := fmt.Sprintf("api/v1/gold/give/%s", username)
 
 	form := url.Values{}
-	form.Set("months", fmt.Sprint(months))
+	form.Set("months", strconv.Itoa(months))
 
 	req, err := s.client.NewRequest(http.MethodPost, path, form)
 	if err != nil {

@@ -398,6 +398,7 @@ func (l *trophyList) UnmarshalJSON(b []byte) error {
 		return err
 	}
 
+	*l = make(trophyList, 0, len(root.Trophies))
 	for _, thing := range root.Trophies {
 		if trophy, ok := thing.Trophy(); ok {
 			*l = append(*l, trophy)
