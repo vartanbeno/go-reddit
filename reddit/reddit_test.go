@@ -10,6 +10,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -220,4 +221,55 @@ func TestClient_ErrorResponse(t *testing.T) {
 	require.IsType(t, &ErrorResponse{}, err)
 	require.EqualError(t, err, fmt.Sprintf(`GET %s/api/v1/test: 403 error message`, client.BaseURL))
 	require.Equal(t, http.StatusForbidden, resp.StatusCode)
+}
+
+func TestClient_Do_RateLimitError(t *testing.T) {
+	client, mux, teardown := setup()
+	defer teardown()
+
+	var counter int
+	mux.HandleFunc("/api/v1/test", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		defer func() { counter++ }()
+
+		switch counter {
+		case 0:
+			w.Header().Set(headerRateLimitRemaining, "500")
+			w.Header().Set(headerRateLimitUsed, "100")
+			w.Header().Set(headerRateLimitReset, "120")
+		case 1:
+			w.Header().Set(headerRateLimitRemaining, "0")
+			w.Header().Set(headerRateLimitUsed, "600")
+			w.Header().Set(headerRateLimitReset, "240")
+		}
+	})
+
+	req, err := client.NewRequest(http.MethodGet, "api/v1/test", nil)
+	require.NoError(t, err)
+
+	client.rate.Remaining = 0
+	client.rate.Reset = time.Now().Add(time.Minute)
+
+	resp, err := client.Do(ctx, req, nil)
+	require.Equal(t, 0, counter)
+	require.IsType(t, &RateLimitError{}, err)
+	require.Equal(t, http.StatusTooManyRequests, resp.StatusCode)
+
+	client.rate = Rate{}
+
+	resp, err = client.Do(ctx, req, nil)
+	require.Equal(t, 1, counter)
+	require.Nil(t, err)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+	require.Equal(t, 500, resp.Rate.Remaining)
+	require.Equal(t, 100, resp.Rate.Used)
+	require.Equal(t, time.Now().Truncate(time.Second).Add(time.Minute*2), resp.Rate.Reset)
+
+	resp, err = client.Do(ctx, req, nil)
+	require.Equal(t, 2, counter)
+	require.IsType(t, &RateLimitError{}, err)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+	require.Equal(t, 0, resp.Rate.Remaining)
+	require.Equal(t, 600, resp.Rate.Used)
+	require.Equal(t, time.Now().Truncate(time.Second).Add(time.Minute*4), resp.Rate.Reset)
 }

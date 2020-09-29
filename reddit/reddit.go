@@ -10,7 +10,10 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/google/go-querystring/query"
 	"golang.org/x/oauth2"
@@ -30,6 +33,10 @@ const (
 	headerContentType = "Content-Type"
 	headerAccept      = "Accept"
 	headerUserAgent   = "User-Agent"
+
+	headerRateLimitRemaining = "x-ratelimit-remaining"
+	headerRateLimitUsed      = "x-ratelimit-used"
+	headerRateLimitReset     = "x-ratelimit-reset"
 )
 
 // DefaultClient is a readonly client with limited access to the Reddit API.
@@ -55,6 +62,9 @@ type Client struct {
 	TokenURL *url.URL
 
 	userAgent string
+
+	rateMu sync.Mutex
+	rate   Rate
 
 	ID       string
 	Secret   string
@@ -286,11 +296,15 @@ type Response struct {
 	// Pagination anchor indicating there are more results before this id.
 	// todo: not sure yet if responses ever contain this
 	Before string
+
+	// Rate limit information.
+	Rate Rate
 }
 
 // newResponse creates a new Response for the provided http.Response.
 func newResponse(r *http.Response) *Response {
 	response := Response{Response: r}
+	response.Rate = parseRate(r)
 	return &response
 }
 
@@ -299,10 +313,35 @@ func (r *Response) populateAnchors(a anchor) {
 	r.Before = a.Before()
 }
 
+// parseRate parses the rate related headers.
+func parseRate(r *http.Response) Rate {
+	var rate Rate
+	if remaining := r.Header.Get(headerRateLimitRemaining); remaining != "" {
+		v, _ := strconv.ParseFloat(remaining, 64)
+		rate.Remaining = int(v)
+	}
+	if used := r.Header.Get(headerRateLimitUsed); used != "" {
+		rate.Used, _ = strconv.Atoi(used)
+	}
+	if reset := r.Header.Get(headerRateLimitReset); reset != "" {
+		if v, _ := strconv.ParseInt(reset, 10, 64); v != 0 {
+			rate.Reset = time.Now().Truncate(time.Second).Add(time.Second * time.Duration(v))
+		}
+	}
+	return rate
+}
+
 // Do sends an API request and returns the API response. The API response is JSON decoded and stored in the value
 // pointed to by v, or returned as an error if an API error has occurred. If v implements the io.Writer interface,
 // the raw response will be written to v, without attempting to decode it.
 func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Response, error) {
+	if err := c.checkRateLimitBeforeDo(req); err != nil {
+		return &Response{
+			Response: err.Response,
+			Rate:     err.Rate,
+		}, err
+	}
+
 	resp, err := DoRequestWithClient(ctx, c.client, req)
 	if err != nil {
 		return nil, err
@@ -314,6 +353,10 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	}
 
 	response := newResponse(resp)
+
+	c.rateMu.Lock()
+	c.rate = response.Rate
+	c.rateMu.Unlock()
 
 	err = CheckResponse(resp)
 	if err != nil {
@@ -339,6 +382,30 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 	}
 
 	return response, nil
+}
+
+func (c *Client) checkRateLimitBeforeDo(req *http.Request) *RateLimitError {
+	c.rateMu.Lock()
+	rate := c.rate
+	c.rateMu.Unlock()
+
+	if !rate.Reset.IsZero() && rate.Remaining == 0 && time.Now().Before(rate.Reset) {
+		// Create a fake 429 response.
+		resp := &http.Response{
+			Status:     http.StatusText(http.StatusTooManyRequests),
+			StatusCode: http.StatusTooManyRequests,
+			Request:    req,
+			Header:     make(http.Header),
+			Body:       ioutil.NopCloser(strings.NewReader("")),
+		}
+		return &RateLimitError{
+			Rate:     rate,
+			Response: resp,
+			Message:  fmt.Sprintf("API rate limit still exceeded until %s, not making remote request.", rate.Reset),
+		}
+	}
+
+	return nil
 }
 
 // id returns the client's Reddit ID.
@@ -371,6 +438,15 @@ func DoRequestWithClient(ctx context.Context, client *http.Client, req *http.Req
 // A response is considered an error if it has a status code outside the 200 range.
 // Reddit also sometimes sends errors with 200 codes; we check for those too.
 func CheckResponse(r *http.Response) error {
+	if r.Header.Get(headerRateLimitRemaining) == "0" {
+		err := &RateLimitError{
+			Rate:     parseRate(r),
+			Response: r,
+		}
+		err.Message = fmt.Sprintf("API rate limit has been exceeded until %s.", err.Rate.Reset)
+		return err
+	}
+
 	jsonErrorResponse := &JSONErrorResponse{Response: r}
 
 	data, err := ioutil.ReadAll(r.Body)
@@ -400,7 +476,17 @@ func CheckResponse(r *http.Response) error {
 	return errorResponse
 }
 
-// A lot of Reddit's responses returns a "thing": { "kind": "...", "data": {...} }
+// Rate represents the rate limit for the client.
+type Rate struct {
+	// The number of remaining requests the client can make in the current 10-minute window.
+	Remaining int `json:"remaining"`
+	// The number of requests the client has made in the current 10-minute window.
+	Used int `json:"used"`
+	// The time at which the current rate limit will reset.
+	Reset time.Time `json:"reset"`
+}
+
+// A lot of Reddit's responses return a "thing": { "kind": "...", "data": {...} }
 // So this is just a nice convenient method to have.
 func (c *Client) getThing(ctx context.Context, path string, opts interface{}) (*thing, *Response, error) {
 	path, err := addOptions(path, opts)

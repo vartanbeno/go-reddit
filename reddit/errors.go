@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // APIError is an error coming from Reddit.
@@ -72,4 +73,33 @@ func (r *ErrorResponse) Error() string {
 	)
 }
 
-// todo: rate limit errors
+// RateLimitError occurs when the client is sending too many requests to Reddit in a given time frame.
+type RateLimitError struct {
+	// Rate specifies the last known rate limit for the client
+	Rate Rate
+	// HTTP response that caused this error
+	Response *http.Response
+	// Error message
+	Message string
+}
+
+func (e *RateLimitError) Error() string {
+	return fmt.Sprintf(
+		"%s %s: %d %s %s",
+		e.Response.Request.Method, e.Response.Request.URL, e.Response.StatusCode, e.Message, e.formateRateReset(),
+	)
+}
+
+func (e *RateLimitError) formateRateReset() string {
+	d := time.Until(e.Rate.Reset).Round(time.Second)
+
+	isNegative := d < 0
+	if isNegative {
+		d *= -1
+	}
+
+	if isNegative {
+		return fmt.Sprintf("[rate limit was reset %s ago]", d)
+	}
+	return fmt.Sprintf("[rate limit will reset in %s]", d)
+}
