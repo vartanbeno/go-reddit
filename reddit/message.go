@@ -42,16 +42,11 @@ type inboxThing struct {
 
 type inboxListing struct {
 	inboxThings
-	after  string
-	before string
+	after string
 }
 
 func (l *inboxListing) After() string {
 	return l.after
-}
-
-func (l *inboxListing) Before() string {
-	return l.before
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -60,7 +55,6 @@ func (l *inboxListing) UnmarshalJSON(b []byte) error {
 		Data struct {
 			Things inboxThings `json:"children"`
 			After  string      `json:"after"`
-			Before string      `json:"before"`
 		} `json:"data"`
 	})
 
@@ -71,7 +65,6 @@ func (l *inboxListing) UnmarshalJSON(b []byte) error {
 
 	l.inboxThings = root.Data.Things
 	l.after = root.Data.After
-	l.before = root.Data.Before
 
 	return nil
 }

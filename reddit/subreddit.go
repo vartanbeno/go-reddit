@@ -680,9 +680,8 @@ func (s *SubredditService) Banned(ctx context.Context, subreddit string, opts *L
 
 	root := new(struct {
 		Data struct {
-			Bans   []*Ban `json:"children"`
-			After  string `json:"after"`
-			Before string `json:"before"`
+			Bans  []*Ban `json:"children"`
+			After string `json:"after"`
 		} `json:"data"`
 	})
 	resp, err := s.client.Do(ctx, req, root)
@@ -691,8 +690,6 @@ func (s *SubredditService) Banned(ctx context.Context, subreddit string, opts *L
 	}
 
 	resp.After = root.Data.After
-	resp.Before = root.Data.Before
-
 	return root.Data.Bans, resp, nil
 }
 
@@ -714,7 +711,6 @@ func (s *SubredditService) Muted(ctx context.Context, subreddit string, opts *Li
 		Data struct {
 			Relationships []*Relationship `json:"children"`
 			After         string          `json:"after"`
-			Before        string          `json:"before"`
 		} `json:"data"`
 	})
 	resp, err := s.client.Do(ctx, req, root)
@@ -723,8 +719,6 @@ func (s *SubredditService) Muted(ctx context.Context, subreddit string, opts *Li
 	}
 
 	resp.After = root.Data.After
-	resp.Before = root.Data.Before
-
 	return root.Data.Relationships, resp, nil
 }
 
@@ -744,9 +738,8 @@ func (s *SubredditService) WikiBanned(ctx context.Context, subreddit string, opt
 
 	root := new(struct {
 		Data struct {
-			Bans   []*Ban `json:"children"`
-			After  string `json:"after"`
-			Before string `json:"before"`
+			Bans  []*Ban `json:"children"`
+			After string `json:"after"`
 		} `json:"data"`
 	})
 	resp, err := s.client.Do(ctx, req, root)
@@ -755,8 +748,6 @@ func (s *SubredditService) WikiBanned(ctx context.Context, subreddit string, opt
 	}
 
 	resp.After = root.Data.After
-	resp.Before = root.Data.Before
-
 	return root.Data.Bans, resp, nil
 }
 
@@ -778,7 +769,6 @@ func (s *SubredditService) Contributors(ctx context.Context, subreddit string, o
 		Data struct {
 			Relationships []*Relationship `json:"children"`
 			After         string          `json:"after"`
-			Before        string          `json:"before"`
 		} `json:"data"`
 	})
 	resp, err := s.client.Do(ctx, req, root)
@@ -787,8 +777,6 @@ func (s *SubredditService) Contributors(ctx context.Context, subreddit string, o
 	}
 
 	resp.After = root.Data.After
-	resp.Before = root.Data.Before
-
 	return root.Data.Relationships, resp, nil
 }
 
@@ -810,7 +798,6 @@ func (s *SubredditService) WikiContributors(ctx context.Context, subreddit strin
 		Data struct {
 			Relationships []*Relationship `json:"children"`
 			After         string          `json:"after"`
-			Before        string          `json:"before"`
 		} `json:"data"`
 	})
 	resp, err := s.client.Do(ctx, req, root)
@@ -819,8 +806,6 @@ func (s *SubredditService) WikiContributors(ctx context.Context, subreddit strin
 	}
 
 	resp.After = root.Data.After
-	resp.Before = root.Data.Before
-
 	return root.Data.Relationships, resp, nil
 }
 

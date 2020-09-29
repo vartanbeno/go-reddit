@@ -31,7 +31,6 @@ const (
 
 type anchor interface {
 	After() string
-	Before() string
 }
 
 // thing is an entity on Reddit.
@@ -51,17 +50,6 @@ func (t *thing) After() string {
 		return ""
 	}
 	return a.After()
-}
-
-func (t *thing) Before() string {
-	if t == nil {
-		return ""
-	}
-	a, ok := t.Data.(anchor)
-	if !ok {
-		return ""
-	}
-	return a.Before()
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -239,19 +227,14 @@ func (t *thing) StyleSheet() (v *SubredditStyleSheet, ok bool) {
 }
 
 // listing is a list of things coming from the Reddit API.
-// It also contains the after/before anchors useful for subsequent requests.
+// It also contains the after anchor useful to get the next results via subsequent requests.
 type listing struct {
 	things things
 	after  string
-	before string
 }
 
 func (l *listing) After() string {
 	return l.after
-}
-
-func (l *listing) Before() string {
-	return l.before
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
@@ -259,7 +242,6 @@ func (l *listing) UnmarshalJSON(b []byte) error {
 	root := new(struct {
 		Things things `json:"children"`
 		After  string `json:"after"`
-		Before string `json:"before"`
 	})
 
 	err := json.Unmarshal(b, root)
@@ -269,7 +251,6 @@ func (l *listing) UnmarshalJSON(b []byte) error {
 
 	l.things = root.Things
 	l.after = root.After
-	l.before = root.Before
 
 	return nil
 }

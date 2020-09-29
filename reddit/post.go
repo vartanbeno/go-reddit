@@ -109,8 +109,6 @@ func (s *PostService) Duplicates(ctx context.Context, id string, opts *ListDupli
 	duplicates := listing2.Posts()
 
 	resp.After = listing2.After()
-	resp.Before = listing2.Before()
-
 	return post, duplicates, resp, nil
 }
 

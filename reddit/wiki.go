@@ -127,16 +127,11 @@ type wikiPageRevisionListing struct {
 	Data struct {
 		Revisions []*WikiPageRevision `json:"children"`
 		After     string              `json:"after"`
-		Before    string              `json:"before"`
 	} `json:"data"`
 }
 
 func (l *wikiPageRevisionListing) After() string {
 	return l.Data.After
-}
-
-func (l *wikiPageRevisionListing) Before() string {
-	return l.Data.Before
 }
 
 // WikiPageRevision is a revision of a wiki page.
@@ -329,7 +324,7 @@ func (s *WikiService) revisions(ctx context.Context, subreddit, page string, opt
 	}
 
 	if opts != nil {
-		idPrefix := "WikiRevision_"
+		const idPrefix = "WikiRevision_"
 		if opts.After != "" && !strings.HasPrefix(opts.After, idPrefix) {
 			opts.After = idPrefix + opts.After
 		}

@@ -293,9 +293,6 @@ type Response struct {
 
 	// Pagination anchor indicating there are more results after this id.
 	After string
-	// Pagination anchor indicating there are more results before this id.
-	// todo: not sure yet if responses ever contain this
-	Before string
 
 	// Rate limit information.
 	Rate Rate
@@ -310,7 +307,6 @@ func newResponse(r *http.Response) *Response {
 
 func (r *Response) populateAnchors(a anchor) {
 	r.After = a.After()
-	r.Before = a.Before()
 }
 
 // parseRate parses the rate related headers.
