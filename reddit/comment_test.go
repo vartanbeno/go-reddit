@@ -324,7 +324,7 @@ func TestCommentService_LoadMoreReplies(t *testing.T) {
 	})
 
 	_, err = client.Comment.LoadMoreReplies(ctx, nil)
-	require.EqualError(t, err, "comment: cannot be nil")
+	require.EqualError(t, err, "*Comment: cannot be nil")
 
 	resp, err := client.Comment.LoadMoreReplies(ctx, &Comment{})
 	require.Nil(t, resp)

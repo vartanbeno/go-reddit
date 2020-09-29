@@ -50,9 +50,9 @@ type FlairChoice struct {
 	CSSClass   string `json:"flair_css_class"`
 }
 
-// RequestConfigureFlair represents a request to configure a subreddit's flair settings.
+// FlairConfigureRequest represents a request to configure a subreddit's flair settings.
 // Not setting an attribute can have unexpected side effects, so assign every one just in case.
-type RequestConfigureFlair struct {
+type FlairConfigureRequest struct {
 	// Enable user flair in the subreddit.
 	UserFlairEnabled *bool `url:"flair_enabled,omitempty"`
 	// One of: left, right.
@@ -196,9 +196,9 @@ func (s *FlairService) ListUserFlairs(ctx context.Context, subreddit string) ([]
 }
 
 // Configure the subreddit's flair settings.
-func (s *FlairService) Configure(ctx context.Context, subreddit string, request *RequestConfigureFlair) (*Response, error) {
+func (s *FlairService) Configure(ctx context.Context, subreddit string, request *FlairConfigureRequest) (*Response, error) {
 	if request == nil {
-		return nil, errors.New("request: cannot be nil")
+		return nil, errors.New("*FlairConfigureRequest: cannot be nil")
 	}
 
 	path := fmt.Sprintf("r/%s/api/flairconfig", subreddit)
@@ -253,7 +253,7 @@ func (s *FlairService) Disable(ctx context.Context, subreddit string) (*Response
 // It returns the created/updated flair template.
 func (s *FlairService) UpsertUserTemplate(ctx context.Context, subreddit string, request *FlairTemplateCreateOrUpdateRequest) (*FlairTemplate, *Response, error) {
 	if request == nil {
-		return nil, nil, errors.New("request: cannot be nil")
+		return nil, nil, errors.New("*FlairTemplateCreateOrUpdateRequest: cannot be nil")
 	}
 
 	path := fmt.Sprintf("r/%s/api/flairtemplate_v2", subreddit)
@@ -283,7 +283,7 @@ func (s *FlairService) UpsertUserTemplate(ctx context.Context, subreddit string,
 // It returns the created/updated flair template.
 func (s *FlairService) UpsertPostTemplate(ctx context.Context, subreddit string, request *FlairTemplateCreateOrUpdateRequest) (*FlairTemplate, *Response, error) {
 	if request == nil {
-		return nil, nil, errors.New("request: cannot be nil")
+		return nil, nil, errors.New("*FlairTemplateCreateOrUpdateRequest: cannot be nil")
 	}
 
 	path := fmt.Sprintf("r/%s/api/flairtemplate_v2", subreddit)
@@ -456,7 +456,7 @@ func (s *FlairService) Select(ctx context.Context, subreddit string, request *Fl
 // This only works if you're a moderator of the subreddit, or if the user is you.
 func (s *FlairService) Assign(ctx context.Context, subreddit, user string, request *FlairSelectRequest) (*Response, error) {
 	if request == nil {
-		return nil, errors.New("request: cannot be nil")
+		return nil, errors.New("*FlairSelectRequest: cannot be nil")
 	}
 
 	path := fmt.Sprintf("r/%s/api/selectflair", subreddit)
@@ -480,7 +480,7 @@ func (s *FlairService) Assign(ctx context.Context, subreddit, user string, reque
 // If the post isn't yours, you have to be a moderator of the post's subreddit for this to work.
 func (s *FlairService) SelectForPost(ctx context.Context, postID string, request *FlairSelectRequest) (*Response, error) {
 	if request == nil {
-		return nil, errors.New("request: cannot be nil")
+		return nil, errors.New("*FlairSelectRequest: cannot be nil")
 	}
 
 	path := "api/selectflair"

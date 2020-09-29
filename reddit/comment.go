@@ -69,7 +69,7 @@ func (s *CommentService) Edit(ctx context.Context, id string, text string) (*Com
 // LoadMoreReplies retrieves more replies that were left out when initially fetching the comment.
 func (s *CommentService) LoadMoreReplies(ctx context.Context, comment *Comment) (*Response, error) {
 	if comment == nil {
-		return nil, errors.New("comment: cannot be nil")
+		return nil, errors.New("*Comment: cannot be nil")
 	}
 
 	if !comment.HasMore() {

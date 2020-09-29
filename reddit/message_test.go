@@ -204,7 +204,7 @@ func TestMessageService_Send(t *testing.T) {
 	})
 
 	_, err := client.Message.Send(ctx, nil)
-	require.EqualError(t, err, "sendRequest: cannot be nil")
+	require.EqualError(t, err, "*SendMessageRequest: cannot be nil")
 
 	_, err = client.Message.Send(ctx, &SendMessageRequest{
 		To:            "test",

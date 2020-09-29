@@ -21,7 +21,7 @@ func TestWithCredentials(t *testing.T) {
 
 func TestWithHTTPClient(t *testing.T) {
 	_, err := NewClient(WithHTTPClient(nil))
-	require.EqualError(t, err, "httpClient: cannot be nil")
+	require.EqualError(t, err, "*http.Client: cannot be nil")
 
 	_, err = NewClient(WithHTTPClient(&http.Client{}))
 	require.NoError(t, err)

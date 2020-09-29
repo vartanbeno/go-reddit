@@ -469,7 +469,7 @@ func (s *PostService) DisableContestMode(ctx context.Context, id string) (*Respo
 // LoadMoreComments retrieves more comments that were left out when initially fetching the post.
 func (s *PostService) LoadMoreComments(ctx context.Context, pc *PostAndComments) (*Response, error) {
 	if pc == nil {
-		return nil, errors.New("pc: cannot be nil")
+		return nil, errors.New("*PostAndComments: cannot be nil")
 	}
 
 	if !pc.HasMore() {

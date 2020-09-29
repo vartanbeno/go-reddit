@@ -187,10 +187,10 @@ func TestEmojiService_Upload(t *testing.T) {
 	})
 
 	_, err = client.Emoji.Upload(ctx, "testsubreddit", nil, emojiFile.Name())
-	require.EqualError(t, err, "createRequest: cannot be nil")
+	require.EqualError(t, err, "*EmojiCreateOrUpdateRequest: cannot be nil")
 
 	_, err = client.Emoji.Upload(ctx, "testsubreddit", &EmojiCreateOrUpdateRequest{Name: ""}, emojiFile.Name())
-	require.EqualError(t, err, "name: cannot be empty")
+	require.EqualError(t, err, "(*EmojiCreateOrUpdateRequest).Name: cannot be empty")
 
 	_, err = client.Emoji.Upload(ctx, "testsubreddit", &EmojiCreateOrUpdateRequest{
 		Name:             "testemoji",
@@ -219,10 +219,10 @@ func TestEmojiService_Update(t *testing.T) {
 	})
 
 	_, err := client.Emoji.Update(ctx, "testsubreddit", nil)
-	require.EqualError(t, err, "updateRequest: cannot be nil")
+	require.EqualError(t, err, "*EmojiCreateOrUpdateRequest: cannot be nil")
 
 	_, err = client.Emoji.Update(ctx, "testsubreddit", &EmojiCreateOrUpdateRequest{Name: ""})
-	require.EqualError(t, err, "name: cannot be empty")
+	require.EqualError(t, err, "(*EmojiCreateOrUpdateRequest).Name: cannot be empty")
 
 	_, err = client.Emoji.Update(ctx, "testsubreddit", &EmojiCreateOrUpdateRequest{
 		Name:             "testemoji",

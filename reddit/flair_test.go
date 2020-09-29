@@ -223,9 +223,9 @@ func TestFlairService_Configure(t *testing.T) {
 	})
 
 	_, err := client.Flair.Configure(ctx, "testsubreddit", nil)
-	require.EqualError(t, err, "request: cannot be nil")
+	require.EqualError(t, err, "*FlairConfigureRequest: cannot be nil")
 
-	_, err = client.Flair.Configure(ctx, "testsubreddit", &RequestConfigureFlair{
+	_, err = client.Flair.Configure(ctx, "testsubreddit", &FlairConfigureRequest{
 		UserFlairEnabled:           Bool(true),
 		UserFlairPosition:          "right",
 		UserFlairSelfAssignEnabled: Bool(false),
@@ -305,7 +305,7 @@ func TestFlairService_UpsertUserTemplate(t *testing.T) {
 	})
 
 	_, _, err = client.Flair.UpsertUserTemplate(ctx, "testsubreddit", nil)
-	require.EqualError(t, err, "request: cannot be nil")
+	require.EqualError(t, err, "*FlairTemplateCreateOrUpdateRequest: cannot be nil")
 
 	flairTemplate, _, err := client.Flair.UpsertUserTemplate(ctx, "testsubreddit", &FlairTemplateCreateOrUpdateRequest{
 		AllowableContent: "all",
@@ -351,7 +351,7 @@ func TestFlairService_UpsertPostTemplate(t *testing.T) {
 	})
 
 	_, _, err = client.Flair.UpsertPostTemplate(ctx, "testsubreddit", nil)
-	require.EqualError(t, err, "request: cannot be nil")
+	require.EqualError(t, err, "*FlairTemplateCreateOrUpdateRequest: cannot be nil")
 
 	flairTemplate, _, err := client.Flair.UpsertPostTemplate(ctx, "testsubreddit", &FlairTemplateCreateOrUpdateRequest{
 		ID:               "testid",
@@ -603,7 +603,7 @@ func TestFlairService_Select(t *testing.T) {
 	})
 
 	_, err := client.Flair.Select(ctx, "testsubreddit", nil)
-	require.EqualError(t, err, "request: cannot be nil")
+	require.EqualError(t, err, "*FlairSelectRequest: cannot be nil")
 
 	_, err = client.Flair.Select(ctx, "testsubreddit", &FlairSelectRequest{
 		ID:   "id123",
@@ -630,7 +630,7 @@ func TestFlairService_Assign(t *testing.T) {
 	})
 
 	_, err := client.Flair.Assign(ctx, "testsubreddit", "testuser", nil)
-	require.EqualError(t, err, "request: cannot be nil")
+	require.EqualError(t, err, "*FlairSelectRequest: cannot be nil")
 
 	_, err = client.Flair.Assign(ctx, "testsubreddit", "testuser", &FlairSelectRequest{
 		ID: "id123",
@@ -657,7 +657,7 @@ func TestFlairService_SelectForPost(t *testing.T) {
 	})
 
 	_, err := client.Flair.SelectForPost(ctx, "t3_123", nil)
-	require.EqualError(t, err, "request: cannot be nil")
+	require.EqualError(t, err, "*FlairSelectRequest: cannot be nil")
 
 	_, err = client.Flair.SelectForPost(ctx, "t3_123", &FlairSelectRequest{
 		ID:   "id123",

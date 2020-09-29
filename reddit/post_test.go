@@ -845,7 +845,7 @@ func TestPostService_LoadMoreReplies(t *testing.T) {
 	})
 
 	_, err = client.Post.LoadMoreComments(ctx, nil)
-	require.EqualError(t, err, "pc: cannot be nil")
+	require.EqualError(t, err, "*PostAndComments: cannot be nil")
 
 	resp, err := client.Post.LoadMoreComments(ctx, &PostAndComments{})
 	require.Nil(t, resp)

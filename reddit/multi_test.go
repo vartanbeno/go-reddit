@@ -118,7 +118,7 @@ func TestMultiService_Copy(t *testing.T) {
 	})
 
 	_, _, err = client.Multi.Copy(ctx, nil)
-	require.EqualError(t, err, "copyRequest: cannot be nil")
+	require.EqualError(t, err, "*MultiCopyRequest: cannot be nil")
 
 	multi, _, err := client.Multi.Copy(ctx, &MultiCopyRequest{
 		FromPath:    "user/testuser/m/testmulti",
@@ -161,7 +161,7 @@ func TestMultiService_Create(t *testing.T) {
 	})
 
 	_, _, err = client.Multi.Create(ctx, nil)
-	require.EqualError(t, err, "createRequest: cannot be nil")
+	require.EqualError(t, err, "*MultiCreateOrUpdateRequest: cannot be nil")
 
 	multi, _, err := client.Multi.Create(ctx, createRequest)
 	require.NoError(t, err)
@@ -198,7 +198,7 @@ func TestMultiService_Update(t *testing.T) {
 	})
 
 	_, _, err = client.Multi.Update(ctx, "user/testuser/m/testmulti", nil)
-	require.EqualError(t, err, "updateRequest: cannot be nil")
+	require.EqualError(t, err, "*MultiCreateOrUpdateRequest: cannot be nil")
 
 	multi, _, err := client.Multi.Update(ctx, "user/testuser/m/testmulti", updateRequest)
 	require.NoError(t, err)

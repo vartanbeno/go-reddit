@@ -234,7 +234,7 @@ func (s *MessageService) Delete(ctx context.Context, id string) (*Response, erro
 // Send a message.
 func (s *MessageService) Send(ctx context.Context, sendRequest *SendMessageRequest) (*Response, error) {
 	if sendRequest == nil {
-		return nil, errors.New("sendRequest: cannot be nil")
+		return nil, errors.New("*SendMessageRequest: cannot be nil")
 	}
 
 	path := "api/compose"

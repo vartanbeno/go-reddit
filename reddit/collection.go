@@ -106,7 +106,7 @@ func (s *CollectionService) FromSubreddit(ctx context.Context, id string) ([]*Co
 // Create a collection.
 func (s *CollectionService) Create(ctx context.Context, createRequest *CollectionCreateRequest) (*Collection, *Response, error) {
 	if createRequest == nil {
-		return nil, nil, errors.New("createRequest: cannot be nil")
+		return nil, nil, errors.New("*CollectionCreateRequest: cannot be nil")
 	}
 
 	path := "api/v1/collections/create_collection"

@@ -25,7 +25,7 @@ func WithCredentials(id, secret, username, password string) Opt {
 func WithHTTPClient(httpClient *http.Client) Opt {
 	return func(c *Client) error {
 		if httpClient == nil {
-			return errors.New("httpClient: cannot be nil")
+			return errors.New("*http.Client: cannot be nil")
 		}
 		c.client = httpClient
 		return nil

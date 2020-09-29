@@ -216,7 +216,7 @@ func (s *WikiService) Pages(ctx context.Context, subreddit string) ([]string, *R
 // Edit a wiki page.
 func (s *WikiService) Edit(ctx context.Context, editRequest *WikiPageEditRequest) (*Response, error) {
 	if editRequest == nil {
-		return nil, errors.New("editRequest: cannot be nil")
+		return nil, errors.New("*WikiPageEditRequest: cannot be nil")
 	}
 
 	form, err := query.Values(editRequest)
@@ -263,7 +263,7 @@ func (s *WikiService) Settings(ctx context.Context, subreddit, page string) (*Wi
 // UpdateSettings updates the subreddit's wiki page's settings.
 func (s *WikiService) UpdateSettings(ctx context.Context, subreddit, page string, updateRequest *WikiPageSettingsUpdateRequest) (*WikiPageSettings, *Response, error) {
 	if updateRequest == nil {
-		return nil, nil, errors.New("updateRequest: cannot be nil")
+		return nil, nil, errors.New("*WikiPageSettingsUpdateRequest: cannot be nil")
 	}
 
 	form, err := query.Values(updateRequest)

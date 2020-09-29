@@ -45,9 +45,11 @@ type EmojiCreateOrUpdateRequest struct {
 }
 
 func (r *EmojiCreateOrUpdateRequest) validate() error {
-	// todo if r == nil { ... }
+	if r == nil {
+		return errors.New("*EmojiCreateOrUpdateRequest: cannot be nil")
+	}
 	if r.Name == "" {
-		return errors.New("name: cannot be empty")
+		return errors.New("(*EmojiCreateOrUpdateRequest).Name: cannot be empty")
 	}
 	return nil
 }
@@ -198,10 +200,6 @@ func (s *EmojiService) upload(ctx context.Context, subreddit string, createReque
 
 // Upload an emoji to the subreddit.
 func (s *EmojiService) Upload(ctx context.Context, subreddit string, createRequest *EmojiCreateOrUpdateRequest, imagePath string) (*Response, error) {
-	if createRequest == nil {
-		return nil, errors.New("createRequest: cannot be nil")
-	}
-
 	err := createRequest.validate()
 	if err != nil {
 		return nil, err
@@ -257,10 +255,6 @@ func (s *EmojiService) Upload(ctx context.Context, subreddit string, createReque
 
 // Update updates an emoji on the subreddit.
 func (s *EmojiService) Update(ctx context.Context, subreddit string, updateRequest *EmojiCreateOrUpdateRequest) (*Response, error) {
-	if updateRequest == nil {
-		return nil, errors.New("updateRequest: cannot be nil")
-	}
-
 	err := updateRequest.validate()
 	if err != nil {
 		return nil, err

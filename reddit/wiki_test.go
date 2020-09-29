@@ -195,7 +195,7 @@ func TestWikiService_Edit(t *testing.T) {
 	})
 
 	_, err := client.Wiki.Edit(ctx, nil)
-	require.EqualError(t, err, "editRequest: cannot be nil")
+	require.EqualError(t, err, "*WikiPageEditRequest: cannot be nil")
 
 	_, err = client.Wiki.Edit(ctx, &WikiPageEditRequest{
 		Subreddit: "testsubreddit",
@@ -265,7 +265,7 @@ func TestWikiService_UpdateSettings(t *testing.T) {
 	})
 
 	_, _, err = client.Wiki.UpdateSettings(ctx, "testsubreddit", "testpage", nil)
-	require.EqualError(t, err, "updateRequest: cannot be nil")
+	require.EqualError(t, err, "*WikiPageSettingsUpdateRequest: cannot be nil")
 
 	wikiPageSettings, _, err := client.Wiki.UpdateSettings(ctx, "testsubreddit", "testpage", &WikiPageSettingsUpdateRequest{
 		Listed:          Bool(false),

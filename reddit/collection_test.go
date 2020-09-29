@@ -144,7 +144,7 @@ func TestCollectionService_Create(t *testing.T) {
 	})
 
 	_, _, err = client.Collection.Create(ctx, nil)
-	require.EqualError(t, err, "createRequest: cannot be nil")
+	require.EqualError(t, err, "*CollectionCreateRequest: cannot be nil")
 
 	collection, _, err := client.Collection.Create(ctx, &CollectionCreateRequest{
 		Title:       "Test Title",
