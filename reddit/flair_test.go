@@ -152,8 +152,7 @@ var expectedFlairChanges = []*FlairChangeResponse{
 }
 
 func TestFlairService_GetUserFlairs(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/user-flairs.json")
 	require.NoError(t, err)
@@ -169,8 +168,7 @@ func TestFlairService_GetUserFlairs(t *testing.T) {
 }
 
 func TestFlairService_GetPostFlairs(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/post-flairs.json")
 	require.NoError(t, err)
@@ -186,8 +184,7 @@ func TestFlairService_GetPostFlairs(t *testing.T) {
 }
 
 func TestFlairService_ListUserFlairs(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/list-user-flairs.json")
 	require.NoError(t, err)
@@ -203,8 +200,7 @@ func TestFlairService_ListUserFlairs(t *testing.T) {
 }
 
 func TestFlairService_Configure(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/flairconfig", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -236,8 +232,7 @@ func TestFlairService_Configure(t *testing.T) {
 }
 
 func TestFlairService_Enable(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/setflairenabled", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -256,8 +251,7 @@ func TestFlairService_Enable(t *testing.T) {
 }
 
 func TestFlairService_Disable(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/setflairenabled", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -276,8 +270,7 @@ func TestFlairService_Disable(t *testing.T) {
 }
 
 func TestFlairService_UpsertUserTemplate(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/flair-template.json")
 	require.NoError(t, err)
@@ -322,8 +315,7 @@ func TestFlairService_UpsertUserTemplate(t *testing.T) {
 }
 
 func TestFlairService_UpsertPostTemplate(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/flair-template.json")
 	require.NoError(t, err)
@@ -368,8 +360,7 @@ func TestFlairService_UpsertPostTemplate(t *testing.T) {
 }
 
 func TestFlairService_Delete(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/deleteflair", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -388,8 +379,7 @@ func TestFlairService_Delete(t *testing.T) {
 }
 
 func TestFlairService_DeleteTemplate(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/deleteflairtemplate", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -408,8 +398,7 @@ func TestFlairService_DeleteTemplate(t *testing.T) {
 }
 
 func TestFlairService_DeleteAllUserTemplates(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/clearflairtemplates", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -428,8 +417,7 @@ func TestFlairService_DeleteAllUserTemplates(t *testing.T) {
 }
 
 func TestFlairService_DeleteAllPostTemplates(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/clearflairtemplates", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -448,8 +436,7 @@ func TestFlairService_DeleteAllPostTemplates(t *testing.T) {
 }
 
 func TestFlairService_ReorderUserTemplates(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/testsubreddit/flair_template_order/USER_FLAIR", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPatch, r.Method)
@@ -465,8 +452,7 @@ func TestFlairService_ReorderUserTemplates(t *testing.T) {
 }
 
 func TestFlairService_ReorderPostTemplates(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/testsubreddit/flair_template_order/LINK_FLAIR", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPatch, r.Method)
@@ -482,8 +468,7 @@ func TestFlairService_ReorderPostTemplates(t *testing.T) {
 }
 
 func TestFlairService_Choices(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/choices.json")
 	require.NoError(t, err)
@@ -508,8 +493,7 @@ func TestFlairService_Choices(t *testing.T) {
 }
 
 func TestFlairService_ChoicesOf(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/choices.json")
 	require.NoError(t, err)
@@ -534,8 +518,7 @@ func TestFlairService_ChoicesOf(t *testing.T) {
 }
 
 func TestFlairService_ChoicesForPost(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/choices.json")
 	require.NoError(t, err)
@@ -560,8 +543,7 @@ func TestFlairService_ChoicesForPost(t *testing.T) {
 }
 
 func TestFlairService_ChoicesForNewPost(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/choices.json")
 	require.NoError(t, err)
@@ -585,8 +567,7 @@ func TestFlairService_ChoicesForNewPost(t *testing.T) {
 }
 
 func TestFlairService_Select(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/selectflair", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -613,8 +594,7 @@ func TestFlairService_Select(t *testing.T) {
 }
 
 func TestFlairService_Assign(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/selectflair", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -639,8 +619,7 @@ func TestFlairService_Assign(t *testing.T) {
 }
 
 func TestFlairService_SelectForPost(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/selectflair", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -667,8 +646,7 @@ func TestFlairService_SelectForPost(t *testing.T) {
 }
 
 func TestFlairService_RemoveFromPost(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/selectflair", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -687,8 +665,7 @@ func TestFlairService_RemoveFromPost(t *testing.T) {
 }
 
 func TestFlairService_Change(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/flair/csv-change.json")
 	require.NoError(t, err)

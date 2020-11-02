@@ -212,8 +212,7 @@ var expectedPostDuplicates = []*Post{
 }
 
 func TestPostService_Get(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
@@ -229,8 +228,7 @@ func TestPostService_Get(t *testing.T) {
 }
 
 func TestPostService_Duplicates(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/duplicates.json")
 	require.NoError(t, err)
@@ -262,8 +260,7 @@ func TestPostService_Duplicates(t *testing.T) {
 }
 
 func TestPostService_SubmitText(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/submit.json")
 	require.NoError(t, err)
@@ -297,8 +294,7 @@ func TestPostService_SubmitText(t *testing.T) {
 }
 
 func TestPostService_SubmitLink(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/submit.json")
 	require.NoError(t, err)
@@ -336,8 +332,7 @@ func TestPostService_SubmitLink(t *testing.T) {
 }
 
 func TestPostService_Edit(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/edit.json")
 	require.NoError(t, err)
@@ -364,8 +359,7 @@ func TestPostService_Edit(t *testing.T) {
 }
 
 func TestPostService_Hide(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/hide", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -387,8 +381,7 @@ func TestPostService_Hide(t *testing.T) {
 }
 
 func TestPostService_Unhide(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/unhide", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -410,8 +403,7 @@ func TestPostService_Unhide(t *testing.T) {
 }
 
 func TestPostService_MarkNSFW(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/marknsfw", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -430,8 +422,7 @@ func TestPostService_MarkNSFW(t *testing.T) {
 }
 
 func TestPostService_UnmarkNSFW(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/unmarknsfw", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -450,8 +441,7 @@ func TestPostService_UnmarkNSFW(t *testing.T) {
 }
 
 func TestPostService_Spoiler(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/spoiler", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -470,8 +460,7 @@ func TestPostService_Spoiler(t *testing.T) {
 }
 
 func TestPostService_Unspoiler(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/unspoiler", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -490,8 +479,7 @@ func TestPostService_Unspoiler(t *testing.T) {
 }
 
 func TestPostService_Sticky(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_subreddit_sticky", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -513,8 +501,7 @@ func TestPostService_Sticky(t *testing.T) {
 }
 
 func TestPostService_Unsticky(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_subreddit_sticky", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -535,8 +522,7 @@ func TestPostService_Unsticky(t *testing.T) {
 }
 
 func TestPostService_PinToProfile(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_subreddit_sticky", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -558,8 +544,7 @@ func TestPostService_PinToProfile(t *testing.T) {
 }
 
 func TestPostService_UnpinFromProfile(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_subreddit_sticky", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -581,8 +566,7 @@ func TestPostService_UnpinFromProfile(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortBest(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -603,8 +587,7 @@ func TestPostService_SetSuggestedSortBest(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortTop(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -625,8 +608,7 @@ func TestPostService_SetSuggestedSortTop(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortNew(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -647,8 +629,7 @@ func TestPostService_SetSuggestedSortNew(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortControversial(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -669,8 +650,7 @@ func TestPostService_SetSuggestedSortControversial(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortOld(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -691,8 +671,7 @@ func TestPostService_SetSuggestedSortOld(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortRandom(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -713,8 +692,7 @@ func TestPostService_SetSuggestedSortRandom(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortAMA(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -735,8 +713,7 @@ func TestPostService_SetSuggestedSortAMA(t *testing.T) {
 }
 
 func TestPostService_SetSuggestedSortLive(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -757,8 +734,7 @@ func TestPostService_SetSuggestedSortLive(t *testing.T) {
 }
 
 func TestPostService_ClearSuggestedSort(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_suggested_sort", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -779,8 +755,7 @@ func TestPostService_ClearSuggestedSort(t *testing.T) {
 }
 
 func TestPostService_EnableContestMode(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_contest_mode", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -801,8 +776,7 @@ func TestPostService_EnableContestMode(t *testing.T) {
 }
 
 func TestPostService_DisableContestMode(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/set_contest_mode", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -823,8 +797,7 @@ func TestPostService_DisableContestMode(t *testing.T) {
 }
 
 func TestPostService_LoadMoreReplies(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/more.json")
 	require.NoError(t, err)
@@ -875,8 +848,7 @@ func TestPostService_LoadMoreReplies(t *testing.T) {
 }
 
 func TestPostService_RandomFromSubreddits(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
@@ -892,8 +864,7 @@ func TestPostService_RandomFromSubreddits(t *testing.T) {
 }
 
 func TestPostService_Random(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
@@ -909,8 +880,7 @@ func TestPostService_Random(t *testing.T) {
 }
 
 func TestPostService_RandomFromSubscriptions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
@@ -926,8 +896,7 @@ func TestPostService_RandomFromSubscriptions(t *testing.T) {
 }
 
 func TestPostService_Delete(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/del", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -946,8 +915,7 @@ func TestPostService_Delete(t *testing.T) {
 }
 
 func TestPostService_Save(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/save", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -966,8 +934,7 @@ func TestPostService_Save(t *testing.T) {
 }
 
 func TestPostService_Unsave(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/unsave", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -986,8 +953,7 @@ func TestPostService_Unsave(t *testing.T) {
 }
 
 func TestPostService_EnableReplies(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1007,8 +973,7 @@ func TestPostService_EnableReplies(t *testing.T) {
 }
 
 func TestPostService_DisableReplies(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1028,8 +993,7 @@ func TestPostService_DisableReplies(t *testing.T) {
 }
 
 func TestPostService_Lock(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/lock", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1048,8 +1012,7 @@ func TestPostService_Lock(t *testing.T) {
 }
 
 func TestPostService_Unlock(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/unlock", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1068,8 +1031,7 @@ func TestPostService_Unlock(t *testing.T) {
 }
 
 func TestPostService_Upvote(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1090,8 +1052,7 @@ func TestPostService_Upvote(t *testing.T) {
 }
 
 func TestPostService_Downvote(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1112,8 +1073,7 @@ func TestPostService_Downvote(t *testing.T) {
 }
 
 func TestPostService_RemoveVote(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1134,8 +1094,7 @@ func TestPostService_RemoveVote(t *testing.T) {
 }
 
 func TestPostService_MarkVisited(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/store_visits", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1156,8 +1115,7 @@ func TestPostService_MarkVisited(t *testing.T) {
 }
 
 func TestPostService_Report(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/report", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

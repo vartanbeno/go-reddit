@@ -46,8 +46,7 @@ var expectedModActions = []*ModAction{
 }
 
 func TestModerationService_Actions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/moderation/actions.json")
 	require.NoError(t, err)
@@ -73,8 +72,7 @@ func TestModerationService_Actions(t *testing.T) {
 }
 
 func TestModerationService_AcceptInvite(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/moderation/actions.json")
 	require.NoError(t, err)
@@ -97,8 +95,7 @@ func TestModerationService_AcceptInvite(t *testing.T) {
 }
 
 func TestModerationService_Approve(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/approve", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -116,8 +113,7 @@ func TestModerationService_Approve(t *testing.T) {
 }
 
 func TestModerationService_Remove(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/remove", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -136,8 +132,7 @@ func TestModerationService_Remove(t *testing.T) {
 }
 
 func TestModerationService_RemoveSpam(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/remove", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -156,8 +151,7 @@ func TestModerationService_RemoveSpam(t *testing.T) {
 }
 
 func TestModerationService_Leave(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/leavemoderator", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -175,8 +169,7 @@ func TestModerationService_Leave(t *testing.T) {
 }
 
 func TestModerationService_LeaveContributor(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/leavecontributor", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -194,8 +187,7 @@ func TestModerationService_LeaveContributor(t *testing.T) {
 }
 
 func TestModerationService_Reported(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// contains posts and comments
 	blob, err := readFileContents("../testdata/user/overview.json")
@@ -219,8 +211,7 @@ func TestModerationService_Reported(t *testing.T) {
 }
 
 func TestModerationService_Spam(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// contains posts and comments
 	blob, err := readFileContents("../testdata/user/overview.json")
@@ -244,8 +235,7 @@ func TestModerationService_Spam(t *testing.T) {
 }
 
 func TestModerationService_Queue(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// contains posts and comments
 	blob, err := readFileContents("../testdata/user/overview.json")
@@ -269,8 +259,7 @@ func TestModerationService_Queue(t *testing.T) {
 }
 
 func TestModerationService_Unmoderated(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// contains posts and comments
 	blob, err := readFileContents("../testdata/user/overview.json")
@@ -290,8 +279,7 @@ func TestModerationService_Unmoderated(t *testing.T) {
 }
 
 func TestModerationService_Edited(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// contains posts and comments
 	blob, err := readFileContents("../testdata/user/overview.json")
@@ -315,8 +303,7 @@ func TestModerationService_Edited(t *testing.T) {
 }
 
 func TestModerationService_IgnoreReports(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/ignore_reports", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -334,8 +321,7 @@ func TestModerationService_IgnoreReports(t *testing.T) {
 }
 
 func TestModerationService_UnignoreReports(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/unignore_reports", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -353,8 +339,7 @@ func TestModerationService_UnignoreReports(t *testing.T) {
 }
 
 func TestModerationService_Invite(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -375,8 +360,7 @@ func TestModerationService_Invite(t *testing.T) {
 }
 
 func TestModerationService_Invite_Permissions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -397,8 +381,7 @@ func TestModerationService_Invite_Permissions(t *testing.T) {
 }
 
 func TestModerationService_Uninvite(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -418,8 +401,7 @@ func TestModerationService_Uninvite(t *testing.T) {
 }
 
 func TestModerationService_SetPermissions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/setpermissions", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -440,8 +422,7 @@ func TestModerationService_SetPermissions(t *testing.T) {
 }
 
 func TestModerationService_Ban(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -470,8 +451,7 @@ func TestModerationService_Ban(t *testing.T) {
 }
 
 func TestModerationService_Unban(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -491,8 +471,7 @@ func TestModerationService_Unban(t *testing.T) {
 }
 
 func TestModerationService_BanWiki(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -521,8 +500,7 @@ func TestModerationService_BanWiki(t *testing.T) {
 }
 
 func TestModerationService_UnbanWiki(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -542,8 +520,7 @@ func TestModerationService_UnbanWiki(t *testing.T) {
 }
 
 func TestModerationService_Mute(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -563,8 +540,7 @@ func TestModerationService_Mute(t *testing.T) {
 }
 
 func TestModerationService_Unmuted(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -584,8 +560,7 @@ func TestModerationService_Unmuted(t *testing.T) {
 }
 
 func TestModerationService_ApproveUser(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -605,8 +580,7 @@ func TestModerationService_ApproveUser(t *testing.T) {
 }
 
 func TestModerationService_UnapproveUser(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -626,8 +600,7 @@ func TestModerationService_UnapproveUser(t *testing.T) {
 }
 
 func TestModerationService_ApproveUserWiki(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/friend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -647,8 +620,7 @@ func TestModerationService_ApproveUserWiki(t *testing.T) {
 }
 
 func TestModerationService_UnapproveUserWiki(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/unfriend", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -668,8 +640,7 @@ func TestModerationService_UnapproveUserWiki(t *testing.T) {
 }
 
 func TestModerationService_Distinguish(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/distinguish", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -689,8 +660,7 @@ func TestModerationService_Distinguish(t *testing.T) {
 }
 
 func TestModerationService_DistinguishAndSticky(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/distinguish", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -711,8 +681,7 @@ func TestModerationService_DistinguishAndSticky(t *testing.T) {
 }
 
 func TestModerationService_Undistinguish(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/distinguish", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

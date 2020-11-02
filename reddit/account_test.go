@@ -123,8 +123,7 @@ var expectedRelationships2 = []Relationship{
 }
 
 func TestAccountService_Info(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/account/info.json")
 	require.NoError(t, err)
@@ -140,8 +139,7 @@ func TestAccountService_Info(t *testing.T) {
 }
 
 func TestAccountService_Karma(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/account/karma.json")
 	require.NoError(t, err)
@@ -157,8 +155,7 @@ func TestAccountService_Karma(t *testing.T) {
 }
 
 func TestAccountService_Settings(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/account/settings.json")
 	require.NoError(t, err)
@@ -174,8 +171,7 @@ func TestAccountService_Settings(t *testing.T) {
 }
 
 func TestAccountService_UpdateSettings(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/account/settings.json")
 	require.NoError(t, err)
@@ -199,8 +195,7 @@ func TestAccountService_UpdateSettings(t *testing.T) {
 }
 
 func TestAccountService_Trophies(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/account/trophies.json")
 	require.NoError(t, err)
@@ -216,8 +211,7 @@ func TestAccountService_Trophies(t *testing.T) {
 }
 
 func TestAccountService_Friends(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/account/friends.json")
 	require.NoError(t, err)
@@ -233,8 +227,7 @@ func TestAccountService_Friends(t *testing.T) {
 }
 
 func TestAccountService_Blocked(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/account/blocked.json")
 	require.NoError(t, err)
@@ -250,8 +243,7 @@ func TestAccountService_Blocked(t *testing.T) {
 }
 
 func TestAccountService_Messaging(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/account/messaging.json")
 	require.NoError(t, err)
@@ -268,8 +260,7 @@ func TestAccountService_Messaging(t *testing.T) {
 }
 
 func TestAccountService_Trusted(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/account/trusted.json")
 	require.NoError(t, err)
@@ -285,8 +276,7 @@ func TestAccountService_Trusted(t *testing.T) {
 }
 
 func TestAccountService_AddTrusted(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/add_whitelisted", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -305,8 +295,7 @@ func TestAccountService_AddTrusted(t *testing.T) {
 }
 
 func TestAccountService_RemoveTrusted(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/remove_whitelisted", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

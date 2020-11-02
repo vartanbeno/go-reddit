@@ -17,9 +17,11 @@ import (
 
 var ctx = context.Background()
 
-func setup() (*Client, *http.ServeMux, func()) {
+func setup(t testing.TB) (*Client, *http.ServeMux) {
 	mux := http.NewServeMux()
+
 	server := httptest.NewServer(mux)
+	t.Cleanup(server.Close)
 
 	mux.HandleFunc("/api/v1/access_token", func(w http.ResponseWriter, r *http.Request) {
 		response := `{
@@ -38,7 +40,7 @@ func setup() (*Client, *http.ServeMux, func()) {
 		WithTokenURL(server.URL+"/api/v1/access_token"),
 	)
 
-	return client, mux, server.Close
+	return client, mux
 }
 
 func readFileContents(path string) (string, error) {
@@ -145,8 +147,7 @@ func TestClient_Readonly_NewRequest(t *testing.T) {
 }
 
 func TestClient_OnRequestComplemented(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	var i int
 	cb := func(*http.Request, *http.Response) {
@@ -175,8 +176,7 @@ func TestClient_OnRequestComplemented(t *testing.T) {
 }
 
 func TestClient_JSONErrorResponse(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/test", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
@@ -203,8 +203,7 @@ func TestClient_JSONErrorResponse(t *testing.T) {
 }
 
 func TestClient_ErrorResponse(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/test", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
@@ -224,8 +223,7 @@ func TestClient_ErrorResponse(t *testing.T) {
 }
 
 func TestClient_Do_RateLimitError(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	var counter int
 	mux.HandleFunc("/api/v1/test", func(w http.ResponseWriter, r *http.Request) {

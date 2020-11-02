@@ -9,8 +9,7 @@ import (
 )
 
 func TestGoldService_Gild(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/gold/gild/t1_test", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -21,8 +20,7 @@ func TestGoldService_Gild(t *testing.T) {
 }
 
 func TestGoldService_Give(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/gold/give/testuser", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

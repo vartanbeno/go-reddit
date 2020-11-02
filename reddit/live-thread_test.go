@@ -171,8 +171,7 @@ var expectedLiveThreadContributorsAndInvited = &LiveThreadContributors{
 }
 
 func TestLiveThreadService_Get(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/live-thread/live-thread.json")
 	require.NoError(t, err)
@@ -188,8 +187,7 @@ func TestLiveThreadService_Get(t *testing.T) {
 }
 
 func TestLiveThreadService_Now(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/live-thread/live-thread.json")
 	require.NoError(t, err)
@@ -205,8 +203,7 @@ func TestLiveThreadService_Now(t *testing.T) {
 }
 
 func TestLiveThreadService_Now_NoContent(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/happening_now", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
@@ -219,8 +216,7 @@ func TestLiveThreadService_Now_NoContent(t *testing.T) {
 }
 
 func TestLiveThreadService_GetMultiple(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/live-thread/live-threads.json")
 	require.NoError(t, err)
@@ -239,8 +235,7 @@ func TestLiveThreadService_GetMultiple(t *testing.T) {
 }
 
 func TestLiveThreadService_Update(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/update", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -259,8 +254,7 @@ func TestLiveThreadService_Update(t *testing.T) {
 }
 
 func TestLiveThreadService_Updates(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/live-thread/updates.json")
 	require.NoError(t, err)
@@ -276,8 +270,7 @@ func TestLiveThreadService_Updates(t *testing.T) {
 }
 
 func TestLiveThreadService_UpdateByID(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/live-thread/update.json")
 	require.NoError(t, err)
@@ -293,8 +286,7 @@ func TestLiveThreadService_UpdateByID(t *testing.T) {
 }
 
 func TestLiveThreadService_Discussions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/live-thread/discussions.json")
 	require.NoError(t, err)
@@ -310,8 +302,7 @@ func TestLiveThreadService_Discussions(t *testing.T) {
 }
 
 func TestLiveThreadService_Strike(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/strike_update", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -330,8 +321,7 @@ func TestLiveThreadService_Strike(t *testing.T) {
 }
 
 func TestLiveThreadService_Delete(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/delete_update", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -350,8 +340,7 @@ func TestLiveThreadService_Delete(t *testing.T) {
 }
 
 func TestLiveThreadService_Create(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/create", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -391,8 +380,7 @@ func TestLiveThreadService_Create(t *testing.T) {
 }
 
 func TestLiveThreadService_Close(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/close_thread", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -410,8 +398,7 @@ func TestLiveThreadService_Close(t *testing.T) {
 }
 
 func TestLiveThreadService_Configure(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/edit", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -450,8 +437,7 @@ func TestLiveThreadService_Configure(t *testing.T) {
 }
 
 func TestLiveThreadService_Contributors(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/live-thread/contributors.json")
 	require.NoError(t, err)
@@ -467,8 +453,7 @@ func TestLiveThreadService_Contributors(t *testing.T) {
 }
 
 func TestLiveThreadService_ContributorsAndInvited(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/live-thread/contributors-and-invited.json")
 	require.NoError(t, err)
@@ -484,8 +469,7 @@ func TestLiveThreadService_ContributorsAndInvited(t *testing.T) {
 }
 
 func TestLiveThreadService_Accept(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/accept_contributor_invite", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -503,8 +487,7 @@ func TestLiveThreadService_Accept(t *testing.T) {
 }
 
 func TestLiveThreadService_Leave(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/leave_contributor", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -522,8 +505,7 @@ func TestLiveThreadService_Leave(t *testing.T) {
 }
 
 func TestLiveThreadService_Invite(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/invite_contributor", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -544,8 +526,7 @@ func TestLiveThreadService_Invite(t *testing.T) {
 }
 
 func TestLiveThreadService_Invite_Permissions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/invite_contributor", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -566,8 +547,7 @@ func TestLiveThreadService_Invite_Permissions(t *testing.T) {
 }
 
 func TestLiveThreadService_Uninvite(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/rm_contributor_invite", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -586,8 +566,7 @@ func TestLiveThreadService_Uninvite(t *testing.T) {
 }
 
 func TestLiveThreadService_SetPermissions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/set_contributor_permissions", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -608,8 +587,7 @@ func TestLiveThreadService_SetPermissions(t *testing.T) {
 }
 
 func TestLiveThreadService_SetPermissionsForInvite(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/set_contributor_permissions", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -630,8 +608,7 @@ func TestLiveThreadService_SetPermissionsForInvite(t *testing.T) {
 }
 
 func TestLiveThreadService_Revoke(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/rm_contributor", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -650,8 +627,7 @@ func TestLiveThreadService_Revoke(t *testing.T) {
 }
 
 func TestLiveThreadService_HideDiscussion(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/hide_discussion", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -670,8 +646,7 @@ func TestLiveThreadService_HideDiscussion(t *testing.T) {
 }
 
 func TestLiveThreadService_UnhideDiscussion(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/unhide_discussion", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -690,8 +665,7 @@ func TestLiveThreadService_UnhideDiscussion(t *testing.T) {
 }
 
 func TestLiveThreadService_Report(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/live/id123/report", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

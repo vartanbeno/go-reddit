@@ -44,8 +44,7 @@ var expectedSubredditEmojis = []*Emoji{
 }
 
 func TestEmojiService_Get(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/emoji/emojis.json")
 	require.NoError(t, err)
@@ -64,8 +63,7 @@ func TestEmojiService_Get(t *testing.T) {
 }
 
 func TestEmojiService_Delete(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/testsubreddit/emoji/testemoji", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
@@ -76,8 +74,7 @@ func TestEmojiService_Delete(t *testing.T) {
 }
 
 func TestEmojiService_SetSize(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/testsubreddit/emoji_custom_size", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -96,8 +93,7 @@ func TestEmojiService_SetSize(t *testing.T) {
 }
 
 func TestEmojiService_DisableCustomSize(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/testsubreddit/emoji_custom_size", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -114,8 +110,7 @@ func TestEmojiService_DisableCustomSize(t *testing.T) {
 }
 
 func TestEmojiService_Upload(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	uploadURL := client.BaseURL.Host + "/api/emoji_upload"
 
@@ -202,8 +197,7 @@ func TestEmojiService_Upload(t *testing.T) {
 }
 
 func TestEmojiService_Update(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/testsubreddit/emoji_permissions", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

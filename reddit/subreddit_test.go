@@ -435,8 +435,7 @@ var expectedSubredditPostRequirements = &SubredditPostRequirements{
 }
 
 func TestSubredditService_HotPosts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
@@ -453,8 +452,7 @@ func TestSubredditService_HotPosts(t *testing.T) {
 }
 
 func TestSubredditService_NewPosts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
@@ -471,8 +469,7 @@ func TestSubredditService_NewPosts(t *testing.T) {
 }
 
 func TestSubredditService_RisingPosts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
@@ -489,8 +486,7 @@ func TestSubredditService_RisingPosts(t *testing.T) {
 }
 
 func TestSubredditService_ControversialPosts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
@@ -507,8 +503,7 @@ func TestSubredditService_ControversialPosts(t *testing.T) {
 }
 
 func TestSubredditService_TopPosts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/posts.json")
 	require.NoError(t, err)
@@ -525,8 +520,7 @@ func TestSubredditService_TopPosts(t *testing.T) {
 }
 
 func TestSubredditService_Get(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/about.json")
 	require.NoError(t, err)
@@ -545,8 +539,7 @@ func TestSubredditService_Get(t *testing.T) {
 }
 
 func TestSubredditService_Popular(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
@@ -563,8 +556,7 @@ func TestSubredditService_Popular(t *testing.T) {
 }
 
 func TestSubredditService_New(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
@@ -581,8 +573,7 @@ func TestSubredditService_New(t *testing.T) {
 }
 
 func TestSubredditService_Gold(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
@@ -599,8 +590,7 @@ func TestSubredditService_Gold(t *testing.T) {
 }
 
 func TestSubredditService_Default(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
@@ -617,8 +607,7 @@ func TestSubredditService_Default(t *testing.T) {
 }
 
 func TestSubredditService_Subscribed(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
@@ -635,8 +624,7 @@ func TestSubredditService_Subscribed(t *testing.T) {
 }
 
 func TestSubredditService_Approved(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
@@ -653,8 +641,7 @@ func TestSubredditService_Approved(t *testing.T) {
 }
 
 func TestSubredditService_Moderated(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
@@ -671,8 +658,7 @@ func TestSubredditService_Moderated(t *testing.T) {
 }
 
 func TestSubredditService_GetSticky1(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
@@ -693,8 +679,7 @@ func TestSubredditService_GetSticky1(t *testing.T) {
 }
 
 func TestSubredditService_GetSticky2(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/post/post.json")
 	require.NoError(t, err)
@@ -715,8 +700,7 @@ func TestSubredditService_GetSticky2(t *testing.T) {
 }
 
 func TestSubredditService_Subscribe(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -735,8 +719,7 @@ func TestSubredditService_Subscribe(t *testing.T) {
 }
 
 func TestSubredditService_SubscribeByID(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -755,8 +738,7 @@ func TestSubredditService_SubscribeByID(t *testing.T) {
 }
 
 func TestSubredditService_Unsubscribe(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -775,8 +757,7 @@ func TestSubredditService_Unsubscribe(t *testing.T) {
 }
 
 func TestSubredditService_UnsubscribeByID(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/subscribe", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -795,8 +776,7 @@ func TestSubredditService_UnsubscribeByID(t *testing.T) {
 }
 
 func TestSubredditService_Favorite(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/favorite", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -816,8 +796,7 @@ func TestSubredditService_Favorite(t *testing.T) {
 }
 
 func TestSubredditService_Unfavorite(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/favorite", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -837,8 +816,7 @@ func TestSubredditService_Unfavorite(t *testing.T) {
 }
 
 func TestSubredditService_Search(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/list.json")
 	require.NoError(t, err)
@@ -870,8 +848,7 @@ func TestSubredditService_Search(t *testing.T) {
 }
 
 func TestSubredditService_SearchNames(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/search-names.json")
 	require.NoError(t, err)
@@ -895,8 +872,7 @@ func TestSubredditService_SearchNames(t *testing.T) {
 }
 
 func TestSubredditService_SearchPosts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/search-posts.json")
 	require.NoError(t, err)
@@ -921,8 +897,7 @@ func TestSubredditService_SearchPosts(t *testing.T) {
 }
 
 func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/search-posts.json")
 	require.NoError(t, err)
@@ -948,8 +923,7 @@ func TestSubredditService_SearchPosts_InSubreddit(t *testing.T) {
 }
 
 func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/search-posts.json")
 	require.NoError(t, err)
@@ -975,8 +949,7 @@ func TestSubredditService_SearchPosts_InSubreddits(t *testing.T) {
 }
 
 func TestSubredditService_Random(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/random.json")
 	require.NoError(t, err)
@@ -998,8 +971,7 @@ func TestSubredditService_Random(t *testing.T) {
 }
 
 func TestSubredditService_RandomNSFW(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/random.json")
 	require.NoError(t, err)
@@ -1021,8 +993,7 @@ func TestSubredditService_RandomNSFW(t *testing.T) {
 }
 
 func TestSubredditService_SubmissionText(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/test/api/submit_text", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
@@ -1038,8 +1009,7 @@ func TestSubredditService_SubmissionText(t *testing.T) {
 }
 
 func TestSubredditService_Banned(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/banned-users.json")
 	require.NoError(t, err)
@@ -1064,8 +1034,7 @@ func TestSubredditService_Banned(t *testing.T) {
 }
 
 func TestSubredditService_Muted(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/relationships.json")
 	require.NoError(t, err)
@@ -1090,8 +1059,7 @@ func TestSubredditService_Muted(t *testing.T) {
 }
 
 func TestSubredditService_WikiBanned(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/banned-users.json")
 	require.NoError(t, err)
@@ -1116,8 +1084,7 @@ func TestSubredditService_WikiBanned(t *testing.T) {
 }
 
 func TestSubredditService_Contributors(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/relationships.json")
 	require.NoError(t, err)
@@ -1141,8 +1108,7 @@ func TestSubredditService_Contributors(t *testing.T) {
 }
 
 func TestSubredditService_WikiContributors(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/relationships.json")
 	require.NoError(t, err)
@@ -1166,8 +1132,7 @@ func TestSubredditService_WikiContributors(t *testing.T) {
 }
 
 func TestSubredditService_Moderators(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/moderators.json")
 	require.NoError(t, err)
@@ -1183,8 +1148,7 @@ func TestSubredditService_Moderators(t *testing.T) {
 }
 
 func TestSubredditService_Rules(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/rules.json")
 	require.NoError(t, err)
@@ -1200,8 +1164,7 @@ func TestSubredditService_Rules(t *testing.T) {
 }
 
 func TestSubredditService_CreateRule(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/add_subreddit_rule", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1228,8 +1191,7 @@ func TestSubredditService_CreateRule(t *testing.T) {
 }
 
 func TestSubredditService_CreateRule_Error(t *testing.T) {
-	client, _, teardown := setup()
-	defer teardown()
+	client, _ := setup(t)
 
 	_, err := client.Subreddit.CreateRule(ctx, "testsubreddit", nil)
 	require.EqualError(t, err, "*SubredditRuleCreateRequest: cannot be nil")
@@ -1256,8 +1218,7 @@ func TestSubredditService_CreateRule_Error(t *testing.T) {
 }
 
 func TestSubredditService_Traffic(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/traffic.json")
 	require.NoError(t, err)
@@ -1275,8 +1236,7 @@ func TestSubredditService_Traffic(t *testing.T) {
 }
 
 func TestSubredditService_StyleSheet(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/stylesheet.json")
 	require.NoError(t, err)
@@ -1292,8 +1252,7 @@ func TestSubredditService_StyleSheet(t *testing.T) {
 }
 
 func TestSubredditService_StyleSheetRaw(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/stylesheet", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
@@ -1306,8 +1265,7 @@ func TestSubredditService_StyleSheetRaw(t *testing.T) {
 }
 
 func TestSubredditService_UpdateStyleSheet(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/subreddit_stylesheet", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1328,8 +1286,7 @@ func TestSubredditService_UpdateStyleSheet(t *testing.T) {
 }
 
 func TestSubredditService_RemoveImage(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/delete_sr_img", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1348,8 +1305,7 @@ func TestSubredditService_RemoveImage(t *testing.T) {
 }
 
 func TestSubredditService_RemoveHeader(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/delete_sr_header", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1367,8 +1323,7 @@ func TestSubredditService_RemoveHeader(t *testing.T) {
 }
 
 func TestSubredditService_RemoveMobileHeader(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/delete_sr_banner", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1386,8 +1341,7 @@ func TestSubredditService_RemoveMobileHeader(t *testing.T) {
 }
 
 func TestSubredditService_RemoveMobileIcon(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/delete_sr_icon", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1405,8 +1359,7 @@ func TestSubredditService_RemoveMobileIcon(t *testing.T) {
 }
 
 func TestSubredditService_UploadImage(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	imageFile, err := ioutil.TempFile("/tmp", "emoji*.png")
 	require.NoError(t, err)
@@ -1452,8 +1405,7 @@ func TestSubredditService_UploadImage(t *testing.T) {
 }
 
 func TestSubredditService_UploadHeader(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	imageFile, err := ioutil.TempFile("/tmp", "emoji*.png")
 	require.NoError(t, err)
@@ -1499,8 +1451,7 @@ func TestSubredditService_UploadHeader(t *testing.T) {
 }
 
 func TestSubredditService_UploadMobileHeader(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	imageFile, err := ioutil.TempFile("/tmp", "emoji*.png")
 	require.NoError(t, err)
@@ -1546,8 +1497,7 @@ func TestSubredditService_UploadMobileHeader(t *testing.T) {
 }
 
 func TestSubredditService_UploadMobileIcon(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	imageFile, err := ioutil.TempFile("/tmp", "emoji*.jpg")
 	require.NoError(t, err)
@@ -1593,8 +1543,7 @@ func TestSubredditService_UploadMobileIcon(t *testing.T) {
 }
 
 func TestSubredditService_UploadImage_Error(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	imageFile, err := ioutil.TempFile("/tmp", "emoji*.jpg")
 	require.NoError(t, err)
@@ -1621,8 +1570,7 @@ func TestSubredditService_UploadImage_Error(t *testing.T) {
 }
 
 func TestSubredditService_Create(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/site_admin", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1682,8 +1630,7 @@ func TestSubredditService_Create(t *testing.T) {
 }
 
 func TestSubredditService_Edit(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/site_admin", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -1743,8 +1690,7 @@ func TestSubredditService_Edit(t *testing.T) {
 }
 
 func TestSubredditService_GetSettings(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/settings.json")
 	require.NoError(t, err)
@@ -1760,8 +1706,7 @@ func TestSubredditService_GetSettings(t *testing.T) {
 }
 
 func TestSubredditService_PostRequirements(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/subreddit/post-requirements.json")
 	require.NoError(t, err)

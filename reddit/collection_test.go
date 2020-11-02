@@ -71,8 +71,7 @@ var expectedCollections = []*Collection{
 }
 
 func TestCollectionService_Get(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/collection/collection.json")
 	require.NoError(t, err)
@@ -97,8 +96,7 @@ func TestCollectionService_Get(t *testing.T) {
 }
 
 func TestCollectionService_FromSubreddit(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/collection/collections.json")
 	require.NoError(t, err)
@@ -122,8 +120,7 @@ func TestCollectionService_FromSubreddit(t *testing.T) {
 }
 
 func TestCollectionService_Create(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/collection/collection.json")
 	require.NoError(t, err)
@@ -156,8 +153,7 @@ func TestCollectionService_Create(t *testing.T) {
 }
 
 func TestCollectionService_Delete(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/delete_collection", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -175,8 +171,7 @@ func TestCollectionService_Delete(t *testing.T) {
 }
 
 func TestCollectionService_AddPost(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/add_post_to_collection", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -195,8 +190,7 @@ func TestCollectionService_AddPost(t *testing.T) {
 }
 
 func TestCollectionService_RemovePost(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/remove_post_in_collection", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -215,8 +209,7 @@ func TestCollectionService_RemovePost(t *testing.T) {
 }
 
 func TestCollectionService_ReorderPosts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/reorder_collection", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -235,8 +228,7 @@ func TestCollectionService_ReorderPosts(t *testing.T) {
 }
 
 func TestCollectionService_UpdateTitle(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/update_collection_title", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -255,8 +247,7 @@ func TestCollectionService_UpdateTitle(t *testing.T) {
 }
 
 func TestCollectionService_UpdateDescription(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/update_collection_description", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -275,8 +266,7 @@ func TestCollectionService_UpdateDescription(t *testing.T) {
 }
 
 func TestCollectionService_UpdateLayoutTimeline(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/update_collection_display_layout", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -295,8 +285,7 @@ func TestCollectionService_UpdateLayoutTimeline(t *testing.T) {
 }
 
 func TestCollectionService_UpdateLayoutGallery(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/update_collection_display_layout", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -315,8 +304,7 @@ func TestCollectionService_UpdateLayoutGallery(t *testing.T) {
 }
 
 func TestCollectionService_Follow(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/follow_collection", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -335,8 +323,7 @@ func TestCollectionService_Follow(t *testing.T) {
 }
 
 func TestCollectionService_Unfollow(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/collections/follow_collection", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

@@ -182,8 +182,7 @@ var expectedSearchUsers = []*User{
 }
 
 func TestUserService_Get(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/get.json")
 	require.NoError(t, err)
@@ -199,8 +198,7 @@ func TestUserService_Get(t *testing.T) {
 }
 
 func TestUserService_GetMultipleByID(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/get-multiple-by-id.json")
 	require.NoError(t, err)
@@ -221,8 +219,7 @@ func TestUserService_GetMultipleByID(t *testing.T) {
 }
 
 func TestUserService_UsernameAvailable(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/username_available", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
@@ -247,8 +244,7 @@ func TestUserService_UsernameAvailable(t *testing.T) {
 }
 
 func TestUserService_Overview(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/overview.json")
 	require.NoError(t, err)
@@ -271,8 +267,7 @@ func TestUserService_Overview(t *testing.T) {
 }
 
 func TestUserService_OverviewOf(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/overview.json")
 	require.NoError(t, err)
@@ -295,8 +290,7 @@ func TestUserService_OverviewOf(t *testing.T) {
 }
 
 func TestUserService_Overview_Options(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/overview.json")
 	require.NoError(t, err)
@@ -327,8 +321,7 @@ func TestUserService_Overview_Options(t *testing.T) {
 }
 
 func TestUserService_Posts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
@@ -347,8 +340,7 @@ func TestUserService_Posts(t *testing.T) {
 }
 
 func TestUserService_PostsOf(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
@@ -367,8 +359,7 @@ func TestUserService_PostsOf(t *testing.T) {
 }
 
 func TestUserService_Posts_Options(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/submitted.json")
 	require.NoError(t, err)
@@ -397,8 +388,7 @@ func TestUserService_Posts_Options(t *testing.T) {
 }
 
 func TestUserService_Comments(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/comments.json")
 	require.NoError(t, err)
@@ -417,8 +407,7 @@ func TestUserService_Comments(t *testing.T) {
 }
 
 func TestUserService_CommentsOf(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/comments.json")
 	require.NoError(t, err)
@@ -437,8 +426,7 @@ func TestUserService_CommentsOf(t *testing.T) {
 }
 
 func TestUserService_Comments_Options(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/comments.json")
 	require.NoError(t, err)
@@ -467,8 +455,7 @@ func TestUserService_Comments_Options(t *testing.T) {
 }
 
 func TestUserService_Saved(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/overview.json")
@@ -492,8 +479,7 @@ func TestUserService_Saved(t *testing.T) {
 }
 
 func TestUserService_Saved_Options(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/overview.json")
@@ -522,8 +508,7 @@ func TestUserService_Saved_Options(t *testing.T) {
 	require.NoError(t, err)
 }
 func TestUserService_Upvoted(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/submitted.json")
@@ -543,8 +528,7 @@ func TestUserService_Upvoted(t *testing.T) {
 }
 
 func TestUserService_Upvoted_Options(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/submitted.json")
@@ -574,8 +558,7 @@ func TestUserService_Upvoted_Options(t *testing.T) {
 }
 
 func TestUserService_UpvotedOf(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/submitted.json")
@@ -595,8 +578,7 @@ func TestUserService_UpvotedOf(t *testing.T) {
 }
 
 func TestUserService_Downvoted(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/submitted.json")
@@ -616,8 +598,7 @@ func TestUserService_Downvoted(t *testing.T) {
 }
 
 func TestUserService_Downvoted_Options(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/submitted.json")
@@ -647,8 +628,7 @@ func TestUserService_Downvoted_Options(t *testing.T) {
 }
 
 func TestUserService_DownvotedOf(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/submitted.json")
@@ -668,8 +648,7 @@ func TestUserService_DownvotedOf(t *testing.T) {
 }
 
 func TestUserService_Hidden(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/submitted.json")
@@ -689,8 +668,7 @@ func TestUserService_Hidden(t *testing.T) {
 }
 
 func TestUserService_Gilded(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	// we'll use this, similar payloads
 	blob, err := readFileContents("../testdata/user/submitted.json")
@@ -710,8 +688,7 @@ func TestUserService_Gilded(t *testing.T) {
 }
 
 func TestUserService_GetFriendship(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/friend.json")
 	require.NoError(t, err)
@@ -727,8 +704,7 @@ func TestUserService_GetFriendship(t *testing.T) {
 }
 
 func TestUserService_Friend(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/friend.json")
 	require.NoError(t, err)
@@ -753,8 +729,7 @@ func TestUserService_Friend(t *testing.T) {
 }
 
 func TestUserService_Unfriend(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/v1/me/friends/test123", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
@@ -767,8 +742,7 @@ func TestUserService_Unfriend(t *testing.T) {
 }
 
 func TestUserService_Block(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/block.json")
 	require.NoError(t, err)
@@ -792,8 +766,7 @@ func TestUserService_Block(t *testing.T) {
 }
 
 func TestUserService_BlockByID(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/block.json")
 	require.NoError(t, err)
@@ -817,8 +790,7 @@ func TestUserService_BlockByID(t *testing.T) {
 }
 
 func TestUserService_Unblock(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	client.redditID = "self123"
 
@@ -840,8 +812,7 @@ func TestUserService_Unblock(t *testing.T) {
 }
 
 func TestUserService_UnblockByID(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	client.redditID = "self123"
 
@@ -863,8 +834,7 @@ func TestUserService_UnblockByID(t *testing.T) {
 }
 
 func TestUserService_Trophies(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/trophies.json")
 	require.NoError(t, err)
@@ -880,8 +850,7 @@ func TestUserService_Trophies(t *testing.T) {
 }
 
 func TestUserService_TrophiesOf(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/trophies.json")
 	require.NoError(t, err)
@@ -897,8 +866,7 @@ func TestUserService_TrophiesOf(t *testing.T) {
 }
 
 func TestUserService_Popular(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/user-subreddits.json")
 	require.NoError(t, err)
@@ -915,8 +883,7 @@ func TestUserService_Popular(t *testing.T) {
 }
 
 func TestUserService_New(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/user-subreddits.json")
 	require.NoError(t, err)
@@ -933,8 +900,7 @@ func TestUserService_New(t *testing.T) {
 }
 
 func TestUserService_Search(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/user/list.json")
 	require.NoError(t, err)

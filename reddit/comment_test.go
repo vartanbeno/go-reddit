@@ -38,8 +38,7 @@ var expectedCommentSubmitOrEdit = &Comment{
 }
 
 func TestCommentService_Submit(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/comment/submit-or-edit.json")
 	require.NoError(t, err)
@@ -66,8 +65,7 @@ func TestCommentService_Submit(t *testing.T) {
 }
 
 func TestCommentService_Edit(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/comment/submit-or-edit.json")
 	require.NoError(t, err)
@@ -94,8 +92,7 @@ func TestCommentService_Edit(t *testing.T) {
 }
 
 func TestCommentService_Delete(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/del", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -114,8 +111,7 @@ func TestCommentService_Delete(t *testing.T) {
 }
 
 func TestCommentService_Save(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/save", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -134,8 +130,7 @@ func TestCommentService_Save(t *testing.T) {
 }
 
 func TestCommentService_Unsave(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/unsave", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -154,8 +149,7 @@ func TestCommentService_Unsave(t *testing.T) {
 }
 
 func TestCommentService_EnableReplies(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -175,8 +169,7 @@ func TestCommentService_EnableReplies(t *testing.T) {
 }
 
 func TestCommentService_DisableReplies(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/sendreplies", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -196,8 +189,7 @@ func TestCommentService_DisableReplies(t *testing.T) {
 }
 
 func TestCommentService_Lock(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/lock", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -216,8 +208,7 @@ func TestCommentService_Lock(t *testing.T) {
 }
 
 func TestCommentService_Unlock(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/unlock", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -236,8 +227,7 @@ func TestCommentService_Unlock(t *testing.T) {
 }
 
 func TestCommentService_Upvote(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -258,8 +248,7 @@ func TestCommentService_Upvote(t *testing.T) {
 }
 
 func TestCommentService_Downvote(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -280,8 +269,7 @@ func TestCommentService_Downvote(t *testing.T) {
 }
 
 func TestCommentService_RemoveVote(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/vote", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -302,8 +290,7 @@ func TestCommentService_RemoveVote(t *testing.T) {
 }
 
 func TestCommentService_LoadMoreReplies(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/comment/more.json")
 	require.NoError(t, err)
@@ -348,8 +335,7 @@ func TestCommentService_LoadMoreReplies(t *testing.T) {
 }
 
 func TestCommentService_Report(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/report", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

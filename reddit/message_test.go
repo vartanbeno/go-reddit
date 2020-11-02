@@ -45,8 +45,7 @@ var expectedMessages = []*Message{
 }
 
 func TestMessageService_ReadAll(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/read_all_messages", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -59,8 +58,7 @@ func TestMessageService_ReadAll(t *testing.T) {
 }
 
 func TestMessageService_Read(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/read_message", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -81,8 +79,7 @@ func TestMessageService_Read(t *testing.T) {
 }
 
 func TestMessageService_Unread(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/unread_message", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -103,8 +100,7 @@ func TestMessageService_Unread(t *testing.T) {
 }
 
 func TestMessageService_Block(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/block", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -122,8 +118,7 @@ func TestMessageService_Block(t *testing.T) {
 }
 
 func TestMessageService_Collapse(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/collapse_message", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -144,8 +139,7 @@ func TestMessageService_Collapse(t *testing.T) {
 }
 
 func TestMessageService_Uncollapse(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/uncollapse_message", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -166,8 +160,7 @@ func TestMessageService_Uncollapse(t *testing.T) {
 }
 
 func TestMessageService_Delete(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/del_msg", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -185,8 +178,7 @@ func TestMessageService_Delete(t *testing.T) {
 }
 
 func TestMessageService_Send(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/api/compose", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -216,8 +208,7 @@ func TestMessageService_Send(t *testing.T) {
 }
 
 func TestMessageService_Inbox(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/message/inbox.json")
 	require.NoError(t, err)
@@ -234,8 +225,7 @@ func TestMessageService_Inbox(t *testing.T) {
 }
 
 func TestMessageService_InboxUnread(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/message/inbox.json")
 	require.NoError(t, err)
@@ -252,8 +242,7 @@ func TestMessageService_InboxUnread(t *testing.T) {
 }
 
 func TestMessageService_Sent(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/message/inbox.json")
 	require.NoError(t, err)

@@ -172,8 +172,7 @@ var expectedWidgets = []Widget{
 }
 
 func TestWidgetService_Get(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/widget/widgets.json")
 	require.NoError(t, err)
@@ -197,8 +196,7 @@ func TestWidgetService_Get(t *testing.T) {
 }
 
 func TestWidgetService_Create(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/widget", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -240,8 +238,7 @@ func TestWidgetService_Create(t *testing.T) {
 }
 
 func TestWidgetService_Delete(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/widget/abc123", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodDelete, r.Method)
@@ -252,8 +249,7 @@ func TestWidgetService_Delete(t *testing.T) {
 }
 
 func TestWidgetService_Reorder(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/widget_order/sidebar", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPatch, r.Method)

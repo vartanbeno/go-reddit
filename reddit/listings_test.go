@@ -141,8 +141,7 @@ var expectedListingPosts2 = []*Post{
 }
 
 func TestListingsService_Get(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/listings/posts-comments-subreddits.json")
 	require.NoError(t, err)
@@ -168,8 +167,7 @@ func TestListingsService_Get(t *testing.T) {
 }
 
 func TestListingsService_GetPosts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/listings/posts.json")
 	require.NoError(t, err)

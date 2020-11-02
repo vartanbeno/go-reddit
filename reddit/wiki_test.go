@@ -116,8 +116,7 @@ var expectedWikiPageRevisions = []*WikiPageRevision{
 }
 
 func TestWikiService_Page(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/wiki/page.json")
 	require.NoError(t, err)
@@ -133,8 +132,7 @@ func TestWikiService_Page(t *testing.T) {
 }
 
 func TestWikiService_PageRevision(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/wiki/page.json")
 	require.NoError(t, err)
@@ -158,8 +156,7 @@ func TestWikiService_PageRevision(t *testing.T) {
 }
 
 func TestWikiService_Pages(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/wiki/pages", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
@@ -178,8 +175,7 @@ func TestWikiService_Pages(t *testing.T) {
 }
 
 func TestWikiService_Edit(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/wiki/edit", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -207,8 +203,7 @@ func TestWikiService_Edit(t *testing.T) {
 }
 
 func TestWikiService_Revert(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/wiki/revert", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -227,8 +222,7 @@ func TestWikiService_Revert(t *testing.T) {
 }
 
 func TestWikiService_Settings(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/wiki/page-settings.json")
 	require.NoError(t, err)
@@ -244,8 +238,7 @@ func TestWikiService_Settings(t *testing.T) {
 }
 
 func TestWikiService_UpdateSettings(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/wiki/page-settings.json")
 	require.NoError(t, err)
@@ -276,8 +269,7 @@ func TestWikiService_UpdateSettings(t *testing.T) {
 }
 
 func TestWikiService_Discussions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/wiki/discussions.json")
 	require.NoError(t, err)
@@ -293,8 +285,7 @@ func TestWikiService_Discussions(t *testing.T) {
 }
 
 func TestWikiService_ToggleVisibility(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/wiki/hide", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -316,8 +307,7 @@ func TestWikiService_ToggleVisibility(t *testing.T) {
 }
 
 func TestWikiService_Revisions(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/wiki/revisions.json")
 	require.NoError(t, err)
@@ -333,8 +323,7 @@ func TestWikiService_Revisions(t *testing.T) {
 }
 
 func TestWikiService_RevisionsPage(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	blob, err := readFileContents("../testdata/wiki/revisions.json")
 	require.NoError(t, err)
@@ -364,8 +353,7 @@ func TestWikiService_RevisionsPage(t *testing.T) {
 }
 
 func TestWikiService_Allow(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/wiki/alloweditor/add", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)
@@ -384,8 +372,7 @@ func TestWikiService_Allow(t *testing.T) {
 }
 
 func TestWikiService_Deny(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	mux.HandleFunc("/r/testsubreddit/api/wiki/alloweditor/del", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodPost, r.Method)

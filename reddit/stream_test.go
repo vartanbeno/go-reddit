@@ -10,11 +10,9 @@ import (
 )
 
 func TestStreamService_Posts(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	var counter int
-
 	mux.HandleFunc("/r/testsubreddit/new", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		defer func() { counter++ }()
@@ -162,11 +160,9 @@ loop:
 }
 
 func TestStreamService_Posts_DiscardInitial(t *testing.T) {
-	client, mux, teardown := setup()
-	defer teardown()
+	client, mux := setup(t)
 
 	var counter int
-
 	mux.HandleFunc("/r/testsubreddit/new", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		defer func() { counter++ }()
