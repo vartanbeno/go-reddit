@@ -18,7 +18,7 @@ func main() {
 	defer close(sig)
 	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 
-	posts, errs, stop := reddit.DefaultClient.Stream.Posts("AskReddit", reddit.StreamInterval(time.Second*3), reddit.StreamDiscardInitial)
+	posts, errs, stop := reddit.DefaultClient().Stream.Posts("AskReddit", reddit.StreamInterval(time.Second*3), reddit.StreamDiscardInitial)
 	defer stop()
 
 	timer := time.NewTimer(time.Minute)

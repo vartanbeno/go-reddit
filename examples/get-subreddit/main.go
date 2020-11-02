@@ -17,7 +17,7 @@ func main() {
 }
 
 func run() (err error) {
-	sr, _, err := reddit.DefaultClient.Subreddit.Get(ctx, "golang")
+	sr, _, err := reddit.DefaultClient().Subreddit.Get(ctx, "golang")
 	if err != nil {
 		return
 	}

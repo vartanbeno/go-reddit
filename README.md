@@ -60,7 +60,7 @@ client, _ := reddit.NewClient(withCredentials, reddit.WithHTTPClient(httpClient)
 
 ### Read-Only Mode
 
-The global `DefaultClient` variable is a valid, read-only client with limited access to the Reddit API, much like a logged out user. You can initialize your own via `NewReadonlyClient`:
+The `DefaultClient` method returns a valid, read-only client with limited access to the Reddit API, much like a logged out user. You can initialize your own and configure it further using options via `NewReadonlyClient`:
 
 ```go
 client, _ := reddit.NewReadonlyClient()

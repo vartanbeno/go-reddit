@@ -134,7 +134,7 @@ func TestNewReadonlyClient_Error(t *testing.T) {
 }
 
 func TestDefaultClient(t *testing.T) {
-	require.NotNil(t, DefaultClient)
+	require.NotNil(t, DefaultClient())
 }
 
 func TestClient_Readonly_NewRequest(t *testing.T) {

@@ -39,8 +39,12 @@ const (
 	headerRateLimitReset     = "x-ratelimit-reset"
 )
 
-// DefaultClient is a readonly client with limited access to the Reddit API.
-var DefaultClient, _ = NewReadonlyClient()
+var defaultClient, _ = NewReadonlyClient()
+
+// DefaultClient returns a valid, read-only client with limited access to the Reddit API.
+func DefaultClient() *Client {
+	return defaultClient
+}
 
 // RequestCompletionCallback defines the type of the request callback function.
 type RequestCompletionCallback func(*http.Request, *http.Response)
@@ -232,7 +236,7 @@ func (c *Client) UserAgent() string {
 }
 
 // NewRequest creates an API request with form data as the body.
-// The path is the relative URL which will be resolves to the BaseURL of the Client.
+// The path is the relative URL which will be resolved to the BaseURL of the Client.
 // It should always be specified without a preceding slash.
 func (c *Client) NewRequest(method string, path string, form url.Values) (*http.Request, error) {
 	u, err := c.BaseURL.Parse(path)
