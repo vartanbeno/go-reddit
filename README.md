@@ -46,8 +46,8 @@ package main
 import "github.com/vartanbeno/go-reddit/reddit"
 
 func main() {
-    withCredentials := reddit.WithCredentials("id", "secret", "username", "password")
-    client, _ := reddit.NewClient(withCredentials)
+    credentials := reddit.Credentials{ID: "id", Secret: "secret", Username: "username", Password: "password"}
+    client, _ := reddit.NewClient(credentials)
 }
 ```
 
@@ -55,7 +55,7 @@ You can pass in a number of options to `NewClient` to further configure the clie
 
 ```go
 httpClient := &http.Client{Timeout: time.Second * 30}
-client, _ := reddit.NewClient(withCredentials, reddit.WithHTTPClient(httpClient))
+client, _ := reddit.NewClient(credentials, reddit.WithHTTPClient(httpClient))
 ```
 
 ### Read-Only Mode
@@ -69,10 +69,10 @@ client, _ := reddit.NewReadonlyClient()
 ## Examples
 
 <details>
-    <summary>Configure the client from environment variables.</summary>
+    <summary>Configure the client from environment variables. When using this option, it's ok to pass an empty struct for the credentials.</summary>
 
 ```go
-client, _ := reddit.NewClient(reddit.FromEnv)
+client, _ := reddit.NewClient(reddit.Credentials{}, reddit.FromEnv)
 ```
 </details>
 

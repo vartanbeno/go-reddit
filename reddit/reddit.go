@@ -21,7 +21,7 @@ import (
 
 const (
 	libraryName    = "github.com/vartanbeno/go-reddit"
-	libraryVersion = "1.0.0"
+	libraryVersion = "2.0.0"
 
 	defaultBaseURL         = "https://oauth.reddit.com"
 	defaultBaseURLReadonly = "https://reddit.com"
@@ -49,7 +49,7 @@ func DefaultClient() *Client {
 // RequestCompletionCallback defines the type of the request callback function.
 type RequestCompletionCallback func(*http.Request, *http.Response)
 
-// Credentials used to authenticate to make requests to the Reddit API.
+// Credentials are used to authenticate to make requests to the Reddit API.
 type Credentials struct {
 	ID       string
 	Secret   string
@@ -110,7 +110,7 @@ func newClient() *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 	tokenURL, _ := url.Parse(defaultTokenURL)
 
-	client := &Client{BaseURL: baseURL, TokenURL: tokenURL}
+	client := &Client{client: &http.Client{}, BaseURL: baseURL, TokenURL: tokenURL}
 
 	client.Account = &AccountService{client: client}
 	client.Collection = &CollectionService{client: client}
@@ -136,18 +136,21 @@ func newClient() *Client {
 }
 
 // NewClient returns a new Reddit API client.
-// Use an Opt to configure the client credentials, such as WithCredentials or FromEnv.
-func NewClient(opts ...Opt) (*Client, error) {
+// Use an Opt to configure the client credentials, such as WithHTTPClient or WithUserAgent.
+// If the FromEnv option is used with the correct environment variables, an empty struct can
+// be passed in as the credentials, since they will be overridden.
+func NewClient(credentials Credentials, opts ...Opt) (*Client, error) {
 	client := newClient()
+
+	client.ID = credentials.ID
+	client.Secret = credentials.Secret
+	client.Username = credentials.Username
+	client.Password = credentials.Password
 
 	for _, opt := range opts {
 		if err := opt(client); err != nil {
 			return nil, err
 		}
-	}
-
-	if client.client == nil {
-		client.client = &http.Client{}
 	}
 
 	userAgentTransport := &userAgentTransport{
@@ -168,7 +171,7 @@ func NewClient(opts ...Opt) (*Client, error) {
 
 // NewReadonlyClient returns a new read-only Reddit API client.
 // The client will have limited access to the Reddit API.
-// Options that modify credentials (such as WithCredentials or FromEnv) won't have any effect on this client.
+// Options that modify credentials (such as FromEnv) won't have any effect on this client.
 func NewReadonlyClient(opts ...Opt) (*Client, error) {
 	client := newClient()
 	client.BaseURL, _ = url.Parse(defaultBaseURLReadonly)

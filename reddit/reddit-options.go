@@ -7,19 +7,8 @@ import (
 	"os"
 )
 
-// Opt is a configuration option to initialize a client.
+// Opt is used to further configure a client upon initialization.
 type Opt func(*Client) error
-
-// WithCredentials sets the credentials used to authenticate with the Reddit API.
-func WithCredentials(id, secret, username, password string) Opt {
-	return func(c *Client) error {
-		c.ID = id
-		c.Secret = secret
-		c.Username = username
-		c.Password = password
-		return nil
-	}
-}
 
 // WithHTTPClient sets the HTTP client which will be used to make requests.
 func WithHTTPClient(httpClient *http.Client) Opt {

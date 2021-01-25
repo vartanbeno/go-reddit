@@ -35,7 +35,7 @@ func setup(t testing.TB) (*Client, *http.ServeMux) {
 	})
 
 	client, _ := NewClient(
-		WithCredentials("id1", "secret1", "user1", "password1"),
+		Credentials{"id1", "secret1", "user1", "password1"},
 		WithBaseURL(server.URL),
 		WithTokenURL(server.URL+"/api/v1/access_token"),
 	)
@@ -98,20 +98,20 @@ func testClientDefaults(t *testing.T, c *Client) {
 }
 
 func TestNewClient(t *testing.T) {
-	c, err := NewClient()
+	c, err := NewClient(Credentials{})
 	require.NoError(t, err)
 	testClientDefaults(t, c)
 }
 
 func TestNewClient_Error(t *testing.T) {
-	_, err := NewClient()
+	_, err := NewClient(Credentials{})
 	require.NoError(t, err)
 
 	errorOpt := func(c *Client) error {
 		return errors.New("foo")
 	}
 
-	_, err = NewClient(errorOpt)
+	_, err = NewClient(Credentials{}, errorOpt)
 	require.EqualError(t, err, "foo")
 }
 

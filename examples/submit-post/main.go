@@ -17,9 +17,8 @@ func main() {
 }
 
 func run() (err error) {
-	withCredentials := reddit.WithCredentials("id", "secret", "username", "password")
-
-	client, err := reddit.NewClient(withCredentials)
+	credentials := reddit.Credentials{ID: "id", Secret: "secret", Username: "username", Password: "password"}
+	client, err := reddit.NewClient(credentials)
 	if err != nil {
 		return
 	}
