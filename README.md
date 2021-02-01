@@ -8,7 +8,7 @@
 
 [![Actions Status](https://github.com/vartanbeno/go-reddit/workflows/tests/badge.svg)](https://github.com/vartanbeno/go-reddit/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/vartanbeno/go-reddit/reddit)](https://pkg.go.dev/github.com/vartanbeno/go-reddit/reddit)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/vartanbeno/go-reddit/v2/reddit)](https://pkg.go.dev/github.com/vartanbeno/go-reddit/v2/reddit)
 
 </div>
 
@@ -45,7 +45,7 @@ Make sure to have a Reddit app with a valid client id and secret. [Here](https:/
 ```go
 package main
 
-import "github.com/vartanbeno/go-reddit/reddit"
+import "github.com/vartanbeno/go-reddit/v2/reddit"
 
 func main() {
     credentials := reddit.Credentials{ID: "id", Secret: "secret", Username: "username", Password: "password"}
