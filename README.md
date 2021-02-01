@@ -24,16 +24,8 @@ You can view Reddit's official API documentation [here](https://www.reddit.com/d
 
 ## Install
 
-To get a specific version from the list of [versions](https://github.com/vartanbeno/go-reddit/releases):
-
 ```sh
-go get github.com/vartanbeno/go-reddit@vX.Y.Z
-```
-
-Or for the latest version:
-
-```sh
-go get github.com/vartanbeno/go-reddit
+go get github.com/vartanbeno/go-reddit/v2
 ```
 
 The repository structure for managing multiple major versions follows the one outlined [here](https://github.com/go-modules-by-example/index/tree/master/016_major_version_repo_strategy#major-branch-strategy).
