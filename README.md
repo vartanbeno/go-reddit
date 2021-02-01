@@ -16,7 +16,7 @@
 
 ## Overview
 
-**Featured in [issue 327 of Golang Weekly](https://golangweekly.com/issues/327) 🎉**
+**Featured in issues [327](https://golangweekly.com/issues/327) and [347](https://golangweekly.com/issues/347) of Golang Weekly 🎉**
 
 go-reddit is a Go client library for accessing the Reddit API.
 
