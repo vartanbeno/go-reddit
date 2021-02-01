@@ -1,6 +1,6 @@
 # Change Log
 
-## [v2.0.0] - 2021-01-24
+## [v2.0.0] - 2021-01-31
 
 - The underlying `*http.Client` is now passed as an option when initializing a client.
 - Use value type instead of pointer for credentials when initializing a client.
