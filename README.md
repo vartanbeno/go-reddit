@@ -22,6 +22,8 @@ go-reddit is a Go client library for accessing the Reddit API.
 
 You can view Reddit's official API documentation [here](https://www.reddit.com/dev/api/).
 
+See packages that import go-reddit [here](https://pkg.go.dev/github.com/vartanbeno/go-reddit/reddit?tab=importedby)
+
 ## Install
 
 To get a specific version from the list of [versions](https://github.com/vartanbeno/go-reddit/releases):
