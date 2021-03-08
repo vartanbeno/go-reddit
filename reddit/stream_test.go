@@ -133,8 +133,7 @@ func TestStreamService_Posts(t *testing.T) {
 		}
 	})
 
-	posts, errs, stop := client.Stream.Posts("testsubreddit", StreamInterval(time.Millisecond*10), StreamMaxRequests(4))
-	defer stop()
+	posts, errs, _ := client.Stream.Posts("testsubreddit", StreamInterval(time.Millisecond*10), StreamMaxRequests(4))
 
 	expectedPostIDs := []string{"t3_post1", "t3_post2", "t3_post3", "t3_post4", "t3_post5", "t3_post6", "t3_post7", "t3_post8", "t3_post9", "t3_post10", "t3_post11", "t3_post12"}
 	var i int
@@ -283,8 +282,7 @@ func TestStreamService_Posts_DiscardInitial(t *testing.T) {
 		}
 	})
 
-	posts, errs, stop := client.Stream.Posts("testsubreddit", StreamInterval(time.Millisecond*10), StreamMaxRequests(4), StreamDiscardInitial)
-	defer stop()
+	posts, errs, _ := client.Stream.Posts("testsubreddit", StreamInterval(time.Millisecond*10), StreamMaxRequests(4), StreamDiscardInitial)
 
 	expectedPostIDs := []string{"t3_post3", "t3_post4", "t3_post5", "t3_post6", "t3_post7", "t3_post8", "t3_post9", "t3_post10", "t3_post11", "t3_post12"}
 	var i int
@@ -433,8 +431,7 @@ func TestStreamService_Comments(t *testing.T) {
 		}
 	})
 
-	comments, errs, stop := client.Stream.Comments("testsubreddit", StreamInterval(time.Millisecond*10), StreamMaxRequests(4))
-	defer stop()
+	comments, errs, _ := client.Stream.Comments("testsubreddit", StreamInterval(time.Millisecond*10), StreamMaxRequests(4))
 
 	expectedCommentIds := []string{"t1_comment1", "t1_comment2", "t1_comment3", "t1_comment4", "t1_comment5", "t1_comment6", "t1_comment7", "t1_comment8", "t1_comment9", "t1_comment10", "t1_comment11", "t1_comment12"}
 	var i int
@@ -583,8 +580,7 @@ func TestStreamService_CommentsDiscardInitial(t *testing.T) {
 		}
 	})
 
-	comments, errs, stop := client.Stream.Comments("testsubreddit", StreamInterval(time.Millisecond*10), StreamMaxRequests(4), StreamDiscardInitial)
-	defer stop()
+	comments, errs, _ := client.Stream.Comments("testsubreddit", StreamInterval(time.Millisecond*10), StreamMaxRequests(4), StreamDiscardInitial)
 
 	expectedCommentIds := []string{"t1_comment3", "t1_comment4", "t1_comment5", "t1_comment6", "t1_comment7", "t1_comment8", "t1_comment9", "t1_comment10", "t1_comment11", "t1_comment12"}
 	var i int
