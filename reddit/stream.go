@@ -43,43 +43,54 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 
 	// originally used the "before" parameter, but if that post gets deleted, subsequent requests
 	// would just return empty listings; easier to just keep track of all post ids encountered
-	ids := set{}
+	ids := NewOrderedMaxSet(2000)
 
 	go func() {
 		defer stop()
+		var wg sync.WaitGroup
+		defer wg.Wait()
+		var mutex sync.Mutex
 
 		var n int
 		infinite := streamConfig.MaxRequests == 0
 
 		for ; ; <-ticker.C {
 			n++
+			wg.Add(1)
+			go s.getPosts(subreddit, func(posts []*Post, err error) {
+				defer wg.Done()
 
-			posts, err := s.getPosts(subreddit)
-			if err != nil {
-				errsCh <- err
-				if !infinite && n >= streamConfig.MaxRequests {
-					break
-				}
-				continue
-			}
-
-			for _, post := range posts {
-				id := post.FullID
-
-				// if this post id is already part of the set, it means that it and the ones
-				// after it in the list have already been streamed, so break out of the loop
-				if ids.Exists(id) {
-					break
-				}
-				ids.Add(id)
-
-				if streamConfig.DiscardInitial {
-					streamConfig.DiscardInitial = false
-					break
+				if err != nil {
+					errsCh <- err
+					return
 				}
 
-				postsCh <- post
-			}
+				for _, post := range posts {
+					id := post.FullID
+
+					// if this post id is already part of the set, it means that it and the ones
+					// after it in the list have already been streamed, so break out of the loop
+					if ids.Exists(id) {
+						break
+					}
+					ids.Add(id)
+
+					if func() bool {
+						mutex.Lock()
+						toReturn := false
+						if streamConfig.DiscardInitial {
+							streamConfig.DiscardInitial = false
+							toReturn = true
+						}
+						mutex.Unlock()
+						return toReturn
+					}() {
+						break
+					}
+
+					postsCh <- post
+				}
+			})
 
 			if !infinite && n >= streamConfig.MaxRequests {
 				break
@@ -120,44 +131,54 @@ func (s *StreamService) Comments(subreddit string, opts ...StreamOpt) (<-chan *C
 		})
 	}
 
-	ids := set{}
+	ids := NewOrderedMaxSet(2000)
 
 	go func() {
 		defer stop()
+		var wg sync.WaitGroup
+		defer wg.Wait()
+		var mutex sync.Mutex
 
 		var n int
 		infinite := streamConfig.MaxRequests == 0
 
 		for ; ; <-ticker.C {
 			n++
+			wg.Add(1)
 
-			comments, err := s.getComments(subreddit)
-			if err != nil {
-				errsCh <- err
-				if !infinite && n >= streamConfig.MaxRequests {
-					break
+			go s.getComments(subreddit, func(comments []*Comment, err error) {
+				defer wg.Done()
+				if err != nil {
+					errsCh <- err
+					return
 				}
-				continue
-			}
 
-			for _, comment := range comments {
-				id := comment.FullID
+				for _, comment := range comments {
+					id := comment.FullID
 
-				// certain comment streams are inconsistent about the completeness of returned comments
-				// it's not enough to check if we've seen older comments, but we must check for every comment individually
-				if !ids.Exists(id) {
-					ids.Add(id)
+					// certain comment streams are inconsistent about the completeness of returned comments
+					// it's not enough to check if we've seen older comments, but we must check for every comment individually
+					if !ids.Exists(id) {
+						ids.Add(id)
 
-					if streamConfig.DiscardInitial {
-						streamConfig.DiscardInitial = false
-						break
+						if func() bool {
+							mutex.Lock()
+							toReturn := false
+							if streamConfig.DiscardInitial {
+								streamConfig.DiscardInitial = false
+								toReturn = true
+							}
+							mutex.Unlock()
+							return toReturn
+						}() {
+							break
+						}
+
+						commentsCh <- comment
 					}
 
-					commentsCh <- comment
 				}
-
-			}
-
+			})
 			if !infinite && n >= streamConfig.MaxRequests {
 				break
 			}
@@ -167,31 +188,12 @@ func (s *StreamService) Comments(subreddit string, opts ...StreamOpt) (<-chan *C
 	return commentsCh, errsCh, stop
 }
 
-func (s *StreamService) getPosts(subreddit string) ([]*Post, error) {
+func (s *StreamService) getPosts(subreddit string, cb func([]*Post, error)) {
 	posts, _, err := s.client.Subreddit.NewPosts(context.Background(), subreddit, &ListOptions{Limit: 100})
-	return posts, err
+	cb(posts, err)
 }
 
-func (s *StreamService) getComments(subreddit string) ([]*Comment, error) {
+func (s *StreamService) getComments(subreddit string, cb func([]*Comment, error)) {
 	comments, _, err := s.client.Subreddit.Comments(context.Background(), subreddit, &ListOptions{Limit: 100})
-	return comments, err
-}
-
-type set map[string]struct{}
-
-func (s set) Add(v string) {
-	s[v] = struct{}{}
-}
-
-func (s set) Delete(v string) {
-	delete(s, v)
-}
-
-func (s set) Len() int {
-	return len(s)
-}
-
-func (s set) Exists(v string) bool {
-	_, ok := s[v]
-	return ok
+	cb(comments, err)
 }
