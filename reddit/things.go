@@ -518,6 +518,15 @@ type More struct {
 	Children []string `json:"children"`
 }
 
+type GalleryMedia struct {
+	ID int64 `json:"id,omitempty"`
+	MediaID string `json:"media_id,omitempty"`
+}
+// Holds information to retrieve gallery items.
+type GalleryData struct {
+	Items []GalleryMedia `json:"items,omitempty"`
+}
+
 // Post is a submitted post on Reddit.
 type Post struct {
 	ID      string     `json:"id,omitempty"`
@@ -534,6 +543,8 @@ type Post struct {
 	// Indicates if you've upvoted/downvoted (true/false).
 	// If neither, it will be nil.
 	Likes *bool `json:"likes"`
+
+	GalleryData GalleryData `json:"gallery_data,omitempty"`
 
 	Score            int     `json:"score"`
 	UpvoteRatio      float32 `json:"upvote_ratio"`
