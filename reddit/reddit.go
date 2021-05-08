@@ -67,6 +67,8 @@ type Client struct {
 
 	userAgent string
 
+	rawJSON bool
+
 	rateMu sync.Mutex
 	rate   Rate
 
@@ -272,7 +274,6 @@ func (c *Client) NewJSONRequest(method string, path string, body interface{}) (*
 	if err != nil {
 		return nil, err
 	}
-
 	buf := new(bytes.Buffer)
 	if body != nil {
 		err = json.NewEncoder(buf).Encode(body)
@@ -489,10 +490,25 @@ type Rate struct {
 	Reset time.Time `json:"reset"`
 }
 
+func addRawJSONQuery(path string, add bool) (string, error) {
+	if !add {
+		return path, nil
+	}
+	u, err := url.Parse(path)
+	if err != nil {
+		return path, err
+	}
+	q := u.Query()
+	q.Add("raw_json", "1")
+	u.RawQuery = q.Encode()
+	return u.String(), nil
+}
+
 // A lot of Reddit's responses return a "thing": { "kind": "...", "data": {...} }
 // So this is just a nice convenient method to have.
 func (c *Client) getThing(ctx context.Context, path string, opts interface{}) (*thing, *Response, error) {
-	path, err := addOptions(path, opts)
+	path, err := addRawJSONQuery(path, c.rawJSON) // if c.rawJSON == true, add "raw_json" to query, else path unmodified.
+	path, err = addOptions(path, opts)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -525,9 +541,6 @@ type ListOptions struct {
 	// Maximum number of items to be returned.
 	// Generally, the default is 25 and max is 100.
 	Limit int `url:"limit,omitempty"`
-
-	// TODO: Find a better place for this to live in.
-	RawJson int `url:"raw_json,omitempty"`
 
 	// The full ID of an item in the listing to use
 	// as the anchor point of the list. Only items
