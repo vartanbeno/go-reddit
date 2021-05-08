@@ -518,31 +518,35 @@ type More struct {
 	Children []string `json:"children"`
 }
 
+// GalleryMedia holds the media metadata.
 type GalleryMedia struct {
-	ID int64 `json:"id,omitempty"`
+	ID      int64  `json:"id,omitempty"`
 	MediaID string `json:"media_id,omitempty"`
 }
 
-// GalleryData Holds information to retrieve gallery items.
+// GalleryData holds information used to retrieve gallery items.
 type GalleryData struct {
 	Items []GalleryMedia `json:"items,omitempty"`
 }
 
-type mediaProperties struct {
-	URL string `json:"u"`
-	Width int64 `json:"x"`
-	Height int64 `json:"y"`
+// MediaProperties is a media and its properties.
+type MediaProperties struct {
+	URL    string `json:"u"`
+	Width  int64  `json:"x"`
+	Height int64  `json:"y"`
 }
 
+// MediaData holds all the media in a Post.
 type MediaData struct {
-	Type string `json:"e"`
-	ID string `json:"id"`
-	MIME string `json:"m"`
-	O []mediaProperties `json:"o"`  // I think this one holds the blurred preview
-	P []mediaProperties `json:"p"` //  This one all the previews ?
-	S mediaProperties `json:"s"` // The biggest preview ???
-	Status string `json:"status"`
+	Type   string            `json:"e"`
+	ID     string            `json:"id"`
+	MIME   string            `json:"m"`
+	O      []MediaProperties `json:"o"` // I think this one holds the blurred preview
+	P      []MediaProperties `json:"p"` //  This one all the previews ?
+	S      MediaProperties   `json:"s"` // The biggest preview ???
+	Status string            `json:"status"`
 }
+
 // Post is a submitted post on Reddit.
 type Post struct {
 	ID      string     `json:"id,omitempty"`
