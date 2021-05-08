@@ -522,11 +522,27 @@ type GalleryMedia struct {
 	ID int64 `json:"id,omitempty"`
 	MediaID string `json:"media_id,omitempty"`
 }
-// Holds information to retrieve gallery items.
+
+// GalleryData Holds information to retrieve gallery items.
 type GalleryData struct {
 	Items []GalleryMedia `json:"items,omitempty"`
 }
 
+type mediaProperties struct {
+	URL string `json:"u"`
+	Width int64 `json:"x"`
+	Height int64 `json:"y"`
+}
+
+type MediaData struct {
+	Type string `json:"e"`
+	ID string `json:"id"`
+	MIME string `json:"m"`
+	O []mediaProperties `json:"o"`  // I think this one holds the blurred preview
+	P []mediaProperties `json:"p"` //  This one all the previews ?
+	S mediaProperties `json:"s"` // The biggest preview ???
+	Status string `json:"status"`
+}
 // Post is a submitted post on Reddit.
 type Post struct {
 	ID      string     `json:"id,omitempty"`
@@ -545,6 +561,8 @@ type Post struct {
 	Likes *bool `json:"likes"`
 
 	GalleryData GalleryData `json:"gallery_data,omitempty"`
+
+	MediaMetadata map[string]MediaData `json:"media_metadata,omitempty"`
 
 	Score            int     `json:"score"`
 	UpvoteRatio      float32 `json:"upvote_ratio"`
