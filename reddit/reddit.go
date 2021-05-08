@@ -526,6 +526,9 @@ type ListOptions struct {
 	// Generally, the default is 25 and max is 100.
 	Limit int `url:"limit,omitempty"`
 
+	// TODO: Find a better place for this to live in.
+	RawJson int `url:"raw_json,omitempty"`
+
 	// The full ID of an item in the listing to use
 	// as the anchor point of the list. Only items
 	// appearing after it will be returned.
