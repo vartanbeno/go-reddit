@@ -163,8 +163,8 @@ var expectedSearchPosts = []*Post{
 		Permalink: "/r/WatchPeopleDieInside/comments/hybow9/pregnancy_test/",
 		URL:       "https://v.redd.it/ra4qnt8bt8d51",
 
-		Title: "Pregnancy test",
-
+		Title:            "Pregnancy test",
+		Media:            Media{},
 		Score:            103829,
 		UpvoteRatio:      0.88,
 		NumberOfComments: 3748,
