@@ -547,6 +547,28 @@ type MediaData struct {
 	Status string            `json:"status"`
 }
 
+// OEmbed holds all the embedded media data.
+type OEmbed struct {
+	ProviderURL     string `json:"provider_url,omitempty"`
+	Version         string `json:"version,omitempty"`
+	Title           string `json:"title,omitempty"`
+	ThumbnailWidth  int    `json:"thumbnail_width,omitempty"`
+	Height          int    `json:"height,omitempty"`
+	Width           int    `json:"width,omitempty"`
+	ProviderName    string `json:"provider_name,omitempty"`
+	ThumbnailURL    string `json:"thumbnail_url,omitempty"`
+	ThumbnailHeight int    `json:"thumbnail_height,omitempty"`
+}
+
+// Media holds all the media metadata.
+type Media struct {
+	Type   string `json:"type,omitempty"`
+	OEmbed OEmbed `json:"oembed,omitempty"`
+}
+
+// MediaMetadata is the media metadata of a Post.
+type MediaMetadata map[string]MediaData
+
 // Post is a submitted post on Reddit.
 type Post struct {
 	ID      string     `json:"id,omitempty"`
@@ -566,7 +588,9 @@ type Post struct {
 
 	GalleryData GalleryData `json:"gallery_data,omitempty"`
 
-	MediaMetadata map[string]MediaData `json:"media_metadata,omitempty"`
+	MediaMetadata MediaMetadata `json:"media_metadata,omitempty"`
+
+	Media Media `json:"media,omitempty"`
 
 	Score            int     `json:"score"`
 	UpvoteRatio      float32 `json:"upvote_ratio"`
