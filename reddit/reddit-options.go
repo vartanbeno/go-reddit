@@ -21,6 +21,13 @@ func WithHTTPClient(httpClient *http.Client) Opt {
 	}
 }
 
+// WithRawJSON sets the query `raw_json` to `1`.
+// This allows the parsing of &lt;, &gt;, and &amp; as <, > and & respectively.
+func WithRawJSON(c *Client) error {
+	c.rawJSON = true
+	return nil
+}
+
 // WithUserAgent sets the User-Agent header for requests made with the client.
 // Reddit recommends the following format for the user agent:
 // <platform>:<app ID>:<version string> (by /u/<reddit username>)

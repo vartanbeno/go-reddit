@@ -518,6 +518,57 @@ type More struct {
 	Children []string `json:"children"`
 }
 
+// GalleryMedia holds the media metadata.
+type GalleryMedia struct {
+	ID      int64  `json:"id,omitempty"`
+	MediaID string `json:"media_id,omitempty"`
+}
+
+// GalleryData holds information used to retrieve gallery items.
+type GalleryData struct {
+	Items []GalleryMedia `json:"items,omitempty"`
+}
+
+// MediaProperties is a media and its properties.
+type MediaProperties struct {
+	URL    string `json:"u"`
+	Width  int64  `json:"x"`
+	Height int64  `json:"y"`
+}
+
+// MediaData holds all the media in a Post.
+type MediaData struct {
+	Type   string            `json:"e"`
+	ID     string            `json:"id"`
+	MIME   string            `json:"m"`
+	O      []MediaProperties `json:"o"` // I think this one holds the blurred preview
+	P      []MediaProperties `json:"p"` //  This one all the previews ?
+	S      MediaProperties   `json:"s"` // The biggest preview ???
+	Status string            `json:"status"`
+}
+
+// OEmbed holds all the embedded media data.
+type OEmbed struct {
+	ProviderURL     string `json:"provider_url,omitempty"`
+	Version         string `json:"version,omitempty"`
+	Title           string `json:"title,omitempty"`
+	ThumbnailWidth  int    `json:"thumbnail_width,omitempty"`
+	Height          int    `json:"height,omitempty"`
+	Width           int    `json:"width,omitempty"`
+	ProviderName    string `json:"provider_name,omitempty"`
+	ThumbnailURL    string `json:"thumbnail_url,omitempty"`
+	ThumbnailHeight int    `json:"thumbnail_height,omitempty"`
+}
+
+// Media holds all the media metadata.
+type Media struct {
+	Type   string `json:"type,omitempty"`
+	OEmbed OEmbed `json:"oembed,omitempty"`
+}
+
+// MediaMetadata is the media metadata of a Post.
+type MediaMetadata map[string]MediaData
+
 // Post is a submitted post on Reddit.
 type Post struct {
 	ID      string     `json:"id,omitempty"`
@@ -534,6 +585,12 @@ type Post struct {
 	// Indicates if you've upvoted/downvoted (true/false).
 	// If neither, it will be nil.
 	Likes *bool `json:"likes"`
+
+	GalleryData GalleryData `json:"gallery_data,omitempty"`
+
+	MediaMetadata MediaMetadata `json:"media_metadata,omitempty"`
+
+	Media Media `json:"media,omitempty"`
 
 	Score            int     `json:"score"`
 	UpvoteRatio      float32 `json:"upvote_ratio"`

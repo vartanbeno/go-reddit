@@ -67,6 +67,8 @@ type Client struct {
 
 	userAgent string
 
+	rawJSON bool
+
 	rateMu sync.Mutex
 	rate   Rate
 
@@ -242,6 +244,10 @@ func (c *Client) UserAgent() string {
 // The path is the relative URL which will be resolved to the BaseURL of the Client.
 // It should always be specified without a preceding slash.
 func (c *Client) NewRequest(method string, path string, form url.Values) (*http.Request, error) {
+	path, err := addRawJSONQuery(path, c.rawJSON)
+	if err != nil {
+		return nil, err
+	}
 	u, err := c.BaseURL.Parse(path)
 	if err != nil {
 		return nil, err
@@ -272,7 +278,6 @@ func (c *Client) NewJSONRequest(method string, path string, body interface{}) (*
 	if err != nil {
 		return nil, err
 	}
-
 	buf := new(bytes.Buffer)
 	if body != nil {
 		err = json.NewEncoder(buf).Encode(body)
@@ -487,6 +492,20 @@ type Rate struct {
 	Used int `json:"used"`
 	// The time at which the current rate limit will reset.
 	Reset time.Time `json:"reset"`
+}
+
+func addRawJSONQuery(path string, add bool) (string, error) {
+	if !add {
+		return path, nil
+	}
+	u, err := url.Parse(path)
+	if err != nil {
+		return path, err
+	}
+	q := u.Query()
+	q.Add("raw_json", "1")
+	u.RawQuery = q.Encode()
+	return u.String(), nil
 }
 
 // A lot of Reddit's responses return a "thing": { "kind": "...", "data": {...} }

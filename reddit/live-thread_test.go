@@ -114,6 +114,7 @@ var expectedLiveThreadDiscussions = []*Post{
 		URL:       "https://www.reddit.com/live/15nfp4mtfbo14/",
 
 		Title: "test title",
+		Media: Media{Type: "liveupdate", OEmbed: OEmbed{}},
 
 		Score:            22,
 		UpvoteRatio:      0.9,
@@ -138,6 +139,7 @@ var expectedLiveThreadDiscussions = []*Post{
 
 		Title: "test title",
 
+		Media:            Media{Type: "liveupdate", OEmbed: OEmbed{}},
 		Score:            71,
 		UpvoteRatio:      0.97,
 		NumberOfComments: 34,
