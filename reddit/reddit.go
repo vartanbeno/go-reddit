@@ -244,6 +244,10 @@ func (c *Client) UserAgent() string {
 // The path is the relative URL which will be resolved to the BaseURL of the Client.
 // It should always be specified without a preceding slash.
 func (c *Client) NewRequest(method string, path string, form url.Values) (*http.Request, error) {
+	path, err := addRawJSONQuery(path, c.rawJSON)
+	if err != nil {
+		return nil, err
+	}
 	u, err := c.BaseURL.Parse(path)
 	if err != nil {
 		return nil, err
@@ -507,8 +511,7 @@ func addRawJSONQuery(path string, add bool) (string, error) {
 // A lot of Reddit's responses return a "thing": { "kind": "...", "data": {...} }
 // So this is just a nice convenient method to have.
 func (c *Client) getThing(ctx context.Context, path string, opts interface{}) (*thing, *Response, error) {
-	path, err := addRawJSONQuery(path, c.rawJSON) // if c.rawJSON == true, add "raw_json" to query, else path unmodified.
-	path, err = addOptions(path, opts)
+	path, err := addOptions(path, opts)
 	if err != nil {
 		return nil, nil, err
 	}
