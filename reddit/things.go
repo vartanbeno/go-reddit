@@ -547,12 +547,13 @@ type Post struct {
 	Author   string `json:"author,omitempty"`
 	AuthorID string `json:"author_fullname,omitempty"`
 
-	Spoiler    bool `json:"spoiler"`
-	Locked     bool `json:"locked"`
-	NSFW       bool `json:"over_18"`
-	IsSelfPost bool `json:"is_self"`
-	Saved      bool `json:"saved"`
-	Stickied   bool `json:"stickied"`
+	Spoiler    bool   `json:"spoiler"`
+	Locked     bool   `json:"locked"`
+	NSFW       bool   `json:"over_18"`
+	IsSelfPost bool   `json:"is_self"`
+	Saved      bool   `json:"saved"`
+	Stickied   bool   `json:"stickied"`
+	Flair      string `json:"link_flair_text"`
 }
 
 // Subreddit holds information about a subreddit
