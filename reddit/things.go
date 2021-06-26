@@ -528,8 +528,9 @@ type Post struct {
 	Permalink string `json:"permalink,omitempty"`
 	URL       string `json:"url,omitempty"`
 
-	Title string `json:"title,omitempty"`
-	Body  string `json:"selftext,omitempty"`
+	Title    string `json:"title,omitempty"`
+	Body     string `json:"selftext,omitempty"`
+	BodyHtml string `json:"selftext_html,omitempty"`
 
 	// Indicates if you've upvoted/downvoted (true/false).
 	// If neither, it will be nil.
