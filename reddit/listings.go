@@ -3,6 +3,7 @@ package reddit
 import (
 	"context"
 	"fmt"
+	"path"
 	"strings"
 )
 
@@ -37,4 +38,14 @@ func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]*Post,
 		return nil, resp, err
 	}
 	return l.Posts(), resp, nil
+}
+
+// Comments returns comments from a subreddit or post.
+func (s *ListingsService) Comments(ctx context.Context, subID, postID string) ([]*Comment, *Response, error) {
+	p := path.Join(subID, postID)
+	l, resp, err := s.client.getListing(ctx, p, nil)
+	if err != nil {
+		return nil, resp, err
+	}
+	return l.Comments(), resp, nil
 }
