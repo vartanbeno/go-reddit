@@ -140,6 +140,39 @@ var expectedListingPosts2 = []*Post{
 	},
 }
 
+var expectedListingComments2 = Comment{
+	ID:                    "h58ffys",
+	FullID:                "t1_h58ffys",
+	Created:               &Timestamp{time.Date(2021, 07, 15, 03, 24, 16, 0, time.UTC)},
+	Edited:                &Timestamp{},
+	ParentID:              "t1_h58ec0d",
+	Permalink:             "/r/test/comments/okk3sn/test/h58ffys/",
+	Body:                  "boats",
+	Author:                "_3xcalibur",
+	AuthorID:              "t2_3iuso214",
+	AuthorFlairText:       "",
+	AuthorFlairID:         "",
+	SubredditName:         "test",
+	SubredditNamePrefixed: "r/test",
+	SubredditID:           "t5_2qh23",
+	Likes:                 nil,
+	Score:                 2,
+	Controversiality:      0,
+	PostID:                "t3_okk3sn",
+	PostTitle:             "test",
+	PostPermalink:         "https://www.reddit.com/r/test/comments/okk3sn/test/",
+	PostAuthor:            "drumwolf",
+	PostNumComments:       Int(9),
+	IsSubmitter:           false,
+	ScoreHidden:           false,
+	Saved:                 false,
+	Stickied:              false,
+	Locked:                false,
+	CanGild:               true,
+	NSFW:                  false,
+	Replies:               Replies{},
+}
+
 func TestListingsService_Get(t *testing.T) {
 	client, mux := setup(t)
 
@@ -169,15 +202,15 @@ func TestListingsService_Get(t *testing.T) {
 func TestListingsService_GetPosts(t *testing.T) {
 	client, mux := setup(t)
 
-	blob, err := readFileContents("../testdata/listings/posts.json")
+	blob, err := readFileContents("../testdata/listings/comments.json")
 	require.NoError(t, err)
 
-	mux.HandleFunc("/by_id/t3_i2gvg4,t3_i2gwgz", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/r/test/comments.json", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
 
-	posts, _, err := client.Listings.GetPosts(ctx, "t3_i2gvg4", "t3_i2gwgz")
+	comments, _, err := client.Listings.Comments(ctx, "test", "")
 	require.NoError(t, err)
-	require.Equal(t, expectedListingPosts2, posts)
+	require.Equal(t, &expectedListingComments2, comments[0])
 }
