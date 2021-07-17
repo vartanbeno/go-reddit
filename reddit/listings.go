@@ -42,7 +42,7 @@ func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]*Post,
 
 // Comments returns comments from a subreddit or post.
 func (s *ListingsService) Comments(ctx context.Context, subID, postID string) ([]*Comment, *Response, error) {
-	p := path.Join(subID, postID)
+	p := path.Join("r", subID, postID, "comments.json")
 	l, resp, err := s.client.getListing(ctx, p, nil)
 	if err != nil {
 		return nil, resp, err
