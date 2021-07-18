@@ -221,7 +221,7 @@ func TestListingsService_GetComments(t *testing.T) {
 	blob, err := readFileContents("../testdata/listings/comments.json")
 	require.NoError(t, err)
 
-	mux.HandleFunc("/r/test/comments.json", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/r/test/comments", func(w http.ResponseWriter, r *http.Request) {
 		require.Equal(t, http.MethodGet, r.Method)
 		fmt.Fprint(w, blob)
 	})
