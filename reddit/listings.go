@@ -3,6 +3,7 @@ package reddit
 import (
 	"context"
 	"fmt"
+	"path"
 	"strings"
 )
 
@@ -16,12 +17,12 @@ type ListingsService struct {
 
 // Get posts, comments, and subreddits from their full IDs.
 func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*Comment, []*Subreddit, *Response, error) {
-	path := "api/info"
+	p := "api/info"
 	params := struct {
 		IDs []string `url:"id,omitempty,comma"`
 	}{ids}
 
-	l, resp, err := s.client.getListing(ctx, path, params)
+	l, resp, err := s.client.getListing(ctx, p, params)
 	if err != nil {
 		return nil, nil, nil, resp, err
 	}
@@ -31,10 +32,20 @@ func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*C
 
 // GetPosts returns posts from their full IDs.
 func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]*Post, *Response, error) {
-	path := fmt.Sprintf("by_id/%s", strings.Join(ids, ","))
-	l, resp, err := s.client.getListing(ctx, path, nil)
+	p := fmt.Sprintf("by_id/%s", strings.Join(ids, ","))
+	l, resp, err := s.client.getListing(ctx, p, nil)
 	if err != nil {
 		return nil, resp, err
 	}
 	return l.Posts(), resp, nil
+}
+
+// Comments returns comments from a subreddit or post.
+func (s *ListingsService) Comments(ctx context.Context, subID, postID string) ([]*Comment, *Response, error) {
+	p := path.Join("r", subID, postID, "comments")
+	l, resp, err := s.client.getListing(ctx, p, nil)
+	if err != nil {
+		return nil, resp, err
+	}
+	return l.Comments(), resp, nil
 }
