@@ -202,6 +202,22 @@ func TestListingsService_Get(t *testing.T) {
 func TestListingsService_GetPosts(t *testing.T) {
 	client, mux := setup(t)
 
+	blob, err := readFileContents("../testdata/listings/posts.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/by_id/t3_i2gvg4,t3_i2gwgz", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	posts, _, err := client.Listings.GetPosts(ctx, "t3_i2gvg4", "t3_i2gwgz")
+	require.NoError(t, err)
+	require.Equal(t, expectedListingPosts2, posts)
+}
+
+func TestListingsService_GetComments(t *testing.T) {
+	client, mux := setup(t)
+
 	blob, err := readFileContents("../testdata/listings/comments.json")
 	require.NoError(t, err)
 
