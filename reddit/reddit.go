@@ -535,6 +535,9 @@ type ListOptions struct {
 	// as the anchor point of the list. Only items
 	// appearing before it will be returned.
 	Before string `url:"before,omitempty"`
+
+	// The number of items returned in the previous call
+	Count int `url:"count,omitempty"`
 }
 
 // ListSubredditOptions defines possible options used when searching for subreddits.
