@@ -55,6 +55,16 @@ func WithTokenURL(u string) Opt {
 	}
 }
 
+// WithApplicationOnlyOAuth sets authentication flow to "Application Only OAuth".
+// Only ID and Secret are required to be set in client. Username and Password are ignored.
+// The flow is described here: https://github.com/reddit-archive/reddit/wiki/OAuth2#application-only-oauth
+func WithApplicationOnlyOAuth(o bool) Opt {
+	return func(c *Client) error {
+		c.applicationOnlyOAuth = o
+		return nil
+	}
+}
+
 // FromEnv configures the client with values from environment variables.
 // Supported environment variables:
 // GO_REDDIT_CLIENT_ID to set the client's id.

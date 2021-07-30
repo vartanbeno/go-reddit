@@ -38,6 +38,7 @@ import (
 	"net/http"
 
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/clientcredentials"
 )
 
 type oauthTokenSource struct {
@@ -50,28 +51,48 @@ func (s *oauthTokenSource) Token() (*oauth2.Token, error) {
 	return s.config.PasswordCredentialsToken(s.ctx, s.username, s.password)
 }
 
+type oauthTwoLeggedTokenSource struct {
+	ctx    context.Context
+	config *clientcredentials.Config
+}
+
+func (s *oauthTwoLeggedTokenSource) Token() (*oauth2.Token, error) {
+	return s.config.Token(s.ctx)
+}
+
 func oauthTransport(client *Client) http.RoundTripper {
 	httpClient := &http.Client{Transport: client.client.Transport}
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, httpClient)
 
-	config := &oauth2.Config{
-		ClientID:     client.ID,
-		ClientSecret: client.Secret,
-		Endpoint: oauth2.Endpoint{
-			TokenURL:  client.TokenURL.String(),
-			AuthStyle: oauth2.AuthStyleInHeader,
-		},
+	var tokenSource oauth2.TokenSource
+	if client.applicationOnlyOAuth {
+		tokenSource = &oauthTwoLeggedTokenSource{
+			ctx: ctx,
+			config: &clientcredentials.Config{
+				ClientID:     client.ID,
+				ClientSecret: client.Secret,
+				TokenURL:     client.TokenURL.String(),
+				AuthStyle:    oauth2.AuthStyleInHeader,
+			},
+		}
+	} else {
+		tokenSource = &oauthTokenSource{
+			ctx: ctx,
+			config: &oauth2.Config{
+				ClientID:     client.ID,
+				ClientSecret: client.Secret,
+				Endpoint: oauth2.Endpoint{
+					TokenURL:  client.TokenURL.String(),
+					AuthStyle: oauth2.AuthStyleInHeader,
+				},
+			},
+			username: client.Username,
+			password: client.Password,
+		}
 	}
 
-	tokenSource := oauth2.ReuseTokenSource(nil, &oauthTokenSource{
-		ctx:      ctx,
-		config:   config,
-		username: client.Username,
-		password: client.Password,
-	})
-
 	return &oauth2.Transport{
-		Source: tokenSource,
+		Source: oauth2.ReuseTokenSource(nil, tokenSource),
 		Base:   client.client.Transport,
 	}
 }
