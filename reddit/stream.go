@@ -58,6 +58,7 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 			n++
 			wg.Add(1)
 			go s.getPosts(subreddit, func(posts []*Post, err error) {
+				defer wg.Done()
 
 				if err != nil {
 					errsCh <- err
