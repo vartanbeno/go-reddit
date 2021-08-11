@@ -36,6 +36,8 @@ var expectedListingPosts = []*Post{
 		Author:   "v_95",
 		AuthorID: "t2_164ab8",
 
+		Awards: []Award{},
+
 		IsSelfPost: true,
 	},
 }
@@ -66,6 +68,8 @@ var expectedListingComments = []*Comment{
 		PostID: "t3_i2gvg4",
 
 		IsSubmitter: true,
+
+		Awards: []Award{},
 	},
 }
 
@@ -113,6 +117,8 @@ var expectedListingPosts2 = []*Post{
 		AuthorID: "t2_164ab8",
 
 		IsSelfPost: true,
+
+		Awards: []Award{},
 	},
 	{
 		ID:      "i2gvs1",
@@ -137,6 +143,8 @@ var expectedListingPosts2 = []*Post{
 
 		Author:   "v_95",
 		AuthorID: "t2_164ab8",
+
+		Awards: []Award{},
 	},
 }
 

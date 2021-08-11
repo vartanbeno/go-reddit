@@ -73,6 +73,8 @@ var expectedWikiPageDiscussions = []*Post{
 
 		Author:   "v_95",
 		AuthorID: "t2_164ab8",
+
+		Awards: []Award{},
 	},
 }
 

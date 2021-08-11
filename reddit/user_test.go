@@ -73,6 +73,7 @@ var expectedPost = &Post{
 	AuthorID: "t2_164ab8",
 
 	IsSelfPost: true,
+	Awards:     []Award{},
 }
 
 var expectedComment = &Comment{
@@ -102,6 +103,7 @@ var expectedComment = &Comment{
 	PostPermalink:   "https://www.reddit.com/r/apple/comments/d7ejpn/im_giving_away_an_iphone_11_pro_to_a_commenter_at/",
 	PostAuthor:      "iamthatis",
 	PostNumComments: Int(89751),
+	Awards:          []Award{},
 }
 
 var expectedRelationship = &Relationship{
