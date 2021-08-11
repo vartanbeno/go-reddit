@@ -34,6 +34,8 @@ var expectedCommentSubmitOrEdit = &Comment{
 	Created: &Timestamp{time.Date(2020, 4, 29, 0, 9, 47, 0, time.UTC)},
 	Edited:  &Timestamp{time.Date(1, 1, 1, 0, 0, 0, 0, time.UTC)},
 
+	Awards: []Award{},
+
 	PostID: "t3_link1",
 }
 

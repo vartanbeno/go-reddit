@@ -36,6 +36,7 @@ var expectedPostAndComments = &PostAndComments{
 		AuthorID: "t2_testuser",
 
 		IsSelfPost: true,
+		Awards:     []Award{},
 	},
 	Comments: []*Comment{
 		{
@@ -62,6 +63,7 @@ var expectedPostAndComments = &PostAndComments{
 
 			IsSubmitter: true,
 			CanGild:     true,
+			Awards:      []Award{},
 
 			Replies: Replies{
 				Comments: []*Comment{
@@ -89,6 +91,7 @@ var expectedPostAndComments = &PostAndComments{
 
 						IsSubmitter: true,
 						CanGild:     true,
+						Awards:      []Award{},
 					},
 				},
 			},
@@ -130,6 +133,7 @@ var expectedEditedPost = &Post{
 
 	Spoiler:    true,
 	IsSelfPost: true,
+	Awards:     []Award{},
 }
 
 var expectedPost2 = &Post{
@@ -156,6 +160,7 @@ var expectedPost2 = &Post{
 
 	Author:   "v_95",
 	AuthorID: "t2_164ab8",
+	Awards:   []Award{},
 }
 
 var expectedPostDuplicates = []*Post{
@@ -183,6 +188,7 @@ var expectedPostDuplicates = []*Post{
 
 		Author:   "GarlicoinAccount",
 		AuthorID: "t2_d2v1r90",
+		Awards:   []Award{},
 	},
 	{
 		ID:      "le1tc",
@@ -208,6 +214,7 @@ var expectedPostDuplicates = []*Post{
 
 		Author:   "prog101",
 		AuthorID: "t2_8dyo",
+		Awards:   []Award{},
 	},
 }
 
