@@ -31,22 +31,16 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 	ticker := time.NewTicker(streamConfig.Interval)
 	postsCh := make(chan *Post)
 	errsCh := make(chan error)
-
-	var once sync.Once
-	stop := func() {
-		once.Do(func() {
-			ticker.Stop()
-			close(postsCh)
-			close(errsCh)
-		})
-	}
+	ctx, cancel := context.WithCancel(context.Background())
 
 	// originally used the "before" parameter, but if that post gets deleted, subsequent requests
 	// would just return empty listings; easier to just keep track of all post ids encountered
 	ids := NewOrderedMaxSet(2000)
 
 	go func() {
-		defer stop()
+		defer close(postsCh)
+		defer close(errsCh)
+		defer cancel()
 		var wg sync.WaitGroup
 		defer wg.Wait()
 		var mutex sync.Mutex
@@ -55,13 +49,24 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 		infinite := streamConfig.MaxRequests == 0
 
 		for ; ; <-ticker.C {
+			select {
+			case <-ctx.Done():
+				ticker.Stop()
+				return
+			default:
+			}
+
 			n++
 			wg.Add(1)
-			go s.getPosts(subreddit, func(posts []*Post, err error) {
+			go s.getPosts(ctx, subreddit, func(posts []*Post, err error) {
 				defer wg.Done()
 
 				if err != nil {
-					errsCh <- err
+					select {
+					case <-ctx.Done():
+					default:
+						errsCh <- err
+					}
 					return
 				}
 
@@ -88,7 +93,12 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 						break
 					}
 
-					postsCh <- post
+					select {
+					case <-ctx.Done():
+						return
+					default:
+						postsCh <- post
+					}
 				}
 			})
 
@@ -98,7 +108,7 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 		}
 	}()
 
-	return postsCh, errsCh, stop
+	return postsCh, errsCh, cancel
 }
 
 // Comments streams comments from the specified subreddit.
@@ -121,20 +131,14 @@ func (s *StreamService) Comments(subreddit string, opts ...StreamOpt) (<-chan *C
 	ticker := time.NewTicker(streamConfig.Interval)
 	commentsCh := make(chan *Comment)
 	errsCh := make(chan error)
-
-	var once sync.Once
-	stop := func() {
-		once.Do(func() {
-			ticker.Stop()
-			close(commentsCh)
-			close(errsCh)
-		})
-	}
+	ctx, cancel := context.WithCancel(context.Background())
 
 	ids := NewOrderedMaxSet(2000)
 
 	go func() {
-		defer stop()
+		defer close(commentsCh)
+		defer close(errsCh)
+		defer cancel()
 		var wg sync.WaitGroup
 		defer wg.Wait()
 		var mutex sync.Mutex
@@ -143,13 +147,23 @@ func (s *StreamService) Comments(subreddit string, opts ...StreamOpt) (<-chan *C
 		infinite := streamConfig.MaxRequests == 0
 
 		for ; ; <-ticker.C {
+			select {
+			case <-ctx.Done():
+				ticker.Stop()
+				return
+			default:
+			}
 			n++
 			wg.Add(1)
 
-			go s.getComments(subreddit, func(comments []*Comment, err error) {
+			go s.getComments(ctx, subreddit, func(comments []*Comment, err error) {
 				defer wg.Done()
 				if err != nil {
-					errsCh <- err
+					select {
+					case <-ctx.Done():
+					default:
+						errsCh <- err
+					}
 					return
 				}
 
@@ -174,7 +188,12 @@ func (s *StreamService) Comments(subreddit string, opts ...StreamOpt) (<-chan *C
 							break
 						}
 
-						commentsCh <- comment
+						select {
+						case <-ctx.Done():
+							return
+						default:
+							commentsCh <- comment
+						}
 					}
 
 				}
@@ -185,15 +204,15 @@ func (s *StreamService) Comments(subreddit string, opts ...StreamOpt) (<-chan *C
 		}
 	}()
 
-	return commentsCh, errsCh, stop
+	return commentsCh, errsCh, cancel
 }
 
-func (s *StreamService) getPosts(subreddit string, cb func([]*Post, error)) {
-	posts, _, err := s.client.Subreddit.NewPosts(context.Background(), subreddit, &ListOptions{Limit: 100})
+func (s *StreamService) getPosts(ctx context.Context, subreddit string, cb func([]*Post, error)) {
+	posts, _, err := s.client.Subreddit.NewPosts(ctx, subreddit, &ListOptions{Limit: 100})
 	cb(posts, err)
 }
 
-func (s *StreamService) getComments(subreddit string, cb func([]*Comment, error)) {
-	comments, _, err := s.client.Subreddit.Comments(context.Background(), subreddit, &ListOptions{Limit: 100})
+func (s *StreamService) getComments(ctx context.Context, subreddit string, cb func([]*Comment, error)) {
+	comments, _, err := s.client.Subreddit.Comments(ctx, subreddit, &ListOptions{Limit: 100})
 	cb(comments, err)
 }
