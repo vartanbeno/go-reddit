@@ -543,6 +543,22 @@ func TestSubredditService_TopPosts(t *testing.T) {
 	require.Equal(t, "t3_hyhquk", resp.After)
 }
 
+func TestSubredditService_Comments(t *testing.T) {
+	client, mux := setup(t)
+
+	blob, err := readFileContents("../testdata/subreddit/comments.json")
+	require.NoError(t, err)
+
+	mux.HandleFunc("/r/golang/comments", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodGet, r.Method)
+		fmt.Fprint(w, blob)
+	})
+
+	comments, _, err := client.Subreddit.Comments(ctx, "golang", nil)
+	require.NoError(t, err)
+	require.Len(t, comments, 5)
+}
+
 func TestSubredditService_Get(t *testing.T) {
 	client, mux := setup(t)
 
