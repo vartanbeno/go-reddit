@@ -1,14 +1,10 @@
 <div align='center'>
 <br />
-<img src='./images/logo.png' alt='go-reddit logo' height='150'>
+# Go-Reddit
 
 ---
 
 <div id='badges' align='center'>
-
-[![Actions Status](https://github.com/vartanbeno/go-reddit/workflows/tests/badge.svg)](https://github.com/vartanbeno/go-reddit/actions)
-[![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/vartanbeno/go-reddit/v2/reddit)](https://pkg.go.dev/github.com/vartanbeno/go-reddit/v2/reddit)
 
 </div>
 
@@ -16,9 +12,9 @@
 
 ## Overview
 
-**Featured in issues [327](https://golangweekly.com/issues/327) and [347](https://golangweekly.com/issues/347) of Golang Weekly 🎉**
-
 go-reddit is a Go client library for accessing the Reddit API.
+
+This is a fork of [go-reddit](https://github.com/vartanbeno/go-reddit) by @vartanbeno
 
 You can view Reddit's official API documentation [here](https://www.reddit.com/dev/api/).
 
@@ -27,13 +23,13 @@ You can view Reddit's official API documentation [here](https://www.reddit.com/d
 To get a specific version from the list of [versions](https://github.com/vartanbeno/go-reddit/releases):
 
 ```sh
-go get github.com/vartanbeno/go-reddit/v2@vX.Y.Z
+go get github.com/rgood/go-reddit@vX.Y.Z
 ```
 
 Or for the latest version:
 
 ```sh
-go get github.com/vartanbeno/go-reddit/v2
+go get github.com/rgood/go-reddit
 ```
 
 The repository structure for managing multiple major versions follows the one outlined [here](https://github.com/go-modules-by-example/index/tree/master/016_major_version_repo_strategy#major-branch-strategy).
@@ -45,7 +41,7 @@ Make sure to have a Reddit app with a valid client id and secret. [Here](https:/
 ```go
 package main
 
-import "github.com/vartanbeno/go-reddit/v2/reddit"
+import "github.com/rgood/go-reddit/reddit"
 
 func main() {
     credentials := reddit.Credentials{ID: "id", Secret: "secret", Username: "username", Password: "password"}
