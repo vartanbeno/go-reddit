@@ -389,6 +389,16 @@ func (l *trophyList) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// Award is an award given to a post or comment
+type Award struct {
+	ID          string `json:"id,omitempty"`
+	Name        string `json:"name,omitempty"`
+	SubredditID string `json:"subreddit_id,omitempty"`
+	Count       int    `json:"count,omitempty"`
+	CoinPrice   int    `json:"coin_price,omitempty"`
+	IconURL     string `json:"icon_url,omitempty"`
+}
+
 // Comment is a comment posted by a user.
 type Comment struct {
 	ID      string     `json:"id,omitempty"`
@@ -433,6 +443,8 @@ type Comment struct {
 	Locked      bool `json:"locked"`
 	CanGild     bool `json:"can_gild"`
 	NSFW        bool `json:"over_18"`
+
+	Awards []Award `json:"all_awardings"`
 
 	Replies Replies `json:"replies"`
 }
@@ -547,12 +559,13 @@ type Post struct {
 	Author   string `json:"author,omitempty"`
 	AuthorID string `json:"author_fullname,omitempty"`
 
-	Spoiler    bool `json:"spoiler"`
-	Locked     bool `json:"locked"`
-	NSFW       bool `json:"over_18"`
-	IsSelfPost bool `json:"is_self"`
-	Saved      bool `json:"saved"`
-	Stickied   bool `json:"stickied"`
+	Spoiler    bool    `json:"spoiler"`
+	Locked     bool    `json:"locked"`
+	NSFW       bool    `json:"over_18"`
+	IsSelfPost bool    `json:"is_self"`
+	Saved      bool    `json:"saved"`
+	Stickied   bool    `json:"stickied"`
+	Awards     []Award `json:"all_awardings,omitempty"`
 }
 
 // Subreddit holds information about a subreddit

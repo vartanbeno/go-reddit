@@ -42,6 +42,7 @@ var expectedPosts = []*Post{
 
 		IsSelfPost: true,
 		Stickied:   true,
+		Awards:     []Award{},
 	},
 	{
 		ID:      "hyhquk",
@@ -65,6 +66,7 @@ var expectedPosts = []*Post{
 
 		Author:   "MuckleMcDuckle",
 		AuthorID: "t2_6fqntbwq",
+		Awards:   []Award{},
 	},
 }
 
@@ -176,6 +178,17 @@ var expectedSearchPosts = []*Post{
 
 		Author:   "chocolat_ice_cream",
 		AuthorID: "t2_3p32m02",
+
+		Awards: []Award{
+			Award{
+				ID:          "award_9663243a-e77f-44cf-abc6-850ead2cd18d",
+				Name:        "Bravo Grande!",
+				SubredditID: "",
+				Count:       1,
+				CoinPrice:   75,
+				IconURL:     "https://www.redditstatic.com/gold/awards/icon/SnooClappingPremium_512.png",
+			},
+		},
 	},
 	{
 		ID:      "hmwhd7",
@@ -199,6 +212,17 @@ var expectedSearchPosts = []*Post{
 
 		Author:   "Jeremy_Martin",
 		AuthorID: "t2_wgrkg",
+
+		Awards: []Award{
+			Award{
+				ID:          "award_6001deaa-c9e0-4914-ab3d-7c4a16bd8617",
+				Name:        "Fireworks",
+				SubredditID: "",
+				Count:       1,
+				CoinPrice:   100,
+				IconURL:     "https://www.redditstatic.com/gold/awards/icon/Fireworks_512.png",
+			},
+		},
 	},
 }
 
