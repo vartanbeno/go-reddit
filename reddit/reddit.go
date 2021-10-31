@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -25,6 +26,7 @@ const (
 
 	defaultBaseURL         = "https://oauth.reddit.com"
 	defaultBaseURLReadonly = "https://reddit.com"
+	defaultAuthURL         = "https://www.reddit.com/api/v1/authorize"
 	defaultTokenURL        = "https://www.reddit.com/api/v1/access_token"
 
 	mediaTypeJSON = "application/json"
@@ -63,6 +65,7 @@ type Client struct {
 	client *http.Client
 
 	BaseURL  *url.URL
+	AuthURL  *url.URL
 	TokenURL *url.URL
 
 	userAgent string
@@ -70,10 +73,9 @@ type Client struct {
 	rateMu sync.Mutex
 	rate   Rate
 
-	ID       string
-	Secret   string
-	Username string
-	Password string
+	Oauth2Config *oauth2.Config
+	Username     string
+	Password     string
 
 	// This is the client's user ID in Reddit's database.
 	redditID string
@@ -108,9 +110,17 @@ func (c *Client) OnRequestCompleted(rc RequestCompletionCallback) {
 
 func newClient() *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
-	tokenURL, _ := url.Parse(defaultTokenURL)
 
-	client := &Client{client: &http.Client{}, BaseURL: baseURL, TokenURL: tokenURL}
+	client := &Client{BaseURL: baseURL, client: &http.Client{},
+		Oauth2Config: &oauth2.Config{
+			Endpoint: oauth2.Endpoint{
+				AuthURL:  defaultAuthURL,
+				TokenURL: defaultTokenURL,
+
+				AuthStyle: oauth2.AuthStyleAutoDetect,
+			},
+		},
+	}
 
 	client.Account = &AccountService{client: client}
 	client.Collection = &CollectionService{client: client}
@@ -135,6 +145,36 @@ func newClient() *Client {
 	return client
 }
 
+func NewTokenClient(clientID, clientSecret, callback string, scopes []string, opts ...Opt) (*Client, error) {
+	client := newClient()
+
+	client.Oauth2Config.ClientID = clientID
+	client.Oauth2Config.ClientSecret = clientSecret
+	client.Oauth2Config.RedirectURL = callback
+	client.Oauth2Config.Scopes = scopes
+
+	for _, opt := range opts {
+		if err := opt(client); err != nil {
+			return nil, err
+		}
+	}
+
+	userAgentTransport := &userAgentTransport{
+		userAgent: client.UserAgent(),
+		Base:      client.client.Transport,
+	}
+	client.client.Transport = userAgentTransport
+
+	if client.client.CheckRedirect == nil {
+		client.client.CheckRedirect = client.redirect
+	}
+
+	oauthTransport := oauthTransport(client)
+	client.client.Transport = oauthTransport
+
+	return client, nil
+}
+
 // NewClient returns a new Reddit API client.
 // Use an Opt to configure the client credentials, such as WithHTTPClient or WithUserAgent.
 // If the FromEnv option is used with the correct environment variables, an empty struct can
@@ -142,8 +182,8 @@ func newClient() *Client {
 func NewClient(credentials Credentials, opts ...Opt) (*Client, error) {
 	client := newClient()
 
-	client.ID = credentials.ID
-	client.Secret = credentials.Secret
+	client.Oauth2Config.ClientID = credentials.ID
+	client.Oauth2Config.ClientSecret = credentials.Secret
 	client.Username = credentials.Username
 	client.Password = credentials.Password
 
@@ -236,6 +276,73 @@ func (c *Client) UserAgent() string {
 		c.userAgent = userAgent
 	}
 	return c.userAgent
+}
+
+func (c *Client) isTokenClient() bool {
+	if url, _ := url.Parse(defaultBaseURLReadonly); url == c.BaseURL {
+		return false
+	}
+
+	if c.Username != "" || c.Password != "" {
+		return false
+	}
+
+	if len(c.Oauth2Config.Scopes) > 0 {
+		return true
+	}
+
+	return false
+}
+
+func (c *Client) AuthorizeURL(state string) (string, bool) {
+	if c.isTokenClient() {
+		return c.Oauth2Config.AuthCodeURL(state), true
+	}
+
+	return "", false
+
+}
+
+func (c *Client) Authorize(code string) (bool, error) {
+	if url, _ := url.Parse(defaultBaseURLReadonly); url == c.BaseURL {
+		return false, errors.New("Cannot authorize read-only client")
+	}
+
+	if c.Username != "" || c.Password != "" {
+		return false, errors.New("Cannot authorize clients with user credentials")
+	}
+
+	httpClient := &http.Client{Transport: newBasicAuthTransport(c.Oauth2Config.ClientID, c.Oauth2Config.ClientSecret,
+		&userAgentTransport{
+			userAgent: c.UserAgent(),
+			Base:      &http.Transport{},
+		},
+	)}
+
+	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, httpClient)
+	token, err := c.Oauth2Config.Exchange(ctx, code)
+
+	if err != nil {
+		return false, err
+	}
+
+	ats := oauth2.ReuseTokenSource(token, &accessTokenSource{
+		Config:    c.Oauth2Config,
+		Code:      code,
+		UserAgent: c.UserAgent(),
+	})
+
+	transport := &oauth2.Transport{
+		Source: ats,
+		Base: &userAgentTransport{
+			userAgent: c.UserAgent(),
+			Base:      &http.Transport{},
+		},
+	}
+
+	c.client = &http.Client{Transport: transport}
+
+	return true, nil
 }
 
 // NewRequest creates an API request with form data as the body.

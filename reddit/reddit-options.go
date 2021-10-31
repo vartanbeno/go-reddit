@@ -63,10 +63,10 @@ func WithTokenURL(u string) Opt {
 // GO_REDDIT_CLIENT_PASSWORD to set the client's password.
 func FromEnv(c *Client) error {
 	if v := os.Getenv("GO_REDDIT_CLIENT_ID"); v != "" {
-		c.ID = v
+		c.Oauth2Config.ClientID = v
 	}
 	if v := os.Getenv("GO_REDDIT_CLIENT_SECRET"); v != "" {
-		c.Secret = v
+		c.Oauth2Config.ClientSecret = v
 	}
 	if v := os.Getenv("GO_REDDIT_CLIENT_USERNAME"); v != "" {
 		c.Username = v

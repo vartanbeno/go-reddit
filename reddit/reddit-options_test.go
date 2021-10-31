@@ -67,8 +67,8 @@ func TestFromEnv(t *testing.T) {
 
 	c, err := NewClient(Credentials{}, FromEnv)
 	require.NoError(t, err)
-	require.Equal(t, "id1", c.ID)
-	require.Equal(t, "secret1", c.Secret)
+	require.Equal(t, "id1", c.Oauth2Config.ClientID)
+	require.Equal(t, "secret1", c.Oauth2Config.ClientSecret)
 	require.Equal(t, "username1", c.Username)
 	require.Equal(t, "password1", c.Password)
 }

@@ -54,18 +54,9 @@ func oauthTransport(client *Client) http.RoundTripper {
 	httpClient := &http.Client{Transport: client.client.Transport}
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, httpClient)
 
-	config := &oauth2.Config{
-		ClientID:     client.ID,
-		ClientSecret: client.Secret,
-		Endpoint: oauth2.Endpoint{
-			TokenURL:  client.TokenURL.String(),
-			AuthStyle: oauth2.AuthStyleInHeader,
-		},
-	}
-
 	tokenSource := oauth2.ReuseTokenSource(nil, &oauthTokenSource{
 		ctx:      ctx,
-		config:   config,
+		config:   client.Oauth2Config,
 		username: client.Username,
 		password: client.Password,
 	})
