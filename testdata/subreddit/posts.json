@@ -43,7 +43,7 @@
           "is_meta": false,
           "category": null,
           "secure_media_embed": {},
-          "link_flair_text": null,
+          "link_flair_text": "test",
           "can_mod_post": false,
           "score": 253,
           "approved_by": null,

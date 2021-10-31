@@ -28,6 +28,8 @@ var expectedPosts = []*Post{
 		Title: "test",
 		Body:  "test",
 
+		LinkFlairText: "test",
+
 		Score:            253,
 		UpvoteRatio:      0.99,
 		NumberOfComments: 1634,
@@ -187,6 +189,8 @@ var expectedSearchPosts = []*Post{
 		URL:       "https://www.theguardian.com/world/2020/jul/07/jair-bolsonaro-coronavirus-positive-test-brazil-president",
 
 		Title: "Brazilian president Jair Bolsonaro tests positive for coronavirus",
+
+		LinkFlairText: "COVID-19",
 
 		Score:            149238,
 		UpvoteRatio:      0.94,

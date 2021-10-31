@@ -115,6 +115,8 @@ var expectedLiveThreadDiscussions = []*Post{
 
 		Title: "test title",
 
+		LinkFlairText: "LIVE THREAD",
+
 		Score:            22,
 		UpvoteRatio:      0.9,
 		NumberOfComments: 1,
@@ -137,6 +139,8 @@ var expectedLiveThreadDiscussions = []*Post{
 		URL:       "https://www.reddit.com/live/15nfp4mtfbo14/",
 
 		Title: "test title",
+
+		LinkFlairText: "LIVE THREAD CLOSED | No further updates.",
 
 		Score:            71,
 		UpvoteRatio:      0.97,
