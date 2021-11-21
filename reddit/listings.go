@@ -32,7 +32,9 @@ func (s *ListingsService) Get(ctx context.Context, ids ...string) ([]*Post, []*C
 // GetPosts returns posts from their full IDs.
 func (s *ListingsService) GetPosts(ctx context.Context, ids ...string) ([]*Post, *Response, error) {
 	path := fmt.Sprintf("by_id/%s", strings.Join(ids, ","))
-	l, resp, err := s.client.getListing(ctx, path, nil)
+	l, resp, err := s.client.getListing(ctx, path, ListOptions{
+		Limit: len(ids),
+	})
 	if err != nil {
 		return nil, resp, err
 	}
