@@ -23,6 +23,7 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 		Interval:       defaultStreamInterval,
 		DiscardInitial: false,
 		MaxRequests:    0,
+		Ctx:            context.Background(),
 	}
 	for _, opt := range opts {
 		opt(streamConfig)
@@ -40,21 +41,31 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 			close(errsCh)
 		})
 	}
+	ctx, cancel := context.WithCancel(streamConfig.Ctx)
 
 	// originally used the "before" parameter, but if that post gets deleted, subsequent requests
 	// would just return empty listings; easier to just keep track of all post ids encountered
 	ids := set{}
 
 	go func() {
+		defer cancel()
 		defer stop()
 
 		var n int
 		infinite := streamConfig.MaxRequests == 0
 
 		for ; ; <-ticker.C {
+
+			// Check if the context was cancelled
+			select {
+			case <-ctx.Done():
+				return
+			default:
+			}
+
 			n++
 
-			posts, err := s.getPosts(subreddit)
+			posts, err := s.getPosts(ctx, subreddit)
 			if err != nil {
 				errsCh <- err
 				if !infinite && n >= streamConfig.MaxRequests {
@@ -78,7 +89,13 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 					break
 				}
 
-				postsCh <- post
+				// Check if the context was cancelled before sending posts to postsCh
+				select {
+				case <-ctx.Done():
+					return
+				default:
+					postsCh <- post
+				}
 			}
 
 			if !infinite && n >= streamConfig.MaxRequests {
@@ -87,11 +104,11 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 		}
 	}()
 
-	return postsCh, errsCh, stop
+	return postsCh, errsCh, cancel
 }
 
-func (s *StreamService) getPosts(subreddit string) ([]*Post, error) {
-	posts, _, err := s.client.Subreddit.NewPosts(context.Background(), subreddit, &ListOptions{Limit: 100})
+func (s *StreamService) getPosts(ctx context.Context, subreddit string) ([]*Post, error) {
+	posts, _, err := s.client.Subreddit.NewPosts(ctx, subreddit, &ListOptions{Limit: 100})
 	return posts, err
 }
 
