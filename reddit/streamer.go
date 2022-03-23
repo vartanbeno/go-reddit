@@ -42,8 +42,8 @@ func StreamMaxRequests(v int) StreamOpt {
 	}
 }
 
-// StreamMaxRequests sets a limit on the number of times data is fetched for a stream.
-// If less than or equal to 0, it is assumed to be infinite.
+// StreamWithContext adds a context to the Stream.
+// It can be used to cancel the stream.
 func StreamWithContext(ctx context.Context) StreamOpt {
 	return func(c *streamConfig) {
 		c.Ctx = ctx
