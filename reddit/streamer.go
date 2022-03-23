@@ -1,6 +1,9 @@
 package reddit
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 const defaultStreamInterval = time.Second * 5
 
@@ -8,6 +11,7 @@ type streamConfig struct {
 	Interval       time.Duration
 	DiscardInitial bool
 	MaxRequests    int
+	Ctx            context.Context
 }
 
 // StreamOpt is a configuration option to configure a stream.
@@ -35,6 +39,14 @@ func StreamMaxRequests(v int) StreamOpt {
 		if v > 0 {
 			c.MaxRequests = v
 		}
+	}
+}
+
+// StreamMaxRequests sets a limit on the number of times data is fetched for a stream.
+// If less than or equal to 0, it is assumed to be infinite.
+func StreamWithContext(ctx context.Context) StreamOpt {
+	return func(c *streamConfig) {
+		c.Ctx = ctx
 	}
 }
 
