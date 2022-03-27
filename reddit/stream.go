@@ -74,6 +74,14 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 				continue
 			}
 
+			if streamConfig.DiscardInitial {
+				for _, post := range posts {
+					id := post.FullID
+					ids.Add(id)
+				}
+				streamConfig.DiscardInitial = false
+			}
+
 			for _, post := range posts {
 				id := post.FullID
 
@@ -84,12 +92,7 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 				}
 				ids.Add(id)
 
-				if streamConfig.DiscardInitial {
-					streamConfig.DiscardInitial = false
-					break
-				}
-
-				// Check if the context was cancelled before sending posts to postsCh
+				// Check if the context is done before sending posts to postsCh
 				select {
 				case <-ctx.Done():
 					return
