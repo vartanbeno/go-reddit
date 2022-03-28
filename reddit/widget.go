@@ -362,13 +362,13 @@ type WidgetButtonHoverState struct {
 	StrokeColor string `json:"color,omitempty"`
 }
 
-// WidgetCreateRequest represents a request to create a widget.
-type WidgetCreateRequest interface {
+// WidgetRequest represents a request to create a widget.
+type WidgetRequest interface {
 	requestKind() string
 }
 
-// TextAreaWidgetCreateRequest represents a requets to create a text area widget.
-type TextAreaWidgetCreateRequest struct {
+// TextAreaWidgetRequest represents a requets to create a text area widget.
+type TextAreaWidgetRequest struct {
 	Style *WidgetStyle `json:"styles,omitempty"`
 	// No longer than 30 characters.
 	Name string `json:"shortName,omitempty"`
@@ -376,10 +376,10 @@ type TextAreaWidgetCreateRequest struct {
 	Text string `json:"text,omitempty"`
 }
 
-func (*TextAreaWidgetCreateRequest) requestKind() string { return widgetKindTextArea }
+func (*TextAreaWidgetRequest) requestKind() string { return widgetKindTextArea }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (r *TextAreaWidgetCreateRequest) MarshalJSON() ([]byte, error) {
+func (r *TextAreaWidgetRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Kind  string       `json:"kind"`
 		Style *WidgetStyle `json:"styles,omitempty"`
@@ -388,18 +388,18 @@ func (r *TextAreaWidgetCreateRequest) MarshalJSON() ([]byte, error) {
 	}{r.requestKind(), r.Style, r.Name, r.Text})
 }
 
-// CommunityListWidgetCreateRequest represents a requets to create a community list widget.
-type CommunityListWidgetCreateRequest struct {
+// CommunityListWidgetRequest represents a requets to create a community list widget.
+type CommunityListWidgetRequest struct {
 	Style *WidgetStyle `json:"styles,omitempty"`
 	// No longer than 30 characters.
 	Name        string   `json:"shortName,omitempty"`
 	Communities []string `json:"data,omitempty"`
 }
 
-func (*CommunityListWidgetCreateRequest) requestKind() string { return widgetKindCommunityList }
+func (*CommunityListWidgetRequest) requestKind() string { return widgetKindCommunityList }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (r *CommunityListWidgetCreateRequest) MarshalJSON() ([]byte, error) {
+func (r *CommunityListWidgetRequest) MarshalJSON() ([]byte, error) {
 	return json.Marshal(struct {
 		Kind        string       `json:"kind"`
 		Style       *WidgetStyle `json:"styles,omitempty"`
@@ -428,9 +428,9 @@ func (s *WidgetService) Get(ctx context.Context, subreddit string) ([]Widget, *R
 }
 
 // Create a widget for the subreddit.
-func (s *WidgetService) Create(ctx context.Context, subreddit string, request WidgetCreateRequest) (Widget, *Response, error) {
+func (s *WidgetService) Create(ctx context.Context, subreddit string, request WidgetRequest) (Widget, *Response, error) {
 	if request == nil {
-		return nil, nil, errors.New("WidgetCreateRequest: cannot be nil")
+		return nil, nil, errors.New("WidgetRequest: cannot be nil")
 	}
 
 	path := fmt.Sprintf("r/%s/api/widget", subreddit)
@@ -446,6 +446,27 @@ func (s *WidgetService) Create(ctx context.Context, subreddit string, request Wi
 	}
 
 	return root.Data, resp, nil
+}
+
+// Update a widget via its id.
+func (s *WidgetService) Update(ctx context.Context, subreddit, id string, request WidgetRequest) (Widget, *Response, error) {
+	if request == nil {
+		return nil, nil, errors.New("WidgetRequest: cannot be nil")
+	}
+
+	path := fmt.Sprintf("r/%s/api/widget/%s", subreddit, id)
+	req, err := s.client.NewJSONRequest(http.MethodPut, path, request)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	root := new(rootWidget)
+	resp, err := s.client.Do(ctx, req, root)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return root.Data, resp, err
 }
 
 // Delete a widget via its id.

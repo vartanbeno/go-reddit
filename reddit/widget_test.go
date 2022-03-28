@@ -220,9 +220,9 @@ func TestWidgetService_Create(t *testing.T) {
 	})
 
 	_, _, err := client.Widget.Create(ctx, "testsubreddit", nil)
-	require.EqualError(t, err, "WidgetCreateRequest: cannot be nil")
+	require.EqualError(t, err, "WidgetRequest: cannot be nil")
 
-	createdWidget, _, err := client.Widget.Create(ctx, "testsubreddit", &TextAreaWidgetCreateRequest{
+	createdWidget, _, err := client.Widget.Create(ctx, "testsubreddit", &TextAreaWidgetRequest{
 		Name: "test name",
 		Text: "test text",
 	})
@@ -235,6 +235,46 @@ func TestWidgetService_Create(t *testing.T) {
 		Name: "test name",
 		Text: "test text",
 	}, createdWidget)
+}
+
+func TestWidgetService_Update(t *testing.T) {
+	client, mux := setup(t)
+
+	mux.HandleFunc("/r/testsubreddit/api/widget/abc123", func(w http.ResponseWriter, r *http.Request) {
+		require.Equal(t, http.MethodPut, r.Method)
+
+		body := new(struct {
+			Name string `json:"shortName"`
+			Text string `json:"text"`
+		})
+
+		err := json.NewDecoder(r.Body).Decode(body)
+		require.NoError(t, err)
+		require.Equal(t, "test text updated", body.Text)
+
+		fmt.Fprint(w, `{
+			"text": "test text updated",
+			"kind": "textarea",
+			"shortName": "test name",
+			"id": "abc123"
+		}`)
+	})
+
+	_, _, err := client.Widget.Update(ctx, "testsubreddit", "abc134", nil)
+	require.EqualError(t, err, "WidgetRequest: cannot be nil")
+
+	updatedWidget, _, err := client.Widget.Update(ctx, "testsubreddit", "abc123", &TextAreaWidgetRequest{
+		Text: "test text updated",
+	})
+	require.NoError(t, err)
+	require.Equal(t, &TextAreaWidget{
+		widget: widget{
+			ID:   "abc123",
+			Kind: "textarea",
+		},
+		Name: "test name",
+		Text: "test text updated",
+	}, updatedWidget)
 }
 
 func TestWidgetService_Delete(t *testing.T) {
