@@ -109,7 +109,7 @@ func (l *WidgetList) UnmarshalJSON(data []byte) error {
 type widget struct {
 	ID    string       `json:"id,omitempty"`
 	Kind  string       `json:"kind,omitempty"`
-	Style *WidgetStyle `json:"styles,omitempty"`
+	Style *WidgetStyle `json:"styles"`
 }
 
 func (w *widget) kind() string  { return w.Kind }
@@ -258,8 +258,8 @@ type CustomWidget struct {
 
 // WidgetStyle contains style information for the widget.
 type WidgetStyle struct {
-	HeaderColor     string `json:"headerColor,omitempty"`
-	BackgroundColor string `json:"backgroundColor,omitempty"`
+	HeaderColor     string `json:"headerColor"`
+	BackgroundColor string `json:"backgroundColor"`
 }
 
 // WidgetImage is an image in a widget.
