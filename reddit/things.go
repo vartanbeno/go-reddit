@@ -560,10 +560,24 @@ type OEmbed struct {
 	ThumbnailHeight int    `json:"thumbnail_height,omitempty"`
 }
 
+type RedditVideoPreview struct {
+	BitrateKbps       int    `json:"bitrate_kbps,omitempty"`
+	DashURL           string `json:"dash_url,omitempty"`
+	Duration          int    `json:"duration,omitempty"`
+	FallbackURL       string `json:"fallback_url,omitempty"`
+	Height            int    `json:"height,omitempty"`
+	Width             int    `json:"width,omitempty"`
+	HlsURL            string `json:"hls_url,omitempty"`
+	IsGif             bool   `json:"is_gif,omitempty"`
+	ScrubberMediaUrl  string `json:"scrubber_media_url,omitempty"`
+	TranscodingStatus string `json:"transcoding_status,omitempty"`
+}
+
 // Media holds all the media metadata.
 type Media struct {
-	Type   string `json:"type,omitempty"`
-	OEmbed OEmbed `json:"oembed,omitempty"`
+	Type        string             `json:"type,omitempty"`
+	OEmbed      OEmbed             `json:"oembed,omitempty"`
+	RedditVideo RedditVideoPreview `json:"reddit_video,omitempty"`
 }
 
 // MediaMetadata is the media metadata of a Post.
