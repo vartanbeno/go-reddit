@@ -1,4 +1,4 @@
-module github.com/vartanbeno/go-reddit/v2
+module github.com/bocanada/go-reddit/v3
 
 go 1.15
 
