@@ -190,6 +190,13 @@ type SubredditSettings struct {
 	// Allow image uploads and links to image hosting sites.
 	AllowImages                *bool `url:"allow_images,omitempty" json:"allow_images,omitempty"`
 	AllowMultipleImagesPerPost *bool `url:"allow_galleries,omitempty" json:"allow_galleries,omitempty"`
+	AllowVideos                *bool `url:"allow_videos,omitempty" json:"allow_videos,omitempty"`
+
+	AllowPredictions             *bool `url:"allow_predictions,omitempty" json:"allow_predictions,omitempty"`
+	AllowPredictionsTournament   *bool `url:"allow_predictions_tournament,omitempty" json:"allow_predictions_tournament,omitempty"`
+	AllowPredictionsContributors *bool `url:"allow_predictions_contributors,omitempty" json:"allow_predictions_contributors,omitempty"`
+
+	AllowTalks *bool `url:"allow_talks,omitempty" json:"allow_talks,omitempty"`
 
 	ExcludeSitewideBannedUsersContent *bool `url:"exclude_banned_modqueue,omitempty" json:"exclude_banned_modqueue,omitempty"`
 
