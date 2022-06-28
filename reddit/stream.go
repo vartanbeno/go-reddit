@@ -73,13 +73,16 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 				}
 				ids.Add(id)
 
+				// skip this post because we are discarding initial fetch of posts
 				if streamConfig.DiscardInitial {
-					streamConfig.DiscardInitial = false
-					break
+					continue
 				}
 
 				postsCh <- post
 			}
+
+			// setting discard initial to false, since we the loop has run once already
+			streamConfig.DiscardInitial = false
 
 			if !infinite && n >= streamConfig.MaxRequests {
 				break
