@@ -35,7 +35,7 @@ func setup(t testing.TB) (*Client, *http.ServeMux) {
 	})
 
 	client, _ := NewClient(
-		Credentials{"id1", "secret1", "user1", "password1"},
+		Credentials{"id1", "secret1", "user1", "password1", ""},
 		WithBaseURL(server.URL),
 		WithTokenURL(server.URL+"/api/v1/access_token"),
 	)

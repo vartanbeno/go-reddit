@@ -55,6 +55,8 @@ type Credentials struct {
 	Secret   string
 	Username string
 	Password string
+
+	AccessToken string
 }
 
 // Client manages communication with the Reddit API.
@@ -74,6 +76,8 @@ type Client struct {
 	Secret   string
 	Username string
 	Password string
+
+	AccessToken string
 
 	// This is the client's user ID in Reddit's database.
 	redditID string
@@ -146,6 +150,8 @@ func NewClient(credentials Credentials, opts ...Opt) (*Client, error) {
 	client.Secret = credentials.Secret
 	client.Username = credentials.Username
 	client.Password = credentials.Password
+
+	client.AccessToken = credentials.AccessToken
 
 	for _, opt := range opts {
 		if err := opt(client); err != nil {
@@ -253,6 +259,11 @@ func (c *Client) NewRequest(method string, path string, form url.Values) (*http.
 	}
 
 	req, err := http.NewRequest(method, u.String(), body)
+
+	if c.AccessToken != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("bearer %s", c.AccessToken))
+		req.Header.Set("User-Agent", "golang:github.com/vartanbeno/go-reddit:v2.0.0")
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -345,7 +356,13 @@ func (c *Client) Do(ctx context.Context, req *http.Request, v interface{}) (*Res
 		}, err
 	}
 
-	resp, err := DoRequestWithClient(ctx, c.client, req)
+	var resp *http.Response
+	var err error
+	if c.AccessToken != "" {
+		resp, err = DoRequest(ctx, req)
+	} else {
+		resp, err = DoRequestWithClient(ctx, c.client, req)
+	}
 	if err != nil {
 		return nil, err
 	}
