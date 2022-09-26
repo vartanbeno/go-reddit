@@ -16,6 +16,7 @@ type StreamService struct {
 //   - a channel into which new posts will be sent
 //   - a channel into which any errors will be sent
 //   - a function that the client can call once to stop the streaming and close the channels
+//
 // Because of the 100 post limit imposed by Reddit when fetching posts, some high-traffic
 // streams might drop submissions between API requests, such as when streaming r/all.
 func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post, <-chan error, func()) {
@@ -93,9 +94,99 @@ func (s *StreamService) Posts(subreddit string, opts ...StreamOpt) (<-chan *Post
 	return postsCh, errsCh, stop
 }
 
+// Comments streams comments from the specified subreddit.
+// It returns 2 channels and a function:
+//   - a channel into which new comments will be sent
+//   - a channel into which any errors will be sent
+//   - a function that the client can call once to stop the streaming and close the channels
+//
+// Because of the 100 post limit imposed by Reddit when fetching posts, some high-traffic
+// streams might drop submissions between API requests, such as when streaming r/all.
+func (s *StreamService) Comments(subreddit string, opts ...StreamOpt) (<-chan *Comment, <-chan error, func()) {
+	streamConfig := &streamConfig{
+		Interval:       defaultStreamInterval,
+		DiscardInitial: false,
+		MaxRequests:    0,
+	}
+	for _, opt := range opts {
+		opt(streamConfig)
+	}
+
+	ticker := time.NewTicker(streamConfig.Interval)
+	commentsCh := make(chan *Comment)
+	errsCh := make(chan error)
+
+	var once sync.Once
+	stop := func() {
+		once.Do(func() {
+			ticker.Stop()
+			close(commentsCh)
+			close(errsCh)
+		})
+	}
+
+	// originally used the "before" parameter, but if that post gets deleted, subsequent requests
+	// would just return empty listings; easier to just keep track of all post ids encountered
+	ids := set{}
+
+	go func() {
+		defer stop()
+
+		var n int
+		infinite := streamConfig.MaxRequests == 0
+
+		for ; ; <-ticker.C {
+			n++
+
+			comments, err := s.getComments(subreddit)
+			if err != nil {
+				errsCh <- err
+				if !infinite && n >= streamConfig.MaxRequests {
+					break
+				}
+				continue
+			}
+
+			for _, comment := range comments {
+				id := comment.FullID
+
+				// if this post id is already part of the set, it means that it and the ones
+				// after it in the list have already been streamed, so break out of the loop
+				if ids.Exists(id) {
+					break
+				}
+				ids.Add(id)
+
+				// skip this post because we are discarding initial fetch of posts
+				if streamConfig.DiscardInitial {
+					continue
+				}
+
+				commentsCh <- comment
+			}
+
+			// setting discard initial to false, since we the loop has run once already
+			streamConfig.DiscardInitial = false
+
+			if !infinite && n >= streamConfig.MaxRequests {
+				break
+			}
+		}
+	}()
+
+	return commentsCh, errsCh, stop
+}
+
 func (s *StreamService) getPosts(subreddit string) ([]*Post, error) {
 	posts, _, err := s.client.Subreddit.NewPosts(context.Background(), subreddit, &ListOptions{Limit: 100})
 	return posts, err
+}
+
+func (s *StreamService) getComments(subreddit string) ([]*Comment, error) {
+	opts := &ListCommentsOptions{}
+	opts.Limit = 100
+	comments, _, err := s.client.Subreddit.NewComments(context.Background(), subreddit, opts)
+	return comments, err
 }
 
 type set map[string]struct{}

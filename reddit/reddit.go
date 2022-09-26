@@ -551,6 +551,15 @@ type ListPostOptions struct {
 	Time string `url:"t,omitempty"`
 }
 
+// ListCommentsOptions defines possible options used when getting comments from a subreddit.
+type ListCommentsOptions struct {
+	ListOptions
+	// One of: hour, day, week, month, year, all.
+	Time string `url:"t,omitempty"`
+	// One of: relevance, hot, top, new, comments.
+	Sort string `url:"sort,omitempty"`
+}
+
 // ListPostSearchOptions defines possible options used when searching for posts within a subreddit.
 type ListPostSearchOptions struct {
 	ListPostOptions
