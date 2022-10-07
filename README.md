@@ -7,7 +7,7 @@
 <div id='badges' align='center'>
 
 [![build & test](https://github.com/kmulvey/reddit/actions/workflows/build.yml/badge.svg)](https://github.com/kmulvey/reddit/actions/workflows/build.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit)
+[![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit/v2)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit/v2)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/vartanbeno/go-reddit/v2/reddit)](https://pkg.go.dev/github.com/vartanbeno/go-reddit/v2/reddit)
 
 </div>
