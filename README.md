@@ -28,13 +28,13 @@ You can view Reddit's official API documentation [here](https://www.reddit.com/d
 To get a specific version from the list of [versions](https://github.com/vartanbeno/go-reddit/releases):
 
 ```sh
-go get github.com/vartanbeno/go-reddit/v2@vX.Y.Z
+go get github.com/kmulvey/reddit/v2@vX.Y.Z
 ```
 
 Or for the latest version:
 
 ```sh
-go get github.com/vartanbeno/go-reddit/v2
+go get github.com/kmulvey/reddit/v2
 ```
 
 The repository structure for managing multiple major versions follows the one outlined [here](https://github.com/go-modules-by-example/index/tree/master/016_major_version_repo_strategy#major-branch-strategy).
@@ -46,7 +46,7 @@ Make sure to have a Reddit app with a valid client id and secret. [Here](https:/
 ```go
 package main
 
-import "github.com/vartanbeno/go-reddit/v2/reddit"
+import "github.com/kmulvey/reddit/v2/reddit"
 
 func main() {
     credentials := reddit.Credentials{ID: "id", Secret: "secret", Username: "username", Password: "password"}

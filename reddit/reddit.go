@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	libraryName    = "github.com/vartanbeno/go-reddit"
+	libraryName    = "github.com/kmulvey/reddit"
 	libraryVersion = "2.0.0"
 
 	defaultBaseURL         = "https://oauth.reddit.com"
