@@ -7,7 +7,7 @@
 <div id='badges' align='center'>
 
 [![build & test](https://github.com/kmulvey/reddit/actions/workflows/build.yml/badge.svg)](https://github.com/kmulvey/reddit/actions/workflows/build.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit/v2)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit/v2)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kmulvey/go-reddit/v2)](https://goreportcard.com/report/github.com/kmulvey/go-reddit/v2)
 [![codecov](https://codecov.io/github/kmulvey/reddit/branch/master/graph/badge.svg?token=ZO7AZIojYs)](https://codecov.io/github/kmulvey/reddit)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/kmulvey/go-reddit/v2/reddit)](https://pkg.go.dev/github.com/kmulvey/go-reddit/v2/reddit)
 
@@ -25,7 +25,7 @@ You can view Reddit's official API documentation [here](https://www.reddit.com/d
 
 ## Install
 
-To get a specific version from the list of [versions](https://github.com/vartanbeno/go-reddit/releases):
+To get a specific version from the list of [versions](https://github.com/kmulvey/go-reddit/releases):
 
 ```sh
 go get github.com/kmulvey/reddit/v2@vX.Y.Z
