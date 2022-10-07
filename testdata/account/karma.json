@@ -1,25 +1,25 @@
 {
-  "kind": "KarmaList",
   "data": [
     {
-      "sr": "nba",
       "comment_karma": 21999,
-      "link_karma": 144
+      "link_karma": 144,
+      "sr": "nba"
     },
     {
-      "sr": "redditdev",
       "comment_karma": 4,
-      "link_karma": 19
+      "link_karma": 19,
+      "sr": "redditdev"
     },
     {
-      "sr": "test",
       "comment_karma": 0,
-      "link_karma": 1
+      "link_karma": 1,
+      "sr": "test"
     },
     {
-      "sr": "golang",
       "comment_karma": 0,
-      "link_karma": 1
+      "link_karma": 1,
+      "sr": "golang"
     }
-  ]
+  ],
+  "kind": "KarmaList"
 }
