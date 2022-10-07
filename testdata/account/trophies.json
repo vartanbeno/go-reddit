@@ -1,31 +1,33 @@
 {
-  "kind": "TrophyList",
   "data": {
     "trophies": [
       {
-        "kind": "t6",
         "data": {
-          "icon_70": "https://www.redditstatic.com/awards2/3_year_club-70.png",
-          "name": "Three-Year Club",
-          "url": null,
-          "icon_40": "https://www.redditstatic.com/awards2/3_year_club-40.png",
-          "award_id": null,
-          "id": null,
-          "description": null
-        }
+          "award_id": "o",
+          "description": null,
+          "granted_at": 1665097020,
+          "icon_40": "https://www.redditstatic.com/awards2/verified_email-40.png",
+          "icon_70": "https://www.redditstatic.com/awards2/verified_email-70.png",
+          "id": "1q1tez",
+          "name": "Verified Email",
+          "url": null
+        },
+        "kind": "t6"
       },
       {
         "kind": "t6",
         "data": {
-          "icon_70": "https://www.redditstatic.com/awards2/verified_email-70.png",
-          "name": "Verified Email",
-          "url": null,
-          "icon_40": "https://www.redditstatic.com/awards2/verified_email-40.png",
-          "award_id": "o",
-          "id": "1q1tez",
-          "description": null
+          "award_id": null,
+          "description": null,
+          "granted_at": 1665086441,
+          "icon_40": "https://www.redditstatic.com/awards2/n00b-40.png",
+          "icon_70": "https://www.redditstatic.com/awards2/n00b-70.png",
+          "id": null,
+          "name": "New User",
+          "url": null
         }
       }
     ]
-  }
+  },
+  "kind": "TrophyList"
 }

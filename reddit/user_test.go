@@ -119,13 +119,13 @@ var expectedBlocked = &Blocked{
 
 var expectedTrophies = []*Trophy{
 	{
-		ID:          "",
-		Name:        "Three-Year Club",
+		ID:          "1q1tez",
+		Name:        "Verified Email",
 		Description: "",
 	},
 	{
-		ID:          "1q1tez",
-		Name:        "Verified Email",
+		ID:          "",
+		Name:        "New User",
 		Description: "",
 	},
 }
