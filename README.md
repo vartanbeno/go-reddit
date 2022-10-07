@@ -22,6 +22,17 @@ go-reddit is a Go client library for accessing the Reddit API.
 
 You can view Reddit's official API documentation [here](https://www.reddit.com/dev/api/).
 
+## Differences from upstream
+
+**This project has been forked from [vartanbeno/go-reddit](https://github.com/vartanbeno/go-reddit).**
+
+Here are the differences from the upstream:
+
+* New Update Widget function
+* Added some missing subreddit settings
+* Fixing a couple of bugs
+* Added a stream for new comments on a subreddit
+
 ## Install
 
 To get a specific version from the list of [versions](https://github.com/vartanbeno/go-reddit/releases):
