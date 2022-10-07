@@ -8,7 +8,7 @@
 
 [![build & test](https://github.com/kmulvey/reddit/actions/workflows/build.yml/badge.svg)](https://github.com/kmulvey/reddit/actions/workflows/build.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kmulvey/reddit/v2)](https://goreportcard.com/report/github.com/kmulvey/reddit/v2)
-[![codecov](https://codecov.io/github/kmulvey/reddit/branch/master/graph/badge.svg?token=ZO7AZIojYs)](https://codecov.io/github/kmulvey/reddit)
+[![codecov](https://codecov.io/gh/kmulvey/reddit/branch/main/graph/badge.svg?token=ZO7AZIojYs)](https://codecov.io/gh/kmulvey/reddit)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/kmulvey/reddit/v2/reddit)](https://pkg.go.dev/github.com/kmulvey/reddit/v2/reddit)
 
 </div>
