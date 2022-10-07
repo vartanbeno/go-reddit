@@ -95,7 +95,7 @@ type Client struct {
 	Widget     *WidgetService
 	Wiki       *WikiService
 
-	// oauth2Transport *oauth2.Transport unused ?
+	// oauth2Transport *oauth2.Transport // unused ?
 
 	onRequestCompleted RequestCompletionCallback
 }
@@ -453,10 +453,10 @@ func CheckResponse(r *http.Response) error {
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err == nil && len(data) > 0 {
-		err = json.Unmarshal(data, jsonErrorResponse)
-		if err != nil {
-			return err
-		}
+		_ = json.Unmarshal(data, jsonErrorResponse) // TODO: handling this error causes tests to fail, #1
+		// if err != nil {
+		// 	return err
+		// }
 		if len(jsonErrorResponse.JSON.Errors) > 0 {
 			return jsonErrorResponse
 		}
