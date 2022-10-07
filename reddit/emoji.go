@@ -224,7 +224,10 @@ func (s *EmojiService) Upload(ctx context.Context, subreddit string, createReque
 	// AWS ignores all fields in the request that come after the file field, so we need to set these before
 	// https://stackoverflow.com/questions/15234496/upload-directly-to-amazon-s3-using-ajax-returning-error-bucket-post-must-contai/15235866#15235866
 	for k, v := range fields {
-		writer.WriteField(k, v)
+		err = writer.WriteField(k, v)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	part, err := writer.CreateFormFile("file", file.Name())

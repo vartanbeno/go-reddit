@@ -1032,7 +1032,10 @@ func (s *SubredditService) uploadImage(ctx context.Context, subreddit, imagePath
 	writer := multipart.NewWriter(body)
 
 	for k := range form {
-		writer.WriteField(k, form.Get(k))
+		err = writer.WriteField(k, form.Get(k))
+		if err != nil {
+			return "", nil, err
+		}
 	}
 
 	part, err := writer.CreateFormFile("file", file.Name())

@@ -16,7 +16,6 @@ import (
 	"time"
 
 	"github.com/google/go-querystring/query"
-	"golang.org/x/oauth2"
 )
 
 const (
@@ -96,7 +95,7 @@ type Client struct {
 	Widget     *WidgetService
 	Wiki       *WikiService
 
-	oauth2Transport *oauth2.Transport
+	// oauth2Transport *oauth2.Transport unused ?
 
 	onRequestCompleted RequestCompletionCallback
 }
@@ -454,7 +453,10 @@ func CheckResponse(r *http.Response) error {
 
 	data, err := ioutil.ReadAll(r.Body)
 	if err == nil && len(data) > 0 {
-		json.Unmarshal(data, jsonErrorResponse)
+		err = json.Unmarshal(data, jsonErrorResponse)
+		if err != nil {
+			return err
+		}
 		if len(jsonErrorResponse.JSON.Errors) > 0 {
 			return jsonErrorResponse
 		}

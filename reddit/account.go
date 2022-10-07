@@ -140,11 +140,11 @@ type Settings struct {
 
 	// Display this many comments by default.
 	// Must be between 1 and 500 (inclusive).
-	NumberOfComments *int `json:"num_comments,omitempty,omitempty"`
+	NumberOfComments *int `json:"num_comments,omitempty"`
 
 	// Display this many posts by default.
 	// Must be between 1 and 100 (inclusive).
-	NumberOfPosts *int `json:"numsites,omitempty,omitempty"`
+	NumberOfPosts *int `json:"numsites,omitempty"`
 
 	// Show the spotlight box on the home feed.
 	// Not sure what this is though...

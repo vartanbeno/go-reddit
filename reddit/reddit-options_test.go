@@ -33,6 +33,7 @@ func TestWithBaseURL(t *testing.T) {
 	urlErr, ok := err.(*url.Error)
 	require.True(t, ok)
 	require.Equal(t, "parse", urlErr.Op)
+	require.Nil(t, c)
 
 	baseURL := "http://localhost:8080"
 	c, err = NewClient(Credentials{}, WithBaseURL(baseURL))
@@ -45,6 +46,7 @@ func TestWithTokenURL(t *testing.T) {
 	urlErr, ok := err.(*url.Error)
 	require.True(t, ok)
 	require.Equal(t, "parse", urlErr.Op)
+	require.Nil(t, c)
 
 	tokenURL := "http://localhost:8080/api/v1/access_token"
 	c, err = NewClient(Credentials{}, WithTokenURL(tokenURL))
