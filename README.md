@@ -6,7 +6,7 @@
 
 <div id='badges' align='center'>
 
-[![Actions Status](https://github.com/vartanbeno/go-reddit/workflows/tests/badge.svg)](https://github.com/vartanbeno/go-reddit/actions)
+[![build & test](https://github.com/kmulvey/reddit/actions/workflows/build.yml/badge.svg)](https://github.com/kmulvey/reddit/actions/workflows/build.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/vartanbeno/go-reddit)](https://goreportcard.com/report/github.com/vartanbeno/go-reddit)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/vartanbeno/go-reddit/v2/reddit)](https://pkg.go.dev/github.com/vartanbeno/go-reddit/v2/reddit)
 
