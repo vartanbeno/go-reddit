@@ -73,7 +73,7 @@ var expectedListingSubreddits = []*Subreddit{
 	{
 		ID:      "2qh23",
 		Name:    "t5_2qh23",
-		Created: &Timestamp{time.Date(2008, 1, 25, 5, 11, 28, 0, time.UTC)},
+		Created: &Timestamp{time.Date(2008, time.January, 25, 13, 11, 28, 0, time.UTC)},
 
 		URL:                 "/r/test/",
 		DisplayName:         "test",
@@ -83,6 +83,37 @@ var expectedListingSubreddits = []*Subreddit{
 
 		Subscribers:      8202,
 		UserIsSubscriber: true,
+
+		// New
+		AllowDiscovery:           true,
+		AllowGalleries:           true,
+		AllowImages:              true,
+		AllowPolls:               true,
+		AllowVideogifs:           true,
+		AllowVideos:              true,
+		CanAssignLinkFlair:       true,
+		CanAssignUserFlair:       true,
+		CreatedUtc:               &Timestamp{time.Date(2008, time.January, 25, 5, 11, 28, 0, time.UTC)},
+		Description:              "This is a place to test things.",
+		DescriptionHTML:          "&lt;!-- SC_OFF --&gt;&lt;div class=\"md\"&gt;&lt;p&gt;This is a place to test things.&lt;/p&gt;\n&lt;/div&gt;&lt;!-- SC_ON --&gt;",
+		FreeFormReports:          true,
+		IsChatPostFeatureEnabled: true,
+		IsCrosspostableSubreddit: true,
+		Lang:                     "en",
+		LinkFlairEnabled:         true,
+		LinkFlairPosition:        "left",
+		NotificationLevel:        "low",
+		RestrictPosting:          true,
+		ShowMedia:                true,
+		ShowMediaPreview:         true,
+		SpoilersEnabled:          true,
+		SubmissionType:           "any",
+		UserFlairPosition:        "right",
+		UserFlairRichtext:        []interface{}{},
+		UserFlairType:            "text",
+		UserSrThemeEnabled:       true,
+		WhitelistStatus:          "all_ads",
+		Wls:                      6,
 	},
 }
 
