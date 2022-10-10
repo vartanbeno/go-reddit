@@ -585,31 +585,31 @@ type Subreddit struct {
 // was changed to a real go type, where it was not interface{} was left. In
 // the future if someone finds a real response these can be changed.
 type Subreddit struct {
-	AcceptFollowers             bool      `json:"accept_followers"`
-	AccountsActive              int       `json:"accounts_active"`
-	AccountsActiveIsFuzzed      bool      `json:"accounts_active_is_fuzzed"`
-	ActiveUserCount             int       `json:"active_user_count"`
-	AdvertiserCategory          string    `json:"advertiser_category"`
-	AllOriginalContent          bool      `json:"all_original_content"`
-	AllowChatPostCreation       bool      `json:"allow_chat_post_creation"`
-	AllowDiscovery              bool      `json:"allow_discovery"`
-	AllowGalleries              bool      `json:"allow_galleries"`
-	AllowImages                 bool      `json:"allow_images"`
-	AllowPolls                  bool      `json:"allow_polls"`
-	AllowPredictionContributors bool      `json:"allow_prediction_contributors"`
-	AllowPredictions            bool      `json:"allow_predictions"`
-	AllowPredictionsTournament  bool      `json:"allow_predictions_tournament"`
-	AllowTalks                  bool      `json:"allow_talks"`
-	AllowVideogifs              bool      `json:"allow_videogifs"`
-	AllowVideos                 bool      `json:"allow_videos"`
-	AllowedMediaInComments      bool      `json:"allowed_media_in_comments"`
-	BannerBackgroundColor       string    `json:"banner_background_color"`
-	BannerBackgroundImage       string    `json:"banner_background_image"`
-	BannerImg                   string    `json:"banner_img"`
-	BannerSize                  []float64 `json:"banner_size"`
-	CanAssignLinkFlair          bool      `json:"can_assign_link_flair"`
-	CanAssignUserFlair          bool      `json:"can_assign_user_flair"`
-	CollapseDeletedComments     bool      `json:"collapse_deleted_comments"`
+	AcceptFollowers             bool        `json:"accept_followers"`
+	AccountsActive              int         `json:"accounts_active"`
+	AccountsActiveIsFuzzed      bool        `json:"accounts_active_is_fuzzed"`
+	ActiveUserCount             int         `json:"active_user_count"`
+	AdvertiserCategory          string      `json:"advertiser_category"`
+	AllOriginalContent          bool        `json:"all_original_content"`
+	AllowChatPostCreation       bool        `json:"allow_chat_post_creation"`
+	AllowDiscovery              bool        `json:"allow_discovery"`
+	AllowGalleries              bool        `json:"allow_galleries"`
+	AllowImages                 bool        `json:"allow_images"`
+	AllowPolls                  bool        `json:"allow_polls"`
+	AllowPredictionContributors bool        `json:"allow_prediction_contributors"`
+	AllowPredictions            bool        `json:"allow_predictions"`
+	AllowPredictionsTournament  bool        `json:"allow_predictions_tournament"`
+	AllowTalks                  bool        `json:"allow_talks"`
+	AllowVideogifs              bool        `json:"allow_videogifs"`
+	AllowVideos                 bool        `json:"allow_videos"`
+	AllowedMediaInComments      interface{} `json:"allowed_media_in_comments"`
+	BannerBackgroundColor       string      `json:"banner_background_color"`
+	BannerBackgroundImage       string      `json:"banner_background_image"`
+	BannerImg                   string      `json:"banner_img"`
+	BannerSize                  []float64   `json:"banner_size"`
+	CanAssignLinkFlair          bool        `json:"can_assign_link_flair"`
+	CanAssignUserFlair          bool        `json:"can_assign_user_flair"`
+	CollapseDeletedComments     bool        `json:"collapse_deleted_comments"`
 	CommentContributionSettings struct {
 	} `json:"comment_contribution_settings"`
 	CommentScoreHideMins             int           `json:"comment_score_hide_mins"`
