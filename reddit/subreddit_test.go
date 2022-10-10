@@ -80,11 +80,11 @@ var expectedSubreddit = &Subreddit{
 	Description:  "Ask questions and post articles about the Go programming language and related tools, events etc.",
 	Type:         "public",
 
-	Subscribers:     116532,
-	ActiveUserCount: Int(386),
+	Subscribers:     190423,
+	ActiveUserCount: Int(368),
 	NSFW:            false,
 	UserIsMod:       false,
-	Subscribed:      true,
+	Subscribed:      false,
 }
 
 var expectedSubreddits = []*Subreddit{
