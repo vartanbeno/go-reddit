@@ -72,17 +72,17 @@ var expectedListingComments = []*Comment{
 var expectedListingSubreddits = []*Subreddit{
 	{
 		ID:      "2qh23",
-		FullID:  "t5_2qh23",
+		Name:    "t5_2qh23",
 		Created: &Timestamp{time.Date(2008, 1, 25, 5, 11, 28, 0, time.UTC)},
 
-		URL:          "/r/test/",
-		Name:         "test",
-		NamePrefixed: "r/test",
-		Title:        "Testing",
-		Type:         "public",
+		URL:                 "/r/test/",
+		DisplayName:         "test",
+		DisplayNamePrefixed: "r/test",
+		Title:               "Testing",
+		SubredditType:       "public",
 
-		Subscribers: 8202,
-		Subscribed:  true,
+		Subscribers:      8202,
+		UserIsSubscriber: true,
 	},
 }
 

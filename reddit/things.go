@@ -555,6 +555,7 @@ type Post struct {
 	Stickied   bool `json:"stickied"`
 }
 
+/*
 // Subreddit holds information about a subreddit
 type Subreddit struct {
 	ID      string     `json:"id,omitempty"`
@@ -575,6 +576,119 @@ type Subreddit struct {
 	UserIsMod       bool `json:"user_is_moderator"`
 	Subscribed      bool `json:"user_is_subscriber"`
 	Favorite        bool `json:"user_has_favorited"`
+}
+*/
+// Subreddit holds information about a subreddit
+// This struct was generated from the response from the api.
+// Some fields are interface{} because they had empty json values, eg:
+// [], {}, null. Where the types were easily inferred from the name, the type
+// was changed to a real go type, where it was not interface{} was left. In
+// the future if someone finds a real response these can be changed.
+type Subreddit struct {
+	AcceptFollowers             bool      `json:"accept_followers"`
+	AccountsActive              int       `json:"accounts_active"`
+	AccountsActiveIsFuzzed      bool      `json:"accounts_active_is_fuzzed"`
+	ActiveUserCount             int       `json:"active_user_count"`
+	AdvertiserCategory          string    `json:"advertiser_category"`
+	AllOriginalContent          bool      `json:"all_original_content"`
+	AllowChatPostCreation       bool      `json:"allow_chat_post_creation"`
+	AllowDiscovery              bool      `json:"allow_discovery"`
+	AllowGalleries              bool      `json:"allow_galleries"`
+	AllowImages                 bool      `json:"allow_images"`
+	AllowPolls                  bool      `json:"allow_polls"`
+	AllowPredictionContributors bool      `json:"allow_prediction_contributors"`
+	AllowPredictions            bool      `json:"allow_predictions"`
+	AllowPredictionsTournament  bool      `json:"allow_predictions_tournament"`
+	AllowTalks                  bool      `json:"allow_talks"`
+	AllowVideogifs              bool      `json:"allow_videogifs"`
+	AllowVideos                 bool      `json:"allow_videos"`
+	AllowedMediaInComments      bool      `json:"allowed_media_in_comments"`
+	BannerBackgroundColor       string    `json:"banner_background_color"`
+	BannerBackgroundImage       string    `json:"banner_background_image"`
+	BannerImg                   string    `json:"banner_img"`
+	BannerSize                  []float64 `json:"banner_size"`
+	CanAssignLinkFlair          bool      `json:"can_assign_link_flair"`
+	CanAssignUserFlair          bool      `json:"can_assign_user_flair"`
+	CollapseDeletedComments     bool      `json:"collapse_deleted_comments"`
+	CommentContributionSettings struct {
+	} `json:"comment_contribution_settings"`
+	CommentScoreHideMins             int           `json:"comment_score_hide_mins"`
+	CommunityIcon                    string        `json:"community_icon"`
+	CommunityReviewed                bool          `json:"community_reviewed"`
+	Created                          *Timestamp    `json:"created"`
+	CreatedUtc                       *Timestamp    `json:"created_utc"`
+	Description                      string        `json:"description"`
+	DescriptionHTML                  string        `json:"description_html"`
+	DisableContributorRequests       bool          `json:"disable_contributor_requests"`
+	DisplayName                      string        `json:"display_name"`
+	DisplayNamePrefixed              string        `json:"display_name_prefixed"`
+	EmojisCustomSize                 interface{}   `json:"emojis_custom_size"`
+	EmojisEnabled                    bool          `json:"emojis_enabled"`
+	FreeFormReports                  bool          `json:"free_form_reports"`
+	HasMenuWidget                    bool          `json:"has_menu_widget"`
+	HeaderImg                        string        `json:"header_img"`
+	HeaderSize                       []int         `json:"header_size"`
+	HeaderTitle                      string        `json:"header_title"`
+	HideAds                          bool          `json:"hide_ads"`
+	IconImg                          string        `json:"icon_img"`
+	IconSize                         []float64     `json:"icon_size"`
+	ID                               string        `json:"id"`
+	IsChatPostFeatureEnabled         bool          `json:"is_chat_post_feature_enabled"`
+	IsCrosspostableSubreddit         bool          `json:"is_crosspostable_subreddit"`
+	IsEnrolledInNewModmail           bool          `json:"is_enrolled_in_new_modmail"`
+	KeyColor                         string        `json:"key_color"`
+	Lang                             string        `json:"lang"`
+	LinkFlairEnabled                 bool          `json:"link_flair_enabled"`
+	LinkFlairPosition                string        `json:"link_flair_position"`
+	MobileBannerImage                string        `json:"mobile_banner_image"`
+	Name                             string        `json:"name"`
+	NotificationLevel                interface{}   `json:"notification_level"`
+	OriginalContentTagEnabled        bool          `json:"original_content_tag_enabled"`
+	Over18                           bool          `json:"over18"`
+	PredictionLeaderboardEntryType   string        `json:"prediction_leaderboard_entry_type"`
+	PrimaryColor                     string        `json:"primary_color"`
+	PublicDescription                string        `json:"public_description"`
+	PublicDescriptionHTML            string        `json:"public_description_html"`
+	PublicTraffic                    bool          `json:"public_traffic"`
+	Quarantine                       bool          `json:"quarantine"`
+	RestrictCommenting               bool          `json:"restrict_commenting"`
+	RestrictPosting                  bool          `json:"restrict_posting"`
+	ShouldArchivePosts               bool          `json:"should_archive_posts"`
+	ShouldShowMediaInCommentsSetting bool          `json:"should_show_media_in_comments_setting"`
+	ShowMedia                        bool          `json:"show_media"`
+	ShowMediaPreview                 bool          `json:"show_media_preview"`
+	SpoilersEnabled                  bool          `json:"spoilers_enabled"`
+	SubmissionType                   string        `json:"submission_type"`
+	SubmitLinkLabel                  string        `json:"submit_link_label"`
+	SubmitText                       string        `json:"submit_text"`
+	SubmitTextHTML                   string        `json:"submit_text_html"`
+	SubmitTextLabel                  string        `json:"submit_text_label"`
+	SubredditType                    string        `json:"subreddit_type"`
+	Subscribers                      int           `json:"subscribers"`
+	SuggestedCommentSort             string        `json:"suggested_comment_sort"`
+	Title                            string        `json:"title"`
+	URL                              string        `json:"url"`
+	UserCanFlairInSr                 interface{}   `json:"user_can_flair_in_sr"`
+	UserFlairBackgroundColor         interface{}   `json:"user_flair_background_color"`
+	UserFlairCSSClass                interface{}   `json:"user_flair_css_class"`
+	UserFlairEnabledInSr             bool          `json:"user_flair_enabled_in_sr"`
+	UserFlairPosition                string        `json:"user_flair_position"`
+	UserFlairRichtext                []interface{} `json:"user_flair_richtext"`
+	UserFlairTemplateID              interface{}   `json:"user_flair_template_id"`
+	UserFlairText                    interface{}   `json:"user_flair_text"`
+	UserFlairTextColor               interface{}   `json:"user_flair_text_color"`
+	UserFlairType                    string        `json:"user_flair_type"`
+	UserHasFavorited                 bool          `json:"user_has_favorited"`
+	UserIsBanned                     bool          `json:"user_is_banned"`
+	UserIsContributor                bool          `json:"user_is_contributor"`
+	UserIsModerator                  bool          `json:"user_is_moderator"`
+	UserIsMuted                      bool          `json:"user_is_muted"`
+	UserIsSubscriber                 bool          `json:"user_is_subscriber"`
+	UserSrFlairEnabled               bool          `json:"user_sr_flair_enabled"`
+	UserSrThemeEnabled               bool          `json:"user_sr_theme_enabled"`
+	WhitelistStatus                  string        `json:"whitelist_status"`
+	WikiEnabled                      bool          `json:"wiki_enabled"`
+	Wls                              int           `json:"wls"`
 }
 
 // PostAndComments is a post and its comments.

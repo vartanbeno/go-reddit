@@ -22,6 +22,6 @@ func run() (err error) {
 		return
 	}
 
-	fmt.Printf("%s was created on %s and has %d subscribers.\n", sr.NamePrefixed, sr.Created.Local(), sr.Subscribers)
+	fmt.Printf("%s was created on %s and has %d subscribers.\n", sr.DisplayNamePrefixed, sr.Created.Local(), sr.Subscribers)
 	return
 }
