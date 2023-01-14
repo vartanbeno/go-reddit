@@ -141,3 +141,28 @@ func oauthTransport(client *Client) (http.RoundTripper, error) {
 
 	return transport, nil
 }
+
+// AuthCodeURL is a util function for buiding a URL to request permission grant from a user.
+//
+// TODO: Currently only works with defaultAuthURL,
+// but should be able to use a custom AuthURL. Need to find an elegant solution. 
+// 
+// By default, Reddit will only issue an access_token to a WebApp for 1h,
+// after which the app would need to ask the user to grant access again.
+// `permanent` should be set to true to additionally request a refresh_token.
+func AuthCodeURL(clientID, redirectURI, state string, scopes []string, permanent bool) string {
+	config := &oauth2.Config{
+		ClientID: clientID,
+		Endpoint: oauth2.Endpoint{
+			AuthURL: defaultAuthURL,
+		},
+		RedirectURL: redirectURI,
+		Scopes:      scopes,
+	}
+	var opts []oauth2.AuthCodeOption
+	if permanent {
+		opts = append(opts, oauth2.SetAuthURLParam("duration", "permanent"))
+	}
+
+	return config.AuthCodeURL(state, opts...)
+}

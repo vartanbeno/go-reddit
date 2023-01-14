@@ -26,6 +26,7 @@ const (
 	defaultBaseURL         = "https://oauth.reddit.com"
 	defaultBaseURLReadonly = "https://reddit.com"
 	defaultTokenURL        = "https://www.reddit.com/api/v1/access_token"
+	defaultAuthURL         = "https://www.reddit.com/api/v1/authorize"
 
 	mediaTypeJSON = "application/json"
 	mediaTypeForm = "application/x-www-form-urlencoded"

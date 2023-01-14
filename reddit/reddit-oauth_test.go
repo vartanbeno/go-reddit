@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
@@ -21,6 +22,37 @@ const (
 
 	subreddit = "golang"
 )
+
+func TestAuthCodeURL(t *testing.T) {
+	state := "test_state"
+	scopes := []string{"scope_a", "scope_b"}
+
+	for _, tt := range []struct {
+		name      string
+		permanent bool
+	}{
+		{"not requesting refresh token", false},
+		{"request refresh token", true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := url.Parse(AuthCodeURL(clientId, testRedirectURI, state, scopes, tt.permanent))
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			checkQueryParameter(t, got, "client_id", clientId)
+			checkQueryParameter(t, got, "state", state)
+			checkQueryParameter(t, got, "redirect_uri", testRedirectURI)
+			checkQueryParameter(t, got, "scope", strings.Join(scopes, " "))
+
+			if tt.permanent {
+				checkQueryParameter(t, got, "duration", "permanent")
+			} else {
+				checkQueryParameter(t, got, "duration", "")
+			}
+		})
+	}
+}
 
 func TestWebAppOauth(t *testing.T) {
 	srv := testRedditServer(t)
@@ -110,4 +142,11 @@ func testRedditServer(tb testing.TB) *httptest.Server {
 
 	srv := httptest.NewServer(mux)
 	return srv
+}
+
+// checkQueryParameter validates URL query parameters.
+func checkQueryParameter(tb testing.TB, URL *url.URL, param, want string) {
+	if got := URL.Query().Get(param); got != want {
+		tb.Errorf("%s: got %q, want %q", param, got, want)
+	}
 }
