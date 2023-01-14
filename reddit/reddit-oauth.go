@@ -105,7 +105,8 @@ func (s *oauthTokenSource) Token() (*oauth2.Token, error) {
 	return s.config.PasswordCredentialsToken(s.ctx, s.username, s.password)
 }
 
-func oauthTransport(client *Client) (http.RoundTripper, error) {
+// oauthTransport returns a Transport to handle authorization based the selected app type.
+func oauthTransport(client *Client) (*oauth2.Transport, error) {
 	httpClient := &http.Client{Transport: client.client.Transport}
 	ctx := context.WithValue(context.Background(), oauth2.HTTPClient, httpClient)
 
