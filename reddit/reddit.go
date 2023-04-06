@@ -45,7 +45,7 @@ const (
 type AppType int
 
 const (
-	ScriptApp AppType = iota // default to "Script app" for compatibility
+	Script AppType = iota // default to "Script" for backward compatibility
 	WebApp
 )
 
@@ -129,7 +129,7 @@ func newClient() *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 	tokenURL, _ := url.Parse(defaultTokenURL)
 
-	client := &Client{client: &http.Client{}, BaseURL: baseURL, TokenURL: tokenURL, appType: ScriptApp}
+	client := &Client{client: &http.Client{}, BaseURL: baseURL, TokenURL: tokenURL, appType: Script}
 
 	client.Account = &AccountService{client: client}
 	client.Collection = &CollectionService{client: client}

@@ -122,7 +122,7 @@ func oauthTransport(client *Client) (*oauth2.Transport, error) {
 	transport := &oauth2.Transport{Base: client.client.Transport}
 
 	switch client.appType {
-	case ScriptApp:
+	case Script:
 		transport.Source = oauth2.ReuseTokenSource(nil, &oauthTokenSource{
 			ctx:      ctx,
 			config:   config,
