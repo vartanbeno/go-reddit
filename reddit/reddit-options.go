@@ -64,7 +64,7 @@ func WithTokenURL(u string) Opt {
 func WithWebAppCode(code, redirectURI string) Opt {
 	return func(c *Client) error {
 		c.appType = WebApp
-		c.webOauth = webAppOathParams{
+		c.webOauth = webAppOAuthParams{
 			Code:        code,
 			RedirectURI: redirectURI,
 		}
@@ -79,7 +79,7 @@ func WithWebAppCode(code, redirectURI string) Opt {
 func WithWebAppRefresh(refreshToken string) Opt {
 	return func(c *Client) error {
 		c.appType = WebApp
-		c.webOauth = webAppOathParams{
+		c.webOauth = webAppOAuthParams{
 			RefreshToken: refreshToken,
 		}
 		return nil

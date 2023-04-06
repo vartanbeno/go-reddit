@@ -92,7 +92,7 @@ type Client struct {
 	Password string
 
 	// OAuth parameters for Web App.
-	webOauth webAppOathParams
+	webOauth webAppOAuthParams
 
 	// This is the client's user ID in Reddit's database.
 	redditID string

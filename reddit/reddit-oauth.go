@@ -58,9 +58,9 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// webAppOauthParams are used to retrieve access token using "code flow" or refresh_token,
+// webAppOAuthParams are used to retrieve access token using "code flow" or refresh_token,
 // see https://github.com/reddit-archive/reddit/wiki/OAuth2#token-retrieval-code-flow.
-type webAppOathParams struct {
+type webAppOAuthParams struct {
 	// Code can be exchanged for access_token.
 	Code string
 
@@ -76,7 +76,7 @@ type webAppOathParams struct {
 // TokenSource creates a reusable token source base on the provided configuration. If code is set,
 // it is exchanged for an access_token. If, on the other hand RefreshToken is set, we assume that
 // the initial authorization has already happened and create an oauth2.Token with immediate expiry.
-func (p webAppOathParams) TokenSource(ctx context.Context, config *oauth2.Config) (oauth2.TokenSource, error) {
+func (p webAppOAuthParams) TokenSource(ctx context.Context, config *oauth2.Config) (oauth2.TokenSource, error) {
 	var tok *oauth2.Token
 	var err error
 
@@ -146,8 +146,8 @@ func oauthTransport(client *Client) (*oauth2.Transport, error) {
 // AuthCodeURL is a util function for buiding a URL to request permission grant from a user.
 //
 // TODO: Currently only works with defaultAuthURL,
-// but should be able to use a custom AuthURL. Need to find an elegant solution. 
-// 
+// but should be able to use a custom AuthURL. Need to find an elegant solution.
+//
 // By default, Reddit will only issue an access_token to a WebApp for 1h,
 // after which the app would need to ask the user to grant access again.
 // `permanent` should be set to true to additionally request a refresh_token.
