@@ -24,6 +24,7 @@ type User struct {
 
 	PostKarma    int `json:"link_karma"`
 	CommentKarma int `json:"comment_karma"`
+	TotalKarma   int `json:"total_karma"`
 
 	IsFriend         bool `json:"is_friend"`
 	IsEmployee       bool `json:"is_employee"`
@@ -40,6 +41,7 @@ type UserSummary struct {
 
 	PostKarma    int `json:"link_karma"`
 	CommentKarma int `json:"comment_karma"`
+	TotalKarma   int `json:"total_karma"`
 
 	NSFW bool `json:"profile_over_18"`
 }
