@@ -36,6 +36,10 @@ var expectedPostAndComments = &PostAndComments{
 		AuthorID: "t2_testuser",
 
 		IsSelfPost: true,
+
+		Hidden: true,
+		RemovedByCategory: "moderator",
+		BannedBy: "",
 	},
 	Comments: []*Comment{
 		{
