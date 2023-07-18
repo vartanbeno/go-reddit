@@ -18,6 +18,7 @@ var expectedUser = &User{
 
 	PostKarma:    8239,
 	CommentKarma: 130514,
+	TotalKarma:   10765,
 
 	HasVerifiedEmail: true,
 }
@@ -28,6 +29,7 @@ var expectedUsers = map[string]*UserSummary{
 		Created:      &Timestamp{time.Date(2017, 3, 12, 2, 1, 47, 0, time.UTC)},
 		PostKarma:    488,
 		CommentKarma: 22223,
+		TotalKarma:   28904,
 		NSFW:         false,
 	},
 	"t2_2": {
@@ -35,6 +37,7 @@ var expectedUsers = map[string]*UserSummary{
 		Created:      &Timestamp{time.Date(2015, 12, 20, 18, 12, 51, 0, time.UTC)},
 		PostKarma:    8277,
 		CommentKarma: 131948,
+		TotalKarma:   140026,
 		NSFW:         false,
 	},
 	"t2_3": {
@@ -42,6 +45,7 @@ var expectedUsers = map[string]*UserSummary{
 		Created:      &Timestamp{time.Date(2013, 3, 4, 15, 46, 31, 0, time.UTC)},
 		PostKarma:    126887,
 		CommentKarma: 81918,
+		TotalKarma:   200341,
 		NSFW:         true,
 	},
 }
@@ -166,6 +170,7 @@ var expectedSearchUsers = []*User{
 
 		PostKarma:    1075227,
 		CommentKarma: 339569,
+		TotalKarma:   10123,
 
 		HasVerifiedEmail: true,
 	},
@@ -176,6 +181,7 @@ var expectedSearchUsers = []*User{
 
 		PostKarma:    76744,
 		CommentKarma: 42717,
+		TotalKarma:   84842,
 
 		HasVerifiedEmail: true,
 	},

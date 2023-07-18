@@ -553,6 +553,10 @@ type Post struct {
 	IsSelfPost bool `json:"is_self"`
 	Saved      bool `json:"saved"`
 	Stickied   bool `json:"stickied"`
+	Hidden     bool `json:"hidden"`
+
+	RemovedByCategory string `json:"removed_by_category"`
+	BannedBy          string `json:"banned_by"`
 }
 
 // Subreddit holds information about a subreddit

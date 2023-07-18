@@ -33,7 +33,10 @@
             "previous_names": [],
             "user_is_moderator": false,
             "over_18": false,
-            "icon_size": [256, 256],
+            "icon_size": [
+              256,
+              256
+            ],
             "primary_color": "",
             "icon_img": "https://styles.redditmedia.com/t5_3kdh5/styles/profileIcon_0ws73gmqq8t21.png?width=256&amp;height=256&amp;crop=256:256,smart&amp;s=a4d69298f5514b44cfa28a428c0953ebe0d5f6a1",
             "icon_color": "",
@@ -49,7 +52,10 @@
             "name": "t5_3kdh5",
             "is_default_banner": false,
             "url": "/user/washingtonpost/",
-            "banner_size": [1280, 384],
+            "banner_size": [
+              1280,
+              384
+            ],
             "user_is_contributor": false,
             "public_description": "Democracy Dies in Dankness. Official account.\n\nOur award-winning journalists have covered Washington and the world since 1877. Modded by /u/GenePark.",
             "link_flair_enabled": true,
@@ -62,6 +68,7 @@
           "is_mod": true,
           "accept_chats": false,
           "link_karma": 1075227,
+          "total_karma": 10123,
           "has_verified_email": true,
           "id": "179965",
           "accept_pms": true
@@ -96,7 +103,10 @@
             "previous_names": [],
             "user_is_moderator": false,
             "over_18": false,
-            "icon_size": [256, 256],
+            "icon_size": [
+              256,
+              256
+            ],
             "primary_color": "",
             "icon_img": "https://styles.redditmedia.com/t5_i4xj7/styles/profileIcon_mlsb0hlsebs01.jpg?width=256&amp;height=256&amp;crop=256:256,smart&amp;s=7cb6c6fcf5079cd5514ea626e73398429f3b4b54",
             "icon_color": "",
@@ -112,7 +122,10 @@
             "name": "t5_i4xj7",
             "is_default_banner": false,
             "url": "/user/reuters/",
-            "banner_size": [1280, 384],
+            "banner_size": [
+              1280,
+              384
+            ],
             "user_is_contributor": false,
             "public_description": "",
             "link_flair_enabled": true,
@@ -125,6 +138,7 @@
           "is_mod": false,
           "accept_chats": false,
           "link_karma": 76744,
+          "total_karma": 84842,
           "has_verified_email": true,
           "id": "11kowl2w",
           "accept_pms": true

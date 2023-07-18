@@ -26,6 +26,7 @@ const (
 	defaultBaseURL         = "https://oauth.reddit.com"
 	defaultBaseURLReadonly = "https://reddit.com"
 	defaultTokenURL        = "https://www.reddit.com/api/v1/access_token"
+	defaultAuthURL         = "https://www.reddit.com/api/v1/authorize"
 
 	mediaTypeJSON = "application/json"
 	mediaTypeForm = "application/x-www-form-urlencoded"
@@ -37,6 +38,15 @@ const (
 	headerRateLimitRemaining = "x-ratelimit-remaining"
 	headerRateLimitUsed      = "x-ratelimit-used"
 	headerRateLimitReset     = "x-ratelimit-reset"
+)
+
+// AppType represents the possible OAuth2 application types as defined by Reddit.
+// See: https://github.com/reddit-archive/reddit/wiki/oauth2-app-types
+type AppType int
+
+const (
+	Script AppType = iota // default to "Script" for backward compatibility
+	WebApp
 )
 
 var defaultClient, _ = NewReadonlyClient()
@@ -70,10 +80,19 @@ type Client struct {
 	rateMu sync.Mutex
 	rate   Rate
 
-	ID       string
-	Secret   string
+	// AppType specifies the type of the app the client is used for. In particular,
+	// it determines the OAuth flow that will be used for token retrieval and renewal.
+	appType AppType
+
+	ID     string
+	Secret string
+
+	// OAuth parameters for Script App
 	Username string
 	Password string
+
+	// OAuth parameters for Web App.
+	webOauth webAppOAuthParams
 
 	// This is the client's user ID in Reddit's database.
 	redditID string
@@ -110,7 +129,7 @@ func newClient() *Client {
 	baseURL, _ := url.Parse(defaultBaseURL)
 	tokenURL, _ := url.Parse(defaultTokenURL)
 
-	client := &Client{client: &http.Client{}, BaseURL: baseURL, TokenURL: tokenURL}
+	client := &Client{client: &http.Client{}, BaseURL: baseURL, TokenURL: tokenURL, appType: Script}
 
 	client.Account = &AccountService{client: client}
 	client.Collection = &CollectionService{client: client}
@@ -163,7 +182,10 @@ func NewClient(credentials Credentials, opts ...Opt) (*Client, error) {
 		client.client.CheckRedirect = client.redirect
 	}
 
-	oauthTransport := oauthTransport(client)
+	oauthTransport, err := oauthTransport(client)
+	if err != nil {
+		return nil, err
+	}
 	client.client.Transport = oauthTransport
 
 	return client, nil
