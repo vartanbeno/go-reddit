@@ -190,6 +190,13 @@ type SubredditSettings struct {
 	// Allow image uploads and links to image hosting sites.
 	AllowImages                *bool `url:"allow_images,omitempty" json:"allow_images,omitempty"`
 	AllowMultipleImagesPerPost *bool `url:"allow_galleries,omitempty" json:"allow_galleries,omitempty"`
+	AllowVideos                *bool `url:"allow_videos,omitempty" json:"allow_videos,omitempty"`
+
+	AllowPredictions             *bool `url:"allow_predictions,omitempty" json:"allow_predictions,omitempty"`
+	AllowPredictionsTournament   *bool `url:"allow_predictions_tournament,omitempty" json:"allow_predictions_tournament,omitempty"`
+	AllowPredictionsContributors *bool `url:"allow_predictions_contributors,omitempty" json:"allow_predictions_contributors,omitempty"`
+
+	AllowTalks *bool `url:"allow_talks,omitempty" json:"allow_talks,omitempty"`
 
 	ExcludeSitewideBannedUsersContent *bool `url:"exclude_banned_modqueue,omitempty" json:"exclude_banned_modqueue,omitempty"`
 
@@ -313,6 +320,18 @@ func (s *SubredditService) getPosts(ctx context.Context, sort string, subreddit 
 	return l.Posts(), resp, nil
 }
 
+func (s *SubredditService) getComments(ctx context.Context, subreddit string, opts interface{}) ([]*Comment, *Response, error) {
+	path := ""
+	if subreddit != "" {
+		path = fmt.Sprintf("r/%s/comments.json", subreddit)
+	}
+	l, resp, err := s.client.getListing(ctx, path, opts)
+	if err != nil {
+		return nil, resp, err
+	}
+	return l.Comments(), resp, nil
+}
+
 // HotPosts returns the hottest posts from the specified subreddit.
 // To search through multiple, separate the names with a plus (+), e.g. "golang+test".
 // If none are defined, it returns the ones from your subscribed subreddits.
@@ -358,6 +377,16 @@ func (s *SubredditService) ControversialPosts(ctx context.Context, subreddit str
 // To search through all and filter out subreddits, provide "all-name1-name2".
 func (s *SubredditService) TopPosts(ctx context.Context, subreddit string, opts *ListPostOptions) ([]*Post, *Response, error) {
 	return s.getPosts(ctx, "top", subreddit, opts)
+}
+
+// NewComments returns the newest comments from the specified subreddit.
+// To search through multiple, separate the names with a plus (+), e.g. "golang+test".
+// If none are defined, it returns the ones from your subscribed subreddits.
+// To search through all, just specify "all".
+// To search through all and filter out subreddits, provide "all-name1-name2".
+func (s *SubredditService) NewComments(ctx context.Context, subreddit string, opts *ListCommentsOptions) ([]*Comment, *Response, error) {
+	opts.Sort = "new"
+	return s.getComments(ctx, subreddit, opts)
 }
 
 // Get a subreddit by name.
