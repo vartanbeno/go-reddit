@@ -530,6 +530,7 @@ type Post struct {
 
 	Title string `json:"title,omitempty"`
 	Body  string `json:"selftext,omitempty"`
+	Flair string `json:"link_flair_text,omitempty"`
 
 	// Indicates if you've upvoted/downvoted (true/false).
 	// If neither, it will be nil.
